@@ -32,6 +32,10 @@ const Layout = ({ children }) => {
         >
           <main>{children}</main>
 
+          <section className="relative bg-gray">
+            <Footer />
+          </section>
+          
           <div id="wa" className="wa__widget_container">
             <a target="_blank" href="https://api.whatsapp.com/send?phone=5215548885013" >
 
@@ -65,7 +69,7 @@ const Layout = ({ children }) => {
 
             </a>
           </div>
-          <Footer />
+
         </div>
       </div>
     </>
