@@ -3,7 +3,7 @@ import '../styles/global.css'
 import Layout from "../components/layout"
 import Seo from "../components/seo"
 import imagen from '../images/banners/home.png'
-import Footer from "../components/footer"
+
 const IndexPage = () => (
   <Layout>
     <main>
@@ -85,8 +85,6 @@ const IndexPage = () => (
         </div>
       </section>
     </main>
-
-
   </Layout>
 )
 export const Head = () => <Seo title="Home" />
