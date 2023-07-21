@@ -7,11 +7,11 @@ import kalpilliDark from "../images/kalpilliDark.png"
 import LogoTop from "../images/download.png"
 
 const navigation = [
-    { name: 'CERTIFÍCATE', href: '../OfertaAcademica', current: false },
-    { name: 'SOBRE NOSOTROS', href: '../ProgramasKalpilli', current: false },
-    { name: 'PUBLICACIONES', href: '../MetodoMontessori', current: false },
-    { name: 'KALPILLI', href: '../Instalaciones', current: false },
-    { name: 'CONTACTO', href: '../Instalaciones', current: false },
+    { name: 'CERTIFÍCATE', href: '../certificate', current: false },
+    { name: 'SOBRE NOSOTROS', href: '../certificate', current: false },
+    { name: 'PUBLICACIONES', href: '../certificate', current: false },
+    { name: 'KALPILLI', href: '../certificate', current: false },
+    { name: 'CONTACTO', href: '../certificate', current: false },
     // { name: 'Inicia Sesión', href: '#', current: false },
 ]
 
