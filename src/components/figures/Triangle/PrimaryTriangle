@@ -1,0 +1,34 @@
+import React from 'react';
+import PropTypes from 'prop-types';
+import './Triangle.css';
+
+const Triangle = ({ rotate, color }) => {
+  const triangleStyle = {
+    transform: `rotate(${rotate}deg)`,
+    borderBottomColor: color,
+    "&::before": {
+      borderLeftColor: color,
+      borderTopColor: color,
+      content: `''` 
+    }
+  };
+
+  return (
+    <div className="gg-shape-triangle" style={triangleStyle}></div>
+  );
+};
+
+Triangle.propTypes = {
+  rotate: PropTypes.number,
+  color: PropTypes.string
+};
+
+Triangle.defaultProps = {
+  rotate: 0,
+  color: 'black'
+};
+
+export default Triangle;
+
+
+

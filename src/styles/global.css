@@ -1,0 +1,24 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body{
+    margin: 0;
+    padding: 0;
+}
+
+.marquee-left {
+    position: relative;
+    animation: rightleft 150s linear infinite;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+@keyframes rightleft {
+    0% {
+        left: 0;
+    }
+    100% {
+        left: -100%;
+    }
+}

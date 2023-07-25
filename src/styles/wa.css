@@ -1,0 +1,110 @@
+wa__widget_container
+wa__btn_popup
+wa__btn_popup_txt
+wa__btn_popup_icon
+
+
+.wa__btn_popup,.wa__btn_popup *,.wa__btn_popup :after,.wa__btn_popup :before,.wa__button,.wa__button *,.wa__button :after,.wa__button :before,.wa__popup_chat_box,.wa__popup_chat_box *,.wa__popup_chat_box :after,.wa__popup_chat_box :before {
+    box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box
+}
+
+.wa__btn_popup {
+    bottom: 30px;
+    cursor: pointer;
+    font-family: Arial,Helvetica,sans-serif;
+    position: fixed;
+    right: 30px;
+    z-index: 999999999
+}
+
+.wa__btn_popup .wa__btn_popup_icon {
+    background: #2db742;
+    border-radius: 50%;
+    -webkit-border-radius: 50%;
+    -moz-border-radius: 50%;
+    box-shadow: 0 6px 8px 2px rgba(0,0,0,.14);
+    -webkit-box-shadow: 0 6px 8px 2px rgba(0,0,0,.14);
+    -moz-box-shadow: 0 6px 8px 2px rgba(0,0,0,.14);
+    height: 56px;
+    width: 56px
+}
+
+.wa__btn_popup .wa__btn_popup_icon:before {
+    background: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 478.165 478.165%22 style=%22enable-background:new 0 0 478.165 478.165%22 width=%22512%22 height=%22512%22%3E%3Cpath d=%22M478.165 232.946c0 128.567-105.057 232.966-234.679 232.966-41.102.0-79.814-10.599-113.445-28.969L0 478.165l42.437-125.04c-21.438-35.065-33.77-76.207-33.77-120.159C8.667 104.34 113.763.0 243.485.0c129.623.0 234.68 104.34 234.68 232.946zM243.485 37.098c-108.802.0-197.422 87.803-197.422 195.868.0 42.915 13.986 82.603 37.576 114.879l-24.586 72.542 75.849-23.968c31.121 20.481 68.457 32.296 108.583 32.296 108.723.0 197.323-87.843 197.323-195.908.0-107.886-88.6-195.709-197.323-195.709zM361.931 286.62c-1.395-2.331-5.22-3.746-10.898-6.814-5.917-2.849-34.089-16.497-39.508-18.37-5.16-1.913-8.986-2.849-12.811 2.829-4.005 5.638-14.903 18.629-18.23 22.354-3.546 3.785-6.854 4.264-12.552 1.435-5.618-2.809-24.267-8.866-46.203-28.391-17.055-15.042-28.67-33.711-31.997-39.508-3.427-5.758-.398-8.826 2.471-11.635 2.69-2.59 5.778-6.734 8.627-10.041 2.969-3.287 3.905-5.638 5.798-9.424 1.913-3.905.936-7.192-.478-10.141-1.415-2.849-13.01-30.881-17.752-42.337-4.841-11.416-9.543-9.523-12.871-9.523-3.467.0-7.212-.478-11.117-.478-3.785.0-10.041 1.395-15.381 7.192-5.2 5.658-20.123 19.465-20.123 47.597.0 28.052 20.601 55.308 23.55 59.053 2.869 3.785 39.747 63.197 98.303 86.07 58.476 22.872 58.476 15.321 69.115 14.365 10.38-.956 34.069-13.867 38.811-27.096 4.66-13.45 4.66-24.766 3.246-27.137z%22 fill=%22%23fff%22/%3E%3C/svg%3E")50% no-repeat;
+    background-size: 30px;
+    -webkit-background-size: 30px auto;
+    -moz-background-size: 30px auto;
+    z-index: 1
+}
+
+.wa__btn_popup .wa__btn_popup_icon:after,.wa__btn_popup .wa__btn_popup_icon:before {
+    content: "";
+    height: 100%;
+    left: 0;
+    position: absolute;
+    top: 0;
+    transition: all .4s ease;
+    -webkit-transition: all .4s ease;
+    -moz-transition: all .4s ease;
+    width: 100%
+}
+
+.wa__btn_popup .wa__btn_popup_icon:after {
+    background: url("data:image/svg+xml,%3Csvg width=%2214%22 height=%2214%22 fill=%22none%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cpath d=%22m8.659 6.998 5-5a1.177 1.177.0 000-1.657 1.177 1.177.0 00-1.657.0l-5 5-5-5A1.172 1.172.0 00.345 1.998l5 5-5 5a1.172 1.172.0 000 1.657 1.177 1.177.0 001.657.0l5-5 5 5a1.177 1.177.0 001.657.0 1.177 1.177.0 000-1.657l-5-5z%22 fill=%22%23fff%22/%3E%3C/svg%3E")50% no-repeat;
+    background-size: 14px;
+    -webkit-background-size: 14px auto;
+    -moz-background-size: 14px auto;
+    opacity: 0;
+    -ms-transform: scale(0)rotate(-1turn);
+    transform: scale(0)rotate(-1turn);
+    -webkit-transform: scale(0)rotate(-1turn);
+    -moz-transform: scale(0)rotate(-1turn);
+    z-index: 2
+}
+
+.wa__btn_popup.wa__active .wa__btn_popup_icon:before {
+    opacity: 0;
+    -ms-transform: scale(0)rotate(1turn);
+    transform: scale(0)rotate(1turn);
+    -webkit-transform: scale(0)rotate(1turn);
+    -moz-transform: scale(0)rotate(1turn)
+}
+
+.wa__btn_popup.wa__active .wa__btn_popup_icon:after {
+    opacity: 1;
+    -ms-transform: scale(1)rotate(0);
+    transform: scale(1)rotate(0);
+    -webkit-transform: scale(1)rotate(0);
+    -moz-transform: scale(1)rotate(0)
+}
+
+.wa__btn_popup .wa__btn_popup_txt {
+    background-color: #f5f7f9;
+    border-radius: 4px;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    color: #43474e;
+    font-size: 12px;
+    letter-spacing: -.03em;
+    line-height: 1.5;
+    margin-right: 7px;
+    padding: 12px 12px;
+    position: absolute;
+    right: 100%;
+    top: 0%;
+    transition: all .4s ease;
+    -webkit-transition: all .4s ease;
+    -moz-transition: all .4s ease;
+    width: 10vw 
+}
+
+.wa__btn_popup.wa__active .wa__btn_popup_txt {
+    opacity: 0;
+    -ms-transform: translateY(15px);
+    transform: translateY(15px);
+    -webkit-transform: translateY(15px);
+    -moz-transform: translateY(15px);
+    visibility: hidden
+}

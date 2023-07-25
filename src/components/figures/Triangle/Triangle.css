@@ -1,0 +1,67 @@
+.gg-shape-triangle {
+  position: relative;
+  transform: scale(var(--ggs, 1));
+  width: 22px;
+  height: 17px;
+  border-left: 3px solid transparent;
+  border-bottom: 3px solid;
+  z-index: 0;
+}
+
+.gg-shape-triangle,
+.gg-shape-triangle::before {
+  display: block;
+  box-sizing: border-box;
+  border-right: 3px solid transparent;
+}
+
+.gg-shape-triangle-animated {
+  animation-name: expansion;
+  animation-duration: 7s;
+  animation-iteration-count: infinite;
+}
+
+.gg-shape-triangle-animated2 {
+  animation-name: expansion2;
+  animation-duration: 7s;
+  animation-iteration-count: infinite;
+}
+
+@keyframes expansion {
+  50% {
+    transform: translate(-50px, 50px);
+    transform: rotate(80);
+  }; 
+  100% {
+    transform: translate(50px, -50px);
+    transform: rotate(-80);
+  };
+}
+
+@keyframes expansion2 {
+  50% {
+    transform: translate(50px, 50px);
+    transform: rotate(80);
+  }; 
+  100% {
+    transform: translate(50px, 60px);
+    transform: rotate(-80);
+  };
+}
+
+.gg-shape-triangle::before {
+  content: "";
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border-left: 3px solid;
+  border-left-color: currentColor;
+
+  border-top: 3px solid;
+  border-left-color: currentColor;
+
+  border-bottom: 3px solid transparent;
+  transform: rotate(45deg) skew(10deg, 10deg);
+  left: -2px;
+  bottom: -13px;
+}
