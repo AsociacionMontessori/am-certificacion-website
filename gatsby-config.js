@@ -25,7 +25,7 @@ module.exports = {
         start_url: `/`,
         background_color: `#663399`,
         display: `minimal-ui`,
-        icon: `src/images/kalpilliDark.png`,
+        icon: `src/images/lasc.png`,
       },
     },
   ],
