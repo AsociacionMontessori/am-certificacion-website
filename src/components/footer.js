@@ -26,7 +26,7 @@ function classNames(...classes) {
 export default function Footer() {
     return (
         <footer className="bg-gray-700 text-white py-8 flex flex-col justify-center items-center max-w-full">
-            <div className=" py-4 px-1 flex flex-col md:flex-row justify-start items-center w-full">
+            <div className=" pl-0 lg:pl-20 xl:pl-10 2xl:pl-0 py-4 px-1 flex flex-col md:flex-row justify-start items-center w-full">
                 <a href="#home" className="flex mx-6 justify-center p-1.5 lg:p-4 items-center lg:w-4/12 md:w-9/12">
                     <img
                         className="w-14 h-14 m-1.5"
