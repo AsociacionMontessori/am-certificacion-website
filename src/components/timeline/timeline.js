@@ -3,6 +3,7 @@ import './time.css';
 
 import resolveConfig from 'tailwindcss/resolveConfig'
 import tailwindConfig from '../../../tailwind.config.js'
+import Button from '../buttons/button';
 
 const fullConfig = resolveConfig(tailwindConfig)
 const red = fullConfig.theme.colors.red.DEFAULT
@@ -91,10 +92,10 @@ const Timeline = () => {
                                 <div style={afterStyles}></div>
                             </div>
                             {items.map((item) => (
-                                <li key={item.title}>
+                                <li className='mb-10' key={item.title}>
                                     <div className="content pt-12 px-6">
                                         <span className="lg:hidden text-4xl absolute dark:opacity-60 opacity-30 top-0 font-bold text-blue">{item.year}</span>
-                                        <h3 className="text-black dark:text-white text-2xl sm:text-3xl md:text-4xl px-4 py-2 mt-4  bg-blue w-full md:w-3/5 rounded-3xl bg-opacity-10">
+                                        <h3 className="text-black dark:text-white text-2xl sm:text-4xl md:text-5xl dark:px-2 px-4 py-2 mt-4  bg-blue w-full md:w-3/5 rounded-3xl bg-opacity-10 dark:bg-opacity-0">
                                             {item.title}
                                         </h3>
                                         <p className="text-black dark:text-white sm:text-2xl md:text-3xl pt-5 ">{item.content}</p>
@@ -118,9 +119,9 @@ const Timeline = () => {
                                                 </svg>
                                             </div>
                                         </div>
-                                        <a className='btn mt-4'>
-                                            conoce el metodo
-                                        </a>
+                                        <div className='pt-5'>
+                                            <Button text="Nuestra Filosofía" type={ (item.color == "blue") ? "blue-green" :  "red"} />
+                                        </div>
                                     </div>
                                 </li>
                             ))}
