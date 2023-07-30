@@ -3,6 +3,9 @@ import '../styles/global.css'
 import Layout from "../components/layout"
 import Seo from "../components/seo"
 import imagen from '../images/banners/home.png'
+import ImgMap from '../images/banners/map.png'
+import ImgMapDark from '../images/banners/dark_map.png'
+import { StaticImage } from "gatsby-plugin-image"
 
 const IndexPage = () => (
   <Layout>
@@ -83,7 +86,33 @@ const IndexPage = () => (
               <label class="italic bg-red/20 dark:bg-black hover:font-semibold dark:hover:text-green/70 rounded-full py-3 px-10 dark:text-white/80 mx-3">El niño crea sus propios movimientos y, una vez creados, los perfecciona</label>
             </div>
           </section>
-
+          <section className="bg-gradient-to-r from-blue via-purple to-green py-20">
+            <div className="flex justify-center">
+              <div className="flex justify-center relative w-full">
+                <img src={ImgMapDark} className="w-full h-3/12 dark:hidden" alt="map" />
+                <img src={ImgMap} className="w-full h-3/12 hidden dark:block" alt="map in dark" />
+                <div className="flex justify-center absolute top-1/3 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full">
+                  <h2 className="text-white dark:text-gray">
+                    <span className="font-bold text-center xl:text-6xl text-2xl ">Certificación internacional</span>
+                  </h2>
+                </div>
+                <div className="pt-20 md:pt-0 flex space-x-2 md:space-x-14 lg:space-x-24 absolute top-2/4 left-1/2 transform -translate-x-1/2 -translate-y-1/2 max-w-max">
+                  <StaticImage src="../images/countries/mex.png" className="h-10 w-10 md:w-16 md:h-16" />
+                  <StaticImage src="../images/countries/eua.png" className="h-10 w-10 md:w-16 md:h-16" />
+                  <StaticImage src="../images/countries/col.png" className="h-10 w-10 md:w-16 md:h-16" />
+                  <StaticImage src="../images/countries/arg.png" className="h-10 w-10 md:w-16 md:h-16" />
+                  <StaticImage src="../images/countries/can.png" className="h-10 w-10 md:w-16 md:h-16" />
+                  <StaticImage src="../images/countries/ale.png" className="h-10 w-10 md:w-16 md:h-16" />
+                  <StaticImage src="../images/countries/eng.png" className="h-10 w-10 md:w-16 md:h-16" />
+                </div>
+                <div className="absolute mb-20 md:mt-0 mt-20 top-3/4 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full">
+                  <p className="font-bold text-center lg:text-2xl text-lg text-white dark:text-gray">
+                    Las certificaciones Montessori cuentan con un gran reconocimiento en todo el mundo
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
         </div>
       </section>
     </main>
