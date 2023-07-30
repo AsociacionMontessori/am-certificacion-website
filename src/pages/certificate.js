@@ -3,6 +3,7 @@ import * as React from "react"
 import Layout from "../components/layout"
 import Seo from "../components/seo"
 import imagen from '../images/banners/cert.png'
+import Card from '../components/card'
 
 const certificate = () => {
   return (
@@ -33,7 +34,7 @@ const certificate = () => {
           </div>
 
         </section>
-        <section id="work" class="relative py-5 z-10 bg-gradient-to-r from-blue to-green py-20">
+        <section id="certificacion_internacional" class="relative py-5 z-10 bg-gradient-to-r from-blue to-green py-20">
           <h2 className="mx-auto max-w-7xl px-6 pb-10 pt-10 lg:px-12 xl:px-6 2xl:px-0">
             <span className="text-white text-2xl md:text-6xl font-bold">Certificación Montessori</span>
           </h2>
@@ -51,16 +52,16 @@ const certificate = () => {
                   </span>
                 </h2>
                 <div className="w-auto pt-10 pr-24 text-lg text-black">
-                <p>
-                Ofrecemos programas de certificación con reconocimiento internacional, diseñados para proporcionar una sólida base en el método y la filosofía Montessori. 
-                <br/>
-                <br/>
-                Ya sea que busques una introducción a Montessori o desees profundizar tu conocimiento y práctica, tenemos el programa adecuado para ti. 
-                <br/>
-                <br/>
-                <br/>
-                <span className="text-gray text-sm">Aplican términos y condiciones *</span>
-                </p> 
+                  <p>
+                    Ofrecemos programas de certificación con reconocimiento internacional, diseñados para proporcionar una sólida base en el método y la filosofía Montessori.
+                    <br />
+                    <br />
+                    Ya sea que busques una introducción a Montessori o desees profundizar tu conocimiento y práctica, tenemos el programa adecuado para ti.
+                    <br />
+                    <br />
+                    <br />
+                    <span className="text-gray text-sm">Aplican términos y condiciones *</span>
+                  </p>
                 </div>
               </div>
               <div>
@@ -68,6 +69,14 @@ const certificate = () => {
               </div>
             </div>
           </div>
+          <section id="prices" className="my-10">
+            <div className="flex space-x-16 justify-center">
+              <Card title="Certificado" subtitle="unico pago" coin="USD" price="200" text="nido y comunidad" time="16 meses"></Card>
+              <Card title="Certificado" subtitle="unico pago" coin="USD" price="200" text="nido y comunidad" time="16 meses"></Card>
+              <Card title="Certificado" subtitle="unico pago" coin="USD" price="200" text="nido y comunidad" time="16 meses"></Card>
+              <Card title="Certificado" subtitle="unico pago" coin="USD" price="200" text="nido y comunidad" time="16 meses"></Card>
+            </div>
+          </section>
         </section>
       </main>
     </Layout>
