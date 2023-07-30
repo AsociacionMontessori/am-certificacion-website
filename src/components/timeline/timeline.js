@@ -62,20 +62,20 @@ const Timeline = () => {
         animation: 'scaleVertical 3s 1s ease both 1',
     };
 
-    // const afterStyles = {
-    //     content: '""',
-    //     clear: 'both',
-    //     position: 'absolute',
-    //     bottom: '0px',
-    //     left: '-1.05em',
-    //     width: '40px',
-    //     height: '40px',
-    //     borderRadius: '50%',
-    //     background: `none repeat scroll 0% 0% ${red}`,
-    //     border: `5px solid ${red}`,
-    //     boxShadow: '1px 1px 1px rgba(0, 0, 0, 0.1)',
-    //     animation: 'revealScaleUp 0.75s 2.82s ease both 1',
-    // };
+    const afterStyles = {
+        content: '""',
+        clear: 'both',
+        position: 'absolute',
+        bottom: '0px',
+        left: '-1.05em',
+        width: '40px',
+        height: '40px',
+        borderRadius: '50%',
+        background: `none repeat scroll 0% 0% ${red}`,
+        border: `5px solid ${red}`,
+        boxShadow: '1px 1px 1px rgba(0, 0, 0, 0.1)',
+        animation: 'revealScaleUp 0.75s 2.82s ease both 1',
+    };
 
     return (
         <>
@@ -88,18 +88,18 @@ const Timeline = () => {
                         <ul className="timeline-list" style={{ position: 'relative' }}>
                             <div>
                                 <div style={{ ...beforeStyles, ...{ background: `repeating-linear-gradient(0deg, ${red} 0%, ${red} 20%, ${blue} 25%, ${blue} 45%, ${red} 50%, ${red} 70%, ${blue} 75%, ${blue} 100%)` } }}></div>
-                                {/* <div style={afterStyles}></div> */}
+                                <div style={afterStyles}></div>
                             </div>
                             {items.map((item) => (
                                 <li key={item.title}>
                                     <div className="content pt-12 px-6">
                                         <span className="lg:hidden text-4xl absolute dark:opacity-60 opacity-30 top-0 font-bold text-blue">{item.year}</span>
-                                        <h3 className="text-black dark:text-whit text-2xl sm:text-3xl md:text-4xl px-4 py-2 mt-4  bg-blue w-full md:w-3/5 rounded-3xl bg-opacity-10">
+                                        <h3 className="text-black dark:text-white text-2xl sm:text-3xl md:text-4xl px-4 py-2 mt-4  bg-blue w-full md:w-3/5 rounded-3xl bg-opacity-10">
                                             {item.title}
                                         </h3>
                                         <p className="text-black dark:text-white sm:text-2xl md:text-3xl pt-5 ">{item.content}</p>
                                         <div className="hidden lg:block">
-                                            <span className={`absolute dark:opacity-60 opacity-30 top-20 text-8xl font-bold mt-20 -ml-60 -rotate-90 text-${item.color}`}>{item.year}</span>
+                                            <span className={`absolute dark:opacity-60 opacity-30 dark:opacity-70 top-20 text-8xl font-bold mt-20 -ml-60 -rotate-90 text-${item.color}`}>{item.year}</span>
                                         </div>
                                         <div>
                                             <div className='absolute top-20 mt-60 -ml-60'>
