@@ -31,6 +31,43 @@ const certificate = () => {
               </div>
             </div>
           </div>
+
+        </section>
+        <section id="work" class="relative py-5 z-10 bg-gradient-to-r from-blue to-green py-20">
+          <h2 className="mx-auto max-w-7xl px-6 pb-10 pt-10 lg:px-12 xl:px-6 2xl:px-0">
+            <span className="text-white text-2xl md:text-6xl font-bold">Certificación Montessori</span>
+          </h2>
+          <div className="bg-white rounded-3xl">
+            <div className="flex mx-auto max-w-7xl px-6 pb-10 pt-10 lg:px-12 xl:px-6 2xl:px-0 ">
+              <div className="w-3/4">
+                <h3>
+                  <span className="text-red md:text-2xl text-xl">
+                    Certificación internacional
+                  </span>
+                </h3>
+                <h2 className="mt-5">
+                  <span className="font-medium text-black md:text-6xl text-3xl">
+                    Guía Montessori
+                  </span>
+                </h2>
+                <div className="w-auto pt-10 pr-24 text-lg text-black">
+                <p>
+                Ofrecemos programas de certificación con reconocimiento internacional, diseñados para proporcionar una sólida base en el método y la filosofía Montessori. 
+                <br/>
+                <br/>
+                Ya sea que busques una introducción a Montessori o desees profundizar tu conocimiento y práctica, tenemos el programa adecuado para ti. 
+                <br/>
+                <br/>
+                <br/>
+                <span className="text-gray text-sm">Aplican términos y condiciones *</span>
+                </p> 
+                </div>
+              </div>
+              <div>
+                Oferta
+              </div>
+            </div>
+          </div>
         </section>
       </main>
     </Layout>
