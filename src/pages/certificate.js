@@ -3,9 +3,23 @@ import * as React from "react"
 import Layout from "../components/layout"
 import Seo from "../components/seo"
 import imagen from '../images/banners/cert.png'
-import Card from '../components/card'
+import Card from '../components/cards/card'
+import CardInscription from '../components/cards/inscriptionCard'
+
 
 const certificate = () => {
+
+
+  const prices = [
+    { title: 'Certificado', subtitle: 'único pago', price: '2,500' },
+    { name: 'SOBRE NOSOTROS', href: '../certificate', current: false },
+    { name: 'PUBLICACIONES', href: '../certificate', current: false },
+    { name: 'KALPILLI', href: '../certificate', current: false },
+    { name: 'CONTACTO', href: '../certificate', current: false },
+
+    // const CardPrice = ({ title, subtitle, price, coin, time, text, }) 
+  ]
+
   return (
     <Layout>
       <main>
@@ -40,7 +54,7 @@ const certificate = () => {
           </h2>
           <div className="bg-white rounded-3xl">
             <div className="flex mx-auto max-w-7xl px-6 pb-10 pt-10 lg:px-12 xl:px-6 2xl:px-0 ">
-              <div className="w-3/4">
+              <div className="md:2/4 w-3/4 absolute md:relative md:block flex sm:flex-col ">
                 <h3>
                   <span className="text-red md:text-2xl text-xl">
                     Certificación internacional
@@ -64,12 +78,14 @@ const certificate = () => {
                   </p>
                 </div>
               </div>
-              <div>
-                Oferta
+              <div className="flex items-center justify-center bg-white pb-10 flex flex-end rounded-3xl absolute left-1/2 translate-x-52 lg:translate-x-52 xl:translate-x-80 transform 2xl:translate-x-96 md:translate-y-[-5rem] lg:translate-y-[-4rem] md:h-[36rem] lg:h-[32rem] ">
+                <CardInscription title="Inscripción" subtitle="único pago" coin=" MXN" price="5,000" text="Único pago de"/>
               </div>
             </div>
           </div>
-          <section id="prices" className="my-10">
+
+
+          <section id="prices" className="my-20">
             <div className="flex space-x-16 justify-center">
               <Card title="Certificado" subtitle="unico pago" coin="USD" price="200" text="nido y comunidad" time="16 meses"></Card>
               <Card title="Certificado" subtitle="unico pago" coin="USD" price="200" text="nido y comunidad" time="16 meses"></Card>

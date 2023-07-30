@@ -11,7 +11,7 @@ const IndexPage = () => (
   <Layout>
     <main>
       <section id="home" class="relative flex min-h-screen items-center">
-        <div aria-hidden="true" class="absolute inset-0 z-[1] bg-gradient-to-b from-white/0 via-white/10 to-white/60  dark:bg-gradient-to-b dark:from-white/0 dark:via-gray/20 dark:to-gray"></div>
+        <div aria-hidden="true" class="absolute inset-0 z-[1] bg-gradient-to-b from-white/0 via-white/10 to-white/60  dark:bg-gradient-to-b dark:from-white/0 dark:via-gray/20 dark:to-gray"/>
         <img src={imagen} class="fixed inset-0 h-full w-full object-cover" alt="woman in dark" width="4160" height="6240" />
         <div class="relative z-10 mx-auto max-w-7xl px-6 pb-40 pt-40 lg:px-12 xl:px-6 2xl:px-0">
           <div class="pb-12 media-h:md:pb-32 media-h:lg:pb-12 xl:pb-12">

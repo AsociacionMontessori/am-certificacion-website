@@ -1,6 +1,6 @@
 import * as React from "react"
-import Clock from "../images/gifs/clock.gif"
-import E from "../images/e.png"
+import Clock from "../../images/gifs/clock.gif"
+import E from "../../images/e.png"
 
 const CardPrice = ({ title, subtitle, price, coin, time, text, }) => {
     return (
@@ -15,7 +15,7 @@ const CardPrice = ({ title, subtitle, price, coin, time, text, }) => {
                 <div className="text-blue  pt-2.5 pr-16">
                     {coin}
                 </div>
-                <div className="text-blue text-2xl pt-1">
+                <div className="text-blue text-2xl pt-1 font-semibold">
                     {price}
                 </div>
                 <div className="pt-7">

@@ -12,7 +12,6 @@ const navigation = [
     { name: 'PUBLICACIONES', href: '../certificate', current: false },
     { name: 'KALPILLI', href: '../certificate', current: false },
     { name: 'CONTACTO', href: '../certificate', current: false },
-    // { name: 'Inicia Sesión', href: '#', current: false },
 ]
 
 function classNames(...classes) {
