@@ -5,6 +5,8 @@ import Seo from "../components/seo"
 import imagen from '../images/banners/cert.png'
 import Card from '../components/cards/card'
 import CardInscription from '../components/cards/inscriptionCard'
+import Button from '../components/button'
+import { StaticImage } from "gatsby-plugin-image"
 
 
 const certificate = () => {
@@ -79,18 +81,67 @@ const certificate = () => {
                 </div>
               </div>
               <div className="flex items-center justify-center bg-white pb-10 flex flex-end rounded-3xl absolute left-1/2 translate-x-52 lg:translate-x-52 xl:translate-x-80 transform 2xl:translate-x-96 md:translate-y-[-5rem] lg:translate-y-[-4rem] md:h-[36rem] lg:h-[32rem] ">
-                <CardInscription title="Inscripción" subtitle="único pago" coin=" MXN" price="5,000" text="Único pago de"/>
+                <CardInscription title="Inscripción" subtitle="único pago" coin=" MXN" price="5,000" text="Único pago de" />
               </div>
             </div>
           </div>
 
 
-          <section id="prices" className="my-20">
-            <div className="flex space-x-16 justify-center">
+          <section id="prices" className="mt-24 mb-10">
+            <div className="flex space-x-32 justify-center">
               <Card title="Certificado" subtitle="unico pago" coin="USD" price="200" text="nido y comunidad" time="16 meses"></Card>
               <Card title="Certificado" subtitle="unico pago" coin="USD" price="200" text="nido y comunidad" time="16 meses"></Card>
               <Card title="Certificado" subtitle="unico pago" coin="USD" price="200" text="nido y comunidad" time="16 meses"></Card>
               <Card title="Certificado" subtitle="unico pago" coin="USD" price="200" text="nido y comunidad" time="16 meses"></Card>
+            </div>
+            <div>
+
+            </div>
+            <p className="mx-auto max-w-7xl px-6 pb-10 pt-10 lg:px-12 xl:px-6 2xl:px-0 text-white text-sm">
+              Precios sujetos a disponibilidad. Aplican Términos y Condiciones.
+            </p>
+          </section>
+          <section id="scholarships" className="bg-white rounded-3xl">
+            <div className="mx-auto max-w-7xl px-6 pb-10 pt-10 lg:px-12 xl:px-6 2xl:px-0">
+              <h3>
+                <span className="text-red md:text-3xl text-xl text-semibold">
+                  Conoce nuestro proyecto de becas
+                </span>
+              </h3>
+              <div className="flex text-black flex-col justify-center items-center md:flex-row">
+                <div className="mt-3">
+                  <h4>
+                    <span className="text-xl">
+                      Requisitos
+                    </span>
+                  </h4>
+                  <ul className="mt-2 ml-3">
+                    <li className="my-1">
+                      No tener ningún atraso en las entregas de actividades
+                    </li>
+                    <li className="my-1">
+                      Asistir al 80 % de clases
+                    </li>
+                    <li className="my-1">
+                      Realizar por lo menos una práctiva virtual (conferencia o proyecto)
+                    </li>
+                  </ul>
+                  <div className="flex mt-5 items-center">
+                    <div>
+                      <Button text="Conocer Más" />
+                    </div>
+                    <div className="mx-1 w-2/3 text-blue">
+                      <h5 className="md:text-lg text-base font-semibold">
+                        Todas las solicitudes son revisadas y evaluadas por el comité académico
+                      </h5>
+                      <p className="text-xs">Sujetas a disponibilidad</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="mt-10">
+                  <StaticImage src="../images/sclshipp.png" className="w-72 w-56 md:w-80 ml-0 md:ml-20"/>
+                </div>
+              </div>
             </div>
           </section>
         </section>

@@ -14,7 +14,7 @@ const CardInscription = ({ title, subtitle, price, coin, time, text, }) => {
                 <div className="text-gray text-base">
                     {subtitle}
                 </div>
-                <div className="text-blue text-3xl font-semibold mt-10">
+                <div className="text-blue text-3xl font-semibold mt-12">
                     {coin} {price}
                 </div>
                 <div className="mt-12 text-center">
