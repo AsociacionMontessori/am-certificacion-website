@@ -8,9 +8,9 @@ import LogoTop from "../images/download.png"
 
 const navigation = [
     { name: 'CERTIFÍCATE', href: '../certificate', current: false },
-    { name: 'SOBRE NOSOTROS', href: '../certificate', current: false },
-    { name: 'PUBLICACIONES', href: '../certificate', current: false },
-    { name: 'KALPILLI', href: '../certificate', current: false },
+    { name: 'SOBRE NOSOTROS', href: '../nosotros', current: false },
+    { name: 'PUBLICACIONES', href: '../publicaciones', current: false },
+    { name: 'KALPILLI', href: 'https://kalpilli.com/', current: false },
     { name: 'CONTACTO', href: '../certificate', current: false },
     // { name: 'Inicia Sesión', href: '#', current: false },
 ]
@@ -55,7 +55,7 @@ export default function Nav() {
                                                 href={item.href}
                                                 className={classNames(
                                                     item.current ? 'text-yellow-400' : 'text-white-300 hover:bg-white-700 hover:text-gray dark:hover:text-white',
-                                                    'rounded-md px-8 py-2 dark:text-gray text-white'
+                                                    'rounded-md px-8 py-2 text-white'
                                                 )}
                                                 aria-current={item.current ? 'page' : undefined}
                                             >
