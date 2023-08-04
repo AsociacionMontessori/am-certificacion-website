@@ -14,21 +14,18 @@ const CardInscription = ({ title, subtitle, price, coin, time, text, }) => {
                 <div className="text-gray text-base">
                     {subtitle}
                 </div>
-                <div className="text-blue text-3xl font-semibold mt-12">
+                <div className="text-blue text-4xl font-semibold mt-12">
                     {coin} {price}
                 </div>
-                <div className="mt-12 text-center">
+                <div className="mt-10 text-center">
                     <p>
-                    {text} 
-                    <br/>
-                    <span className="text-blue font-semibold">
-                    {price}   
-                    </span>
-                    {coin}
+                        {text}
+                        <br />
+                        <span className="text-blue font-semibold"> {price}</span> {coin}
                     </p>
                 </div>
-                <div className="flex mt-4 w-full justify-center mt-24">
-                   <Button text="Inscríbete" color="bg-gradient-to-r from-blue to-green"/>
+                <div className="flex mt-10 w-full justify-center mt-24">
+                    <Button text="Inscríbete" color="bg-gradient-to-r from-blue to-green" />
                 </div>
             </div>
         </>

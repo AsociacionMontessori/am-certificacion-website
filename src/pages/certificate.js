@@ -19,6 +19,13 @@ const Certificate = () => {
     city: "",
   })
 
+  const getLocalizedPrice = (state, priceData) => {
+    const { countryName } = state;
+    const coin = countryName === 'Mexico' ? 'MXN' : 'USD';
+    const priceToShow = countryName === 'Mexico' ? priceData.priceMx : priceData.priceUsd;
+    return { coin, priceToShow };
+  };
+
   const getGeoInfo = () => {
     axios
       .get("https://ipapi.co/json/")
@@ -50,6 +57,10 @@ const Certificate = () => {
     { title: 'Taller', subtitle: 'único pago', priceMx: '4,500', priceUsd: '250', text: 'Taller I y II', duration: '20 meses' },
   ]
 
+  const inscripcion = [
+    { title: 'Inscripción', subtitle: 'único pago', priceMx: '5,000', priceUsd: '299', text: 'Único pago de' },
+  ]
+  // subtitle="único pago" coin=" MXN" price="5,000" text="Único pago de" />
   return (
     <Layout>
       <main>
@@ -109,7 +120,19 @@ const Certificate = () => {
                 </div>
               </div>
               <div className="flex items-center justify-center bg-white pb-10 flex flex-end rounded-3xl absolute left-1/2 translate-x-52 lg:translate-x-52 xl:translate-x-80 transform 2xl:translate-x-96 md:translate-y-[-5rem] lg:translate-y-[-4rem] md:h-[36rem] lg:h-[32rem] ">
-                <CardInscription title="Inscripción" subtitle="único pago" coin=" MXN" price="5,000" text="Único pago de" />
+
+                {inscripcion.map((price) => {
+                  const { title, subtitle, text } = price;
+                  const { coin, priceToShow } = getLocalizedPrice(state, price);
+                  return (
+                    <CardInscription
+                      title={title}
+                      subtitle={subtitle}
+                      coin={coin}
+                      price={priceToShow}
+                      text={text} />
+                  )
+                })}
               </div>
             </div>
           </div>
@@ -121,9 +144,7 @@ const Certificate = () => {
 
               {certificado.map((price) => {
                 const { title, subtitle, text, duration, footer } = price;
-                const coin = state.countryName === 'Mexico' ? 'MXN' : 'USD';
-                const priceToShow = state.countryName === 'Mexico' ? price.priceMx : price.priceUsd;
-
+                const { coin, priceToShow } = getLocalizedPrice(state, price);
                 return (
                   <CardCertification title={title}
                     subtitle={subtitle}
@@ -136,11 +157,8 @@ const Certificate = () => {
               })}
 
               {prices.map((price) => {
-
                 const { title, subtitle, text, duration } = price;
-                const coin = state.countryName === 'Mexico' ? 'MXN' : 'USD';
-                const priceToShow = state.countryName === 'Mexico' ? price.priceMx : price.priceUsd;
-
+                const { coin, priceToShow } = getLocalizedPrice(state, price);
                 return (
                   <Card
                     title={title}

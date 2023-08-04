@@ -19,7 +19,7 @@ const CardCertification = ({ title, subtitle, price, coin, footer, text, }) => {
                     {price}
                 </div>
                 <div className="pt-7 w-2/4 text-center">
-                    {text}<br/><span className="text-blue font-bold">$ {price}{coin}</span>
+                    {text}<br/><span className="text-blue font-bold">$ {price} {coin}</span>
                 </div>
                 <div className="pt-7 w-3/4 text-center">
                     {footer}
