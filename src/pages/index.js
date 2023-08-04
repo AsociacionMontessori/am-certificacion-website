@@ -6,7 +6,7 @@ import imagen from '../images/banners/home.png'
 import ImgMap from '../images/banners/map.png'
 import ImgMapDark from '../images/banners/dark_map.png'
 import { StaticImage } from "gatsby-plugin-image"
-// import Button from "../components/buttons/button"
+import CertificationPrice from '../components/certificationPrice'
 
 const IndexPage = () => (
   <Layout>
@@ -117,6 +117,7 @@ const IndexPage = () => (
             </div>
           </section>
         </div>
+        <CertificationPrice/>
       </section>
     </main>
   </Layout>
