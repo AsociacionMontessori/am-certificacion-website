@@ -7,11 +7,13 @@ import Timeline from "../components/timeline/timeline"
 
 const nosotros = () => {
   return (
-    <Layout>
-      <main>
-        <Timeline />    
-      </main>
-    </Layout>
+    <div className="bg-white dark:bg-gray">
+      <Layout>
+        <main className="">
+          <Timeline />
+        </main>
+      </Layout>
+    </div>
   )
 }
 
