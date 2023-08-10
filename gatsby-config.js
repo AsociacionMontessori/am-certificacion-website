@@ -28,5 +28,19 @@ module.exports = {
         icon: `src/images/lasc.png`,
       },
     },
+    {
+      resolve: `gatsby-transformer-remark`,
+      options: {
+        plugins: [`gatsby-remark-responsive-iframe`],
+      },
+    },
+    {
+      resolve: `gatsby-source-wordpress`,
+      options: {
+        url:
+          process.env.WPGRAPHQL_URL ||
+          `http://am-website-test.local/graphql`,
+      },
+    },
   ],
 }

@@ -1,0 +1,36 @@
+.wp-block-cover__inner-container{
+    color: #000 !important;
+    font-size: 1.25rem !important;
+    text-align: center;
+}
+.has-small-font-size{
+    color: #000 !important;
+    }
+
+.wordpress-content {
+    font-size: 16px;
+    line-height: 1.6;
+  }
+  
+  .wp-block-group {
+    margin-top: 0;
+    margin-bottom: 0;
+    padding: 0 2vw;
+    padding-top: 0 !important;
+    margin-top: 3rem !important;
+  }
+  
+  .wp-block-columns {
+    display: flex;
+    flex-direction: row;
+  }
+
+  @media screen and (max-width: 576px) {
+    .wp-block-columns {
+      flex-direction: column;
+    }
+
+
+
+
+}
