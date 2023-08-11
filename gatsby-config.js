@@ -39,7 +39,7 @@ module.exports = {
       options: {
         url:
           process.env.WPGRAPHQL_URL ||
-          `http://am-website-test.local/graphql`,
+          `http://carlosalfonsor5.sg-host.com/graphql`,
       },
     },
   ],
