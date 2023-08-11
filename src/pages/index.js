@@ -24,12 +24,15 @@ const IndexPage = () => (
                 Únete a nosotros en este emocionante viaje de aprendizaje y exploración. Descubre la filosofía y práctica de este gran método, con nuestras clases gratuitas, contenido y certificaciones con validez internacional.
               </p>
               <div className="mb-5">
+                <a href="./certificate" className="btn btn-outline hover:text-white hover:bg-blue bg-gradient-to-r from-blue/50 hover:from-gray hover:bg-opacity-70 rounded-full px-10 mr-4 bg-blue text-white bg-opacity-10">
+                  Certifícate
+                </a>
                 {/* <button className="btn btn-outline hover:text-white hover:bg-blue bg-gradient-to-r from-blue/50 hover:from-gray hover:bg-opacity-70 rounded-full px-10 mr-4 bg-blue text-white bg-opacity-10">Certifícate</button> */}
                 {/* <Button text={"Certifícate"} type={"blue"}/>
                 <Button text={"Certifícate"} type={"green"}/> */}
-                {/* <a href="https://kalpilli.com/MetodoMontessori/" target="__blank" className="btn btn-outline hover:text-white hover:bg-green bg-gradient-to-r from-green/50 hover:from-gray hover:bg-opacity-70 rounded-full px-10 mr-4 bg-green text-white bg-opacity-10">
+                <a href="https://kalpilli.com/MetodoMontessori/" target="__blank" className="btn btn-outline hover:text-white hover:bg-green bg-gradient-to-r from-green/50 hover:from-gray hover:bg-opacity-70 rounded-full px-10 mr-4 bg-green text-white bg-opacity-10">
                   Conoce el Método
-                </a> */}
+                </a>
               </div>
             </div>
           </div>

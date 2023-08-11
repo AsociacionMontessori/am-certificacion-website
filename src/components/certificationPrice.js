@@ -11,58 +11,58 @@ const CertificationPrice = () => {
         ip: "",
         countryName: "",
         city: "",
-      })
-    
-      const getLocalizedPrice = (state, priceData) => {
+    })
+
+    const getLocalizedPrice = (state, priceData) => {
         const { countryName } = state;
         const coin = countryName === 'Mexico' ? 'MXN' : 'USD';
         const priceToShow = countryName === 'Mexico' ? priceData.priceMx : priceData.priceUsd;
         return { coin, priceToShow };
-      };
-    
-      const getGeoInfo = () => {
+    };
+
+    const getGeoInfo = () => {
         axios
-          .get("https://ipapi.co/json/")
-          .then((response) => {
-            let data = response.data
-            setState({
-              ...state,
-              ip: data.ip,
-              countryName: data.country_name,
-              city: data.city,
+            .get("https://ipapi.co/json/")
+            .then((response) => {
+                let data = response.data
+                setState({
+                    ...state,
+                    ip: data.ip,
+                    countryName: data.country_name,
+                    city: data.city,
+                })
             })
-          })
-          .catch((error) => {
-            console.log(error);
-          })
-      }
-    
-      useEffect(() => {
+            .catch((error) => {
+                console.log(error);
+            })
+    }
+
+    useEffect(() => {
         getGeoInfo();
-      }, [])
-    
-      const certificado = [
+    }, [])
+
+    const certificado = [
         { title: 'Certificado', subtitle: 'único pago', priceMx: '2,500', priceUsd: '200', text: 'Único pago de ', footer: "+  gasto de envío fuera de México" }
-      ]
-    
-      const prices = [
+    ]
+
+    const prices = [
         { title: 'Nido', subtitle: 'y comunidad infantil', priceMx: '3,800', priceUsd: '210', text: 'Nido y Comunidad infantil', duration: '16 meses' },
         { title: 'Casa de Niños', subtitle: 'certifícate como guía montessori', priceMx: '4,000', priceUsd: '230', text: 'Casa de niños', duration: '17 meses' },
         { title: 'Taller', subtitle: 'único pago', priceMx: '4,500', priceUsd: '250', text: 'Taller I y II', duration: '20 meses' },
-      ]
-    
-      const inscripcion = [
+    ]
+
+    const inscripcion = [
         { title: 'Inscripción', subtitle: 'único pago', priceMx: '5,000', priceUsd: '299', text: 'Único pago de' },
-      ]
+    ]
     return (
         <>
-            <section id="certificacion_internacional" class=" bg-gradient-to-r from-blue to-green">
+            <section id="certificacion_internacional" class="relative py-5 z-10  bg-gradient-to-r from-blue to-green">
                 <h2 className="mx-auto max-w-7xl px-6 pb-10 pt-10 lg:px-12 xl:px-6 2xl:px-0">
                     <span className="text-white text-2xl md:text-6xl font-bold">Certificación Montessori</span>
                 </h2>
                 <div className="bg-white rounded-3xl">
-                    <div className="flex mx-auto max-w-7xl px-6 pb-10 pt-10 lg:px-12 xl:px-6 2xl:px-0 ">
-                        <div className="md:2/4 w-3/4 absolute md:relative md:block flex sm:flex-col ">
+                    <div className="sm:flex sm:mx-auto max-w-7xl px-6 pb-10 pt-10 lg:px-12 xl:px-6 2xl:px-0">
+                        <div className="w-full md:2/4 w-3/4 md:relative md:block md:flex sm:flex-col">
                             <h3>
                                 <span className="text-red md:text-2xl text-xl">
                                     Certificación internacional
@@ -73,7 +73,7 @@ const CertificationPrice = () => {
                                     Guía Montessori
                                 </span>
                             </h2>
-                            <div className="w-auto pt-10 pr-24 text-lg text-black">
+                            <div className="w-full sm:w-3/4 sm:pt-10 md:pr-24 text-lg text-black">
                                 <p>
                                     Ofrecemos programas de certificación con reconocimiento internacional, diseñados para proporcionar una sólida base en el método y la filosofía Montessori.
                                     <br />
@@ -86,7 +86,7 @@ const CertificationPrice = () => {
                                 </p>
                             </div>
                         </div>
-                        <div className="flex items-center justify-center bg-white pb-10 flex flex-end rounded-3xl absolute left-1/2 translate-x-52 lg:translate-x-52 xl:translate-x-80 transform 2xl:translate-x-96 md:translate-y-[-5rem] lg:translate-y-[-4rem] md:h-[36rem] lg:h-[32rem] ">
+                        <div className="pb-5 my-10 sm:my-0 max-h-128 outline outline-offset-2 outline-blue sm:outline-none sm:flex sm:flex-end items-center justify-center bg-white rounded-3xl sm:absolute sm:left-1/2 sm:translate-x-52 lg:translate-x-52 xl:translate-x-80 transform 2xl:translate-x-96 md:translate-y-[-5rem] lg:translate-y-[-4rem] md:h-[36rem] lg:h-[32rem]">
 
                             {inscripcion.map((price) => {
                                 const { title, subtitle, text } = price;
@@ -107,19 +107,21 @@ const CertificationPrice = () => {
 
                 <section id="prices" className="mt-24 mb-10">
 
-                    <div className="flex space-x-32 justify-center">
+                    <div className="flex flex-col md:flex-row flex-wrap sm:flex-nowrap content-center sm:space-x-32 justify-center">
 
                         {certificado.map((price) => {
                             const { title, subtitle, text, duration, footer } = price;
                             const { coin, priceToShow } = getLocalizedPrice(state, price);
                             return (
-                                <CardCertification title={title}
-                                    subtitle={subtitle}
-                                    coin={coin}
-                                    price={priceToShow}
-                                    text={text}
-                                    time={duration}
-                                    footer={footer} />
+                                <div className="py-3 sm:pt-0">
+                                    <CardCertification title={title}
+                                        subtitle={subtitle}
+                                        coin={coin}
+                                        price={priceToShow}
+                                        text={text}
+                                        time={duration}
+                                        footer={footer} />
+                                </div>
                             )
                         })}
 
@@ -127,14 +129,16 @@ const CertificationPrice = () => {
                             const { title, subtitle, text, duration } = price;
                             const { coin, priceToShow } = getLocalizedPrice(state, price);
                             return (
-                                <Card
-                                    title={title}
-                                    subtitle={subtitle}
-                                    coin={coin}
-                                    price={priceToShow}
-                                    text={text}
-                                    time={duration}
-                                />
+                                <div className="py-3 sm:pt-0">
+                                    <Card
+                                        title={title}
+                                        subtitle={subtitle}
+                                        coin={coin}
+                                        price={priceToShow}
+                                        text={text}
+                                        time={duration}
+                                    />
+                                </div>
                             )
                         })}
                     </div>

@@ -9,8 +9,10 @@ const nosotros = () => {
   return (
     <div className="bg-white dark:bg-gray">
       <Layout>
-        <main className="">
-          <Timeline />
+        <main className="bg-gradient-to-r from-blue via-purple to-green">
+          <div className="bg-white dark:bg-gray">
+            <Timeline />
+          </div>
         </main>
       </Layout>
     </div>

@@ -23,13 +23,13 @@ const Scholarship = () => {
                             </h4>
                             <ul className="mt-2 ml-3">
                                 <li className="my-1">
-                                    No tener ningún atraso en las entregas de actividades
+                                    No tener ningún atraso en la entrega de actividades
                                 </li>
                                 <li className="my-1">
-                                    Asistir al 80 % de clases
+                                    Asistir por lo menos al 80 % de clases
                                 </li>
                                 <li className="my-1">
-                                    Realizar por lo menos una práctiva virtual (conferencia o proyecto)
+                                    Realizar por lo menos una práctica virtual (conferencia o proyecto)
                                 </li>
                             </ul>
                             <div className="flex mt-5 items-center">
