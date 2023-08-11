@@ -20,19 +20,19 @@ const Scholarship = () => {
                                 <span className="text-xl">
                                     Requisitos
                                 </span>
+                                <ul className="mt-2 ml-3">
+                                    <li className="my-1">
+                                        No tener ningún atraso en la entrega de actividades
+                                    </li>
+                                    <li className="my-1">
+                                        Asistir por lo menos al 80 % de clases
+                                    </li>
+                                    <li className="my-1">
+                                        Realizar por lo menos una práctica virtual (conferencia o proyecto)
+                                    </li>
+                                </ul>
                             </h4>
-                            <ul className="mt-2 ml-3">
-                                <li className="my-1">
-                                    No tener ningún atraso en la entrega de actividades
-                                </li>
-                                <li className="my-1">
-                                    Asistir por lo menos al 80 % de clases
-                                </li>
-                                <li className="my-1">
-                                    Realizar por lo menos una práctica virtual (conferencia o proyecto)
-                                </li>
-                            </ul>
-                            <div className="flex mt-5 items-center">
+                            <div className="sm:flex mt-5 items-center">
                                 <div>
                                     <Button text="Conocer Más" />
                                 </div>
@@ -44,7 +44,7 @@ const Scholarship = () => {
                                 </div>
                             </div>
                         </div>
-                        <div className="mt-10">
+                        <div className="mt-10 hidden md:block">
                             <StaticImage src="../images/sclshipp.png" className="w-72 w-56 md:w-80 ml-0 md:ml-20" />
                         </div>
                     </div>
