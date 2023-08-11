@@ -54,7 +54,7 @@ export default function Nav() {
                                                 href={item.href}
                                                 className={classNames(
                                                     item.current ? 'text-yellow-400' : 'text-white-300 hover:bg-white-700 hover:text-gray dark:hover:text-white',
-                                                    'rounded-md px-8 py-2 text-white'
+                                                    'rounded-md px-8 py-2 text-gray dark:text-white'
                                                 )}
                                                 aria-current={item.current ? 'page' : undefined}
                                             >
