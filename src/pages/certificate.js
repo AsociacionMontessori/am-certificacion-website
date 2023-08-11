@@ -35,8 +35,13 @@ const Certificate = () => {
             </div>
           </div>
         </section>
+        <section id="" class="relative py-5 z-10 bg-gradient-to-r from-blue to-green py-20">
+
         <CertificationPrice/>
+        <Scholarship/>
         {/* <Scholarship/> */}
+        </section>
+
       </main>
     </Layout>
   )

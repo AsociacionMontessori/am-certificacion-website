@@ -5,7 +5,6 @@ import Card from './cards/card'
 import CardInscription from './cards/inscriptionCard'
 import CardCertification from './cards/cardCertification'
 import axios from 'axios'
-import Scholarship from './scholarship'
 
 const CertificationPrice = () => {
     const [state, setState] = useState({
@@ -57,7 +56,7 @@ const CertificationPrice = () => {
       ]
     return (
         <>
-            <section id="certificacion_internacional" class="relative py-5 z-10 bg-gradient-to-r from-blue to-green py-20">
+            <section id="certificacion_internacional" class=" bg-gradient-to-r from-blue to-green">
                 <h2 className="mx-auto max-w-7xl px-6 pb-10 pt-10 lg:px-12 xl:px-6 2xl:px-0">
                     <span className="text-white text-2xl md:text-6xl font-bold">Certificación Montessori</span>
                 </h2>
@@ -147,7 +146,6 @@ const CertificationPrice = () => {
                         Precios sujetos a disponibilidad. Aplican Términos y Condiciones.
                     </p>
                 </section>
-                <Scholarship/>
             </section>
         </>
     )

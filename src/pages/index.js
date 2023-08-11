@@ -35,7 +35,7 @@ const IndexPage = () => (
           </div>
         </div>
       </section>
-      <section id="work" class="relative py-5 z-10 bg-white dark:bg-gray pb-20 pb-72 lg:pt-0">
+      <section id="work" class="relative py-5 z-10 bg-white dark:bg-gray pb-2 pb-72 lg:pt-0">
         <div class="mx-auto max-w-7xl px-6 lg:px-12 xl:px-6 2xl:px-0 pt-10">
           <div data-rellax-speed="-3" data-rellax-xs-speed="0" data-rellax-mobile-speed="0" class="rellax flex flex-wrap items-center gap-6">
             <h2 class="pt-5 text-5xl text-red font-bold dark:text-white xl:text-6xl">EDUCACIÓN SIGNIFICATIVA</h2>
@@ -67,7 +67,7 @@ const IndexPage = () => (
               <label class="italic bg-red/20 dark:bg-black hover:font-semibold dark:hover:text-blue rounded-full py-3 px-10 dark:text-white/80 mx-3">Lo que la mano hace, la mente lo recuerda</label>
             </div>
           </section>
-          <section className="my-5 block h-12 overflow-hidden relative w-max marquee-left xxl:hidden">
+          <section className="my-5 block h-12 overflow-hidden relative w-max marquee-left xxl:hidden mb-20">
             <div className="flex float-left w-50">
               <label class="italic bg-red/20 dark:bg-black hover:font-semibold dark:hover:text-green/70 rounded-full py-3 px-10 dark:text-white/80 mx-3">No se puede ser libre, si no se es independiente</label>
               <label class="italic bg-red/20 dark:bg-black hover:font-semibold dark:hover:text-green/70 rounded-full py-3 px-10 dark:text-white/80 mx-3">Lo que la mano hace, la mente lo recuerda</label>
@@ -95,7 +95,7 @@ const IndexPage = () => (
                 <img src={ImgMapDark} className="w-full h-3/12 dark:hidden" alt="map" />
                 <img src={ImgMap} className="w-full h-3/12 hidden dark:block" alt="map in dark" />
                 <div className="flex justify-center absolute top-1/3 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full">
-                  <h2 className="text-white dark:text-gray">
+                  <h2 className="text-white">
                     <span className="font-bold text-center xl:text-6xl text-2xl ">Certificación internacional</span>
                   </h2>
                 </div>
@@ -109,7 +109,7 @@ const IndexPage = () => (
                   <StaticImage src="../images/countries/eng.png" className="h-10 w-10 md:w-16 md:h-16" />
                 </div>
                 <div className="absolute mb-20 md:mt-0 mt-20 top-3/4 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full">
-                  <p className="font-bold text-center lg:text-2xl text-lg text-white dark:text-gray">
+                  <p className="font-bold text-center lg:text-2xl text-lg text-white">
                     Las certificaciones Montessori cuentan con un gran reconocimiento en todo el mundo
                   </p>
                 </div>
