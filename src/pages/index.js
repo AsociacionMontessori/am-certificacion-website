@@ -35,7 +35,7 @@ const IndexPage = () => (
           </div>
         </div>
       </section>
-      <section id="work" class="relative py-5 z-10 bg-white dark:bg-gray pb-2 pb-72 lg:pt-0">
+      <section id="work" class="relative py-5 z-10 bg-white dark:bg-gray lg:pt-0">
         <div class="mx-auto max-w-7xl px-6 lg:px-12 xl:px-6 2xl:px-0 pt-10">
           <div data-rellax-speed="-3" data-rellax-xs-speed="0" data-rellax-mobile-speed="0" class="rellax flex flex-wrap items-center gap-6">
             <h2 class="pt-5 text-5xl text-red font-bold dark:text-white xl:text-6xl">EDUCACIÓN SIGNIFICATIVA</h2>
