@@ -5,18 +5,21 @@ import Seo from "../components/seo"
 import imagen from '../images/books/books1.jpg'
 import imagen2 from '../images/books/books2.jpg'
 import '../styles/publications.css'
-import Button from '../components/buttons/button';
+import '../styles/wordpress_publications.css'
+import { graphql } from "gatsby";
 
 
-const publicaciones = () => {
+
+const publicaciones = ({ data }) => {
     const title = "Montessori: Una presentación del secreto de la infancia"
     const publishDate = "Enero 19, 2020"
     const description = "A través de nuestra serie de libros, buscamos presentar la filosofía y el método Montessori a un público más amplio. Nuestro segundo libro, 'Montessori: Una presentación del secreto de la infancia', se basa en la obra 'El niño, el secreto de la infancia' de María Montessori, publicada en 1938 y traducida a más de 15 idiomas."
     const author = "Roxana Muñoz"
+    const page = data.allWpPage.edges[0].node; // Tomar la primera página (debería ser la única)
     return (
         <Layout>
             <main>
-                <div className="bg-gradient-to-r from-blue via-purple to-green py-20 w-full  overflow-x-hidden">
+                <div className="bg-gradient-to-r from-blue via-purple to-green pt-20 w-full  overflow-x-hidden">
                     <section className="flex flex-col antialiased text-gray-200 pl-10 md:ml-40">
                         <div className="hidden sm:block relative w-full  pb-10">
                             <h1 className="text-6xl text-white  ">Conoce nuestras Publicaciones</h1>
@@ -76,11 +79,8 @@ const publicaciones = () => {
                             </article>
                         </div>
                     </section>
-                    <section className="bg-white min-h-screen">
-                        <section class="flex flex-col antialiased text-gray-200 pl-10 md:ml-40 bg-white min-h-screen">
-                            <h2 className="text-black">Contenido Blog: Cargando...</h2>
-                        </section>
-
+                    <section className="bg-white">
+                                  <div dangerouslySetInnerHTML={{ __html: page.content }} />
                     </section>
                 </div>
 
@@ -90,5 +90,20 @@ const publicaciones = () => {
 }
 
 export const Head = () => <Seo title="Sobre Nosotros" />
+
+export const query = graphql`
+query MyQuery {
+    allWpPage(filter: { title: { eq: "Publicaciones Asociación Montessori" } }) {
+      edges {
+        node {
+          title
+          content
+        }
+      }
+    }
+  }
+`;
+
+
 
 export default publicaciones
