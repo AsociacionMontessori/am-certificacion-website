@@ -11,7 +11,7 @@ const navigation = [
     { name: 'SOBRE NOSOTROS', href: '../nosotros', current: false },
     { name: 'PUBLICACIONES', href: '../publicaciones', current: false },
     { name: 'KALPILLI', href: 'https://kalpilli.com/', current: false },
-    { name: 'CONTACTO', href: '../certificate', current: false },
+    { name: 'CONTACTO', href: '../contact', current: false },
 ]
 
 function classNames(...classes) {
