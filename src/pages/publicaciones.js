@@ -48,7 +48,7 @@ const publicaciones = ({ data }) => {
                                             <a class="hover:text-gray-100 transition duration-150 ease-in-out" href="#0">{title}</a>
                                         </h3>
                                         <div>
-                                            <a class="font-medium hover:text-gray-100 transition duration-150 ease-in-out" href="#0">{author}</a>
+                                            <a class="font-medium hover:text-gray-100 transition duration-150 ease-in-out" href="../roxana">{author}</a>
                                             <span class="text-gray-700"> - </span>
                                             <span class="text-gray-500">{publishDate}</span>
                                         </div>

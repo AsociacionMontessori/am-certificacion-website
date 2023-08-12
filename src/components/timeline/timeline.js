@@ -15,29 +15,49 @@ const Timeline = () => {
     const items = [
         {
             title: 'Se funda AMMAC',
-            content: 'La Asociación Montessori de México A.C. (Ammac) se fundó con el objetivo de promover la pedagogía de María Montessori en México. \n Con más de 57 años de experiencia, somos pioneros en la implementación y difusión del método Montessori en todo el mundo. Nuestro equipo está formado por profesionales apasionados por la educación y comprometidos con el crecimiento y desarrollo integral de cada niño.',
-            year: '1964',
+            content: 'La Asociación Montessori de México A.C. (Ammac) se fundó, por la Dra. Angelina Almeida, con el objetivo de promover la pedagogía de María Montessori en México. Con más de 57 años de experiencia, la asociación es pionera en la implementación, innovación y difusión del método Montessori en todo el mundo.',
+            year: '1965',
             color: "blue"
         },
         {
             title: 'Kalpilli Montessori',
-            content: 'Kalpilli Montessori abre sus puertas ... Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut quam felis, rutrum nec enim non, sodales facilisis purus. Vestibulum viverra egestas ipsum eget commodo. Nullam aliquet lorem vitae nulla dictum vestibulum sed quis tellus. Sed diam diam, facilisis tincidunt volutpat nec, auctor quis magna. Proin sed nunc iaculis ipsum scelerisque tincidunt. Cras eleifend leo tellus, fermentum finibus tortor fringilla eu.',
-            year: '1964',
+            content: 'Escuela Primaria Kalpilli abre sus puertas en Polanco, en la Ciudad de México, con el objetivo de ofrecer una educación Montessori de calidad, con un enfoque humanista, que promueva el desarrollo integral de los niños y niñas. Siendo la primera escuela Montessori en México.',
+            year: '1965',
             color: "red"
         },
         {
-            title: 'Random dots?',
-            content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut quam felis, rutrum nec enim non, sodales facilisis purus. Vestibulum viverra egestas ipsum eget commodo. Nullam aliquet lorem vitae nulla dictum vestibulum sed quis tellus. Sed diam diam, facilisis tincidunt volutpat nec, auctor quis magna. Proin sed nunc iaculis ipsum scelerisque tincidunt. Cras eleifend leo tellus, fermentum finibus tortor fringilla eu.',
-            year: '1964',
+            title: 'AMMAC y el Gobierno de Tabasco',
+            content: 'En 1984 el gobierno de Tabasco en alianza con AMMAC desarrollan un programa de capacitación pedagógica a maestros Nahuas, Chontales, Mayas, Zapotecos, Totonacas y Mixes',
+            year: '1984',
             color: "blue"
         },
         {
-            title: 'Absolutely nothing.',
-            content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut quam felis, rutrum nec enim non, sodales facilisis purus. Vestibulum viverra egestas ipsum eget commodo. Nullam aliquet lorem vitae nulla dictum vestibulum sed quis tellus. Sed diam diam, facilisis tincidunt volutpat nec, auctor quis magna. Proin sed nunc iaculis ipsum scelerisque tincidunt. Cras eleifend leo tellus, fermentum finibus tortor fringilla eu.',
-            year: '1964',
+            title: 'Kalpilli en San Pedro de los Pinos',
+            content: 'En 1992, Kalpilli encuentra su nueva sede en San Pedro de los Pinos, entre libros, aprendizaje, material Montessori, ferias, campamentos, y mucho amor, Kalpilli y la Asociación Montessori de México han hecho historia, construyendo una comunidad por y para los niños, con una Educación Humanista e Innovadora.',
+            year: '1992',
             color: "red"
         },
     ];
+
+    // getRandomPositions = () => {
+    //     const positions = [
+    //         {
+    //             top: '20px',
+    //             left: '20px',
+    //         },
+    //         {
+    //             top: '20px',
+    //             right: '20px',
+    //         },
+    //         {
+    //             bottom: '20px',
+    //             left: '20px',
+    //         }
+    //     ];
+
+    //     return positions[Math.floor(Math.random() * positions.length)];
+    // }
+
 
     const getColor = (color) => {
         switch (color) {
@@ -120,7 +140,7 @@ const Timeline = () => {
                                             </div>
                                         </div>
                                         <div className='pt-5'>
-                                            <Button text="Nuestra Filosofía" type={ (item.color == "blue") ? "blue-green" :  "red"} />
+                                            <Button text="Nuestra Filosofía" type={(item.color == "blue") ? "blue-green" : "red"} />
                                         </div>
                                     </div>
                                 </li>
