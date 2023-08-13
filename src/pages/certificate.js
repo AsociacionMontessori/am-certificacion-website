@@ -1,15 +1,17 @@
-import React, { useState, useEffect } from "react"
+import React from "react"
 
 import Layout from "../components/layout"
 import Seo from "../components/seo"
 import imagen from '../images/banners/cert.png'
 import CertificationPrice from '../components/certificationPrice'
 import Scholarship from '../components/scholarship'
+import Nav from "../components/nav"
 
 
 const Certificate = () => {
   return (
     <Layout>
+      <Nav textColor="text-white" />
       <main className="overflow-x-hidden">
         <section id="home" className="relative flex min-h-screen items-center">
           <div aria-hidden="true" className="absolute inset-0 z-[1] bg-gradient-to-b from-white/0 via-gray/20 to-gray"></div>

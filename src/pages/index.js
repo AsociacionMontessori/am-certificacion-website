@@ -7,9 +7,11 @@ import ImgMap from '../images/banners/map.png'
 import ImgMapDark from '../images/banners/dark_map.png'
 import { StaticImage } from "gatsby-plugin-image"
 import CertificationPrice from '../components/certificationPrice'
+import Nav from "../components/nav"
 
 const IndexPage = () => (
   <Layout>
+    <Nav textColor="text-white"/>
     <main>
       <section id="home" class="relative flex min-h-screen items-center">
         <div aria-hidden="true" class="absolute inset-0 z-[1] bg-gradient-to-b from-white/0 via-white/10 to-white/60  dark:bg-gradient-to-b dark:from-white/0 dark:via-gray/20 dark:to-gray" />

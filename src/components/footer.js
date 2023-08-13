@@ -1,18 +1,6 @@
 import * as React from "react"
 import { StaticImage } from "gatsby-plugin-image"
 
-const navigation = [
-    { name: 'Oferta Académica', href: '../OfertaAcademica', current: false },
-    { name: 'Programas Kalpilli', href: '../ProgramasKalpilli', current: false },
-    { name: 'Método Montessori', href: '../MetodoMontessori', current: false },
-    { name: 'Instalaciones', href: '#', current: false },
-    { name: 'Inicia Sesión', href: '#', current: false },
-]
-
-function classNames(...classes) {
-    return classes.filter(Boolean).join(' ')
-}
-
 export default function Footer() {
     return (
         <footer className="bg-gray-700 text-white pb-8 flex flex-col justify-center items-center max-w-full">

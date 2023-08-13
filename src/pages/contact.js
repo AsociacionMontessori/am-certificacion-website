@@ -4,11 +4,13 @@ import Layout from "../components/layout"
 import Seo from "../components/seo"
 import '../styles/publications.css'
 import '../styles/wordpress_publications.css'
+import Nav from "../components/nav"
 
 const contact = () => {
     const iconsSize = "w-20 h-20"
     return (
         <Layout>
+            <Nav textColor="dark:text-white text-black" />
             <main>
                 <section class="bg-gradient-to-r from-blue via-purple to-green text-white">
                     <div class="container px-6 py-12 mx-auto">

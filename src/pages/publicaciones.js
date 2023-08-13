@@ -6,6 +6,8 @@ import imagen from '../images/books/books1.jpg'
 import imagen2 from '../images/books/books2.jpg'
 import '../styles/publications.css'
 import '../styles/wordpress_publications.css'
+import Nav from "../components/nav"
+
 
 const publicaciones = () => {
     const title = "Montessori: Una presentación del secreto de la infancia"
@@ -14,6 +16,7 @@ const publicaciones = () => {
     const author = "Roxana Muñoz"
     return (
         <Layout>
+            <Nav textColor="dark:text-white text-black" />
             <main>
                 <div className="bg-gradient-to-r from-blue via-purple to-green pt-20 w-full  overflow-x-hidden">
                     <section className="flex flex-col antialiased text-gray-200 pl-10 md:ml-40">
@@ -23,7 +26,6 @@ const publicaciones = () => {
                         <div class="mx-auto p-4 sm:px-6 h-full">
                             <article class="max-w-sm mx-auto md:max-w-none grid md:grid-cols-2 gap-4 md:gap-8 lg:gap-12 xl:gap-16">
                                 <div class="relative lg:mt-28 w-1/2 block group" href="#0">
-                                    {/* <div class="absolute inset-0 bg-gray-800 hidden md:block transform md:translate-y-2 md:translate-x-4 xl:translate-y-4 xl:translate-x-8 group-hover:translate-x-0 group-hover:translate-y-0 transition duration-700 ease-out pointer-events-none" aria-hidden="true"></div> */}
                                     <div className="sm:hidden ml-20 sm:ml-28 absolute w-full z-10">
                                         <h1 className="text-3xl sm:text-4xl text-white font-bold drop-shadow-4xl ">Conoce nuestras Publicaciones</h1>
                                     </div>

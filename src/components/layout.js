@@ -1,28 +1,14 @@
 import * as React from "react"
-// import { useStaticQuery, graphql } from "gatsby"
-
-import Nav from "./nav"
 import Footer from "./footer"
 import "./../styles/wa.css"
 import { Transition } from "@headlessui/react"
 
 const Layout = ({ children }) => {
   const [showWABtn, setShowWABtn] = React.useState(false)
-  // const data = useStaticQuery(graphql`
-  //   query SiteTitleQuery {
-  //     site {
-  //       siteMetadata {
-  //         title
-  //       }
-  //     }
-  //   }
-  // `)
 
   return (
     <>
-      <div className="dark:bg-gray-900">
-        {/* <Header/> */}
-        <Nav />
+      <div className="dark:bg-gray">
         <div
           style={{
             margin: `0 auto`,

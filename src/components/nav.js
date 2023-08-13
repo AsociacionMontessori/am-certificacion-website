@@ -1,10 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { Fragment } from 'react'
-import { Disclosure, Menu, Transition } from '@headlessui/react'
-import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
+import React from 'react';
+import { Disclosure} from '@headlessui/react'
+import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 import kalpilliLight from "../images/lasc.png"
-import kalpilliDark from "../images/kalpilliDark.png"
-import LogoTop from "../images/download.png"
 
 const navigation = [
     { name: 'CERTIFÍCATE', href: '../certificate', current: false },
@@ -18,7 +15,7 @@ function classNames(...classes) {
     return classes.filter(Boolean).join(' ')
 }
 
-export default function Nav() {
+export default function Nav({textColor}) {
     return (
         <Disclosure as="nav" className="bg-white-400 mb-10 relative z-20">
             {({ open }) => (
@@ -54,7 +51,8 @@ export default function Nav() {
                                                 href={item.href}
                                                 className={classNames(
                                                     item.current ? 'text-yellow-400' : 'text-white-300 hover:bg-white-700 hover:text-gray dark:hover:text-white',
-                                                    'rounded-md px-8 py-2 text-gray dark:text-white'
+                                                    // 'rounded-md px-8 py-2 text-white'
+                                                    `${textColor} rounded-md px-8 py-2`
                                                 )}
                                                 aria-current={item.current ? 'page' : undefined}
                                             >
@@ -75,8 +73,8 @@ export default function Nav() {
                                     as="a"
                                     href={item.href}
                                     className={classNames(
-                                        item.current ? 'bg-red  dark:text-white text-black' : ' text-white hover:bg-red hover:text-white ',
-                                        'block rounded-md px-3 py-2 text-base font-medium dark:text-gray'
+                                        item.current ? `bg-red ${textColor}` : ' text-black hover:bg-red hover:text-white ',
+                                        `${textColor} block rounded-md px-3 py-2 text-base font-medium`
                                     )}
                                     aria-current={item.current ? 'page' : undefined}
                                 >
