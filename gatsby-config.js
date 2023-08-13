@@ -33,14 +33,6 @@ module.exports = {
       options: {
         plugins: [`gatsby-remark-responsive-iframe`],
       },
-    },
-    {
-      resolve: `gatsby-source-wordpress`,
-      options: {
-        url:
-          process.env.WPGRAPHQL_URL ||
-          `http://carlosalfonsor5.sg-host.com/graphql`,
-      },
-    },
+    }
   ],
 }
