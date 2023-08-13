@@ -1,15 +1,5 @@
 import * as React from "react"
-import logoAs from "../images/lasc.png"
-import fcbk from "../images/facebook.png"
-import insta from "../images/instagram.png"
-import ytb from "../images/youtube.png"
-import lnin from "../images/linkedin.png"
-import logoSem from "../images/lsems.png"
-import tiktok from "../images/tik-tok.png"
-
-
-
-
+import { StaticImage } from "gatsby-plugin-image"
 
 const navigation = [
     { name: 'Oferta Académica', href: '../OfertaAcademica', current: false },
@@ -28,22 +18,14 @@ export default function Footer() {
         <footer className="bg-gray-700 text-white pb-8 flex flex-col justify-center items-center max-w-full">
             <div className=" pl-0 lg:pl-20 xl:pl-10 2xl:pl-0 py-4 px-1 flex flex-col md:flex-row justify-start items-center w-full">
                 <a href="#home" className="flex mx-6 justify-center p-1.5 lg:p-4 items-center lg:w-4/12 md:w-9/12">
-                    <img
-                        className="w-14 h-14 m-1.5"
-                        src={logoAs}
-                        alt="Logo Asociación Montessori"
-                    />
+                    <StaticImage src="../images/lasc.png" className="w-14 h-14 m-1.5" alt="Logo Asociación Montessori"/>
                     <div className="m-1.5 lg:text-base text-sm ">
                         <div className="font-medium">Asociación Montessori de México A.C.</div>
                         <p>Todos los derechos reservados 2023</p>
                     </div>
                 </a>
                 <div className="flex mx-2 justify-center p-4 items-center lg:w-4/12 md:w-9/12">
-                    <img
-                        className="w-14 h-14 m-1.5"
-                        src={logoSem}
-                        alt="Logo Sociedad de Escuelas Montessori"
-                    />
+                    <StaticImage src="../images/lsems.png" className="w-14 h-14 m-1.5" alt="Logo Sociedad de Escuelas Montessori"/>
                     <div className="m-1.5 lg:text-base text-sm ">
                         <div className="font-medium">Sociedad de Escuelas Montessori S.C.</div>
                     </div>
@@ -54,10 +36,18 @@ export default function Footer() {
                 <div className="mx-1 md:mx-10  sm:py-0 md:py-2 lg:py-4 px-1 md:px-6 grid grid-cols-1 md:grid-cols-4 gap-1 md:gap-0">
                     <div className="lg:pl-16 pl-0 text-center md:text-left m-4 md:m-0">
                         <h3 className="text-lg font-semibold mb-2">Asociación</h3>
+                        <a href="#certificacion_internacional">
                         <p>Certificaciones</p>
+                        </a>
+                        <a href="../nosotros">
                         <p>Sobre nosotros</p>
+                        </a>
+                        <a href="../publicaciones">
                         <p>Publicaciones</p>
+                        </a>
+                        <a href="../contact">
                         <p>Contacto</p>
+                        </a>
                         <p>Preguntas Frecuentes</p>
                     </div>
                     <div className="text-center md:text-left m-4 md:m-0">
@@ -81,44 +71,24 @@ export default function Footer() {
                         <div className="flex items-center">
                             <a href="https://www.instagram.com/asociacionmontessori/"
                                 target="_blank">
-                                <img
-                                    src={insta}
-                                    alt="Instagram"
-                                    className="w-6 h-6 mr-8  md:mr-0 lg:mr-2"
-                                    href="https://www.instagram.com/asociacionmontessori/"
-                                    target="_blank"
-                                />
+                                <StaticImage src="../images/instagram.png" className="w-6 h-6 mr-8  md:mr-0 lg:mr-2" alt="Instragram"/>
                             </a>
                             <a href="https://www.linkedin.com/in/asociaci%C3%B3n-montessori-de-m%C3%A9xico-a-c-5a868417a/?originalSubdomain=mx"
                                 target="_blank">
-                                <img
-                                    src={lnin}
-                                    alt="LinkedIn"
-                                    className="w-6 h-6 mr-8   md:mr-0 lg:mr-2"
-                                />
+                                <StaticImage src="../images/linkedin.png"  alt="LinkedIn" className="w-6 h-6 mr-8   md:mr-0 lg:mr-2" />
                             </a>
                             <a href="https://www.youtube.com/@montessorimx"
                                 target="_blank">
-                                <img
-                                    src={ytb}
-                                    alt="YouTube"
-                                    className="w-6 h-6 mr-8   md:mr-0 lg:mr-2"
-                                />
+                                <StaticImage src="../images/youtube.png"  alt="YouTube" className="w-6 h-6 mr-8   md:mr-0 lg:mr-2" />
                             </a>
                             <a href="https://www.facebook.com/asociacionmontessori"
                                 target="_blank">
-                                <img
-                                    src={fcbk}
-                                    alt="Facebook"
-                                    className="w-6 h-6 mr-8   md:mr-0 lg:mr-2"
-                                /></a>
+                                <StaticImage src="../images/facebook.png"  alt="Facebook" className="w-6 h-6 mr-8   md:mr-0 lg:mr-2" />
+                            </a>
                             <a href="https://www.tiktok.com/@montessorimx"
                                 target="_blank">
-                                <img
-                                    src={tiktok}
-                                    alt="TikTok"
-                                    className="w-6 h-6 "
-                                /></a>
+                                <StaticImage src="../images/tik-tok.png"  alt="TikTok" className="w-6 h-6 " />
+                            </a>
                         </div>
                     </div>
                 </div>
