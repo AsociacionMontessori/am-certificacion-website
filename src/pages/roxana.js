@@ -4,11 +4,9 @@ import Layout from "../components/layout"
 import Seo from "../components/seo"
 import '../styles/publications.css'
 import '../styles/wordpress_publications.css'
-import { graphql } from "gatsby";
-
 import img1 from '../images/rox.jpg'
 
-const roxana = ({ data }) => {
+const roxana = () => {
 
     return (
         <Layout>
@@ -60,20 +58,4 @@ const roxana = ({ data }) => {
 }
 
 export const Head = () => <Seo title="Sobre Nosotros" />
-
-export const query = graphql`
-query MyQuery {
-    allWpPage(filter: { title: { eq: "Publicaciones Asociación Montessori" } }) {
-      edges {
-        node {
-          title
-          content
-        }
-      }
-    }
-  }
-`;
-
-
-
 export default roxana
