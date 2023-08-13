@@ -124,6 +124,6 @@ const IndexPage = () => (
     </main>
   </Layout>
 )
-export const Head = () => <Seo title="Home" description="Descubre Kalpilli" />
+export const Head = () => <Seo title="Home" />
 
 export default IndexPage
