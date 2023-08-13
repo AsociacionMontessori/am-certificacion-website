@@ -15,7 +15,7 @@ const publicaciones = ({ data }) => {
     const publishDate = "Enero 19, 2020"
     const description = "A través de nuestra serie de libros, buscamos presentar la filosofía y el método Montessori a un público más amplio. Nuestro segundo libro, 'Montessori: Una presentación del secreto de la infancia', se basa en la obra 'El niño, el secreto de la infancia' de María Montessori, publicada en 1938 y traducida a más de 15 idiomas."
     const author = "Roxana Muñoz"
-    const page = data.allWpPage.edges[0].node; // Tomar la primera página (debería ser la única)
+    // const page = data.allWpPage.edges[0].node; // Tomar la primera página (debería ser la única)
     return (
         <Layout>
             <main>
@@ -79,8 +79,9 @@ const publicaciones = ({ data }) => {
                             </article>
                         </div>
                     </section>
-                    <section className="bg-white">
-                        <div dangerouslySetInnerHTML={{ __html: page.content }} />
+                    <section className="bg-white h-[63rem] sm:h-[30rem]">
+                        {/* <div dangerouslySetInnerHTML={{ __html: page.content }} /> */}
+                        <iframe src="https://carlosalfonsor5.sg-host.com/180-2/" width="100%" height="100%"></iframe>
                     </section>
                 </div>
 
@@ -91,18 +92,18 @@ const publicaciones = ({ data }) => {
 
 export const Head = () => <Seo title="Sobre Nosotros" />
 
-export const query = graphql`
-query MyQuery {
-    allWpPage(filter: { title: { eq: "Publicaciones Asociación Montessori" } }) {
-      edges {
-        node {
-          title
-          content
-        }
-      }
-    }
-  }
-`;
+// export const query = graphql`
+// query MyQuery {
+//     allWpPage(filter: { title: { eq: "Publicaciones Asociación Montessori" } }) {
+//       edges {
+//         node {
+//           title
+//           content
+//         }
+//       }
+//     }
+//   }
+// `;
 
 
 
