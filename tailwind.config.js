@@ -27,7 +27,7 @@ module.exports = {
           '0 35px 35px rgba(0, 0, 0, 1)',
           '0 45px 65px rgba(0, 0, 0, 1)'
         ]
-      }, 
+      },
       maxHeight: {
         '128': '30rem',
       }
