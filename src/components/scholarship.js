@@ -45,7 +45,7 @@ const Scholarship = () => {
                             </div>
                         </div>
                         <div className="mt-10 hidden md:block">
-                            <StaticImage src="../images/sclshipp.png" className="w-72 w-56 md:w-80 ml-0 md:ml-20" />
+                            <StaticImage src="../images/sclshipp.png" className="w-72 w-56 md:w-80 ml-0 md:ml-20" alt={""} />
                         </div>
                     </div>
                 </div>

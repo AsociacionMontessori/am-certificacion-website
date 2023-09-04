@@ -19,6 +19,17 @@ body{
         left: 0;
     }
     100% {
-        left: -100%;
+        left: -120%;
+    }
+}
+
+@media (max-width: 640px) {
+    @keyframes rightleft {
+        0% {
+            left: 0;
+        }
+        100% {
+            left: -1200%;
+        }
     }
 }

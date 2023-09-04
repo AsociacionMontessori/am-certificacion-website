@@ -56,7 +56,7 @@ const CertificationPrice = () => {
     ]
     return (
         <>
-            <section id="certificacion_internacional" class="relative py-5 z-10  bg-gradient-to-r from-blue to-green">
+            <section id="certificacion_internacional" className="relative py-5 z-10  bg-gradient-to-r from-blue to-green">
                 <h2 className="mx-auto max-w-7xl px-6 pb-10 pt-10 lg:px-12 xl:px-6 2xl:px-0">
                     <span className="text-white text-2xl md:text-6xl font-bold">Certificación Montessori</span>
                 </h2>
@@ -87,18 +87,19 @@ const CertificationPrice = () => {
                             </div>
                         </div>
                         <div className="pb-5 my-10 sm:my-0 max-h-128 outline outline-offset-2 outline-blue sm:outline-none sm:flex sm:flex-end items-center justify-center bg-white rounded-3xl sm:absolute sm:left-1/2 sm:translate-x-52 lg:translate-x-52 xl:translate-x-80 transform 2xl:translate-x-96 md:translate-y-[-5rem] lg:translate-y-[-4rem] md:h-[36rem] lg:h-[32rem]">
-
-                            {inscripcion.map((price) => {
+                            {inscripcion.map((price, index) => {
                                 const { title, subtitle, text } = price;
                                 const { coin, priceToShow } = getLocalizedPrice(state, price);
                                 return (
                                     <CardInscription
+                                        key={index}
                                         title={title}
                                         subtitle={subtitle}
                                         coin={coin}
                                         price={priceToShow}
-                                        text={text} />
-                                )
+                                        text={text}
+                                    />
+                                );
                             })}
                         </div>
                     </div>
@@ -109,12 +110,13 @@ const CertificationPrice = () => {
 
                     <div className="flex flex-col md:flex-row flex-wrap sm:flex-nowrap content-center sm:space-x-32 justify-center">
 
-                        {certificado.map((price) => {
+                        {certificado.map((price, index) => {
                             const { title, subtitle, text, duration, footer } = price;
                             const { coin, priceToShow } = getLocalizedPrice(state, price);
                             return (
-                                <div className="py-3 sm:pt-0">
-                                    <CardCertification title={title}
+                                <div className="py-3 sm:pt-0" key={index}>
+                                    <CardCertification
+                                        title={title}
                                         subtitle={subtitle}
                                         coin={coin}
                                         price={priceToShow}
@@ -125,11 +127,11 @@ const CertificationPrice = () => {
                             )
                         })}
 
-                        {prices.map((price) => {
+                        {prices.map((price, index) => {
                             const { title, subtitle, text, duration } = price;
                             const { coin, priceToShow } = getLocalizedPrice(state, price);
                             return (
-                                <div className="py-3 sm:pt-0">
+                                <div className="py-3 sm:pt-0" key={index}>
                                     <Card
                                         title={title}
                                         subtitle={subtitle}

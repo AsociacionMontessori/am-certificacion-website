@@ -2,13 +2,14 @@ import * as React from "react"
 import Footer from "./footer"
 import "./../styles/wa.css"
 import { Transition } from "@headlessui/react"
+import "../styles/fonts.css"
 
 const Layout = ({ children }) => {
   const [showWABtn, setShowWABtn] = React.useState(false)
 
   return (
     <>
-      <div className="dark:bg-gray">
+      <div className="bg-gradient-to-r from-blue via-purple to-green">
         <div
           style={{
             margin: `0 auto`,

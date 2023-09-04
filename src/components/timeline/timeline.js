@@ -125,17 +125,17 @@ const Timeline = () => {
                                         <div>
                                             <div className='absolute top-20 mt-60 -ml-60'>
                                                 <svg width='50' height='50'>
-                                                    <circle cx='25' cy='25' r='20' stroke={getColor(item.color)} opacity={.15} stroke-width='2' fill='transparent' />
+                                                    <circle cx='25' cy='25' r='20' stroke={getColor(item.color)} opacity={.15} strokeWidth='2' fill='transparent' />
                                                 </svg>
                                             </div>
                                             <div className='absolute top-10 mt-20 -ml-60'>
                                                 <svg width='100' height='110' rotate={25}>
-                                                    <rect transform="rotate(-45 100 50)" x='10' y='10' width='30' height='30' stroke={getColor(item.color)} opacity={.15} stroke-width='2' fill='transparent' />
+                                                    <rect transform="rotate(-45 100 50)" x='10' y='10' width='30' height='30' stroke={getColor(item.color)} opacity={.15} strokeWidth='2' fill='transparent' />
                                                 </svg>
                                             </div>
                                             <div className='absolute top-20 mt-64 -ml-40'>
                                                 <svg width='100' height='200'>
-                                                    <rect transform="rotate(22 0 50)" x='10' y='10' width='30' height='30' stroke={getColor(item.color)} opacity={.15} stroke-width='2' fill='transparent' />
+                                                    <rect transform="rotate(22 0 50)" x='10' y='10' width='30' height='30' stroke={getColor(item.color)} opacity={.15} strokeWidth='2' fill='transparent' />
                                                 </svg>
                                             </div>
                                         </div>
