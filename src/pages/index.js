@@ -104,16 +104,16 @@ const IndexPage = () => (
                   </h2>
                 </div>
                 <div className="pt-20 md:pt-0 flex space-x-2 md:space-x-14 lg:space-x-24 absolute top-2/4 left-1/2 transform -translate-x-1/2 -translate-y-1/2 max-w-max">
-                  <StaticImage src="../images/countries/mex.png" alt="Mexican flag" className="h-10 w-10 md:w-16 md:h-16" />
-                  <StaticImage src="../images/countries/eua.png" alt="United States flag" className="h-10 w-10 md:w-16 md:h-16" />
-                  <StaticImage src="../images/countries/col.png" alt="Colombian flag" className="h-10 w-10 md:w-16 md:h-16" />
-                  <StaticImage src="../images/countries/arg.png" alt="Argentinian flag" className="h-10 w-10 md:w-16 md:h-16" />
-                  <StaticImage src="../images/countries/can.png" alt="Canadian flag" className="h-10 w-10 md:w-16 md:h-16" />
-                  <StaticImage src="../images/countries/ale.png" alt="German flag" className="h-10 w-10 md:w-16 md:h-16" />
-                  <StaticImage src="../images/countries/eng.png" alt="English flag" className="h-10 w-10 md:w-16 md:h-16" />
+                  <StaticImage src="../images/countries/mex.png" alt="Mexican flag" className="h-10 w-10 md:w-16 md:h-16 transform hover:scale-110 transition-transform bounce-animation delay-0s" />
+                  <StaticImage src="../images/countries/eua.png" alt="United States flag" className="h-10 w-10 md:w-16 md:h-16 transform hover:scale-110 transition-transform bounce-animation delay-3s" />
+                  <StaticImage src="../images/countries/col.png" alt="Colombian flag" className="h-10 w-10 md:w-16 md:h-16 transform hover:scale-110 transition-transform bounce-animation delay-6s" />
+                  <StaticImage src="../images/countries/arg.png" alt="Argentinian flag" className="h-10 w-10 md:w-[4.25rem] md:h-16 transform hover:scale-110 transition-transform bounce-animation delay-9s" />
+                  <StaticImage src="../images/countries/can.png" alt="Canadian flag" className="h-10 w-10 md:w-[4.95rem] md:h-16 transform hover:scale-110 transition-transform bounce-animation delay-12s" />
+                  <StaticImage src="../images/countries/ale.png" alt="German flag" className="h-10 w-10 md:w-16 md:h-16 transform hover:scale-110 transition-transform bounce-animation delay-15s" />
+                  <StaticImage src="../images/countries/eng.png" alt="English flag" className="h-10 w-10 md:w-16 md:h-16 transform hover:scale-110 transition-transform bounce-animation delay-18s" />
                 </div>
                 <div className="absolute mb-20 md:mt-0 mt-20 top-3/4 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full">
-                  <p className="font-bold text-center lg:text-2xl text-lg text-white">
+                  <p className="font-bold text-center lg:text-2xl text-sm lg:p-0 p-2 text-white">
                     Las certificaciones Montessori cuentan con un gran reconocimiento en todo el mundo
                   </p>
                 </div>
