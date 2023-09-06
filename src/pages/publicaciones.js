@@ -49,9 +49,9 @@ const publicaciones = () => {
                                 </div>
                                 <div className="text-white ml-0 xl:-ml-40 -pt-28 lg:pt-10 w-full">
                                     <header>
-                                        <h3 className="text-2xl lg:text-4xl font-bold leading-tight mb-2">
+                                        <div className="text-2xl lg:text-4xl font-bold leading-tight mb-2">
                                             <h2 className="hover:text-gray-100 transition duration-150 ease-in-out">{title}</h2>
-                                        </h3>
+                                        </div>
                                         <div>
                                             <a className="font-medium hover:text-gray-100 transition duration-150 ease-in-out" href="../roxana">{author}</a>
                                             <span className="text-gray-700"> - </span>
