@@ -74,7 +74,7 @@ const contact = () => {
                                         <Page height={450} adaptContainerWidth smallHeader href="https://www.facebook.com/asociacionmontessori/" tabs="timeline" />
                                     </FacebookProvider>
                                 </div>
-                                <div className="pt-20 sm:pt-0 h-70 w-3/4">
+                                <div className="pt-40 lg:pt-20 sm:pt-0 h-70 w-3/4">
                                     <figure data-behold-id="zEmsp3sC0nZjZ0Bs8CZA"></figure>
                                     <Helmet>
                                         <script src="https://w.behold.so/widget.js" type="module"></script>
