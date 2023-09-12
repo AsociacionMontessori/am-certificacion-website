@@ -7,7 +7,7 @@ import { StaticImage } from "gatsby-plugin-image"
 const Scholarship = () => {
     return (
         <>
-            <section id="scholarships" className="bg-white rounded-3xl z-10">
+            <section id="scholarships" className="bg-white rounded-3xl z-10 selection:text-red selection:bg-red selection:bg-opacity-10">
                 <div className="mx-auto max-w-7xl px-6 pb-10 pt-10 lg:px-12 xl:px-6 2xl:px-0">
                     <h3>
                         <span className="text-red md:text-3xl text-xl text-semibold">
@@ -33,10 +33,12 @@ const Scholarship = () => {
                                 </ul>
                             </h4>
                             <div className="sm:flex mt-5 items-center">
-                                <div>
-                                    <Button text="Conocer Más" />
+                                <div className="mr-10">
+                                    <a href="https://api.whatsapp.com/send?phone=5215548885013&text=Hola,%20quiero%20certificarme%20como%20gu%C3%ADa%20Montessori/" target="__blank" >
+                                        <Button text="Conocer Más" />
+                                    </a>
                                 </div>
-                                <div className="mx-1 w-2/3 text-blue">
+                                <div className="ml-5 mt-5 sm:mt-0 w-full sm:mx-1 sm:w-2/3 text-blue selection:text-blue selection:bg-blue selection:bg-opacity-10">
                                     <h5 className="md:text-lg text-base font-semibold">
                                         Todas las solicitudes son revisadas y evaluadas por el comité académico
                                     </h5>
@@ -45,7 +47,7 @@ const Scholarship = () => {
                             </div>
                         </div>
                         <div className="mt-10 hidden md:block">
-                            <StaticImage src="../images/sclshipp.png" className="w-72 w-56 md:w-80 ml-0 md:ml-20" alt={""} />
+                            <StaticImage src="../images/sclshipp.png" className="w-72 w-56 md:w-80 ml-0 md:ml-20" alt={"imagen becas"} />
                         </div>
                     </div>
                 </div>

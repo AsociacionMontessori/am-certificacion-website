@@ -21,7 +21,7 @@ const publicaciones = () => {
             <main>
                 <div className="bg-gradient-to-r from-blue via-purple to-green pt-20 w-full  overflow-x-hidden">
                     <section className="flex flex-col antialiased text-gray-200 pl-10 md:ml-40">
-                        <div className="hidden sm:block relative w-full  pb-10">
+                        <div className="hidden sm:block relative w-full  pb-10 selection:text-white selection:bg-green selection:bg-opacity-20">
                             {/* <h1 style={{ fontFamily: "Alice", letterSpacing: ".4rem" }} className="text-[2rem] md:text-[10rem] text-white body-font">
                                 Publicaciones
                             </h1> */}
@@ -48,7 +48,7 @@ const publicaciones = () => {
                                     </div>
                                 </div>
                                 <div className="text-white ml-0 xl:-ml-40 -pt-28 lg:pt-10 w-full">
-                                    <header>
+                                    <header className="selection:text-white selection:bg-green selection:bg-opacity-20">
                                         <div className="text-2xl lg:text-4xl font-bold leading-tight mb-2">
                                             <h2 className="hover:text-gray-100 transition duration-150 ease-in-out">{title}</h2>
                                         </div>
@@ -58,7 +58,7 @@ const publicaciones = () => {
                                             <span className="text-gray-500">{publishDate}</span>
                                         </div>
                                     </header>
-                                    <p className="text-lg flex-grow">{description}</p>
+                                    <p className="text-lg flex-grow selection:text-white selection:bg-green selection:bg-opacity-20">{description}</p>
                                     <div className="mt-5 mb-3 w-full">
                                         <ul className="flex flex-wrap text-xs font-medium -m-1">
                                             <li className="m-1 z-10">
@@ -69,7 +69,7 @@ const publicaciones = () => {
                                                     </svg>
                                                 </a>
                                             </li>
-                                            <li className="m-1 z-10">
+                                            <li className="m-1 z-10 selection:text-white selection:bg-green selection:bg-opacity-20">
                                                 <a title="Ver serie de libro en Amazon" className="inline-flex text-center text-gray-100 py-3 px-6 rounded-full bg-blue-500 hover:bg-blue-600 transition duration-150 ease-in-out" href="https://www.amazon.com.mx/dp/B09VX943R1">
                                                     Ver en Amazon
                                                     <svg xmlns="http://www.w3.org/2000/svg" className="ml-1 w-4 h-4" viewBox="0 0 512 512">

@@ -6,26 +6,26 @@ const CardPrice = ({ title, subtitle, price, coin, time, text, }) => {
     return (
         <>
             <div className="flex justify-center items-center flex-col bg-white w-56 rounded-3xl text-xs text-black">
-                <div className="text-lg pt-2.5 text-base w-auto">
+                <div className="text-lg pt-2.5 text-base w-auto selection:text-black selection:bg-blue selection:bg-opacity-20">
                     {title}
                 </div>
-                <div className="text-gray w-2/3 text-center">
+                <div className="text-gray w-2/3 text-center selection:text-black selection:bg-blue selection:bg-opacity-20">
                     {subtitle}
                 </div>
-                <div className="text-blue  pt-2.5 pr-16">
+                <div className="text-blue  pt-2.5 pr-16 selection:text-black selection:bg-blue selection:bg-opacity-20">
                     {coin}
                 </div>
-                <div className="text-blue text-2xl pt-1 font-semibold">
+                <div className="text-blue text-2xl pt-1 font-semibold selection:text-white selection:bg-blue selection:bg-opacity-90">
                     {price}
                 </div>
-                <div className="pt-7">
+                <div className="pt-7 selection:text-black selection:bg-blue selection:bg-opacity-20">
                     {text}
                 </div>
                 <div className="flex mt-4 w-full justify-center">
                     <div className="ml-10">
                         <img src={Clock} className="w-5 h-5" alt="Clock" />
                     </div>
-                    <div className="flex-grow flex justify-center items-center mr-12">
+                    <div className="flex-grow flex justify-center items-center mr-12 selection:text-black selection:bg-blue selection:bg-opacity-20">
                         {time}
                     </div>
                 </div>
@@ -34,8 +34,8 @@ const CardPrice = ({ title, subtitle, price, coin, time, text, }) => {
                     <img src={E} className="w-4 h-5" alt="Clock" />
                     </div>
                     <div className="flex-grow flex justify-center items-center mr-12">
-                        <p>
-                            <span className="text-blue">
+                        <p className="selection:text-black selection:bg-blue selection:bg-opacity-20">
+                            <span className="text-blue selection:text-black selection:bg-blue selection:bg-opacity-20">
                             {price}
                             </span> {coin} x mes
                         </p>

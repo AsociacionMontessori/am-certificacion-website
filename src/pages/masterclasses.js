@@ -11,7 +11,7 @@ const masterclasses = () => {
       <Layout>
         <main className="bg-gradient-to-r from-blue via-purple to-green -z-20">
           <Nav textColor="text-white" />
-          <section className="relative pl-10 md:pl-28 lg:pl-40 xl:pl-60 pt-10 md:pt-20">
+          <section className="relative pl-10 md:pl-28 lg:pl-40 xl:pl-60 pt-10 md:pt-20 selection:text-white selection:bg-green selection:bg-opacity-20">
             <div className="w-full m-1">
               <h1 style={{ fontFamily: "Alice", letterSpacing: ".4rem" }} className="text-[2rem] md:text-[3rem] lg:text-[5rem] xl:text-[10rem] text-white body-font">
                 MONTESSORI

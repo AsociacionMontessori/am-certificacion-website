@@ -31,7 +31,6 @@ block-content p {
   letter-spacing: 0.02em;
 }
 
-
 p {
   /* font-family: $fontstack_body; */
   line-height: 1.5;
@@ -79,11 +78,11 @@ p {
   border-radius: 50%;
 
   margin-top: -1em;
-  -webkit-box-shadow: 6px 6px 20px 1px rgba(0,0,0,0.09);
-  -moz-box-shadow: 6px 6px 20px 1px rgba(0,0,0,0.09);
-  box-shadow: 6px 6px 20px 1px rgba(0,0,0,0.09);
+  -webkit-box-shadow: 6px 6px 20px 1px rgba(0, 0, 0, 0.09);
+  -moz-box-shadow: 6px 6px 20px 1px rgba(0, 0, 0, 0.09);
+  box-shadow: 6px 6px 20px 1px rgba(0, 0, 0, 0.09);
   /* background: none repeat scroll 0% 0% #D90368; */
-  background: none repeat scroll 0% 0% #0097B2;
+  background: none repeat scroll 0% 0% #0097b2;
   /* border: 5px solid #fff; */
   animation: revealScaleUp 0.75s 0s ease both 1;
 }
@@ -103,10 +102,10 @@ p {
 .timeline-list li:nth-child(3):before {
   /* background: none repeat scroll 0% 0% #38709E; */
   margin-top: 3em;
-  -webkit-box-shadow: 6px 6px 20px 1px rgba(0,0,0,0.09);
-  -moz-box-shadow: 6px 6px 20px 1px rgba(0,0,0,0.09);
-  box-shadow: 6px 6px 20px 1px rgba(0,0,0,0.09);
-  background: none repeat scroll 0% 0% #D90368;
+  -webkit-box-shadow: 6px 6px 20px 1px rgba(0, 0, 0, 0.09);
+  -moz-box-shadow: 6px 6px 20px 1px rgba(0, 0, 0, 0.09);
+  box-shadow: 6px 6px 20px 1px rgba(0, 0, 0, 0.09);
+  background: none repeat scroll 0% 0% #d90368;
   animation-delay: 1.2s;
 }
 .timeline-list li:nth-child(3) .content {
@@ -115,10 +114,10 @@ p {
 .timeline-list li:nth-child(4):before {
   /* background: none repeat scroll 0% 0% #714A8B; */
   margin-top: 3em;
-  -webkit-box-shadow: 6px 6px 20px 1px rgba(0,0,0,0.09);
-  -moz-box-shadow: 6px 6px 20px 1px rgba(0,0,0,0.09);
-  box-shadow: 6px 6px 20px 1px rgba(0,0,0,0.09);
-  background: none repeat scroll 0% 0% #0097B2;
+  -webkit-box-shadow: 6px 6px 20px 1px rgba(0, 0, 0, 0.09);
+  -moz-box-shadow: 6px 6px 20px 1px rgba(0, 0, 0, 0.09);
+  box-shadow: 6px 6px 20px 1px rgba(0, 0, 0, 0.09);
+  background: none repeat scroll 0% 0% #0097b2;
   animation-delay: 1.8s;
 }
 .timeline-list li:nth-child(4) .content {
@@ -127,16 +126,129 @@ p {
 .timeline-list li:nth-child(5):before {
   /* background: none repeat scroll 0% 0% #A2297B; */
   margin-top: 3em;
-  -webkit-box-shadow: 6px 6px 20px 1px rgba(0,0,0,0.09);
-  -moz-box-shadow: 6px 6px 20px 1px rgba(0,0,0,0.09);
-  box-shadow: 6px 6px 20px 1px rgba(0,0,0,0.09);
-  background: none repeat scroll 0% 0% #D90368;
+  -webkit-box-shadow: 6px 6px 20px 1px rgba(0, 0, 0, 0.09);
+  -moz-box-shadow: 6px 6px 20px 1px rgba(0, 0, 0, 0.09);
+  box-shadow: 6px 6px 20px 1px rgba(0, 0, 0, 0.09);
+  background: none repeat scroll 0% 0% #d90368;
 
   animation-delay: 2s;
 }
 .timeline-list li:nth-child(5) .content {
   animation-delay: 2.3s;
 }
+
+.timeline-list li:nth-child(6):before {
+  /* background: none repeat scroll 0% 0% #714A8B; */
+  margin-top: 3em;
+  -webkit-box-shadow: 6px 6px 20px 1px rgba(0, 0, 0, 0.09);
+  -moz-box-shadow: 6px 6px 20px 1px rgba(0, 0, 0, 0.09);
+  box-shadow: 6px 6px 20px 1px rgba(0, 0, 0, 0.09);
+  background: none repeat scroll 0% 0% #0097b2;
+  animation-delay: 1.8s;
+}
+.timeline-list li:nth-child(6) .content {
+  animation-delay: 2.1s;
+}
+
+.timeline-list li:nth-child(7):before {
+  /* background: none repeat scroll 0% 0% #A2297B; */
+  margin-top: 3em;
+  -webkit-box-shadow: 6px 6px 20px 1px rgba(0, 0, 0, 0.09);
+  -moz-box-shadow: 6px 6px 20px 1px rgba(0, 0, 0, 0.09);
+  box-shadow: 6px 6px 20px 1px rgba(0, 0, 0, 0.09);
+  background: none repeat scroll 0% 0% #d90368;
+
+  animation-delay: 2s;
+}
+.timeline-list li:nth-child(7) .content {
+  animation-delay: 2.3s;
+}
+
+.timeline-list li:nth-child(8):before {
+  /* background: none repeat scroll 0% 0% #714A8B; */
+  margin-top: 3em;
+  -webkit-box-shadow: 6px 6px 20px 1px rgba(0, 0, 0, 0.09);
+  -moz-box-shadow: 6px 6px 20px 1px rgba(0, 0, 0, 0.09);
+  box-shadow: 6px 6px 20px 1px rgba(0, 0, 0, 0.09);
+  background: none repeat scroll 0% 0% #0097b2;
+  animation-delay: 1.8s;
+}
+.timeline-list li:nth-child(8) .content {
+  animation-delay: 2.1s;
+}
+
+
+
+
+.timeline-list li:nth-child(9):before {
+  /* background: none repeat scroll 0% 0% #A2297B; */
+  margin-top: 3em;
+  -webkit-box-shadow: 6px 6px 20px 1px rgba(0, 0, 0, 0.09);
+  -moz-box-shadow: 6px 6px 20px 1px rgba(0, 0, 0, 0.09);
+  box-shadow: 6px 6px 20px 1px rgba(0, 0, 0, 0.09);
+  background: none repeat scroll 0% 0% #d90368;
+
+  animation-delay: 2s;
+}
+.timeline-list li:nth-child(9) .content {
+  animation-delay: 2.3s;
+}
+
+.timeline-list li:nth-child(10):before {
+  /* background: none repeat scroll 0% 0% #714A8B; */
+  margin-top: 3em;
+  -webkit-box-shadow: 6px 6px 20px 1px rgba(0, 0, 0, 0.09);
+  -moz-box-shadow: 6px 6px 20px 1px rgba(0, 0, 0, 0.09);
+  box-shadow: 6px 6px 20px 1px rgba(0, 0, 0, 0.09);
+  background: none repeat scroll 0% 0% #0097b2;
+  animation-delay: 1.8s;
+}
+.timeline-list li:nth-child(10) .content {
+  animation-delay: 2.1s;
+}
+
+
+.timeline-list li:nth-child(11):before {
+  /* background: none repeat scroll 0% 0% #A2297B; */
+  margin-top: 3em;
+  -webkit-box-shadow: 6px 6px 20px 1px rgba(0, 0, 0, 0.09);
+  -moz-box-shadow: 6px 6px 20px 1px rgba(0, 0, 0, 0.09);
+  box-shadow: 6px 6px 20px 1px rgba(0, 0, 0, 0.09);
+  background: none repeat scroll 0% 0% #d90368;
+
+  animation-delay: 2s;
+}
+.timeline-list li:nth-child(11) .content {
+  animation-delay: 2.3s;
+}
+
+.timeline-list li:nth-child(12):before {
+  /* background: none repeat scroll 0% 0% #714A8B; */
+  margin-top: 3em;
+  -webkit-box-shadow: 6px 6px 20px 1px rgba(0, 0, 0, 0.09);
+  -moz-box-shadow: 6px 6px 20px 1px rgba(0, 0, 0, 0.09);
+  box-shadow: 6px 6px 20px 1px rgba(0, 0, 0, 0.09);
+  background: none repeat scroll 0% 0% #0097b2;
+  animation-delay: 1.8s;
+}
+.timeline-list li:nth-child(12) .content {
+  animation-delay: 2.1s;
+}
+
+.timeline-list li:nth-child(12):before {
+  /* background: none repeat scroll 0% 0% #A2297B; */
+  margin-top: 3em;
+  -webkit-box-shadow: 6px 6px 20px 1px rgba(0, 0, 0, 0.09);
+  -moz-box-shadow: 6px 6px 20px 1px rgba(0, 0, 0, 0.09);
+  box-shadow: 6px 6px 20px 1px rgba(0, 0, 0, 0.09);
+  background: none repeat scroll 0% 0% #d90368;
+
+  animation-delay: 2s;
+}
+.timeline-list li:nth-child(12) .content {
+  animation-delay: 2.3s;
+}
+
 @keyframes revealFromLeft {
   0% {
     transform: translateX(-1em);

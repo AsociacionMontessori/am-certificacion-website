@@ -62,18 +62,18 @@ const CertificationPrice = () => {
                 </h2>
                 <div className="bg-white rounded-3xl">
                     <div className="sm:flex sm:mx-auto max-w-7xl px-6 pb-10 pt-10 lg:px-12 xl:px-6 2xl:px-0">
-                        <div className="w-full md:2/4 w-3/4 md:relative md:block md:flex sm:flex-col">
+                        <div className="w-full md:2/4 w-3/4 md:relative md:block md:flex sm:flex-col ">
                             <h3>
-                                <span className="text-red md:text-2xl text-xl">
+                                <span className="text-red md:text-2xl text-xl selection:text-white selection:bg-red selection:bg-opacity-40">
                                     Certificación internacional
                                 </span>
                             </h3>
                             <h2 className="mt-5">
-                                <span className="font-medium text-black md:text-6xl text-3xl">
+                                <span className="font-medium text-black md:text-6xl text-3xl selection:text-white selection:bg-red selection:bg-opacity-40">
                                     Guía Montessori
                                 </span>
                             </h2>
-                            <div className="w-full sm:w-3/4 sm:pt-10 md:pr-24 text-lg text-black">
+                            <div className="w-full sm:w-3/4 sm:pt-10 md:pr-24 text-lg text-black selection:text-white selection:bg-red selection:bg-opacity-40">
                                 <p>
                                     Ofrecemos programas de certificación con reconocimiento internacional, diseñados para proporcionar una sólida base en el método y la filosofía Montessori.
                                     <br />
@@ -108,7 +108,7 @@ const CertificationPrice = () => {
 
                 <section id="prices" className="mt-24 mb-10">
 
-                    <div className="flex flex-col md:flex-row flex-wrap sm:flex-nowrap content-center sm:space-x-32 justify-center">
+                    <div className="flex flex-col md:flex-row flex-wrap sm:flex-nowrap content-center sm:space-x-32 justify-center selection:bg-blue selection:text-black">
 
                         {certificado.map((price, index) => {
                             const { title, subtitle, text, duration, footer } = price;

@@ -9,6 +9,56 @@ import { StaticImage } from "gatsby-plugin-image"
 import Timeline from '../components/timeline/timeline'
 import Nav from "../components/nav"
 
+function CustomParagraph1({ text }) {
+  return (
+    <p className="italic bg-red/20 dark:bg-black hover:font-semibold dark:hover:text-blue rounded-full py-3 px-10 dark:text-white/80 mx-3 selection:bg-blue selection:text-white">
+      {text}
+    </p>
+  );
+}
+function CustomParagraph2({ text }) {
+  return (
+    <p className="italic bg-red/20 dark:bg-black hover:font-semibold dark:hover:text-green/70 rounded-full py-3 px-10 dark:text-white/80 mx-3 selection:bg-green/70 selection:text-white">
+      {text}
+    </p>
+  );
+}
+
+const phrases = [
+  "El niño crea sus propios movimientos y, una vez creados, los perfecciona",
+  "No se puede ser libre, si no se es independiente",
+  "Lo que la mano hace, la mente lo recuerda",
+  "El niño crea sus propios movimientos y, una vez creados, los perfecciona",
+  "No se puede ser libre, si no se es independiente",
+  "Lo que la mano hace, la mente lo recuerda",
+  "El niño crea sus propios movimientos y, una vez creados, los perfecciona",
+  "No se puede ser libre, si no se es independiente",
+  "Lo que la mano hace, la mente lo recuerda",
+  "El niño crea sus propios movimientos y, una vez creados, los perfecciona",
+  "No se puede ser libre, si no se es independiente",
+  "Lo que la mano hace, la mente lo recuerda",
+  "El niño crea sus propios movimientos y, una vez creados, los perfecciona",
+  "No se puede ser libre, si no se es independiente",
+  "Lo que la mano hace, la mente lo recuerda",
+];
+
+const phrases2 = [
+  "No se puede ser libre, si no se es independiente",
+  "Lo que la mano hace, la mente lo recuerda",
+  "El niño crea sus propios movimientos y, una vez creados, los perfecciona",
+  "No se puede ser libre, si no se es independiente",
+  "Lo que la mano hace, la mente lo recuerda",
+  "El niño crea sus propios movimientos y, una vez creados, los perfecciona",
+  "No se puede ser libre, si no se es independiente",
+  "Lo que la mano hace, la mente lo recuerda",
+  "El niño crea sus propios movimientos y, una vez creados, los perfecciona",
+  "No se puede ser libre, si no se es independiente",
+  "Lo que la mano hace, la mente lo recuerda",
+  "El niño crea sus propios movimientos y, una vez creados, los perfecciona",
+  "No se puede ser libre, si no se es independiente",
+  "Lo que la mano hace, la mente lo recuerda",
+];
+
 const IndexPage = () => (
   <Layout>
     <Nav textColor="text-white" />
@@ -16,10 +66,10 @@ const IndexPage = () => (
       <section id="home" className="relative flex min-h-screen items-center">
         <div aria-hidden="true" className="absolute inset-0 z-[1] bg-gradient-to-b from-white/0 via-white/10 to-white/60  dark:bg-gradient-to-b dark:from-white/0 dark:via-gray/20 dark:to-gray" />
         <img src={imagen} className="fixed inset-0 h-full w-full object-cover" alt="woman in dark" width="4160" height="6240" />
-        <div className="relative z-10 mx-auto max-w-7xl px-6 pb-40 pt-40 lg:px-12 xl:px-6 2xl:px-0">
+        <div className="relative z-10 mx-auto max-w-7xl px-6 pb-40 pt-40 lg:px-12 xl:px-6 2xl:px-0 selection:text-white selection:bg-green selection:bg-opacity-20">
           <div className="pb-12 media-h:md:pb-32 media-h:lg:pb-4 xl:pb-4">
             <h1 data-rellax-speed="-3" data-rellax-xs-speed="0" data-rellax-mobile-speed="0" className="rellax text-6xl font-bold text-white sm:text-7xl md:text-8xl xl:leading-tight" >
-              Asociación Montessori
+              Asociación Montessori <br/>de México A.C.
             </h1>
           </div>
           <div>
@@ -41,7 +91,7 @@ const IndexPage = () => (
       </section>
       <section id="work" className="relative py-5 z-10 bg-white dark:bg-gray lg:pt-0">
         <div className="mx-auto max-w-7xl px-6 lg:px-12 xl:px-6 2xl:px-0 pt-10">
-          <div data-rellax-speed="-3" data-rellax-xs-speed="0" data-rellax-mobile-speed="0" className="rellax flex flex-wrap items-center gap-6">
+          <div data-rellax-speed="-3" data-rellax-xs-speed="0" data-rellax-mobile-speed="0" className="rellax flex flex-wrap items-center gap-6 selection:text-white selection:bg-red selection:bg-opacity-20">
             <h2 className="pt-5 text-5xl text-red font-bold dark:text-white xl:text-6xl">EDUCACIÓN SIGNIFICATIVA</h2>
             <p className="text-2xl">
               En la educación significativa, se busca que los <strong className="text-blue dark:text-red">estudiantes se involucren de manera activa en su propio proceso de aprendizaje,</strong> relacionando los nuevos conceptos con su conocimiento previo y con su entorno. El objetivo es que los estudiantes no solo adquieran información de manera pasiva, sino que la comprendan, le encuentren sentido y la integren en su propia estructura cognitiva.
@@ -51,51 +101,21 @@ const IndexPage = () => (
         <div className="overflow-hidden mt-5">
           <section className="my-5 block h-12 overflow-hidden relative w-max marquee-left xxl:hidden">
             <div className="flex float-left w-50">
-              <p className="italic bg-red/20 dark:bg-black hover:font-semibold dark:hover:text-blue rounded-full py-3 px-10 dark:text-white/80 mx-3">El niño crea sus propios movimientos y, una vez creados, los perfecciona</p>
-              <p className="italic bg-red/20 dark:bg-black hover:font-semibold dark:hover:text-blue rounded-full py-3 px-10 dark:text-white/80 mx-3">No se puede ser libre, si no se es independiente</p>
-              <p className="italic bg-red/20 dark:bg-black hover:font-semibold dark:hover:text-blue rounded-full py-3 px-10 dark:text-white/80 mx-3">Lo que la mano hace, la mente lo recuerda</p>
-              <p className="italic bg-red/20 dark:bg-black hover:font-semibold dark:hover:text-blue rounded-full py-3 px-10 dark:text-white/80 mx-3">El niño crea sus propios movimientos y, una vez creados, los perfecciona</p>
-              <p className="italic bg-red/20 dark:bg-black hover:font-semibold dark:hover:text-blue rounded-full py-3 px-10 dark:text-white/80 mx-3">No se puede ser libre, si no se es independiente</p>
-              <p className="italic bg-red/20 dark:bg-black hover:font-semibold dark:hover:text-blue rounded-full py-3 px-10 dark:text-white/80 mx-3">Lo que la mano hace, la mente lo recuerda</p>
-              <p className="italic bg-red/20 dark:bg-black hover:font-semibold dark:hover:text-blue rounded-full py-3 px-10 dark:text-white/80 mx-3">El niño crea sus propios movimientos y, una vez creados, los perfecciona</p>
-              <p className="italic bg-red/20 dark:bg-black hover:font-semibold dark:hover:text-blue rounded-full py-3 px-10 dark:text-white/80 mx-3">No se puede ser libre, si no se es independiente</p>
-              <p className="italic bg-red/20 dark:bg-black hover:font-semibold dark:hover:text-blue rounded-full py-3 px-10 dark:text-white/80 mx-3">Lo que la mano hace, la mente lo recuerda</p>
-              <p className="italic bg-red/20 dark:bg-black hover:font-semibold dark:hover:text-blue rounded-full py-3 px-10 dark:text-white/80 mx-3">El niño crea sus propios movimientos y, una vez creados, los perfecciona</p>
-              <p className="italic bg-red/20 dark:bg-black hover:font-semibold dark:hover:text-blue rounded-full py-3 px-10 dark:text-white/80 mx-3">No se puede ser libre, si no se es independiente</p>
-              <p className="italic bg-red/20 dark:bg-black hover:font-semibold dark:hover:text-blue rounded-full py-3 px-10 dark:text-white/80 mx-3">Lo que la mano hace, la mente lo recuerda</p>
-              <p className="italic bg-red/20 dark:bg-black hover:font-semibold dark:hover:text-blue rounded-full py-3 px-10 dark:text-white/80 mx-3">El niño crea sus propios movimientos y, una vez creados, los perfecciona</p>
-              <p className="italic bg-red/20 dark:bg-black hover:font-semibold dark:hover:text-blue rounded-full py-3 px-10 dark:text-white/80 mx-3">No se puede ser libre, si no se es independiente</p>
-              <p className="italic bg-red/20 dark:bg-black hover:font-semibold dark:hover:text-blue rounded-full py-3 px-10 dark:text-white/80 mx-3">Lo que la mano hace, la mente lo recuerda</p>
-              <p className="italic bg-red/20 dark:bg-black hover:font-semibold dark:hover:text-blue rounded-full py-3 px-10 dark:text-white/80 mx-3">El niño crea sus propios movimientos y, una vez creados, los perfecciona</p>
-              <p className="italic bg-red/20 dark:bg-black hover:font-semibold dark:hover:text-blue rounded-full py-3 px-10 dark:text-white/80 mx-3">No se puede ser libre, si no se es independiente</p>
-              <p className="italic bg-red/20 dark:bg-black hover:font-semibold dark:hover:text-blue rounded-full py-3 px-10 dark:text-white/80 mx-3">Lo que la mano hace, la mente lo recuerda</p>
+              {phrases.map((phrase, index) => (
+                <CustomParagraph1 key={index} text={phrase} />
+              ))}
             </div>
           </section>
           <section className="my-5 block h-12 overflow-hidden relative w-max marquee-left xxl:hidden mb-20">
             <div className="flex float-left w-50">
-              <p className="italic bg-red/20 dark:bg-black hover:font-semibold dark:hover:text-green/70 rounded-full py-3 px-10 dark:text-white/80 mx-3">No se puede ser libre, si no se es independiente</p>
-              <p className="italic bg-red/20 dark:bg-black hover:font-semibold dark:hover:text-green/70 rounded-full py-3 px-10 dark:text-white/80 mx-3">Lo que la mano hace, la mente lo recuerda</p>
-              <p className="italic bg-red/20 dark:bg-black hover:font-semibold dark:hover:text-green/70 rounded-full py-3 px-10 dark:text-white/80 mx-3">El niño crea sus propios movimientos y, una vez creados, los perfecciona</p>
-              <p className="italic bg-red/20 dark:bg-black hover:font-semibold dark:hover:text-green/70 rounded-full py-3 px-10 dark:text-white/80 mx-3">No se puede ser libre, si no se es independiente</p>
-              <p className="italic bg-red/20 dark:bg-black hover:font-semibold dark:hover:text-green/70 rounded-full py-3 px-10 dark:text-white/80 mx-3">Lo que la mano hace, la mente lo recuerda</p>
-              <p className="italic bg-red/20 dark:bg-black hover:font-semibold dark:hover:text-green/70 rounded-full py-3 px-10 dark:text-white/80 mx-3">El niño crea sus propios movimientos y, una vez creados, los perfecciona</p>
-              <p className="italic bg-red/20 dark:bg-black hover:font-semibold dark:hover:text-green/70 rounded-full py-3 px-10 dark:text-white/80 mx-3">No se puede ser libre, si no se es independiente</p>
-              <p className="italic bg-red/20 dark:bg-black hover:font-semibold dark:hover:text-green/70 rounded-full py-3 px-10 dark:text-white/80 mx-3">Lo que la mano hace, la mente lo recuerda</p>
-              <p className="italic bg-red/20 dark:bg-black hover:font-semibold dark:hover:text-green/70 rounded-full py-3 px-10 dark:text-white/80 mx-3">El niño crea sus propios movimientos y, una vez creados, los perfecciona</p>
-              <p className="italic bg-red/20 dark:bg-black hover:font-semibold dark:hover:text-green/70 rounded-full py-3 px-10 dark:text-white/80 mx-3">No se puede ser libre, si no se es independiente</p>
-              <p className="italic bg-red/20 dark:bg-black hover:font-semibold dark:hover:text-green/70 rounded-full py-3 px-10 dark:text-white/80 mx-3">Lo que la mano hace, la mente lo recuerda</p>
-              <p className="italic bg-red/20 dark:bg-black hover:font-semibold dark:hover:text-green/70 rounded-full py-3 px-10 dark:text-white/80 mx-3">El niño crea sus propios movimientos y, una vez creados, los perfecciona</p>
-              <p className="italic bg-red/20 dark:bg-black hover:font-semibold dark:hover:text-green/70 rounded-full py-3 px-10 dark:text-white/80 mx-3">No se puede ser libre, si no se es independiente</p>
-              <p className="italic bg-red/20 dark:bg-black hover:font-semibold dark:hover:text-green/70 rounded-full py-3 px-10 dark:text-white/80 mx-3">Lo que la mano hace, la mente lo recuerda</p>
-              <p className="italic bg-red/20 dark:bg-black hover:font-semibold dark:hover:text-green/70 rounded-full py-3 px-10 dark:text-white/80 mx-3">El niño crea sus propios movimientos y, una vez creados, los perfecciona</p>
-              <p className="italic bg-red/20 dark:bg-black hover:font-semibold dark:hover:text-green/70 rounded-full py-3 px-10 dark:text-white/80 mx-3">No se puede ser libre, si no se es independiente</p>
-              <p className="italic bg-red/20 dark:bg-black hover:font-semibold dark:hover:text-green/70 rounded-full py-3 px-10 dark:text-white/80 mx-3">Lo que la mano hace, la mente lo recuerda</p>
-              <p className="italic bg-red/20 dark:bg-black hover:font-semibold dark:hover:text-green/70 rounded-full py-3 px-10 dark:text-white/80 mx-3">El niño crea sus propios movimientos y, una vez creados, los perfecciona</p>
+              {phrases2.map((phrase, index) => (
+                <CustomParagraph2 key={index} text={phrase} />
+              ))}
             </div>
           </section>
           <section className="bg-gradient-to-r from-blue via-purple to-green py-20">
             <div className="flex justify-center">
-              <div className="flex justify-center relative w-full">
+              <div className="flex justify-center relative w-full selection:text-white selection:bg-green selection:bg-opacity-20">
                 <img src={ImgMapDark} className="w-full h-3/12 dark:hidden" alt="map" />
                 <img src={ImgMap} className="w-full h-3/12 hidden dark:block" alt="map in dark" />
                 <div className="flex justify-center absolute top-1/3 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full">
