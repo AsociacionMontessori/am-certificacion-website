@@ -19,7 +19,7 @@ const masterclasses = () => {
               <h2 style={{ fontFamily: "Italianno" }} className="text-[2rem] md:text-[3rem] lg:text-[5rem] text-white absolute top-[2vh] left-[10vw]">
                 MasterClasses
               </h2>
-              <p className="text-white text-sm pr-10 tr-0 md:text-xl z-20">
+              <p className="text-white text-sm md:text-md lg:text-xl pr-10 tr-0 md:text-xl z-20">
                 Conoce nuestro amplio catálogo de experiencias y conocimientos que te ayudarán a mejorar tu práctica docente.
               </p>
 
@@ -29,7 +29,7 @@ const masterclasses = () => {
           <section className="bg-white dark:bg-gray">
             {/* <Timeline /> */}
             <div className="w-full h-[180vh] md:h-[80vh]">
-              <iframe className="sm:overflow-hidden" style={{ marginTop: "200px" }} src="https://staging2.certificacionmontessori.com/wp/" name="myiFrame" scrolling="no" frameborder="1" marginheight="0px" marginwidth="0px" height="100%" width="100%" allowfullscreen></iframe>
+              <iframe className="sm:overflow-hidden" style={{ marginTop: "200px" }} src="https://certificacionmontessori.com/wp/montessori-masterclass" name="myiFrame" scrolling="no" frameborder="1" marginheight="0px" marginwidth="0px" height="100%" width="100%" allowfullscreen></iframe>
             </div>
 
           </section>
