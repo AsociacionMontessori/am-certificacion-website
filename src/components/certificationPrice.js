@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from "react"
 
-
-import Card from './cards/card'
-import CardInscription from './cards/inscriptionCard'
-import CardCertification from './cards/cardCertification'
-import axios from 'axios'
+import Card from "./cards/card"
+import CardInscription from "./cards/inscriptionCard"
+import CardCertification from "./cards/cardCertification"
+import axios from "axios"
 
 const CertificationPrice = () => {
     const [state, setState] = useState({
@@ -14,16 +13,17 @@ const CertificationPrice = () => {
     })
 
     const getLocalizedPrice = (state, priceData) => {
-        const { countryName } = state;
-        const coin = countryName === 'Mexico' ? 'MXN' : 'USD';
-        const priceToShow = countryName === 'Mexico' ? priceData.priceMx : priceData.priceUsd;
-        return { coin, priceToShow };
-    };
+        const { countryName } = state
+        const coin = countryName === "Mexico" ? "MXN" : "USD"
+        const priceToShow =
+            countryName === "Mexico" ? priceData.priceMx : priceData.priceUsd
+        return { coin, priceToShow }
+    }
 
     const getGeoInfo = () => {
         axios
             .get("https://ipapi.co/json/")
-            .then((response) => {
+            .then(response => {
                 let data = response.data
                 setState({
                     ...state,
@@ -32,33 +32,72 @@ const CertificationPrice = () => {
                     city: data.city,
                 })
             })
-            .catch((error) => {
-                console.log(error);
+            .catch(error => {
+                console.log(error)
             })
     }
 
     useEffect(() => {
-        getGeoInfo();
+        getGeoInfo()
     }, [])
 
     const certificado = [
-        { title: 'Certificado', subtitle: 'único pago', priceMx: '2,500', priceUsd: '200', text: 'Único pago de ', footer: "+  gasto de envío fuera de México" }
+        {
+            title: "Certificado",
+            subtitle: "único pago",
+            priceMx: "2,500",
+            priceUsd: "200",
+            text: "Único pago de ",
+            footer: "+  gasto de envío fuera de México",
+        },
     ]
 
     const prices = [
-        { title: 'Nido', subtitle: 'y comunidad infantil', priceMx: '3,800', priceUsd: '210', text: 'Nido y Comunidad infantil', duration: '16 meses' },
-        { title: 'Casa de Niños', subtitle: 'certifícate como guía montessori', priceMx: '4,000', priceUsd: '230', text: 'Casa de niños', duration: '17 meses' },
-        { title: 'Taller', subtitle: 'único pago', priceMx: '4,500', priceUsd: '250', text: 'Taller I y II', duration: '20 meses' },
+        {
+            title: "Nido",
+            subtitle: "y comunidad infantil",
+            priceMx: "3,800",
+            priceUsd: "210",
+            text: "Nido y Comunidad infantil",
+            duration: "16 meses",
+        },
+        {
+            title: "Casa de Niños",
+            subtitle: "certifícate como guía montessori",
+            priceMx: "4,000",
+            priceUsd: "230",
+            text: "Casa de niños",
+            duration: "17 meses",
+        },
+        {
+            title: "Taller",
+            subtitle: "único pago",
+            priceMx: "4,500",
+            priceUsd: "250",
+            text: "Taller I y II",
+            duration: "20 meses",
+        },
     ]
 
     const inscripcion = [
-        { title: 'Inscripción', subtitle: 'único pago', priceMx: '5,000', priceUsd: '299', text: 'Único pago de' },
+        {
+            title: "Inscripción",
+            subtitle: "único pago",
+            priceMx: "5,000",
+            priceUsd: "299",
+            text: "Único pago de",
+        },
     ]
     return (
         <>
-            <section id="certificacion_internacional" className="relative py-5 z-10  bg-gradient-to-r from-blue to-green">
+            <section
+                id="certificacion_internacional"
+                className="relative py-5 z-10  bg-gradient-to-r from-blue to-green"
+            >
                 <h2 className="mx-auto max-w-7xl px-6 pb-10 pt-10 lg:px-12 xl:px-6 2xl:px-0">
-                    <span className="text-white text-2xl md:text-6xl font-bold">Certificación Montessori</span>
+                    <span className="text-white text-2xl md:text-6xl font-bold">
+                        Certificación Montessori
+                    </span>
                 </h2>
                 <div className="bg-white rounded-3xl">
                     <div className="sm:flex sm:mx-auto max-w-7xl px-6 pb-10 pt-10 lg:px-12 xl:px-6 2xl:px-0">
@@ -104,17 +143,13 @@ const CertificationPrice = () => {
                         </div>
                     </div>
                 </div>
-
-
-                <section id="prices" className="mt-24 mb-10">
-
-                    <div className="flex flex-col md:flex-row flex-wrap sm:flex-nowrap content-center sm:space-x-32 justify-center selection:bg-blue selection:text-black">
-
+                <section id="prices" className="mt-24 mb-10 px-4 sm:mx-auto max-w-7xl px-6  lg:px-12 xl:px-6 2xl:px-0">
+                    <div className="flex flex-wrap content-center justify-center selection:bg-blue selection:text-black">
                         {certificado.map((price, index) => {
-                            const { title, subtitle, text, duration, footer } = price;
-                            const { coin, priceToShow } = getLocalizedPrice(state, price);
+                            const { title, subtitle, text, duration, footer } = price
+                            const { coin, priceToShow } = getLocalizedPrice(state, price)
                             return (
-                                <div className="py-3 sm:pt-0" key={index}>
+                                <div className="py-3 sm:pt-0 xl:m-10 lg:m-5 md:m-2 sm:m-1" key={index}>
                                     <CardCertification
                                         title={title}
                                         subtitle={subtitle}
@@ -122,16 +157,16 @@ const CertificationPrice = () => {
                                         price={priceToShow}
                                         text={text}
                                         time={duration}
-                                        footer={footer} />
+                                        footer={footer}
+                                    />
                                 </div>
                             )
                         })}
-
                         {prices.map((price, index) => {
-                            const { title, subtitle, text, duration } = price;
-                            const { coin, priceToShow } = getLocalizedPrice(state, price);
+                            const { title, subtitle, text, duration } = price
+                            const { coin, priceToShow } = getLocalizedPrice(state, price)
                             return (
-                                <div className="py-3 sm:pt-0" key={index}>
+                                <div className="py-3 sm:pt-0 xl:m-10 lg:m-5 md:m-2 sm:m-1" key={index}>
                                     <Card
                                         title={title}
                                         subtitle={subtitle}
@@ -144,11 +179,7 @@ const CertificationPrice = () => {
                             )
                         })}
                     </div>
-
-                    <div>
-
-                    </div>
-                    <p className="mx-auto max-w-7xl px-6 pb-10 pt-10 lg:px-12 xl:px-6 2xl:px-0 text-white text-sm">
+                    <p className="text-white md:text-sm text-xs md:text-left xl:ml-12 lg:ml-10 md:ml-6 sm:ml-2">
                         Precios sujetos a disponibilidad. Aplican Términos y Condiciones.
                     </p>
                 </section>
@@ -158,7 +189,3 @@ const CertificationPrice = () => {
 }
 
 export default CertificationPrice
-
-
-
-

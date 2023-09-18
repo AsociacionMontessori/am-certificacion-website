@@ -7,7 +7,7 @@ import Button from '../button'
 const CardInscription = ({ title, subtitle, price, coin, time, text, }) => {
     return (
         <>
-            <div className="flex justify-start items-center flex-col bg-white w-72 lg:w-72 xl:w-80 max-h-full h-full rounded-3xl text-lg text-black">
+            <div className="flex justify-start items-center flex-col bg-white w-auto lg:w-72 xl:w-80 max-h-full h-full rounded-3xl text-lg text-black">
                 <div className="text-3xl mt-12 selection:text-black selection:bg-blue selection:bg-opacity-20">
                     {title}
                 </div>

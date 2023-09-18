@@ -61,9 +61,9 @@ const phrases2 = [
 
 const IndexPage = () => (
   <Layout>
-    <Nav textColor="text-white" />
+    {/* <Nav textColor="text-white" /> */}
     <main>
-      <section id="home" className="relative flex min-h-screen items-center">
+      <section id="home" className="relative flex items-center">
         <div aria-hidden="true" className="absolute inset-0 z-[1] bg-gradient-to-b from-white/0 via-white/10 to-white/60  dark:bg-gradient-to-b dark:from-white/0 dark:via-gray/20 dark:to-gray" />
         <img src={imagen} className="fixed inset-0 h-full w-full object-cover" alt="woman in dark" width="4160" height="6240" />
         <div className="relative z-10 mx-auto max-w-7xl px-6 pb-40 pt-40 lg:px-12 xl:px-6 2xl:px-0 selection:text-white selection:bg-green selection:bg-opacity-20">
