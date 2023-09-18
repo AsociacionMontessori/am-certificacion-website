@@ -85,9 +85,9 @@ const publicaciones = () => {
                         </div>
                     </section>
                     <div className="w-full bg-white h-full mt-10">
-                        <h3 className="pl-10 md:ml-40 text-3xl sm:text-5xl text-black py-3">
+                        {/* <h3 className="pl-10 md:ml-40 text-3xl sm:text-5xl text-black py-3">
                             Conoce nuestro blog (próximamente)
-                        </h3>
+                        </h3> */}
                     </div>
                     <section className="bg-white h-[80rem] sm:h-[35.5rem]">
                         <iframe src="https://carlosalfonsor5.sg-host.com/180-2/" className="px-10 sm:px-0" width="100%" height="100%"></iframe>

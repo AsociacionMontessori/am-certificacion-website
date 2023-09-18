@@ -69,7 +69,7 @@ const IndexPage = () => (
         <div className="relative z-10 mx-auto max-w-7xl px-6 pb-40 pt-40 lg:px-12 xl:px-6 2xl:px-0 selection:text-white selection:bg-green selection:bg-opacity-20">
           <div className="pb-12 media-h:md:pb-32 media-h:lg:pb-4 xl:pb-4">
             <h1 data-rellax-speed="-3" data-rellax-xs-speed="0" data-rellax-mobile-speed="0" className="rellax text-6xl font-bold text-white sm:text-7xl md:text-8xl xl:leading-tight" >
-              Asociación Montessori <br/>de México A.C.
+              Asociación Montessori <br />de México A.C.
             </h1>
           </div>
           <div>
@@ -133,7 +133,7 @@ const IndexPage = () => (
                   <StaticImage src="../images/countries/eng.png" alt="English flag" className="h-10 w-10 md:w-16 md:h-16 transform hover:scale-110 transition-transform bounce-animation delay-18s" />
                 </div>
                 <div className="absolute mb-20 md:mt-0 mt-20 top-3/4 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full">
-                  <p className="font-bold text-center lg:text-2xl text-sm lg:p-0 p-2 text-white">
+                  <p className="font-bold text-center lg:text-2xl text-xs md:text-sm lg:p-0 p-2 text-white uppercase font-light">
                     Las certificaciones Montessori cuentan con un gran reconocimiento en todo el mundo
                   </p>
                 </div>

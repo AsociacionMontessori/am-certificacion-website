@@ -167,7 +167,7 @@ const Timeline = () => {
                                         <h3 className="text-black dark:text-white text-2xl sm:text-4xl md:text-5xl dark:px-2 px-4 py-2 mt-4  bg-blue w-full md:w-3/5 rounded-3xl bg-opacity-10 dark:bg-opacity-0">
                                             {item.title}
                                         </h3>
-                                        <p className="text-black dark:text-white sm:text-2xl md:text-3xl pt-5 ">{item.content}</p>
+                                        <p className="text-black font-thin dark:text-white sm:text-2xl md:text-3xl pt-5 ">{item.content}</p>
                                         <div className="hidden lg:block">
                                             <span className={`absolute dark:opacity-60 opacity-30 dark:opacity-70 top-20 text-8xl font-bold mt-20 -ml-60 -rotate-90 text-${item.color}`}>{item.year}</span>
                                         </div>

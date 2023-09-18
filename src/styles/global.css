@@ -2,10 +2,28 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+    font-family: sansSerifBook;
+    src: url(fonts/sansserifflf/SansSerifBookFLF.otf);
+}
+
 body {
     margin: 0;
     padding: 0;
+    font-family: 'Helvetica', 'Arial', sans-serif;
+    /* font-family: sansSerifBook; */
 }
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: sansSerifBook;
+}
+
+
 
 .marquee-left {
     position: relative;

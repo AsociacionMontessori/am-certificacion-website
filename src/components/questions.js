@@ -37,7 +37,7 @@ const Questions = () => {
         <div className="bg-white w-10/12 md:w-8/12 m-10 rounded-tl-3xl rounded-br-3xl text-black selection:text-black selection:bg-green selection:bg-opacity-20">
             <div className="sm:p-10 p-2">
                 <div className="md:p-5 p-2">
-                    <h2 className="md:text-4xl lg:text-6xl text-xl font-medium">Preguntas Frecuentes</h2>
+                    <h2 className="md:text-4xl lg:text-6xl text-xl font-medium text-red">Preguntas Frecuentes</h2>
                 </div>
                 <div className="md:p-5 p-2">
                     {preguntasRespuestas.map((item, index) => (
@@ -50,7 +50,7 @@ const Questions = () => {
                                     <ChevronDownIcon className="h-6 w-6 flex-shrink-0 min-w-[24px]" />}
                             </div>
                             {respuestasVisibles[index] && (
-                                <p className="lg:text-2xl md:text-base text-xs m-1 my-2 md:m-4">{item.respuesta}</p>
+                                <p className="lg:text-2xl md:text-base text-xs m-1 my-2 md:m-4 font-light">{item.respuesta}</p>
                             )}
                         </div>
                     ))}
