@@ -8,10 +8,9 @@
 }
 
 body {
-    margin: 0;
-    padding: 0;
+  margin: 0;
+  padding: 0;
     font-family: 'Helvetica', 'Arial', sans-serif;
-    /* font-family: sansSerifBook; */
 }
 
 h1,
@@ -26,75 +25,74 @@ h6 {
 
 
 .marquee-left {
-    position: relative;
-    animation: rightleft 150s linear infinite;
-    white-space: nowrap;
-    overflow: hidden;
+  position: relative;
+  animation: rightleft 150s linear infinite;
+  white-space: nowrap;
+  overflow: hidden;
 }
 
 @keyframes rightleft {
-    0% {
-        left: 0;
-    }
+  0% {
+    left: 0;
+  }
 
-    100% {
-        left: -120%;
-    }
+  100% {
+    left: -120%;
+  }
 }
 
 @media (max-width: 640px) {
-    @keyframes rightleft {
-        0% {
-            left: 0;
-        }
-
-        100% {
-            left: -1200%;
-        }
+  @keyframes rightleft {
+    0% {
+      left: 0;
     }
+
+    100% {
+      left: -1200%;
+    }
+  }
 }
 
 @keyframes bounce {
+  0%,
+  4.76%,
+  100% {
+    transform: translateY(0);
+  }
 
-    0%,
-    4.76%,
-    100% {
-        transform: translateY(0);
-    }
-
-    2.38% {
-        transform: translateY(-10px);
-    }
+  2.38% {
+    transform: translateY(-10px);
+  }
 }
 
 .bounce-animation {
-    animation: bounce 21s infinite;
+  animation: bounce 21s infinite;
 }
 
 .delay-0s {
-    animation-delay: 0s;
+  animation-delay: 0s;
 }
 
 .delay-3s {
-    animation-delay: 3s;
+  animation-delay: 3s;
 }
 
 .delay-6s {
-    animation-delay: 6s;
+  animation-delay: 6s;
 }
 
 .delay-9s {
-    animation-delay: 9s;
+  animation-delay: 9s;
 }
 
 .delay-12s {
-    animation-delay: 12s;
+  animation-delay: 12s;
 }
 
 .delay-15s {
-    animation-delay: 15s;
+  animation-delay: 15s;
 }
 
 .delay-18s {
-    animation-delay: 18s;
+  animation-delay: 18s;
 }

@@ -1,6 +1,4 @@
 import * as React from "react"
-import Clock from "../../images/gifs/clock.gif"
-import E from "../../images/e.png"
 import Button from '../button'
 
 
@@ -25,7 +23,7 @@ const CardInscription = ({ title, subtitle, price, coin, time, text, }) => {
                     </p>
                 </div>
                 <div className="flex mt-10 w-full justify-center mt-24">
-                    <a href="https://api.whatsapp.com/send?phone=5215548885013&text=Hola,%20quiero%20certificarme%20como%20gu%C3%ADa%20Montessori/" target="__blank">
+                    <a href="https://docs.google.com/forms/d/e/1FAIpQLScmvkdg4BSCWsempnaQhJWc0ZGaYFSrgiFcnJ3hlpQqF8PU0g/viewform" target="__blank">
                         <Button text="Inscríbete" color="bg-gradient-to-r from-blue to-green" />
                     </a>
                 </div>
