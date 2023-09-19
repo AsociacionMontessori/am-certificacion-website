@@ -50,7 +50,7 @@ export default function Nav({ textColor }) {
                                                 href={item.href}
                                                 className={classNames(
                                                     item.current ? 'text-yellow-400' : 'text-white-300 hover:bg-white-700',
-                                                    `${textColor} rounded-md px-8 py-2`
+                                                    `${textColor} rounded-md px-8 text-sm xl:text-base py-2`
                                                 )}
                                                 aria-current={item.current ? 'page' : undefined}
                                             >

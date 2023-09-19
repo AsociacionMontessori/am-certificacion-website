@@ -23,7 +23,7 @@ const CardInscription = ({ title, subtitle, price, coin, time, text, }) => {
                     </p>
                 </div>
                 <div className="flex mt-10 w-full justify-center mt-24">
-                    <a href="https://docs.google.com/forms/d/e/1FAIpQLScmvkdg4BSCWsempnaQhJWc0ZGaYFSrgiFcnJ3hlpQqF8PU0g/viewform" target="__blank">
+                    <a href="https://forms.gle/8mNepRAmhS82awAr7" target="__blank">
                         <Button text="Inscríbete" color="bg-gradient-to-r from-blue to-green" />
                     </a>
                 </div>

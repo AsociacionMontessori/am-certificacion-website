@@ -62,7 +62,7 @@ const phrases2 = [
 
 const IndexPage = () => (
   <Layout>
-    {/* <Nav textColor="text-white" /> */}
+    <Nav textColor="text-white" />
     <main>
       <section id="home" className="relative flex items-center">
         <div aria-hidden="true" className="absolute inset-0 z-[1] bg-gradient-to-b from-white/0 via-white/10 to-white/60  dark:bg-gradient-to-b dark:from-white/0 dark:via-gray/20 dark:to-gray" />
