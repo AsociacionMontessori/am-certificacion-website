@@ -9,11 +9,11 @@ const masterclasses = () => {
   return (
     <div>
       <Layout>
-        <main className="bg-gradient-to-r from-blue via-purple to-green -z-20">
+        <div className="bg-gradient-to-r from-blue via-purple to-green -z-20">
           <Nav textColor="text-white" />
-          <section className="relative pl-10 md:pl-28 lg:pl-40 xl:pl-60 pt-10 md:pt-20 selection:text-white selection:bg-green selection:bg-opacity-20">
+          <section className="relative pl-10 h-10 sm:h-auto md:pl-28 lg:pl-40 xl:pl-60 pt-10 md:pt-20 selection:text-white selection:bg-green selection:bg-opacity-20">
             <div className="w-full m-1">
-              <h1 style={{ fontFamily: "Alice", letterSpacing: ".4rem" }} className="text-[2rem] md:text-[3rem] lg:text-[5rem] xl:text-[10rem] text-white body-font">
+              <h1 style={{ fontFamily: "Alice", letterSpacing: ".4rem" }} className="text-[1.5rem] sm:text-[2rem] md:text-[3rem] lg:text-[5rem] xl:text-[10rem] text-white body-font">
                 MONTESSORI
               </h1>
               <h2 style={{ fontFamily: "Italianno" }} className="text-[2rem] md:text-[3rem] lg:text-[5rem] text-white absolute top-[2vh] left-[10vw]">
@@ -28,12 +28,12 @@ const masterclasses = () => {
           </section>
           <section className="bg-white dark:bg-gray">
             {/* <Timeline /> */}
-            <div className="w-full h-[180vh] md:h-[80vh]">
+            <div className="w-full h-[280vh] md:h-[100vh]">
               <iframe className="sm:overflow-hidden" style={{ marginTop: "200px" }} src="https://certificacionmontessori.com/wp/montessori-masterclass" name="myiFrame" scrolling="no" frameborder="1" marginheight="0px" marginwidth="0px" height="100%" width="100%" allowfullscreen></iframe>
             </div>
 
           </section>
-        </main>
+        </div>
       </Layout>
     </div>
   )

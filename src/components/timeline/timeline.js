@@ -1,14 +1,36 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './time.css';
 
 import resolveConfig from 'tailwindcss/resolveConfig'
 import tailwindConfig from '../../../tailwind.config.js'
-import Button from '../buttons/button';
 
 const fullConfig = resolveConfig(tailwindConfig)
 const red = fullConfig.theme.colors.red.DEFAULT
-const green = fullConfig.theme.colors.green
 const blue = fullConfig.theme.colors.blue
+
+function TextoExpansible({ contenido }) {
+    const [expanded, setExpanded] = useState(false);
+  
+    const toggleTexto = () => {
+      setExpanded(!expanded);
+    };
+  
+    return (
+      <div>
+        <p className={`text-black dark:text-white text-sm sm:text-xl md:text-2xl ${expanded ? '' : 'line-clamp-4 md:line-clamp-3'}`}>
+          {contenido}
+        </p>
+        {!expanded && (
+          <button
+            onClick={toggleTexto}
+            className="text-blue-500 hover:underline cursor-pointer"
+          >
+            Ver más
+          </button>
+        )}
+      </div>
+    );
+  }
 
 const Timeline = () => {
     const title = "Asociación Montessori de México - AMMAC"
@@ -22,13 +44,13 @@ const Timeline = () => {
         {
             title: 'La AMMAC crea la primera escuela Montessori en la Ciudad de México: la Escuela Montessori Kalpilli',
             content: 'Durante el año de su fundación, la AMMAC abre las puertas de la Escuela Montessori Kalpilli, siendo ésta la primera escuela Montessori en la Ciudad de México. Ubicada  originalmente en la colonia Polanco, Montessori Kalpilli inició sus labores impartiendo una educación basada en la pedagogía científica de María Montessori, cuyo método y filosofía tiene como propósito enfocarse en el desarrollo integral del niño.',
-            year: '1965',
+            year: '1966',
             color: "red"
         },
         {
             title: 'Primera muestra pedagógica abierta',
             content: 'La Asociación Montessori organiza en la Escuela Montessori  Kalpilli, la primera muestra pedagógica abierta a público y prensa con el objetivo de difundir y mostrar la aplicación del método Montessori, el uso de materiales y la importancia de las presentaciones Montessori. Las muestras pedagógicas se han convertido en una tradición de la AMMAC que año con año realiza en las instalaciones de la Escuela Montessori Kalpilli. ',
-            year: '1965',
+            year: '1967',
             color: "blue"
         },
         {
@@ -57,7 +79,7 @@ const Timeline = () => {
         },
         {
             title: 'Certificaciones profesionales para Guías Montessori con validez internacional',
-            content: 'La AMMAC inició su oferta de formación profesional de Guías Montessori,destacándose por ser la única reconocida oficialmente por la Universidad Nacional Autónoma de México, la Universidad Autónoma Metropolitana y la Universidad del Valle de México, cumpliendo ademàs con las competencias y acuerdos internacionales para generar certificaciones con validez internacional. ',
+            content: 'La AMMAC inició su oferta de formación profesional de Guías Montessori,destacándose por ser la única reconocida oficialmente por la Universidad Nacional Autónoma de México, la Universidad Autónoma Metropolitana y la Universidad del Valle de México, cumpliendo además con las competencias y acuerdos internacionales para generar certificaciones con validez internacional. ',
             year: '2005',
             color: "red"
         },
@@ -87,25 +109,6 @@ const Timeline = () => {
         },
 
     ];
-
-    // getRandomPositions = () => {
-    //     const positions = [
-    //         {
-    //             top: '20px',
-    //             left: '20px',
-    //         },
-    //         {
-    //             top: '20px',
-    //             right: '20px',
-    //         },
-    //         {
-    //             bottom: '20px',
-    //             left: '20px',
-    //         }
-    //     ];
-
-    //     return positions[Math.floor(Math.random() * positions.length)];
-    // }
 
 
     const getColor = (color) => {
@@ -162,12 +165,12 @@ const Timeline = () => {
                             </div>
                             {items.map((item) => (
                                 <li className='mb-10' key={item.title}>
-                                    <div className="content pt-12 px-6">
+                                    <div className="content pt-12 md:px-2 md:px-6">
                                         <span className="lg:hidden text-4xl absolute dark:opacity-60 opacity-30 top-0 font-bold text-blue">{item.year}</span>
-                                        <h3 className="text-black dark:text-white text-2xl sm:text-4xl md:text-5xl dark:px-2 px-4 py-2 mt-4  bg-blue w-full md:w-3/5 rounded-3xl bg-opacity-10 dark:bg-opacity-0">
+                                        <h3 className="font-semibold text-black dark:text-white text-sm sm:text-3xl md:text-4xl dark:px-2 sm:px-2 px-4 py-2 mt-4  bg-blue w-full md:w-auto rounded-3xl bg-opacity-10 dark:bg-opacity-0">
                                             {item.title}
                                         </h3>
-                                        <p className="text-black dark:text-white sm:text-2xl md:text-3xl pt-5 ">{item.content}</p>
+                                        <TextoExpansible  contenido={item.content} />
                                         <div className="hidden lg:block">
                                             <span className={`absolute dark:opacity-60 opacity-30 dark:opacity-70 top-20 text-8xl font-bold mt-20 -ml-60 -rotate-90 text-${item.color}`}>{item.year}</span>
                                         </div>
@@ -188,9 +191,6 @@ const Timeline = () => {
                                                 </svg>
                                             </div>
                                         </div>
-                                        {/* <div className='pt-5'>
-                                            <Button text="Nuestra Filosofía" type={(item.color == "blue") ? "blue-green" : "red"} />
-                                        </div> */}
                                     </div>
                                 </li>
                             ))}

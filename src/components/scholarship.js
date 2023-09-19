@@ -34,7 +34,7 @@ const Scholarship = () => {
                             </h4>
                             <div className="sm:flex mt-5 items-center">
                                 <div className="mr-10">
-                                    <a href="https://api.whatsapp.com/send?phone=5215548885013&text=Hola,%20quiero%20certificarme%20como%20gu%C3%ADa%20Montessori/" target="__blank" >
+                                    <a href="https://docs.google.com/forms/d/e/1FAIpQLScoDebIHpXugyfszH7VsUcVFNSiM-49mhaLkuN0AQoSxjE48g/viewform" target="__blank" >
                                         <Button text="Conocer Más" />
                                     </a>
                                 </div>

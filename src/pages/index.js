@@ -1,24 +1,25 @@
-import * as React from "react"
-import '../styles/global.css'
-import Layout from "../components/layout"
-import Seo from "../components/seo"
-import imagen from '../images/banners/home.png'
-import ImgMap from '../images/banners/map.png'
-import ImgMapDark from '../images/banners/dark_map.png'
-import { StaticImage } from "gatsby-plugin-image"
-import Timeline from '../components/timeline/timeline'
-import Nav from "../components/nav"
+import * as React from 'react';
+import '../styles/global.css';
+import Layout from '../components/layout';
+import Seo from '../components/seo';
+import imagen from '../images/banners/home.png';
+import ImgMap from '../images/banners/map.png';
+import ImgMapDark from '../images/banners/dark_map.png';
+import { StaticImage } from 'gatsby-plugin-image';
+import Timeline from '../components/timeline/timeline';
+import Nav from '../components/nav';
+import NextCourse from '../components/nextCourse';
 
 function CustomParagraph1({ text }) {
   return (
-    <p className="italic bg-red/20 dark:bg-black hover:font-semibold dark:hover:text-blue rounded-full py-3 px-10 dark:text-white/80 mx-3 selection:bg-blue selection:text-white">
+    <p className="italic bg-red/50 text-white dark:bg-black hover:font-semibold dark:hover:text-blue rounded-full py-3 px-10 dark:text-white/80 mx-3 selection:bg-blue selection:text-white">
       {text}
     </p>
   );
 }
 function CustomParagraph2({ text }) {
   return (
-    <p className="italic bg-red/20 dark:bg-black hover:font-semibold dark:hover:text-green/70 rounded-full py-3 px-10 dark:text-white/80 mx-3 selection:bg-green/70 selection:text-white">
+    <p className="italic bg-red/50 text-white dark:bg-black hover:font-semibold dark:hover:text-green/70 rounded-full py-3 px-10 dark:text-white/80 mx-3 selection:bg-green/70 selection:text-white">
       {text}
     </p>
   );
@@ -66,25 +67,26 @@ const IndexPage = () => (
       <section id="home" className="relative flex min-h-screen items-center">
         <div aria-hidden="true" className="absolute inset-0 z-[1] bg-gradient-to-b from-white/0 via-white/10 to-white/60  dark:bg-gradient-to-b dark:from-white/0 dark:via-gray/20 dark:to-gray" />
         <img src={imagen} className="fixed inset-0 h-full w-full object-cover" alt="woman in dark" width="4160" height="6240" />
-        <div className="relative z-10 mx-auto max-w-7xl px-6 pb-40 pt-40 lg:px-12 xl:px-6 2xl:px-0 selection:text-white selection:bg-green selection:bg-opacity-20">
-          <div className="pb-12 media-h:md:pb-32 media-h:lg:pb-4 xl:pb-4">
-            <h1 data-rellax-speed="-3" data-rellax-xs-speed="0" data-rellax-mobile-speed="0" className="rellax text-6xl font-bold text-white sm:text-7xl md:text-8xl xl:leading-tight" >
-              Asociación Montessori <br/>de México A.C.
+        <div className="relative z-10 mx-auto max-w-7xl px-6 pb-40 pt-20 md:pt-30 lg:px-12 xl:px-6 2xl:px-0 selection:text-white selection:bg-green selection:bg-opacity-20">
+          <div className="pb-6 media-h:md:pb-20 media-h:lg:pb-4 xl:pb-2">
+            <h1 data-rellax-speed="-3" data-rellax-xs-speed="0" data-rellax-mobile-speed="0" className="rellax text-3xl font-bold text-white sm:text-7xl md:text-8xl xl:leading-tight" >
+              Asociación Montessori <br />de México A.C.
             </h1>
           </div>
           <div>
             <div className="mr-auto md:w-3/5 md:pt-2 lg:w-2/3">
-              <p className="mb-5 text-lg font-light text-white sm:text-2xl xl:leading-normal">
+              <p className="mb-5 text-sm md:text-lg font-light text-white sm:text-2xl xl:leading-normal">
                 Únete a nosotros en este emocionante viaje de aprendizaje y exploración. Descubre la filosofía y práctica de este gran método, con nuestras clases gratuitas, contenido y certificaciones con validez internacional.
               </p>
-              <div className="mb-5">
-                <a href="./certificate" className="btn btn-outline hover:text-white hover:bg-blue bg-gradient-to-r from-blue/50 hover:from-gray hover:bg-opacity-70 rounded-full px-10 mr-4 bg-blue text-white bg-opacity-10">
+              <NextCourse URLiframe={"https://montessorimexico.org/proxima-certificacion/"} URLButton={"/certificate/#certificacion_internacional"} />
+              {/* <div className="mb-5">
+                <a href="./certificate" className="btn btn-outline hover:text-white hover:bg-blue bg-gradient-to-r from-blue/50 hover:from-gray hover:bg-opacity-70 rounded-full px-10 mr-4 bg-blue text-white bg-opacity-10 w-full sm:w-auto">
                   Certifícate
                 </a>
-                <a href="https://kalpilli.com/MetodoMontessori/" target="__blank" className="pt-3 sm:pt-0 btn btn-outline hover:text-white hover:bg-green bg-gradient-to-r from-green/50 hover:from-gray hover:bg-opacity-70 rounded-full px-10 mr-4 bg-green text-white bg-opacity-10">
+                <a href="https://kalpilli.com/MetodoMontessori/" target="__blank" className="mt-3 sm:pt-0 btn btn-outline hover:text-white hover:bg-green bg-gradient-to-r from-green/50 hover:from-gray hover:bg-opacity-70 rounded-full px-10 mr-4 bg-green text-white bg-opacity-10 w-full sm:w-auto">
                   Conoce el Método
                 </a>
-              </div>
+              </div> */}
             </div>
           </div>
         </div>
@@ -92,8 +94,8 @@ const IndexPage = () => (
       <section id="work" className="relative py-5 z-10 bg-white dark:bg-gray lg:pt-0">
         <div className="mx-auto max-w-7xl px-6 lg:px-12 xl:px-6 2xl:px-0 pt-10">
           <div data-rellax-speed="-3" data-rellax-xs-speed="0" data-rellax-mobile-speed="0" className="rellax flex flex-wrap items-center gap-6 selection:text-white selection:bg-red selection:bg-opacity-20">
-            <h2 className="pt-5 text-5xl text-red font-bold dark:text-white xl:text-6xl">EDUCACIÓN SIGNIFICATIVA</h2>
-            <p className="text-2xl">
+            <h2 className="pt-5 text-red font-bold dark:text-white sm:text-4xl md:text-5xl xl:text-6xl">EDUCACIÓN SIGNIFICATIVA</h2>
+            <p className="text-base text-black dark:text-white md:text-2xl">
               En la educación significativa, se busca que los <strong className="text-blue dark:text-red">estudiantes se involucren de manera activa en su propio proceso de aprendizaje,</strong> relacionando los nuevos conceptos con su conocimiento previo y con su entorno. El objetivo es que los estudiantes no solo adquieran información de manera pasiva, sino que la comprendan, le encuentren sentido y la integren en su propia estructura cognitiva.
             </p>
           </div>
