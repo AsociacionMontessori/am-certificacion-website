@@ -67,7 +67,7 @@ const IndexPage = () => (
       <section id="home" className="relative flex items-center">
         <div aria-hidden="true" className="absolute inset-0 z-[1] bg-gradient-to-b from-white/0 via-white/10 to-white/60  dark:bg-gradient-to-b dark:from-white/0 dark:via-gray/20 dark:to-gray" />
         <img src={imagen} className="fixed inset-0 h-full w-full object-cover" alt="woman in dark" width="4160" height="6240" />
-        <div className="relative z-10 mx-auto max-w-7xl px-6 pb-40 pt-20 md:pt-30 lg:px-12 xl:px-6 2xl:px-0 selection:text-white selection:bg-green selection:bg-opacity-20">
+        <div className="relative z-10 mx-auto max-w-7xl px-6 pb-10 md:pb-20 lg:pb-40 pt-20 md:pt-30 lg:px-12 xl:px-6 2xl:px-0 selection:text-white selection:bg-green selection:bg-opacity-20">
           <div className="pb-6 media-h:md:pb-20 media-h:lg:pb-4 xl:pb-2">
             <h1 data-rellax-speed="-3" data-rellax-xs-speed="0" data-rellax-mobile-speed="0" className="rellax text-3xl font-bold text-white sm:text-7xl md:text-8xl xl:leading-tight" >
               Asociación Montessori <br />de México A.C.
@@ -96,7 +96,7 @@ const IndexPage = () => (
           <div data-rellax-speed="-3" data-rellax-xs-speed="0" data-rellax-mobile-speed="0" className="rellax flex flex-wrap items-center gap-6 selection:text-white selection:bg-red selection:bg-opacity-20">
             <h2 className="pt-5 text-red font-bold dark:text-white sm:text-4xl md:text-5xl xl:text-6xl">EDUCACIÓN SIGNIFICATIVA</h2>
             <p className="text-base text-black dark:text-white md:text-2xl">
-              En la educación significativa, se busca que los <span className="text-blue font-semibold dark:text-red">estudiantes se involucren de manera activa en su propio proceso de aprendizaje,</span> relacionando los nuevos conceptos con su conocimiento previo y con su entorno. El objetivo es que los estudiantes no solo adquieran información de manera pasiva, sino que la comprendan, le encuentren sentido y la integren en su propia estructura cognitiva.
+              En la educación significativa,<span className="text-blue underline dark:text-white underline-offset-4 dark:selection:bg-red selection:bg-blue dark:decoration-red"> se busca que los estudiantes se involucren de manera activa en su propio proceso de aprendizaje,</span> relacionando los nuevos conceptos con su conocimiento previo y con su entorno. El objetivo es que los estudiantes no solo adquieran información de manera pasiva, sino que la comprendan, le encuentren sentido y la integren en su propia estructura cognitiva.
             </p>
           </div>
         </div>
@@ -115,14 +115,15 @@ const IndexPage = () => (
               ))}
             </div>
           </section>
-          <section className="bg-gradient-to-r from-blue via-purple to-green py-20">
+          <section className="bg-gradient-to-r from-blue via-purple to-green py-20 md:py-10">
             <div className="flex justify-center">
               <div className="flex justify-center relative w-full selection:text-white selection:bg-green selection:bg-opacity-20">
                 <img src={ImgMapDark} className="w-full h-3/12 dark:hidden" alt="map" />
                 <img src={ImgMap} className="w-full h-3/12 hidden dark:block" alt="map in dark" />
                 <div className="flex justify-center absolute top-1/3 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full">
-                  <h2 className="text-white">
-                    <span className="font-bold text-center xl:text-6xl text-2xl ">Certificación internacional</span>
+                  <h2 className="text-white text-center">
+                    <span className="font-extrabold text-center text-sm sm:text-base md:text-2xl xl:text-4xl bg-clip-text text-transparent bg-gradient-to-r from-slate-200/60 to-50% to-slate-200">Todas nuestros cursos cuentan con: </span><br />
+                    <span className="font-bold text-center text-2xl sm:text-3xl md:text-4xl xl:text-6xl drop-shadow-2xl">Certificación Internacional</span>
                   </h2>
                 </div>
                 <div className="pt-20 md:pt-0 flex space-x-2 md:space-x-14 lg:space-x-24 absolute top-2/4 left-1/2 transform -translate-x-1/2 -translate-y-1/2 max-w-max">
