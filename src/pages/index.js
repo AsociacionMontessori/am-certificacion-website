@@ -96,7 +96,7 @@ const IndexPage = () => (
           <div data-rellax-speed="-3" data-rellax-xs-speed="0" data-rellax-mobile-speed="0" className="rellax flex flex-wrap items-center gap-6 selection:text-white selection:bg-red selection:bg-opacity-20">
             <h2 className="pt-5 text-red font-bold dark:text-white sm:text-4xl md:text-5xl xl:text-6xl">EDUCACIÓN SIGNIFICATIVA</h2>
             <p className="text-base text-black dark:text-white md:text-2xl">
-              En la educación significativa, se busca que los <strong className="text-blue dark:text-red">estudiantes se involucren de manera activa en su propio proceso de aprendizaje,</strong> relacionando los nuevos conceptos con su conocimiento previo y con su entorno. El objetivo es que los estudiantes no solo adquieran información de manera pasiva, sino que la comprendan, le encuentren sentido y la integren en su propia estructura cognitiva.
+              En la educación significativa, se busca que los <span className="text-blue font-semibold dark:text-red">estudiantes se involucren de manera activa en su propio proceso de aprendizaje,</span> relacionando los nuevos conceptos con su conocimiento previo y con su entorno. El objetivo es que los estudiantes no solo adquieran información de manera pasiva, sino que la comprendan, le encuentren sentido y la integren en su propia estructura cognitiva.
             </p>
           </div>
         </div>
@@ -148,5 +148,5 @@ const IndexPage = () => (
     </main>
   </Layout>
 )
-export const Head = () => <Seo title="Home" description="Conoce la Asociación Montessori De México A.C." />
+export const Head = () => <Seo title="Certifícate" description="Asociación Montessori De México A.C." />
 export default IndexPage
