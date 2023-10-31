@@ -27,7 +27,7 @@ export default function Footer() {
                         <a href="#certificacion_internacional">
                             <p>Certificaciones</p>
                         </a>
-                        <a href="../nosotros">
+                        <a href="/">
                             <p>Sobre nosotros</p>
                         </a>
                         <a href="../publicaciones">
