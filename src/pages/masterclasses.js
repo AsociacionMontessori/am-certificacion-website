@@ -39,6 +39,6 @@ const masterclasses = () => {
   )
 }
 
-export const Head = () => <Seo title="MasterClasses" />
+export const Head = () => <Seo title="MasterClasses" description="Clases Magistrales de referentes en el Método Montessori" />
 
 export default masterclasses

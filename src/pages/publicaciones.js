@@ -94,5 +94,5 @@ const publicaciones = () => {
     )
 }
 
-export const Head = () => <Seo title="Sobre Nosotros" />
+export const Head = () => <Seo title="Publicaciones Montessori" description="Libros, eventos y artículos sobre el Método Montessori" />
 export default publicaciones

@@ -1,7 +1,7 @@
 module.exports = {
   siteMetadata: {
     title: `Asociacion Montessori De Mexico, A.C.`,
-    description: `La primera institución educativa en México en implementar el método montessori. Asociacion Montessori De Mexico, A.C. `,
+    description: `Certificaciones en en el método Montessori. Certificaciones, cursos y diplomados. Asociacion Montessori De Mexico, A.C. `,
     author: `@AsociacionMontessori`,
     siteUrl: `https://gatsbystarterdefaultsource.gatsbyjs.io/`,
   },

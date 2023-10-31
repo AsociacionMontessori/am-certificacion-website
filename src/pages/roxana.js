@@ -85,26 +85,14 @@ const roxana = () => {
                                 <p className="text-white text-sm">
                                     Lo que hace especialmente notable a Roxana es su incansable compromiso con el bienestar de los niños. Ella considera que cada niño es un individuo con un potencial ilimitado que simplemente necesita la orientación y el entorno adecuados para florecer. Su dedicación a ayudar a los niños a alcanzar su máximo potencial va más allá del mero discurso y se refleja en su enfoque práctico y en las acciones concretas que realiza en su capacidad como educadora y líder en el campo.
                                 </p>
-
                             </div>
                         </div>
-
-
                     </div>
-
-
-
-
-
-
-
                 </section>
-
-
             </main>
         </Layout>
     )
 }
 
-export const Head = () => <Seo title="Sobre Nosotros" />
+export const Head = () => <Seo title="Roxana Muñoz" description="Dirección de la Asociación Montessori de México" />
 export default roxana

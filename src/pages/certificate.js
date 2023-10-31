@@ -45,5 +45,5 @@ const Certificate = () => {
     </Layout>
   )
 }
-export const Head = () => <Seo title="Certifícate" />
+export const Head = () => <Seo title="Certifícate" description="Conviertete en guía Montessori" />
 export default Certificate

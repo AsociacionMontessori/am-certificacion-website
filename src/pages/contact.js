@@ -103,7 +103,7 @@ const contactMethods = [
 
 
 
-export const Head = () => <Seo title="Sobre Nosotros" />
+export const Head = () => <Seo title="Contacto" description="En Asociación Montessi tienes un contacto humano, moderno y constructivo" />
 
 
 export default contact
