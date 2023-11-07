@@ -149,5 +149,5 @@ const IndexPage = () => (
     </main>
   </Layout>
 )
-export const Head = () => <Seo title="Certifícación Montessori" description="Conoce la Asociación Montessori De México A.C." />
+export const Head = () => <Seo title="Inicio" description="Conoce la Asociación Montessori De México A.C." />
 export default IndexPage

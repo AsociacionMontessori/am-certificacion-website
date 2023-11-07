@@ -55,6 +55,37 @@ const Layout = ({ children }) => {
               </div>
 
             </a>
+            {/* <a target="_blank" href="https://api.whatsapp.com/send?phone=5215548885013" >
+
+              <div className="wa__btn_popup" style={{ left: 'unset', right: '100px' }}>
+                <Transition
+                  show={showWABtn}
+                  enter="transition-opacity duration-75"
+                  enterFrom="opacity-0"
+                  enterTo="opacity-100"
+                  leave="transition-opacity duration-150"
+                  leaveFrom="opacity-100"
+                  leaveTo="opacity-0"
+                >
+                  <div className="hidden md:block">
+                    <FadeIn delay="delay-[0ms]">
+                      <div className="wa__btn_popup_txt " style={{ display: 'block', left: 'unset', right: '100%', marginRight: '7px', marginLeft: '0px', width: '228px' }}>
+                        <span><strong>Solicita Informes</strong></span>
+                      </div>
+                    </FadeIn>
+
+                  </div>
+                </Transition>
+                <div className="am__btn_popup_icon" onMouseOut={() => {
+                  setTimeout(() => {
+                    setShowWABtn(false)
+                  }
+                    , 4000)
+                }} onMouseOver={() => setShowWABtn(true)} style={{ background: 'rgb(45, 183, 66)' }}>
+                </div>
+              </div>
+
+            </a> */}
           </div>
 
         </div>

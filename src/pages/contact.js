@@ -21,8 +21,7 @@ const contact = () => {
                     <section className="bg-gradient-to-r from-blue via-purple to-green text-white">
                         <div className="container px-6 py-12 mx-auto">
                             <div className="selection:text-white selection:bg-green selection:bg-opacity-20">
-                                <h1 className="mt-2 text-4xl font-semibold text-gray-800 md:text-8xl dark:text-white">Contáctanos</h1>
-
+                                <h1 className="mt-2 text-4xl font-semibold text-gray-800 md:text-8xl dark:text-white">Envíanos un mensaje</h1>
                                 <p className="mt-3 ">Nuestro equipo estará encantado de atenderte. La comunicación siempre es la clave.</p>
                             </div>
 
@@ -64,7 +63,7 @@ const ContactMethod = ({ icon, title, description }) => (
         <span className={`md:p-3 text-blue-500 rounded-full bg-blue-100/80 dark:bg-gray-800 ${iconsSize}`}>
             {icon}
         </span>
-        <h2 className="mt-4 text-sm sm:font-medium text-gray-800 dark:text-white">{title}</h2>
+        <h2 className="mt-4 text-sm sm:font-medium md:text-lg text-gray-800 dark:text-white">{title}</h2>
         <p className="mt-2">{description}</p>
     </div>
 );

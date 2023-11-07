@@ -29,7 +29,7 @@ const masterclasses = () => {
           <section className="bg-white dark:bg-gray">
             {/* <Timeline /> */}
             <div className="w-full h-[280vh] md:h-[100vh]">
-              <iframe className="sm:overflow-hidden" style={{ marginTop: "200px" }} src="https://certificacionmontessori.com/wp/montessori-masterclass" name="myiFrame" scrolling="no" frameborder="1" marginheight="0px" marginwidth="0px" height="100%" width="100%" allowfullscreen></iframe>
+              <iframe className="sm:overflow-hidden" style={{ marginTop: "200px" }} title="Eventos" src="https://certificacionmontessori.com/wp/montessori-masterclass" name="myiFrame" scrolling="no" frameborder="1" marginheight="0px" marginwidth="0px" height="100%" width="100%" allowfullscreen></iframe>
             </div>
 
           </section>

@@ -84,15 +84,14 @@ const publicaciones = () => {
                             </article>
                         </div>
                     </section>
-                    <section className="bg-white h-[80rem] sm:h-[35.5rem]">
-                        <iframe src="https://carlosalfonsor5.sg-host.com/180-2/" className="px-10 sm:px-0" width="100%" height="100%"></iframe>
+                    <section className="bg-white md:px-20 py-10 h-[80rem] sm:h-[28rem]">
+                        <iframe src="https://montessorimexico.org/proxima-certificacion/massterclasses/" title="Nuestro Blog" className="px-10 sm:px-0" width="100%" height="100%"></iframe>
                     </section>
                 </div>
-
             </main>
         </Layout>
     )
 }
 
-export const Head = () => <Seo title="Publicaciones Montessori" description="Libros, eventos y artículos sobre el Método Montessori" />
+export const Head = () => <Seo title="Publicaciones" description="Libros, eventos y artículos sobre el Método Montessori" />
 export default publicaciones

@@ -24,16 +24,16 @@ export default function Footer() {
                 <div className="mx-1 md:mx-10  sm:py-0 md:py-2 lg:py-4 px-1 md:px-6 grid grid-cols-1 md:grid-cols-4 gap-1 md:gap-0">
                     <div className="lg:pl-16 pl-0 text-center md:text-left m-4 md:m-0">
                         <h3 className="text-lg font-semibold mb-2">Asociación</h3>
-                        <a href="#certificacion_internacional">
+                        <a target="_blank" className="hover:underline decoration-red" href="#certificacion_internacional">
                             <p>Certificaciones</p>
                         </a>
-                        <a href="/">
+                        <a target="_blank" className="hover:underline decoration-red" href="/">
                             <p>Sobre nosotros</p>
                         </a>
-                        <a href="../publicaciones">
+                        <a target="_blank" className="hover:underline decoration-red" href="../publicaciones">
                             <p>Publicaciones</p>
                         </a>
-                        <a href="../contact">
+                        <a target="_blank" className="hover:underline decoration-red" href="../contact">
                             <p>Contacto</p>
                         </a>
                         <p>Preguntas Frecuentes</p>
@@ -41,18 +41,18 @@ export default function Footer() {
                     <div className="text-center md:text-left m-4 md:m-0">
                         <h3 className="text-lg font-semibold mb-2">Legal</h3>
                         <p>Aviso de Privacidad</p>
-                        <a href="https://drive.google.com/file/d/1XaVbYjwltjMJjcjvCuqdhKIAFvxjecOJ/view" target="_blank" rel="noopener noreferrer">Constacia de Seguridad Estructural</a>
+                        <a className="hover:underline decoration-red" href="https://drive.google.com/file/d/1XaVbYjwltjMJjcjvCuqdhKIAFvxjecOJ/view" target="_blank" rel="noopener noreferrer">Constacia de Seguridad Estructural</a>
                         <br />
-                        <a href='https://drive.google.com/file/d/1mE54tJUcoFfaX4mJQjaD7slE_ESlPY-r/view' target='_blank' rel="noopener noreferrer">Visto Bueno de Seguridad Estructural</a>
+                        <a className="hover:underline decoration-red" href='https://drive.google.com/file/d/1mE54tJUcoFfaX4mJQjaD7slE_ESlPY-r/view' target='_blank' rel="noopener noreferrer">Visto Bueno de Seguridad Estructural</a>
 
                     </div>
                     <div className="text-center md:text-left m-4 md:m-0">
                         <h3 className="text-lg font-semibold mb-2">Escuelas Montassori</h3>
-                        <a href="https://www.google.com.mx/maps/place/Primaria+Montessori+Kalpilli/@19.3925921,-99.1847762,17z/data=!4m6!3m5!1s0x85d1ff7b7998ce53:0x3f544be41b8ca559!8m2!3d19.3928452!4d-99.1838964!16s%2Fg%2F11sj5sp5xh?entry=ttu" className="italic" target="_blank" rel="noopener noreferrer">Kalpilli</a> ver en mapa
+                        <a className="hover:underline decoration-red italic" href="https://www.google.com.mx/maps/place/Primaria+Montessori+Kalpilli/@19.3925921,-99.1847762,17z/data=!4m6!3m5!1s0x85d1ff7b7998ce53:0x3f544be41b8ca559!8m2!3d19.3928452!4d-99.1838964!16s%2Fg%2F11sj5sp5xh?entry=ttu"  target="_blank" rel="noopener noreferrer">Kalpilli</a> ver en mapa
                         <br />
                         <a href="tel:5558121853" target="_blank" rel="noopener noreferrer">52 + 55 58 12 18 53</a>
                         <br />
-                        <a href="https://www.google.com.mx/maps/place/Primaria+Montessori+Kalpilli/@19.3925921,-99.1847762,17z/data=!4m6!3m5!1s0x85d1ff7b7998ce53:0x3f544be41b8ca559!8m2!3d19.3928452!4d-99.1838964!16s%2Fg%2F11sj5sp5xh?entry=ttu" target="_blank" rel="noopener noreferrer" className="w-1/4">Calle Av. Dos 48, San Pedro de los Pinos, Benito Juárez, 03800 Ciudad de México, CDMX</a>
+                        <a className="hover:underline decoration-red w-1/4" href="https://www.google.com.mx/maps/place/Primaria+Montessori+Kalpilli/@19.3925921,-99.1847762,17z/data=!4m6!3m5!1s0x85d1ff7b7998ce53:0x3f544be41b8ca559!8m2!3d19.3928452!4d-99.1838964!16s%2Fg%2F11sj5sp5xh?entry=ttu" target="_blank" rel="noopener noreferrer" >Calle Av. Dos 48, San Pedro de los Pinos, Benito Juárez, 03800 Ciudad de México, CDMX</a>
                     </div>
                     <div className="text-center md:text-left m-4 md:m-0 flex flex-col md:items-left items-center">
                         <h3 className="text-lg font-semibold mb-2">Redes Sociales</h3>
