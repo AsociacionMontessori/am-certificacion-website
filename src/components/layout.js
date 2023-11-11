@@ -3,9 +3,12 @@ import Footer from "./footer"
 import "./../styles/wa.css"
 import { Transition } from "@headlessui/react"
 import "../styles/fonts.css"
+import { StaticImage } from "gatsby-plugin-image"
 
 const Layout = ({ children }) => {
   const [showWABtn, setShowWABtn] = React.useState(false)
+  const [showAMBtn, setShowAMBtn] = React.useState(true)
+  const [readed, setReaded] = React.useState(false)
 
   return (
     <>
@@ -22,7 +25,7 @@ const Layout = ({ children }) => {
           <section className="relative bg-gray">
             <Footer />
           </section>
-          
+
           <div id="wa" className="wa__widget_container">
             <a target="_blank" href="https://api.whatsapp.com/send?phone=5215548885013" >
 
@@ -50,16 +53,18 @@ const Layout = ({ children }) => {
                     setShowWABtn(false)
                   }
                     , 4000)
-                }} onMouseOver={() => setShowWABtn(true)} style={{ background: 'rgb(45, 183, 66)' }}>
+                }} onMouseOver={() => {
+                  setShowWABtn(true)
+                  setShowAMBtn(false)
+                }} style={{ background: 'rgb(45, 183, 66)' }}>
                 </div>
               </div>
 
             </a>
-            {/* <a target="_blank" href="https://api.whatsapp.com/send?phone=5215548885013" >
 
               <div className="wa__btn_popup" style={{ left: 'unset', right: '100px' }}>
                 <Transition
-                  show={showWABtn}
+                  show={showAMBtn}
                   enter="transition-opacity duration-75"
                   enterFrom="opacity-0"
                   enterTo="opacity-100"
@@ -69,8 +74,16 @@ const Layout = ({ children }) => {
                 >
                   <div className="hidden md:block">
                     <FadeIn delay="delay-[0ms]">
-                      <div className="wa__btn_popup_txt " style={{ display: 'block', left: 'unset', right: '100%', marginRight: '7px', marginLeft: '0px', width: '228px' }}>
-                        <span><strong>Solicita Informes</strong></span>
+                      {/* <div className="wa__btn_popup_txt " style={{ display: 'block', left: 'unset', right: '100%', marginRight: '7px', marginLeft: '0px', width: '228px' }}>
+                      <span><strong>Asiste a nuestro siguiente Massterclass: </strong></span>
+                      </div> */}
+                      <div className="w-[16vw] p-[0.7rem] absolute -bottom-10 -right-10">
+                        <StaticImage src="../images/notf.png" alt="AM" placeholder="none" />
+                      </div>
+                      <div className="w-[16vw] h-20  p-[0.7rem] absolute bottom-10 -right-10">
+                      <iframe className="sm:overflow-hidden" style={{ marginLeft: "10px" }} title="Eventos" src="https://montessorimexico.org/massterclass/" name="myiFrame" scrolling="no" frameborder="1" marginheight="0px" marginwidth="0px" height="100%" width="80%" allowfullscreen></iframe>
+
+                      {/* <span><strong>Asiste a nuestro siguiente Massterclass: </strong></span> */}
                       </div>
                     </FadeIn>
 
@@ -78,14 +91,26 @@ const Layout = ({ children }) => {
                 </Transition>
                 <div className="am__btn_popup_icon" onMouseOut={() => {
                   setTimeout(() => {
-                    setShowWABtn(false)
+                    setShowAMBtn(false)
                   }
-                    , 4000)
-                }} onMouseOver={() => setShowWABtn(true)} style={{ background: 'rgb(45, 183, 66)' }}>
+                    , 10000)
+                }} onMouseOver={() => {
+                  setShowAMBtn(true)
+                  setShowWABtn(false)
+                  setReaded(true)
+                }} >
+                  {!readed ? <div>
+                    <div
+                      class="absolute bottom-auto left-auto right-0 top-0 z-10 inline-block -translate-y-1/2 translate-x-2/4 rotate-0 skew-x-0 skew-y-0 scale-x-100 scale-y-100 whitespace-nowrap rounded-full bg-red px-2.5 py-1 text-center align-baseline text-xs font-bold leading-none text-white">
+                      1
+                    </div>
+                  </div> : ""
+
+                  }
+                  <StaticImage src="../images/lasc.png" alt="AM" placeholder="none" className="w-full p-[0.7rem]" />
                 </div>
               </div>
 
-            </a> */}
           </div>
 
         </div>
