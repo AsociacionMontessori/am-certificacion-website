@@ -17,7 +17,7 @@ const publicaciones = () => {
     const author = "Roxana Muñoz"
     return (
         <Layout>
-            <Nav textColor="dark:text-white text-gray" />
+            <Nav textColor="text-white" />
             <main>
                 <div className="bg-gradient-to-r from-blue via-purple to-green pt-20 w-full  overflow-x-hidden">
                     <section className="flex flex-col antialiased text-gray-200 pl-10 md:ml-40">

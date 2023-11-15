@@ -16,7 +16,7 @@ const contact = () => {
     return (
         <>
             <Layout>
-                <Nav textColor="dark:text-white text-gray" />
+                <Nav textColor="text-white" />
                 <main>
                     <section className="bg-gradient-to-r from-blue via-purple to-green text-white">
                         <div className="container px-6 py-12 mx-auto">
