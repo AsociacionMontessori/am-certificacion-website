@@ -72,21 +72,15 @@ const Layout = ({ children }) => {
                   leaveFrom="opacity-100"
                   leaveTo="opacity-0"
                 >
-                  <div className="hidden md:block">
+                  <div className="md:block relative">
                     <FadeIn delay="delay-[0ms]">
-                      {/* <div className="wa__btn_popup_txt " style={{ display: 'block', left: 'unset', right: '100%', marginRight: '7px', marginLeft: '0px', width: '228px' }}>
-                      <span><strong>Asiste a nuestro siguiente Massterclass: </strong></span>
-                      </div> */}
-                      <div className="w-[16vw] p-[0.7rem] absolute -bottom-10 -right-10">
+                      <div className="w-[60vw] lg:w-[16vw] p-[0.7rem] absolute  -bottom-10  -right-5 lg:-right-10">
                         <StaticImage src="../images/notf.png" alt="AM" placeholder="none" />
                       </div>
-                      <div className="w-[16vw] h-20  p-[0.7rem] absolute bottom-10 -right-10">
-                      <iframe className="sm:overflow-hidden" style={{ marginLeft: "10px" }} title="Eventos" src="https://montessorimexico.org/massterclass/" name="myiFrame" scrolling="no" frameborder="1" marginheight="0px" marginwidth="0px" height="100%" width="80%" allowfullscreen></iframe>
-
-                      {/* <span><strong>Asiste a nuestro siguiente Massterclass: </strong></span> */}
+                      <div className="w-[60vw] lg:w-[16vw] lg:h-20  p-[0.7rem] absolute -bottom-16 lg:bottom-10 -right-5 lg:-right-10">
+                        <iframe className="sm:overflow-hidden" style={{ marginLeft: "10px" }} title="Eventos" src="https://montessorimexico.org/massterclass/" name="myiFrame" scrolling="no" frameborder="1" marginheight="0px" marginwidth="0px" height="100%" width="80%" allowfullscreen></iframe>
                       </div>
                     </FadeIn>
-
                   </div>
                 </Transition>
                 <div className="am__btn_popup_icon" onMouseOut={() => {
@@ -94,11 +88,16 @@ const Layout = ({ children }) => {
                     setShowAMBtn(false)
                   }
                     , 10000)
-                }} onMouseOver={() => {
+                }} 
+                 onClick={() => {
                   setShowAMBtn(true)
                   setShowWABtn(false)
                   setReaded(true)
-                }} >
+                  setTimeout(() => {
+                    setShowAMBtn(false)
+                  }, 6000)
+                 }}
+                >
                   {!readed ? <div>
                     <div
                       class="absolute bottom-auto left-auto right-0 top-0 z-10 inline-block -translate-y-1/2 translate-x-2/4 rotate-0 skew-x-0 skew-y-0 scale-x-100 scale-y-100 whitespace-nowrap rounded-full bg-red px-2.5 py-1 text-center align-baseline text-xs font-bold leading-none text-white">
