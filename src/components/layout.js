@@ -7,7 +7,7 @@ import { StaticImage } from "gatsby-plugin-image"
 
 const Layout = ({ children }) => {
   const [showWABtn, setShowWABtn] = React.useState(false)
-  const [showAMBtn, setShowAMBtn] = React.useState(true)
+  const [showAMBtn, setShowAMBtn] = React.useState(false)
   const [readed, setReaded] = React.useState(false)
 
   return (
@@ -27,7 +27,7 @@ const Layout = ({ children }) => {
           </section>
 
           <div id="wa" className="wa__widget_container">
-            <a target="_blank" href="https://api.whatsapp.com/send?phone=5215548885013" >
+            <a target="_blank" rel="noreferrer" href="https://api.whatsapp.com/send?phone=5215548885013" >
 
               <div className="wa__btn_popup" style={{ left: 'unset', right: '30px' }}>
                 <Transition
