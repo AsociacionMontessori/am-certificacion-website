@@ -3,13 +3,13 @@ import React from "react"
 const NextCourse = ({URLiframe, URLButton}) => {
     return (
         <>
-            <div>
-                <h2 className="pb-10 pt-10">
+            <div className="pb-10 lg:pb-0">
+                <h2 className="py-2 lg:py-10">
                     <span className="text-white text-2xl font-bold">Próximos Cursos:</span>
                 </h2>
                 <div className="relative">
-                    <iframe title="Próximos Cursos" style={{ background: "transparent", colorScheme: "normal", color: "white" }} className="w-full" allowtransparency="true" src={URLiframe} />
-                    <div className="absolute top-16">
+                    <iframe title="Próximos Cursos" scrolling="no" style={{ background: "transparent", colorScheme: "normal", color: "white" }} className="w-full h-24" allowtransparency="true" src={URLiframe} />
+                    <div className="pt-0">
                         <a href="https://docs.google.com/forms/d/e/1FAIpQLScmvkdg4BSCWsempnaQhJWc0ZGaYFSrgiFcnJ3hlpQqF8PU0g/viewform" target="__blank" className="mt-3 sm:mt-0 btn btn-outline hover:text-white hover:bg-blue bg-gradient-to-r from-blue/50 hover:from-gray hover:bg-opacity-70 rounded-full px-10 mr-4 bg-blue text-white bg-opacity-10 w-full md:w-auto">
                             Inscríbete Ahora
                         </a>

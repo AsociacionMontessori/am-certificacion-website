@@ -5,6 +5,7 @@ import kalpilliLight from "../images/lasc.png"
 
 const navigation = [
     { name: 'CERTIFÍCATE', href: '../certificate', current: false },
+    { name: 'DIPLOMADOS', href: '../diplomados', current: false },
     { name: 'MASSTERCLASSES', href: '../masterclasses', current: false },
     { name: 'PUBLICACIONES', href: '../publicaciones', current: false },
     { name: 'KALPILLI', href: 'https://kalpilli.com/', current: false },
@@ -20,7 +21,7 @@ export default function Nav({ textColor }) {
         <Disclosure as="nav" className="bg-white-400 mb-10 relative z-20">
             {({ open }) => (
                 <>
-                    <div className="mx-auto max-w-7x1 px-6 sm:px-6 lg:px-8 min-w-fit dark:text-white pt-5" >
+                    <div className="mx-auto max-w-7x1 px-3 sm:px-4 lg:px-6 min-w-fit dark:text-white pt-5" >
                         <div className="relative flex h-16 items-center justify-between sm:justify-center">
                             <div className="absolute inset-y-0 left-0 flex items-center lg:hidden">
                                 <Disclosure.Button className="bg-white dark:bg-red inline-flex items-center justify-center rounded-md p-2 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
@@ -43,14 +44,14 @@ export default function Nav({ textColor }) {
                                     </a>
                                 </div>
                                 <div className="hidden lg:ml-6 lg:block pt-6">
-                                    <div className="flex space-x-1 font-bold text-sm md:text-xs lg:text-base sm:text-xs">
+                                    <div className="flex space-x-1 text-sm md:text-xs lg:text-base sm:text-xs">
                                         {navigation.map((item) => (
                                             <a
                                                 key={item.name}
                                                 href={item.href}
                                                 className={classNames(
                                                     item.current ? 'text-yellow-400' : 'text-white-300 hover:bg-white-700',
-                                                    `${textColor} rounded-md px-8 text-sm xl:text-base py-2`
+                                                    `${textColor} rounded-md px-4 md:px-6 text-sm xl:text-base py-`
                                                 )}
                                                 aria-current={item.current ? 'page' : undefined}
                                             >

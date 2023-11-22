@@ -77,8 +77,8 @@ const Layout = ({ children }) => {
                       <div className="w-[60vw] lg:w-[16vw] p-[0.7rem] absolute  -bottom-10  -right-5 lg:-right-10">
                         <StaticImage src="../images/notf.png" alt="AM" placeholder="none" />
                       </div>
-                      <div className="w-[60vw] lg:w-[16vw] lg:h-20  p-[0.7rem] absolute -bottom-16 lg:bottom-10 -right-5 lg:-right-10">
-                        <iframe className="sm:overflow-hidden" style={{ marginLeft: "10px" }} title="Eventos" src="https://montessorimexico.org/massterclass/" name="myiFrame" scrolling="no" frameborder="1" marginheight="0px" marginwidth="0px" height="100%" width="80%" allowfullscreen></iframe>
+                      <div className="w-[60vw] lg:w-[16vw] lg:h-28  p-[0.7rem] absolute -bottom-16 lg:bottom-10 -right-5 lg:-right-10">
+                        <iframe className="sm:overflow-hidden my-auto" style={{ marginLeft: "10px" }} title="Eventos" src="https://montessorimexico.org/massterclass/" name="myiFrame" scrolling="no" frameborder="1" marginheight="0px" marginwidth="0px" height="100%" width="80%" allowfullscreen></iframe>
                       </div>
                     </FadeIn>
                   </div>
