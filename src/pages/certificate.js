@@ -29,7 +29,7 @@ const Certificate = () => {
             <div>
               <div className="mr-auto md:w-3/5 md:pt-2 lg:w-2/3">
                 <p className="mb-5 text-lg font-light text-white sm:text-2xl xl:leading-normal">
-                  Descubre Nuestros programas de certificación con validez internacional, conoce el método Montessori y aprende a implementarlo en tu salón de clases.
+                  Descubre Nuestros Diplomados de certificación con validez internacional, conoce el método Montessori y aprende a implementarlo en tu salón de clases.
                 </p>
                 <NextCourse {...nextCourseProps} />
               </div>
@@ -38,7 +38,6 @@ const Certificate = () => {
         </section>
         <section id="" className="relative z-10 bg-gradient-to-r from-blue to-green pb-20">
           <CertificationPrice />
-          <Scholarship />
         </section>
 
       </main>

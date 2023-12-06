@@ -4,8 +4,8 @@ import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 import kalpilliLight from "../images/lasc.png"
 
 const navigation = [
-    { name: 'CERTIFÍCATE', href: '../certificate', current: false },
-    { name: 'DIPLOMADOS', href: '../diplomados', current: false },
+    // { name: 'CERTIFÍCATE', href: '../certificate', current: false },
+    { name: 'DIPLOMADOS', href: '../certificate', current: false },
     { name: 'MASSTERCLASSES', href: '../masterclasses', current: false },
     { name: 'PUBLICACIONES', href: '../publicaciones', current: false },
     { name: 'KALPILLI', href: 'https://kalpilli.com/', current: false },

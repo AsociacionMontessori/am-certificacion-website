@@ -5,7 +5,7 @@ import { StaticImage } from "gatsby-plugin-image"
 const Scholarship = () => {
     return (
         <>
-            <section id="scholarships" className="bg-white rounded-3xl z-10 selection:text-red selection:bg-red selection:bg-opacity-10 relative">
+            <section id="scholarships" className="bg-white z-10 selection:text-red selection:bg-red selection:bg-opacity-10 relative">
                 <div className="mx-auto max-w-7xl px-6 pb-10 pt-10 lg:px-12 xl:px-6 2xl:px-0 text-black flex flex-col sm:flex-row items-center justify-between">
                     <div>
                         <h3>
