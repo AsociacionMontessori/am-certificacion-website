@@ -117,7 +117,7 @@ const CertificationPrice = () => {
                                     Ofrecemos programas de certificación con reconocimiento internacional, diseñados para proporcionar una sólida base en el método y la filosofía Montessori.
                                     <br />
                                     <br />
-                                    Ya sea que busques una introducción a Montessori o desees profundizar tu conocimiento y práctica, tenemos el programa adecuado para ti.
+                                    Ya sea que busques una introducción a Montessori o desees profundizar tu conocimiento y práctica, <a className="text-red" href="../diplomados/">tenemos el programa adecuado para ti.</a>
                                     <br />
                                     <br />
                                     <br />

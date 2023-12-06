@@ -122,7 +122,7 @@ const IndexPage = () => (
                 <img src={ImgMap} className="w-full h-3/12 hidden dark:block" alt="map in dark" />
                 <div className="flex justify-center absolute top-1/3 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full">
                   <h2 className="text-white text-center">
-                    <span className="font-extrabold text-center text-sm sm:text-base md:text-2xl xl:text-4xl bg-clip-text text-transparent bg-gradient-to-r from-slate-200/60 to-50% to-slate-200">Todas nuestros cursos cuentan con: </span><br />
+                    <span className="font-extrabold text-center text-sm sm:text-base md:text-2xl xl:text-4xl bg-clip-text text-transparent bg-gradient-to-r from-slate-200/60 to-50% to-slate-200">Todas nuestros diplomados cuentan con: </span><br />
                     <span className="font-bold text-center text-2xl sm:text-3xl md:text-4xl xl:text-6xl drop-shadow-2xl">Certificación Internacional</span>
                   </h2>
                 </div>
