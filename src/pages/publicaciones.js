@@ -19,8 +19,8 @@ const publicaciones = () => {
         <Layout>
             <Nav textColor="text-white" />
             <main>
-                <div className="bg-gradient-to-r from-blue via-purple to-green pt-20 w-full  overflow-x-hidden">
-                    <section className="flex flex-col antialiased text-gray-200 pl-10 md:ml-40">
+                <div className="bg-gradient-to-r from-blue via-purple to-green pt-5 md:pt-20 w-full  overflow-x-hidden">
+                    <section className="flex flex-col antialiased text-gray-200 pl-10 sm:pl-5 xl:ml-40 md:ml-10">
                         <div className="hidden sm:block relative w-full  pb-10 selection:text-white selection:bg-green selection:bg-opacity-20">
                             {/* <h1 style={{ fontFamily: "Alice", letterSpacing: ".4rem" }} className="text-[2rem] md:text-[10rem] text-white body-font">
                                 Publicaciones

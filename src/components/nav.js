@@ -2,6 +2,7 @@ import React from 'react';
 import { Disclosure } from '@headlessui/react'
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 import kalpilliLight from "../images/lasc.png"
+import { StaticImage } from 'gatsby-plugin-image';
 
 const navigation = [
     // { name: 'CERTIFÍCATE', href: '../certificate', current: false },
@@ -25,7 +26,7 @@ export default function Nav({ textColor }) {
                         <div className="relative flex h-16 items-center justify-between sm:justify-center">
                             <div className="absolute inset-y-0 left-0 flex items-center lg:hidden">
                                 <Disclosure.Button className="bg-white dark:bg-red inline-flex items-center justify-center rounded-md p-2 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
-                                    <span className="sr-only">Open main menu</span>
+                                    <span className="sr-only">Abrir Menu</span>
                                     {open ? (
                                         <XMarkIcon className="dark:bg-red block h-6 w-6" aria-hidden="true" />
                                     ) : (
@@ -50,12 +51,15 @@ export default function Nav({ textColor }) {
                                                 key={item.name}
                                                 href={item.href}
                                                 className={classNames(
-                                                    item.current ? 'text-yellow-400' : 'text-white-300 hover:bg-white-700',
-                                                    `${textColor} rounded-md px-4 md:px-6 text-sm xl:text-base py-`
+                                                    item.current ? 'text-yellow-400' : 'text-white-300',
+                                                    `${textColor} group rounded-md px-4 md:px-6 text-sm xl:text-base py-`
                                                 )}
                                                 aria-current={item.current ? 'page' : undefined}
                                             >
                                                 {item.name}
+                                                <div className="inline relative opacity-0 group-hover:opacity-100 transition duration-300 ease-in-out transistion-all">
+                                                    <StaticImage className='w-6 h-6 absolute' src="../images/elements/decor2.png" alt="decoration" />
+                                                </div>
                                             </a>
                                         ))}
                                     </div>
@@ -65,7 +69,7 @@ export default function Nav({ textColor }) {
                     </div>
 
                     <Disclosure.Panel className="lg:hidden">
-                        <div className="space-y-1 px-2 pb-3 pt-2">
+                        <div className="space-y-1 y-10 px-2 pb-3 pt-2">
                             {navigation.map((item) => (
                                 <Disclosure.Button
                                     key={item.name}

@@ -75,18 +75,10 @@ const IndexPage = () => (
           </div>
           <div>
             <div className="mr-auto md:w-3/5 md:pt-2 lg:w-2/3">
-              <p className="mb-5 text-sm md:text-lg font-light text-white sm:text-2xl xl:leading-normal">
+              <p className="mb-2 sm:mb-2 xl:mb-5 text-sm md:text-lg font-light text-white sm:text-2xl xl:leading-normal">
                 Únete a nosotros en este emocionante viaje de aprendizaje y exploración. Descubre la filosofía y práctica de este gran método, con nuestras clases gratuitas, contenido y certificaciones con validez internacional.
               </p>
               <NextCourse URLiframe={"https://montessorimexico.org/proxima-certificacion/"} URLButton={"/certificate/#certificacion_internacional"} />
-              {/* <div className="mb-5">
-                <a href="./certificate" className="btn btn-outline hover:text-white hover:bg-blue bg-gradient-to-r from-blue/50 hover:from-gray hover:bg-opacity-70 rounded-full px-10 mr-4 bg-blue text-white bg-opacity-10 w-full sm:w-auto">
-                  Certifícate
-                </a>
-                <a href="https://kalpilli.com/MetodoMontessori/" target="__blank" className="mt-3 sm:pt-0 btn btn-outline hover:text-white hover:bg-green bg-gradient-to-r from-green/50 hover:from-gray hover:bg-opacity-70 rounded-full px-10 mr-4 bg-green text-white bg-opacity-10 w-full sm:w-auto">
-                  Conoce el Método
-                </a>
-              </div> */}
             </div>
           </div>
         </div>
