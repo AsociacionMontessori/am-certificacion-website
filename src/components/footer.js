@@ -9,7 +9,7 @@ export default function Footer() {
                     <StaticImage src="../images/lasc.png" className="w-14 h-14 m-1.5" alt={"Logo Asociación Montessori"} />
                     <div className="m-1.5 lg:text-base text-sm ">
                         <div className="font-medium">Asociación Montessori de México A.C.</div>
-                        <p>Todos los derechos reservados 2023</p>
+                        <p>Todos los derechos reservados 2024</p>
                     </div>
                 </a>
                 <div className="flex mx-2 justify-center p-4 items-center lg:w-4/12 md:w-9/12">
@@ -24,10 +24,10 @@ export default function Footer() {
                 <div className="mx-1 md:mx-10  sm:py-0 md:py-2 lg:py-4 px-1 md:px-6 grid grid-cols-1 md:grid-cols-4 gap-1 md:gap-0">
                     <div className="lg:pl-16 pl-0 text-center md:text-left m-4 md:m-0">
                         <h3 className="text-lg font-semibold mb-2">Asociación</h3>
-                        <a target="_blank" className="hover:underline decoration-red" href="#certificacion_internacional">
+                        <a target="_blank" className="hover:underline decoration-red" href="/certificate">
                             <p>Certificaciones</p>
                         </a>
-                        <a target="_blank" className="hover:underline decoration-red" href="/">
+                        <a target="_blank" className="hover:underline decoration-red" href="/#sobrenosotros">
                             <p>Sobre nosotros</p>
                         </a>
                         <a target="_blank" className="hover:underline decoration-red" href="../publicaciones">
@@ -36,11 +36,14 @@ export default function Footer() {
                         <a target="_blank" className="hover:underline decoration-red" href="../contact">
                             <p>Contacto</p>
                         </a>
-                        <p>Preguntas Frecuentes</p>
+                        <a target="_blank" className="hover:underline decoration-red" href="../contact#Preguntas Frecuentes">
+                            <p>Preguntas Frecuentes</p>
+                        </a>
                     </div>
                     <div className="text-center md:text-left m-4 md:m-0">
                         <h3 className="text-lg font-semibold mb-2">Legal</h3>
-                        <p>Aviso de Privacidad</p>
+                        <a className="hover:underline decoration-red" href="../privacy" target="_blank" rel="noopener noreferrer">Aviso de Privacidad</a>
+                        <br />
                         <a className="hover:underline decoration-red" href="https://drive.google.com/file/d/1XaVbYjwltjMJjcjvCuqdhKIAFvxjecOJ/view" target="_blank" rel="noopener noreferrer">Constacia de Seguridad Estructural</a>
                         <br />
                         <a className="hover:underline decoration-red" href='https://drive.google.com/file/d/1mE54tJUcoFfaX4mJQjaD7slE_ESlPY-r/view' target='_blank' rel="noopener noreferrer">Visto Bueno de Seguridad Estructural</a>
@@ -50,7 +53,7 @@ export default function Footer() {
                         <h3 className="text-lg font-semibold mb-2">Escuelas Montassori</h3>
                         <a className="hover:underline decoration-red italic" href="https://www.google.com.mx/maps/place/Primaria+Montessori+Kalpilli/@19.3925921,-99.1847762,17z/data=!4m6!3m5!1s0x85d1ff7b7998ce53:0x3f544be41b8ca559!8m2!3d19.3928452!4d-99.1838964!16s%2Fg%2F11sj5sp5xh?entry=ttu"  target="_blank" rel="noopener noreferrer">Kalpilli</a> ver en mapa
                         <br />
-                        <a href="tel:5558121853" target="_blank" rel="noopener noreferrer">52 + 55 58 12 18 53</a>
+                        <a href="tel:5555152701" target="_blank" rel="noopener noreferrer">55 5515 2701</a>
                         <br />
                         <a className="hover:underline decoration-red w-1/4" href="https://www.google.com.mx/maps/place/Primaria+Montessori+Kalpilli/@19.3925921,-99.1847762,17z/data=!4m6!3m5!1s0x85d1ff7b7998ce53:0x3f544be41b8ca559!8m2!3d19.3928452!4d-99.1838964!16s%2Fg%2F11sj5sp5xh?entry=ttu" target="_blank" rel="noopener noreferrer" >Calle Av. Dos 48, San Pedro de los Pinos, Benito Juárez, 03800 Ciudad de México, CDMX</a>
                     </div>

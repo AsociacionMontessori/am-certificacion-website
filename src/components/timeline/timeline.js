@@ -152,7 +152,7 @@ const Timeline = () => {
 
     return (
         <>
-            <section className="block-content t-block-teal l-block-spacing pl-10 md:ml-40">
+            <section id='sobrenosotros' className="block-content t-block-teal l-block-spacing pl-10 md:ml-40">
                 <div className="l-contained">
                     <header className="heading-group pl-10 sm:pl-0">
                         <h2 className="text-blue dark:text-white text-3xl sm:text-5xl lg:text-6xl font-bold">{title}</h2>

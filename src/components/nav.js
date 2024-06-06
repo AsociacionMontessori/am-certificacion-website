@@ -3,6 +3,8 @@ import { Disclosure } from '@headlessui/react'
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 import kalpilliLight from "../images/lasc.png"
 import { StaticImage } from 'gatsby-plugin-image';
+import { useEffect } from 'react';
+
 
 const navigation = [
     // { name: 'CERTIFÍCATE', href: '../certificate', current: false },
@@ -18,6 +20,28 @@ function classNames(...classes) {
 }
 
 export default function Nav({ textColor }) {
+
+    const [largeBanner, setLargeBanner] = React.useState(true);
+
+    useEffect(() => {
+        // const scrollContainer = scrollContainerRef.current;
+        const scrollDistanceToShowNavbar = 200; // Puedes ajustar este valor
+        const scrollDistanceToShowNavbarOnMobile = 600;
+    
+        const handleScroll = () => {
+          const currentScrollY = window.scrollY;
+        //   let currentScrollYMobile = 0;
+        //   if (scrollContainer) {
+        //     currentScrollYMobile = scrollContainer.scrollTop;
+        //   }
+        //   if (currentScrollY >= scrollDistanceToShowNavbar || currentScrollYMobile >= scrollDistanceToShowNavbarOnMobile) {
+        //     setShowSecondNavbar(true);
+        //   } else {
+        //     setShowSecondNavbar(false);
+        //   }
+        };
+    }, []);
+
     return (
         <Disclosure as="nav" className="bg-white-400 mb-10 relative z-20">
             {({ open }) => (

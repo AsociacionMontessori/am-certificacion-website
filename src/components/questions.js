@@ -35,9 +35,9 @@ const Questions = () => {
     };
     return (
         <div className="bg-white w-10/12 md:w-8/12 m-10 rounded-tl-3xl rounded-br-3xl text-black selection:text-black selection:bg-green selection:bg-opacity-20">
-            <div className="sm:p-10 p-2">
+            <div className="sm:p-10 p-2" id="Preguntas Frecuentes">
                 <div className="md:p-5 p-2">
-                    <h2 className="md:text-3xl lg:text-4xl text-xl font-medium text-red">Preguntas Frecuentes</h2>
+                    <h2  className="md:text-3xl lg:text-4xl text-xl font-medium text-red">Preguntas Frecuentes</h2>
                 </div>
                 <div className="md:p-5 p-2">
                     {preguntasRespuestas.map((item, index) => (

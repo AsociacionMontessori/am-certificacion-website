@@ -58,7 +58,8 @@ const contact = () => {
     )
 }
 
-const ContactMethod = ({ icon, title, description }) => (
+const ContactMethod = ({ icon, title, link, description }) => (
+    <a href={link} target="_blank" rel="noopener noreferrer" className="flex flex-col items-center justify-center text-center selection:text-white selection:bg-green selection:bg-opacity-20">
     <div className="flex flex-col items-center justify-center text-center selection:text-white selection:bg-green selection:bg-opacity-20">
         <span className={`md:p-3 text-blue-500 rounded-full bg-blue-100/80 dark:bg-gray-800 ${iconsSize}`}>
             {icon}
@@ -66,6 +67,8 @@ const ContactMethod = ({ icon, title, description }) => (
         <h2 className="mt-4 text-sm sm:font-medium md:text-lg text-gray-800 dark:text-white">{title}</h2>
         <p className="mt-2">{description}</p>
     </div>
+
+    </a>
 );
 
 
@@ -78,6 +81,7 @@ const contactMethods = [
         ),
         title: "Email",
         description: "Envíanos un correo electrónico.\ninfo@certificacionmontessori.com",
+        link: "mailto:info@certificacionmontessori.com"
     },
     {
         icon: (
@@ -88,6 +92,7 @@ const contactMethods = [
         ),
         title: "Encuéntranos en",
         description: "Calle Av. Dos 48, San Pedro de los Pinos, Benito Juárez, 03800 Ciudad de México, CDMX",
+        link: "https://maps.app.goo.gl/9EqAmfUryR5RB65W8"
     },
     {
         icon: (
@@ -96,7 +101,8 @@ const contactMethods = [
             </svg>
         ),
         title: "Contáctanos",
-        description: "Llamadas, o mensajes de WhatsApp, Horario: 8am - 5pm.\nNúmero de Teléfono: 52 + 55 58 12 18 53",
+        description: "Llamadas en Horario: 8am - 5pm.\nNúmero de Teléfono: 55 5515 2701",
+        link: "tel:5558121853"
     },
 ];
 
