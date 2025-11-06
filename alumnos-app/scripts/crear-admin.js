@@ -1,3 +1,4 @@
+/* eslint-env node */
 /**
  * Script para crear el documento de admin en Firestore
  * Ejecutar con: node scripts/crear-admin.js

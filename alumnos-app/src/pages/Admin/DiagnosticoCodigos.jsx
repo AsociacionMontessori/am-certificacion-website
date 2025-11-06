@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { collection, getDocs, doc, getDoc } from 'firebase/firestore';
+import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { generarCodigoVerificacion } from '../../services/certificadoService';
 import { ArrowLeftIcon, ExclamationTriangleIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
 
 const DiagnosticoCodigos = () => {
-  const [alumnos, setAlumnos] = useState([]);
+  const [alumnos, setAlumnos] = useState([]); // usado para resumen
   const [loading, setLoading] = useState(true);
   const [diagnostico, setDiagnostico] = useState([]);
 

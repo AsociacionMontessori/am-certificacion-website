@@ -81,15 +81,11 @@ export const regenerarTodosLosCodigos = async () => {
         } catch (updateError) {
           // Si updateDoc falla, intentar con setDoc
           console.warn(`⚠️ updateDoc falló, intentando con setDoc para ${alumnoData.nombre || alumnoId}:`, updateError);
-          try {
-            await setDoc(doc(db, 'alumnos', alumnoId), {
-              codigoVerificacion: nuevoCodigo,
-              fechaActualizacionCodigo: serverTimestamp()
-            }, { merge: true });
-            console.log(`✅ Código guardado con setDoc para ${alumnoData.nombre || alumnoId}`);
-          } catch (setDocError) {
-            throw setDocError;
-          }
+          await setDoc(doc(db, 'alumnos', alumnoId), {
+            codigoVerificacion: nuevoCodigo,
+            fechaActualizacionCodigo: serverTimestamp()
+          }, { merge: true });
+          console.log(`✅ Código guardado con setDoc para ${alumnoData.nombre || alumnoId}`);
         }
 
         actualizados++;

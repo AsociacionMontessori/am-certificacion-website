@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+/* eslint-env node */
 
 import { readFileSync, writeFileSync } from 'fs';
 import { join, dirname } from 'path';
@@ -50,7 +51,7 @@ const updateChangelog = (newVersion, type) => {
   
   try {
     changelog = readFileSync(changelogPath, 'utf8');
-  } catch (error) {
+  } catch (e) {
     // Si no existe, crear uno nuevo
     changelog = `# Changelog
 

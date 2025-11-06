@@ -233,7 +233,7 @@ const CertificadoDigital = () => {
                   title: `${esGraduado ? 'Certificado Digital' : 'Constancia de Estudios'} - ${alumno.nombreCompleto}`,
                   text: `Certificado digital de ${alumno.nombreCompleto}`,
                   url: url
-                }).catch(err => {
+                }).catch(() => {
                   // Si falla, copiar al portapapeles
                   navigator.clipboard.writeText(url).then(() => {
                     alert('URL copiada al portapapeles');

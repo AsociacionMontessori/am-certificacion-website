@@ -7,7 +7,7 @@ import LoadingSpinner from '../components/LoadingSpinner';
 import { formatearFechaLarga } from '../utils/formatearFecha';
 
 const Expediente = () => {
-  const { currentUser, userData } = useAuth();
+  const { currentUser } = useAuth();
   const [expediente, setExpediente] = useState(null);
   const [loading, setLoading] = useState(true);
 

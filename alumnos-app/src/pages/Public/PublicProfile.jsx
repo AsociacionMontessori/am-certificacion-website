@@ -89,35 +89,7 @@ const PublicProfile = () => {
     window.print();
   };
 
-  // Función para compartir
-  const handleShare = async () => {
-    const url = window.location.href;
-    const title = `Constancia de Estudios - ${alumno?.nombre || 'Alumno'}`;
-    
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title,
-          text: `Constancia de Estudios de ${alumno?.nombre || 'alumno'}`,
-          url
-        });
-      } catch (error) {
-        if (error.name !== 'AbortError') {
-          console.error('Error al compartir:', error);
-        }
-      }
-    } else {
-      // Fallback: copiar al portapapeles
-      try {
-        await navigator.clipboard.writeText(url);
-        alert('Enlace copiado al portapapeles');
-      } catch (error) {
-        console.error('Error al copiar:', error);
-        // Fallback final: mostrar el enlace
-        prompt('Copia este enlace:', url);
-      }
-    }
-  };
+  // (compartir nativo se maneja inline donde aplica)
 
   // Función para copiar al portapapeles
   const handleCopyToClipboard = async (texto, tipo = '') => {
