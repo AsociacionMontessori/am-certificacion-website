@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { collection, query, where, getDocs, orderBy } from 'firebase/firestore';
+import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../config/firebase';
-import { CalendarIcon, ClockIcon, MapPinIcon } from '@heroicons/react/24/outline';
+import { CalendarIcon, ClockIcon, MapPinIcon, UserIcon } from '@heroicons/react/24/outline';
 
 const Calendario = () => {
   const { currentUser } = useAuth();
@@ -15,15 +15,22 @@ const Calendario = () => {
         try {
           const materiasQuery = query(
             collection(db, 'materias'),
-            where('alumnoId', '==', currentUser.uid),
-            orderBy('dia', 'asc'),
-            orderBy('horaInicio', 'asc')
+            where('alumnoId', '==', currentUser.uid)
           );
           const querySnapshot = await getDocs(materiasQuery);
           const materiasData = querySnapshot.docs.map(doc => ({
             id: doc.id,
             ...doc.data()
           }));
+          // Ordenar manualmente: primero las que tienen fecha, luego las que no
+          materiasData.sort((a, b) => {
+            const fechaA = a.fechaInicio?.toDate ? a.fechaInicio.toDate() : null;
+            const fechaB = b.fechaInicio?.toDate ? b.fechaInicio.toDate() : null;
+            if (!fechaA && !fechaB) return 0;
+            if (!fechaA) return 1;
+            if (!fechaB) return -1;
+            return fechaA - fechaB;
+          });
           setMaterias(materiasData);
         } catch (error) {
           console.error('Error al cargar materias:', error);
@@ -35,11 +42,24 @@ const Calendario = () => {
     loadMaterias();
   }, [currentUser]);
 
-  const diasSemana = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
-  const materiasPorDia = diasSemana.map(dia => ({
-    dia,
-    materias: materias.filter(m => m.dia === dia)
-  }));
+  // Agrupar materias por fecha de inicio
+  const materiasPorFecha = materias.reduce((acc, materia) => {
+    const fechaInicio = materia.fechaInicio 
+      ? (materia.fechaInicio.toDate ? materia.fechaInicio.toDate().toLocaleDateString() : materia.fechaInicio)
+      : 'Sin fecha';
+    
+    if (!acc[fechaInicio]) {
+      acc[fechaInicio] = [];
+    }
+    acc[fechaInicio].push(materia);
+    return acc;
+  }, {});
+
+  const fechasOrdenadas = Object.keys(materiasPorFecha).sort((a, b) => {
+    if (a === 'Sin fecha') return 1;
+    if (b === 'Sin fecha') return -1;
+    return new Date(a) - new Date(b);
+  });
 
   if (loading) {
     return (
@@ -50,62 +70,84 @@ const Calendario = () => {
   }
 
   return (
-    <div className="px-4 py-6 sm:px-0">
+    <div className="space-y-6 sm:space-y-8 animate-fade-in">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white">
           Calendario de Materias
         </h1>
-        <p className="mt-2 text-gray-600 dark:text-gray-400">
-          Horarios y materias del semestre actual
+        <p className="mt-1 sm:mt-2 text-sm sm:text-base text-gray-600 dark:text-gray-400">
+          Materias organizadas por fecha de inicio
         </p>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-7">
-        {materiasPorDia.map(({ dia, materias }) => (
-          <div key={dia} className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
-              <CalendarIcon className="w-5 h-5 text-green mr-2" />
-              {dia}
-            </h2>
-            {materias.length > 0 ? (
-              <div className="space-y-3">
-                {materias.map((materia) => (
-                  <div key={materia.id} className="border-l-4 border-blue pl-3 py-2">
-                    <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
-                      {materia.nombre}
-                    </h3>
-                    <div className="mt-1 space-y-1">
-                      <div className="flex items-center text-xs text-gray-600 dark:text-gray-400">
-                        <ClockIcon className="w-4 h-4 mr-1" />
-                        {materia.horaInicio} - {materia.horaFin}
-                      </div>
-                      {materia.profesor && (
-                        <div className="text-xs text-gray-600 dark:text-gray-400">
-                          Prof. {materia.profesor}
-                        </div>
-                      )}
-                      {materia.aula && (
-                        <div className="flex items-center text-xs text-gray-600 dark:text-gray-400">
-                          <MapPinIcon className="w-4 h-4 mr-1" />
-                          {materia.aula}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                ))}
+      {fechasOrdenadas.length > 0 ? (
+        <div className="space-y-6">
+          {fechasOrdenadas.map((fecha) => (
+            <div key={fecha} className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
+              <div className="bg-blue/10 dark:bg-blue/20 px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 dark:border-gray-700">
+                <h2 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white flex items-center">
+                  <CalendarIcon className="w-5 h-5 sm:w-6 sm:h-6 text-blue mr-2" />
+                  {fecha === 'Sin fecha' ? 'Materias sin fecha asignada' : `Inicio: ${fecha}`}
+                </h2>
               </div>
-            ) : (
-              <p className="text-sm text-gray-500 dark:text-gray-400">Sin materias</p>
-            )}
-          </div>
-        ))}
-      </div>
-
-      {materias.length === 0 && (
-        <div className="mt-8 bg-white dark:bg-gray-800 rounded-lg shadow-md p-8 text-center">
+              <div className="p-4 sm:p-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {materiasPorFecha[fecha].map((materia) => (
+                    <div key={materia.id} className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 border border-gray-200 dark:border-gray-600">
+                      <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-3">
+                        {materia.nombre}
+                      </h3>
+                      <div className="space-y-2">
+                        {materia.fechaFin && (
+                          <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
+                            <ClockIcon className="w-4 h-4 mr-2 flex-shrink-0" />
+                            <span>Fin: {materia.fechaFin.toDate ? materia.fechaFin.toDate().toLocaleDateString() : materia.fechaFin}</span>
+                          </div>
+                        )}
+                        {materia.profesor && (
+                          <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
+                            <UserIcon className="w-4 h-4 mr-2 flex-shrink-0" />
+                            <span>Prof. {materia.profesor}</span>
+                          </div>
+                        )}
+                        {materia.aula && (
+                          <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
+                            <MapPinIcon className="w-4 h-4 mr-2 flex-shrink-0" />
+                            <span>{materia.aula}</span>
+                          </div>
+                        )}
+                        {materia.horario && (
+                          <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
+                            <ClockIcon className="w-4 h-4 mr-2 flex-shrink-0" />
+                            <span>{materia.horario}</span>
+                          </div>
+                        )}
+                        {materia.estado && (
+                          <div className="mt-2">
+                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                              materia.estado === 'Completada' 
+                                ? 'bg-green text-white'
+                                : materia.estado === 'En curso'
+                                ? 'bg-blue text-white'
+                                : 'bg-gray text-white'
+                            }`}>
+                              {materia.estado}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-8 sm:p-12 text-center">
           <CalendarIcon className="w-16 h-16 text-gray-400 mx-auto mb-4" />
           <p className="text-gray-600 dark:text-gray-400">
-            No hay materias registradas para este semestre.
+            No hay materias registradas.
           </p>
         </div>
       )}
@@ -114,4 +156,3 @@ const Calendario = () => {
 };
 
 export default Calendario;
-

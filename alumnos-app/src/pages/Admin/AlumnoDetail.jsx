@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../../config/firebase';
-import { ArrowLeftIcon } from '@heroicons/react/24/outline';
+import { ArrowLeftIcon, CalendarIcon, ChartBarIcon, AcademicCapIcon } from '@heroicons/react/24/outline';
 
 const AlumnoDetail = () => {
   const { id } = useParams();
@@ -137,6 +137,45 @@ const AlumnoDetail = () => {
               </dd>
             </div>
           </dl>
+        </div>
+
+        {/* Gestión Académica */}
+        <div className="lg:col-span-2 bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+            Gestión Académica
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <Link
+              to={`/admin/alumno/${alumno.id}/materias`}
+              className="flex items-center p-4 bg-blue/10 dark:bg-blue/20 rounded-lg hover:bg-blue/20 dark:hover:bg-blue/30 transition-colors"
+            >
+              <CalendarIcon className="w-6 h-6 text-blue mr-3" />
+              <div>
+                <p className="font-semibold text-gray-900 dark:text-white">Materias</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Gestionar calendario</p>
+              </div>
+            </Link>
+            <Link
+              to={`/admin/alumno/${alumno.id}/calificaciones`}
+              className="flex items-center p-4 bg-yellow/10 dark:bg-yellow/20 rounded-lg hover:bg-yellow/20 dark:hover:bg-yellow/30 transition-colors"
+            >
+              <ChartBarIcon className="w-6 h-6 text-yellow mr-3" />
+              <div>
+                <p className="font-semibold text-gray-900 dark:text-white">Calificaciones</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Gestionar calificaciones</p>
+              </div>
+            </Link>
+            <Link
+              to={`/admin/alumno/${alumno.id}/graduacion`}
+              className="flex items-center p-4 bg-green/10 dark:bg-green/20 rounded-lg hover:bg-green/20 dark:hover:bg-green/30 transition-colors"
+            >
+              <AcademicCapIcon className="w-6 h-6 text-green mr-3" />
+              <div>
+                <p className="font-semibold text-gray-900 dark:text-white">Graduación</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Gestionar graduación</p>
+              </div>
+            </Link>
+          </div>
         </div>
 
         {/* Vista Pública */}

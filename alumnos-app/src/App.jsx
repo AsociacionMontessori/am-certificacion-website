@@ -16,6 +16,9 @@ import AdminDashboard from './pages/Admin/Dashboard';
 import AlumnoDetail from './pages/Admin/AlumnoDetail';
 import Inscripciones from './pages/Admin/Inscripciones';
 import CrearUsuario from './pages/Admin/CrearUsuario';
+import GestionMaterias from './pages/Admin/GestionMaterias';
+import GestionCalificaciones from './pages/Admin/GestionCalificaciones';
+import GestionGraduacion from './pages/Admin/GestionGraduacion';
 import PublicProfile from './pages/Public/PublicProfile';
 
 // Componente para redirigir según el rol
@@ -110,6 +113,36 @@ function App() {
               <AdminRoute>
                 <AdminLayout>
                   <CrearUsuario />
+                </AdminLayout>
+              </AdminRoute>
+            }
+          />
+          <Route
+            path="/admin/alumno/:id/materias"
+            element={
+              <AdminRoute>
+                <AdminLayout>
+                  <GestionMaterias />
+                </AdminLayout>
+              </AdminRoute>
+            }
+          />
+          <Route
+            path="/admin/alumno/:id/calificaciones"
+            element={
+              <AdminRoute>
+                <AdminLayout>
+                  <GestionCalificaciones />
+                </AdminLayout>
+              </AdminRoute>
+            }
+          />
+          <Route
+            path="/admin/alumno/:id/graduacion"
+            element={
+              <AdminRoute>
+                <AdminLayout>
+                  <GestionGraduacion />
                 </AdminLayout>
               </AdminRoute>
             }

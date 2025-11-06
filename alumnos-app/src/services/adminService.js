@@ -6,9 +6,12 @@ import {
 import { 
   doc, 
   setDoc, 
+  addDoc,
+  collection,
   serverTimestamp 
 } from 'firebase/firestore';
 import { auth, db } from '../config/firebase';
+import { getMateriasPorNivel } from '../data/materiasPorNivel';
 
 /**
  * Crea un nuevo usuario en Firebase Authentication y su documento en Firestore
@@ -46,7 +49,33 @@ export const crearUsuarioAlumno = async (datosUsuario) => {
 
     await setDoc(doc(db, 'alumnos', user.uid), alumnoData);
 
-    // 4. Enviar email de restablecimiento de contraseña (opcional)
+    // 4. Inicializar materias para el alumno según su nivel
+    if (datosAdicionales.nivel) {
+      try {
+        const materias = getMateriasPorNivel(datosAdicionales.nivel);
+        const materiasCollection = collection(db, 'materias');
+        const promises = materias.map((nombreMateria) => {
+          return addDoc(materiasCollection, {
+            alumnoId: user.uid,
+            nombre: nombreMateria,
+            nivel: datosAdicionales.nivel,
+            fechaInicio: null,
+            fechaFin: null,
+            profesor: null,
+            aula: null,
+            horario: null,
+            estado: 'Pendiente',
+            fechaCreacion: serverTimestamp(),
+            fechaActualizacion: serverTimestamp()
+          });
+        });
+        await Promise.all(promises);
+      } catch (materiasError) {
+        console.warn('No se pudieron inicializar las materias:', materiasError);
+      }
+    }
+
+    // 5. Enviar email de restablecimiento de contraseña (opcional)
     // El usuario puede cambiar su contraseña después del primer login
     if (datosAdicionales.enviarEmailBienvenida) {
       try {
