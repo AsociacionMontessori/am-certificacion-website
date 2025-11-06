@@ -1,15 +1,18 @@
 import { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
-import { db } from '../../config/firebase';
-import { ArrowLeftIcon, CalendarIcon, ChartBarIcon, AcademicCapIcon, PencilIcon, CheckIcon, XMarkIcon, EyeIcon, EyeSlashIcon, ClipboardDocumentIcon } from '@heroicons/react/24/outline';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { db, auth } from '../../config/firebase';
+import { ArrowLeftIcon, CalendarIcon, ChartBarIcon, AcademicCapIcon, PencilIcon, CheckIcon, XMarkIcon, EyeIcon, EyeSlashIcon, ClipboardDocumentIcon, ArrowRightOnRectangleIcon } from '@heroicons/react/24/outline';
 
 const AlumnoDetail = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [alumno, setAlumno] = useState(null);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [signingIn, setSigningIn] = useState(false);
   const [formData, setFormData] = useState({
     matricula: '',
     email: '',
@@ -133,6 +136,64 @@ const AlumnoDetail = () => {
     setEditing(false);
   };
 
+  // Función para iniciar sesión como este usuario
+  const handleSignInAsUser = async () => {
+    if (!alumno?.email) {
+      alert('No se puede iniciar sesión: el usuario no tiene email');
+      return;
+    }
+
+    // Obtener la contraseña temporal guardada en localStorage
+    const tempPasswordKey = `temp_password_${id}`;
+    const tempPassword = localStorage.getItem(tempPasswordKey);
+
+    if (!tempPassword) {
+      const userPassword = prompt(
+        'La contraseña temporal no está disponible. Por favor, ingresa la contraseña del usuario:',
+        ''
+      );
+      if (!userPassword) {
+        return;
+      }
+      try {
+        setSigningIn(true);
+        await signInWithEmailAndPassword(auth, alumno.email, userPassword);
+        // Redirigir al dashboard del alumno
+        navigate('/');
+      } catch (error) {
+        console.error('Error al iniciar sesión:', error);
+        alert(`Error al iniciar sesión: ${error.message}`);
+      } finally {
+        setSigningIn(false);
+      }
+      return;
+    }
+
+    try {
+      setSigningIn(true);
+      await signInWithEmailAndPassword(auth, alumno.email, tempPassword);
+      // Redirigir al dashboard del alumno
+      navigate('/');
+    } catch (error) {
+      console.error('Error al iniciar sesión:', error);
+      // Si la contraseña temporal no funciona, pedirla manualmente
+      const userPassword = prompt(
+        'La contraseña temporal no funcionó. Por favor, ingresa la contraseña del usuario:',
+        ''
+      );
+      if (userPassword) {
+        try {
+          await signInWithEmailAndPassword(auth, alumno.email, userPassword);
+          navigate('/');
+        } catch (retryError) {
+          alert(`Error al iniciar sesión: ${retryError.message}`);
+        }
+      }
+    } finally {
+      setSigningIn(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -159,13 +220,32 @@ const AlumnoDetail = () => {
         Volver al panel
       </Link>
 
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-          {alumno.nombre}
-        </h1>
-        <p className="mt-2 text-gray-600 dark:text-gray-400">
-          Detalles del alumno
-        </p>
+      <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+            {alumno.nombre}
+          </h1>
+          <p className="mt-2 text-gray-600 dark:text-gray-400">
+            Detalles del alumno
+          </p>
+        </div>
+        <button
+          onClick={handleSignInAsUser}
+          disabled={signingIn}
+          className="inline-flex items-center px-4 py-2 bg-blue text-white rounded-lg hover:bg-blue/90 font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {signingIn ? (
+            <>
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+              Iniciando sesión...
+            </>
+          ) : (
+            <>
+              <ArrowRightOnRectangleIcon className="w-5 h-5 mr-2" />
+              Iniciar sesión como este usuario
+            </>
+          )}
+        </button>
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">

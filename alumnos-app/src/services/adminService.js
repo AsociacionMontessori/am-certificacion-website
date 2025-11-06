@@ -83,17 +83,29 @@ export const crearUsuarioAlumno = async (datosUsuario) => {
       }
     }
 
-    // 5. IMPORTANTE: Cerrar sesión del nuevo usuario creado
-    // Esto evita que el admin quede logueado como el nuevo usuario
-    // El admin necesitará volver a iniciar sesión manualmente
-    await signOut(auth);
+    // 5. Guardar la contraseña temporalmente en localStorage para que el admin pueda iniciar sesión como este usuario después
+    // La contraseña se guarda con el UID del usuario como clave
+    try {
+      const tempPasswordKey = `temp_password_${user.uid}`;
+      localStorage.setItem(tempPasswordKey, password);
+      // Limpiar después de 24 horas (opcional, por seguridad)
+      setTimeout(() => {
+        localStorage.removeItem(tempPasswordKey);
+      }, 24 * 60 * 60 * 1000);
+    } catch (storageError) {
+      console.warn('No se pudo guardar la contraseña temporal:', storageError);
+    }
+
+    // 6. NO cerrar sesión automáticamente - el admin puede elegir si quiere iniciar sesión como el nuevo usuario
+    // Si el admin quiere volver a su sesión, puede hacerlo manualmente
 
     return {
       success: true,
       uid: user.uid,
       email: user.email,
       message: 'Usuario creado exitosamente',
-      adminEmail: adminEmail // Devolver el email del admin para referencia
+      adminEmail: adminEmail, // Devolver el email del admin para referencia
+      password: password // Devolver la contraseña para uso inmediato
     };
   } catch (error) {
     console.error('Error al crear usuario:', error);

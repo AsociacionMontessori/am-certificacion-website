@@ -95,11 +95,13 @@ const CrearUsuario = () => {
 
       if (resultado.success) {
         setSuccess(true);
-        // Nota: El servicio cierra la sesión automáticamente para evitar que el admin quede logueado como el nuevo usuario
-        // Redirigir al login después de un breve delay para que el usuario vea el mensaje de éxito
-        setTimeout(() => {
-          navigate('/login');
-        }, 2000);
+        // Guardar información del usuario creado para poder iniciar sesión como él después
+        if (resultado.uid && resultado.email) {
+          // La contraseña ya está guardada en localStorage por el servicio
+          // Guardar también el UID y email para referencia
+          sessionStorage.setItem('lastCreatedUserId', resultado.uid);
+          sessionStorage.setItem('lastCreatedUserEmail', resultado.email);
+        }
       } else {
         setError(resultado.error || 'Error al crear el usuario');
       }
@@ -118,14 +120,22 @@ const CrearUsuario = () => {
           <h2 className="text-2xl font-bold mb-2">¡Usuario creado exitosamente!</h2>
           <p className="mb-4">El alumno ha sido registrado correctamente.</p>
           <p className="mb-4 text-sm opacity-90">
-            Por seguridad, tu sesión se ha cerrado. Serás redirigido al inicio de sesión.
+            Actualmente estás logueado como el nuevo usuario. Puedes ver su perfil o volver al panel de admin.
           </p>
-          <Link
-            to="/login"
-            className="inline-block px-6 py-2 bg-white text-green rounded-lg hover:bg-gray-100 transition-colors"
-          >
-            Ir al Inicio de Sesión
-          </Link>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <Link
+              to={`/admin/alumno/${sessionStorage.getItem('lastCreatedUserId')}`}
+              className="inline-block px-6 py-2 bg-white text-green rounded-lg hover:bg-gray-100 transition-colors"
+            >
+              Ver Detalles del Alumno
+            </Link>
+            <Link
+              to="/admin"
+              className="inline-block px-6 py-2 bg-white/20 text-white rounded-lg hover:bg-white/30 transition-colors border border-white/30"
+            >
+              Volver al Panel
+            </Link>
+          </div>
         </div>
       </div>
     );
