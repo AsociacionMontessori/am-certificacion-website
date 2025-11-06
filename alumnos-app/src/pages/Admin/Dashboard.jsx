@@ -6,7 +6,9 @@ import {
   MagnifyingGlassIcon,
   DocumentTextIcon,
   AcademicCapIcon,
-  UserPlusIcon
+  UserPlusIcon,
+  Squares2X2Icon,
+  TableCellsIcon
 } from '@heroicons/react/24/outline';
 import { Link } from 'react-router-dom';
 
@@ -14,6 +16,12 @@ const AdminDashboard = () => {
   const [alumnos, setAlumnos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [viewMode, setViewMode] = useState(() => {
+    // Por defecto, tarjetas en móvil y tabla en desktop
+    // Guardar preferencia en localStorage
+    const saved = localStorage.getItem('adminViewMode');
+    return saved || 'auto'; // 'auto', 'table', 'cards'
+  });
 
   useEffect(() => {
     const loadAlumnos = async () => {
@@ -111,24 +119,58 @@ const AdminDashboard = () => {
         ))}
       </div>
 
-      {/* Búsqueda */}
+      {/* Búsqueda y Vista */}
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 transition-all duration-300 hover:shadow-md hover:border-gray-200 dark:hover:border-gray-600 p-4 sm:p-5">
-        <div className="relative">
-          <MagnifyingGlassIcon className="absolute left-3 sm:left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-          <input
-            type="text"
-            placeholder="Buscar por nombre, email, matrícula o nivel..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full px-4 py-2.5 sm:py-3 pl-10 sm:pl-12 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue transition-all duration-200"
-          />
+        <div className="flex flex-col sm:flex-row gap-4">
+          <div className="relative flex-1">
+            <MagnifyingGlassIcon className="absolute left-3 sm:left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Buscar por nombre, email, matrícula o nivel..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full px-4 py-2.5 sm:py-3 pl-10 sm:pl-12 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue transition-all duration-200"
+            />
+          </div>
+          <div className="flex items-center gap-2 bg-gray-50 dark:bg-gray-700 rounded-lg p-1">
+            <button
+              onClick={() => {
+                setViewMode('table');
+                localStorage.setItem('adminViewMode', 'table');
+              }}
+              className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                viewMode === 'table'
+                  ? 'bg-white dark:bg-gray-600 text-blue shadow-sm'
+                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+              }`}
+              title="Vista de tabla"
+            >
+              <TableCellsIcon className="w-5 h-5" />
+              <span className="hidden sm:inline">Tabla</span>
+            </button>
+            <button
+              onClick={() => {
+                setViewMode('cards');
+                localStorage.setItem('adminViewMode', 'cards');
+              }}
+              className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                viewMode === 'cards'
+                  ? 'bg-white dark:bg-gray-600 text-blue shadow-sm'
+                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+              }`}
+              title="Vista de tarjetas"
+            >
+              <Squares2X2Icon className="w-5 h-5" />
+              <span className="hidden sm:inline">Tarjetas</span>
+            </button>
+          </div>
         </div>
       </div>
 
       {/* Lista de Alumnos */}
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
-        {/* Desktop Table */}
-        <div className="hidden lg:block overflow-x-auto">
+        {/* Vista de Tabla */}
+        <div className={`overflow-x-auto ${viewMode === 'cards' ? 'hidden' : viewMode === 'auto' ? 'hidden lg:block' : 'block'}`}>
           <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
             <thead className="bg-gray-50 dark:bg-gray-700">
               <tr>
@@ -199,18 +241,27 @@ const AdminDashboard = () => {
           </table>
         </div>
 
-        {/* Mobile Cards */}
-        <div className="lg:hidden divide-y divide-gray-200 dark:divide-gray-700">
+        {/* Vista de Tarjetas */}
+        <div className={`${viewMode === 'table' ? 'hidden' : viewMode === 'auto' ? 'block lg:hidden' : 'block'} ${
+          viewMode === 'cards' ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 p-4 sm:p-6' : 'divide-y divide-gray-200 dark:divide-gray-700'
+        }`}>
           {filteredAlumnos.map((alumno) => (
-            <div key={alumno.id} className="p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+            <div 
+              key={alumno.id} 
+              className={`${
+                viewMode === 'cards' 
+                  ? 'bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4 sm:p-5 hover:shadow-md transition-all duration-200 border border-gray-200 dark:border-gray-600' 
+                  : 'p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors'
+              }`}
+            >
               <div className="flex items-start justify-between mb-3">
-                <div className="flex-1">
-                  <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-1">
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-1 truncate">
                     {alumno.nombre || 'N/A'}
                   </h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">{alumno.email || 'N/A'}</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 truncate">{alumno.email || 'N/A'}</p>
                 </div>
-                <span className={`badge ml-2 ${
+                <span className={`badge ml-2 flex-shrink-0 ${
                   alumno.estado === 'Activo' 
                     ? 'bg-green text-white'
                     : alumno.estado === 'Graduado'
@@ -220,31 +271,31 @@ const AdminDashboard = () => {
                   {alumno.estado || 'N/A'}
                 </span>
               </div>
-              <div className="space-y-2 mb-3">
+              <div className={`space-y-2 mb-4 ${viewMode === 'cards' ? 'text-sm' : ''}`}>
                 {alumno.matricula && (
                   <div className="flex items-center text-sm">
-                    <span className="text-gray-500 dark:text-gray-400 mr-2">Matrícula:</span>
-                    <span className="text-gray-900 dark:text-white font-medium">{alumno.matricula}</span>
+                    <span className="text-gray-500 dark:text-gray-400 mr-2 font-medium">Matrícula:</span>
+                    <span className="text-gray-900 dark:text-white">{alumno.matricula}</span>
                   </div>
                 )}
                 {alumno.nivel && (
                   <div className="flex items-center text-sm">
-                    <span className="text-gray-500 dark:text-gray-400 mr-2">Nivel:</span>
-                    <span className="text-gray-900 dark:text-white font-medium">{alumno.nivel}</span>
+                    <span className="text-gray-500 dark:text-gray-400 mr-2 font-medium">Nivel:</span>
+                    <span className="text-gray-900 dark:text-white">{alumno.nivel}</span>
                   </div>
                 )}
               </div>
-              <div className="flex flex-wrap gap-2 sm:gap-3">
+              <div className="flex flex-wrap gap-2">
                 <Link
                   to={`/admin/alumno/${alumno.id}`}
-                  className="inline-flex items-center justify-center px-3 py-1.5 text-sm font-semibold text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200"
+                  className="inline-flex items-center justify-center flex-1 sm:flex-none px-3 py-2 text-sm font-medium text-white bg-blue rounded-lg hover:bg-blue/90 transition-colors"
                 >
                   Ver Detalles
                 </Link>
                 <Link
                   to={`/public/alumno/${alumno.id}`}
                   target="_blank"
-                  className="inline-flex items-center justify-center px-3 py-1.5 text-sm font-semibold text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200"
+                  className="inline-flex items-center justify-center flex-1 sm:flex-none px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                 >
                   Vista Pública
                 </Link>
