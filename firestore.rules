@@ -13,6 +13,14 @@ service cloud.firestore {
       return request.auth != null && request.auth.uid == alumnoId;
     }
     
+    // Certificado válido para acceso público (folio + código y no inactivo)
+    function hasValidCertificate(alumnoId) {
+      return exists(/databases/$(database)/documents/alumnos/$(alumnoId)) &&
+             get(/databases/$(database)/documents/alumnos/$(alumnoId)).data.folioCertificado != null &&
+             get(/databases/$(database)/documents/alumnos/$(alumnoId)).data.codigoVerificacion != null &&
+             get(/databases/$(database)/documents/alumnos/$(alumnoId)).data.estado != 'Inactivo';
+    }
+    
     // Colección: admins
     // PERMITE que un usuario autenticado lea su propio documento de admin
     match /admins/{adminId} {
@@ -44,20 +52,22 @@ service cloud.firestore {
     
     // Colección: materias
     match /materias/{materiaId} {
-      // Alumnos solo pueden leer sus propias materias
-      allow read: if request.auth != null && 
-                     resource.data.alumnoId == request.auth.uid;
-      // Admin puede leer todas y escribir
-      allow read, write: if isAdmin();
+      // Lectura: propio alumno o pública si el alumno tiene certificado válido
+      allow read: if (request.auth != null && resource.data.alumnoId == request.auth.uid)
+                   || (request.auth == null && hasValidCertificate(resource.data.alumnoId))
+                   || isAdmin();
+      // Escritura solo admin
+      allow write: if isAdmin();
     }
     
     // Colección: calificaciones
     match /calificaciones/{calificacionId} {
-      // Alumnos solo pueden leer sus propias calificaciones
-      allow read: if request.auth != null && 
-                     resource.data.alumnoId == request.auth.uid;
-      // Admin puede leer todas y escribir
-      allow read, write: if isAdmin();
+      // Lectura: propio alumno o pública si el alumno tiene certificado válido
+      allow read: if (request.auth != null && resource.data.alumnoId == request.auth.uid)
+                   || (request.auth == null && hasValidCertificate(resource.data.alumnoId))
+                   || isAdmin();
+      // Escritura solo admin
+      allow write: if isAdmin();
     }
     
     // Colección: graduacion

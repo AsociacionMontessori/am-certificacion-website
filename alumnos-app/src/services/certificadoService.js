@@ -139,10 +139,45 @@ export const obtenerCertificado = async (alumnoId) => {
     // Calcular promedio
     const promedio = await calcularPromedioFinal(alumnoId);
 
+    // Cargar materias del alumno (acceso público)
+    let materias = [];
+    try {
+      const materiasQuery = query(
+        collection(db, 'materias'),
+        where('alumnoId', '==', alumnoId)
+      );
+      const materiasSnapshot = await getDocs(materiasQuery);
+      materias = materiasSnapshot.docs.map((docSnap) => ({ id: docSnap.id, ...docSnap.data() }));
+    } catch (errorMaterias) {
+      console.error('Error al cargar materias públicas:', errorMaterias);
+    }
+
+    // Cargar calificaciones del alumno (acceso público)
+    let calificaciones = [];
+    try {
+      const calificacionesQuery = query(
+        collection(db, 'calificaciones'),
+        where('alumnoId', '==', alumnoId)
+      );
+      const calificacionesSnapshot = await getDocs(calificacionesQuery);
+      calificaciones = calificacionesSnapshot.docs.map((docSnap) => ({ id: docSnap.id, ...docSnap.data() }));
+      // Orden: período desc, materia asc
+      calificaciones.sort((a, b) => {
+        if (a.periodo !== b.periodo) {
+          return (b.periodo || '').localeCompare(a.periodo || '');
+        }
+        return (a.materia || '').localeCompare(b.materia || '');
+      });
+    } catch (errorCal) {
+      console.error('Error al cargar calificaciones públicas:', errorCal);
+    }
+
     return {
       folio,
       codigoVerificacion,
       promedio,
+      materias,
+      calificaciones,
       alumno: {
         id: alumnoDoc.id,
         nombreCompleto: alumnoData.nombre,
