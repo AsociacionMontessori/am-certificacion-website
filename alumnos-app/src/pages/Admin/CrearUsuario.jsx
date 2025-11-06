@@ -12,35 +12,24 @@ const CrearUsuario = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const [formData, setFormData] = useState({
-    // Información básica
-    nombre: '',
+    nombreCompleto: '',
     email: '',
     password: '',
     confirmPassword: '',
-    
-    // Información académica
-    matricula: '',
-    programa: '',
-    cohorte: '',
-    nivelEducativo: '',
-    fechaIngreso: '',
-    estado: 'Activo',
-    
-    // Información de contacto
     telefono: '',
-    direccion: '',
-    ciudad: '',
-    estadoDireccion: '',
-    codigoPostal: '',
-    
-    // Privacidad
-    mostrarEmail: false,
-    mostrarTelefono: false,
-    nombrePublico: '',
-    
-    // Opciones
+    nivel: '',
+    fechaIngreso: '',
+    fechaEgresoEstimada: '',
+    estado: 'Activo',
     enviarEmailBienvenida: true,
   });
+
+  const niveles = [
+    'Propedéutico',
+    'Nido & Comunidad infantil',
+    'Casa de Niños',
+    'Taller'
+  ];
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -85,9 +74,15 @@ const CrearUsuario = () => {
 
     try {
       const resultado = await crearUsuarioAlumno({
-        ...formData,
-        creadoPor: currentUser?.uid,
+        nombre: formData.nombreCompleto,
+        email: formData.email,
+        password: formData.password,
+        telefono: formData.telefono,
+        nivel: formData.nivel,
         fechaIngreso: formData.fechaIngreso || new Date().toISOString().split('T')[0],
+        fechaEgresoEstimada: formData.fechaEgresoEstimada,
+        estado: formData.estado,
+        creadoPor: currentUser?.uid,
       });
 
       if (resultado.success) {
@@ -134,7 +129,7 @@ const CrearUsuario = () => {
       </Link>
 
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
           Crear Nuevo Alumno
         </h1>
         <p className="mt-2 text-gray-600 dark:text-gray-400">
@@ -142,7 +137,7 @@ const CrearUsuario = () => {
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 sm:p-8 space-y-6 sm:space-y-8">
+      <form onSubmit={handleSubmit} className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 sm:p-8 space-y-6">
         {error && (
           <div className="bg-red-light border border-red rounded-md p-3 text-red text-sm">
             {error}
@@ -151,26 +146,27 @@ const CrearUsuario = () => {
 
         {/* Información Básica */}
         <section>
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+          <h2 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white mb-4">
             Información Básica
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Nombre Completo *
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Nombre completo *
               </label>
               <input
                 type="text"
-                name="nombre"
+                name="nombreCompleto"
                 required
-                value={formData.nombre}
+                value={formData.nombreCompleto}
                 onChange={handleChange}
+                placeholder="Ej: Juan Pérez García"
                 className="w-full px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue transition-all duration-200"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Email *
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Mail de contacto *
               </label>
               <input
                 type="email"
@@ -178,11 +174,96 @@ const CrearUsuario = () => {
                 required
                 value={formData.email}
                 onChange={handleChange}
+                placeholder="ejemplo@correo.com"
                 className="w-full px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue transition-all duration-200"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Teléfono de contacto *
+              </label>
+              <input
+                type="tel"
+                name="telefono"
+                required
+                value={formData.telefono}
+                onChange={handleChange}
+                placeholder="Ej: 5512345678"
+                className="w-full px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue transition-all duration-200"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Nivel *
+              </label>
+              <select
+                name="nivel"
+                required
+                value={formData.nivel}
+                onChange={handleChange}
+                className="w-full px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue transition-all duration-200"
+              >
+                <option value="">Selecciona un nivel</option>
+                {niveles.map((nivel) => (
+                  <option key={nivel} value={nivel}>
+                    {nivel}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Fecha de ingreso *
+              </label>
+              <input
+                type="date"
+                name="fechaIngreso"
+                required
+                value={formData.fechaIngreso}
+                onChange={handleChange}
+                className="w-full px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue transition-all duration-200"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Fecha estimada de egreso *
+              </label>
+              <input
+                type="date"
+                name="fechaEgresoEstimada"
+                required
+                value={formData.fechaEgresoEstimada}
+                onChange={handleChange}
+                className="w-full px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue transition-all duration-200"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Estado *
+              </label>
+              <select
+                name="estado"
+                required
+                value={formData.estado}
+                onChange={handleChange}
+                className="w-full px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue transition-all duration-200"
+              >
+                <option value="Activo">Activo</option>
+                <option value="Inactivo">Inactivo</option>
+                <option value="Graduado">Graduado</option>
+              </select>
+            </div>
+          </div>
+        </section>
+
+        {/* Credenciales de Acceso */}
+        <section>
+          <h2 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white mb-4">
+            Credenciales de Acceso
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Contraseña *
                 <button
                   type="button"
@@ -203,7 +284,7 @@ const CrearUsuario = () => {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Confirmar Contraseña *
               </label>
               <input
@@ -219,222 +300,8 @@ const CrearUsuario = () => {
           </div>
         </section>
 
-        {/* Información Académica */}
-        <section>
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-            Información Académica
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Matrícula
-              </label>
-              <input
-                type="text"
-                name="matricula"
-                value={formData.matricula}
-                onChange={handleChange}
-                className="w-full px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue transition-all duration-200"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Programa *
-              </label>
-              <select
-                name="programa"
-                required
-                value={formData.programa}
-                onChange={handleChange}
-                className="w-full px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue transition-all duration-200"
-              >
-                <option value="">Selecciona un programa</option>
-                <option value="Diplomado Guía Montessori">Diplomado Guía Montessori</option>
-                <option value="Certificación Internacional">Certificación Internacional</option>
-                <option value="Masterclass">Masterclass</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Cohorte
-              </label>
-              <input
-                type="text"
-                name="cohorte"
-                value={formData.cohorte}
-                onChange={handleChange}
-                placeholder="Ej: 2024-1"
-                className="w-full px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue transition-all duration-200"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Nivel Educativo
-              </label>
-              <select
-                name="nivelEducativo"
-                value={formData.nivelEducativo}
-                onChange={handleChange}
-                className="w-full px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue transition-all duration-200"
-              >
-                <option value="">Selecciona</option>
-                <option value="Licenciatura">Licenciatura</option>
-                <option value="Maestría">Maestría</option>
-                <option value="Doctorado">Doctorado</option>
-                <option value="Otro">Otro</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Fecha de Ingreso
-              </label>
-              <input
-                type="date"
-                name="fechaIngreso"
-                value={formData.fechaIngreso}
-                onChange={handleChange}
-                className="w-full px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue transition-all duration-200"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Estado *
-              </label>
-              <select
-                name="estado"
-                required
-                value={formData.estado}
-                onChange={handleChange}
-                className="w-full px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue transition-all duration-200"
-              >
-                <option value="Activo">Activo</option>
-                <option value="Inactivo">Inactivo</option>
-                <option value="Graduado">Graduado</option>
-              </select>
-            </div>
-          </div>
-        </section>
-
-        {/* Información de Contacto */}
-        <section>
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-            Información de Contacto
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Teléfono
-              </label>
-              <input
-                type="tel"
-                name="telefono"
-                value={formData.telefono}
-                onChange={handleChange}
-                className="w-full px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue transition-all duration-200"
-              />
-            </div>
-            <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Dirección
-              </label>
-              <input
-                type="text"
-                name="direccion"
-                value={formData.direccion}
-                onChange={handleChange}
-                className="w-full px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue transition-all duration-200"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Ciudad
-              </label>
-              <input
-                type="text"
-                name="ciudad"
-                value={formData.ciudad}
-                onChange={handleChange}
-                className="w-full px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue transition-all duration-200"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Estado
-              </label>
-              <input
-                type="text"
-                name="estadoDireccion"
-                value={formData.estadoDireccion}
-                onChange={handleChange}
-                className="w-full px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue transition-all duration-200"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Código Postal
-              </label>
-              <input
-                type="text"
-                name="codigoPostal"
-                value={formData.codigoPostal}
-                onChange={handleChange}
-                className="w-full px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue transition-all duration-200"
-              />
-            </div>
-          </div>
-        </section>
-
-        {/* Configuración de Privacidad */}
-        <section>
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-            Configuración de Privacidad
-          </h2>
-          <div className="space-y-4">
-            <div className="flex items-center">
-              <input
-                type="checkbox"
-                name="mostrarEmail"
-                checked={formData.mostrarEmail}
-                onChange={handleChange}
-                className="w-4 h-4 text-blue border-gray-300 rounded focus:ring-blue"
-              />
-              <label className="ml-2 text-sm text-gray-700 dark:text-gray-300">
-                Permitir que el email sea visible en el perfil público
-              </label>
-            </div>
-            <div className="flex items-center">
-              <input
-                type="checkbox"
-                name="mostrarTelefono"
-                checked={formData.mostrarTelefono}
-                onChange={handleChange}
-                className="w-4 h-4 text-blue border-gray-300 rounded focus:ring-blue"
-              />
-              <label className="ml-2 text-sm text-gray-700 dark:text-gray-300">
-                Permitir que el teléfono sea visible en el perfil público
-              </label>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Nombre para mostrar públicamente (opcional)
-              </label>
-              <input
-                type="text"
-                name="nombrePublico"
-                value={formData.nombrePublico}
-                onChange={handleChange}
-                placeholder="Dejar vacío para usar nombre completo"
-                className="w-full px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue transition-all duration-200"
-              />
-            </div>
-          </div>
-        </section>
-
         {/* Opciones */}
         <section>
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-            Opciones
-          </h2>
           <div className="flex items-center">
             <input
               type="checkbox"
@@ -450,18 +317,18 @@ const CrearUsuario = () => {
         </section>
 
         {/* Botones */}
-        <div className="flex justify-end space-x-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+        <div className="flex flex-col sm:flex-row justify-end gap-3 sm:gap-4 pt-4 border-t border-gray-200 dark:border-gray-700">
           <button
             type="button"
             onClick={() => navigate('/admin')}
-            className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700 transition-colors"
+            className="px-6 py-2.5 sm:py-3 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors text-sm sm:text-base font-medium"
           >
             Cancelar
           </button>
           <button
             type="submit"
             disabled={loading}
-            className="px-6 py-2 bg-blue text-white rounded-lg hover:bg-blue/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center"
+            className="px-6 py-2.5 sm:py-3 bg-blue text-white rounded-lg hover:bg-blue/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm sm:text-base font-medium shadow-sm hover:shadow-md flex items-center justify-center"
           >
             {loading ? (
               <>
@@ -482,4 +349,3 @@ const CrearUsuario = () => {
 };
 
 export default CrearUsuario;
-

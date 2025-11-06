@@ -32,24 +32,13 @@ export const crearUsuarioAlumno = async (datosUsuario) => {
     const alumnoData = {
       nombre: nombre || '',
       email: email,
-      matricula: datosAdicionales.matricula || null,
       telefono: datosAdicionales.telefono || null,
-      fechaNacimiento: datosAdicionales.fechaNacimiento || null,
-      programa: datosAdicionales.programa || null,
-      cohorte: datosAdicionales.cohorte || null,
+      nivel: datosAdicionales.nivel || null,
       fechaIngreso: datosAdicionales.fechaIngreso ? new Date(datosAdicionales.fechaIngreso) : serverTimestamp(),
+      fechaEgresoEstimada: datosAdicionales.fechaEgresoEstimada ? new Date(datosAdicionales.fechaEgresoEstimada) : null,
       estado: datosAdicionales.estado || 'Activo',
-      nivelEducativo: datosAdicionales.nivelEducativo || null,
-      direccion: datosAdicionales.direccion || null,
-      ciudad: datosAdicionales.ciudad || null,
-      estadoDireccion: datosAdicionales.estadoDireccion || null,
-      codigoPostal: datosAdicionales.codigoPostal || null,
-      mostrarEmail: datosAdicionales.mostrarEmail || false,
-      mostrarTelefono: datosAdicionales.mostrarTelefono || false,
-      nombrePublico: datosAdicionales.nombrePublico || nombre || '',
       fechaCreacion: serverTimestamp(),
       creadoPor: datosAdicionales.creadoPor || null,
-      ...datosAdicionales
     };
 
     await setDoc(doc(db, 'alumnos', user.uid), alumnoData);
