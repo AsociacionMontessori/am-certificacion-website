@@ -43,22 +43,35 @@ export const AuthProvider = ({ children }) => {
             };
             setUserData(userDataWithRole);
           } else {
-            // Si no es admin, intentar como alumno
-            const alumnoDoc = await getDoc(doc(db, 'alumnos', user.uid));
+            // Si no es admin, intentar como directivo
+            const directivoDoc = await getDoc(doc(db, 'directivos', user.uid));
             
-            if (alumnoDoc.exists()) {
-              const alumnoData = alumnoDoc.data();
+            if (directivoDoc.exists()) {
+              const directivoData = directivoDoc.data();
               const userDataWithRole = { 
-                id: alumnoDoc.id, 
-                ...alumnoData, 
-                rol: 'alumno' 
+                id: directivoDoc.id, 
+                ...directivoData, 
+                rol: 'directivo' 
               };
               setUserData(userDataWithRole);
             } else {
-              console.warn('⚠️ Usuario no encontrado en admins ni alumnos:', user.uid);
-              console.warn('⚠️ Verifica que exista un documento en Firestore con ID =', user.uid);
-              // Si no existe en ninguna colección, no establecer userData
-              setUserData(null);
+              // Si no es directivo, intentar como alumno
+              const alumnoDoc = await getDoc(doc(db, 'alumnos', user.uid));
+              
+              if (alumnoDoc.exists()) {
+                const alumnoData = alumnoDoc.data();
+                const userDataWithRole = { 
+                  id: alumnoDoc.id, 
+                  ...alumnoData, 
+                  rol: 'alumno' 
+                };
+                setUserData(userDataWithRole);
+              } else {
+                console.warn('⚠️ Usuario no encontrado en admins, directivos ni alumnos:', user.uid);
+                console.warn('⚠️ Verifica que exista un documento en Firestore con ID =', user.uid);
+                // Si no existe en ninguna colección, no establecer userData
+                setUserData(null);
+              }
             }
           }
         } catch (error) {

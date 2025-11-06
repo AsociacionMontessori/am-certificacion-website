@@ -158,3 +158,46 @@ export const crearUsuarioAdmin = async (datosAdmin) => {
   }
 };
 
+/**
+ * Crea un nuevo directivo (solo lectura)
+ */
+export const crearUsuarioDirectivo = async (datosDirectivo) => {
+  try {
+    const { email, password, nombre } = datosDirectivo;
+
+    // Crear usuario en Authentication
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
+
+    // Actualizar perfil
+    if (nombre) {
+      await updateProfile(user, {
+        displayName: nombre
+      });
+    }
+
+    // Crear documento en Firestore en la colección 'directivos'
+    await setDoc(doc(db, 'directivos', user.uid), {
+      nombre: nombre || '',
+      email: email,
+      rol: 'directivo',
+      fechaCreacion: serverTimestamp(),
+      activo: true
+    });
+
+    return {
+      success: true,
+      uid: user.uid,
+      email: user.email,
+      message: 'Directivo creado exitosamente'
+    };
+  } catch (error) {
+    console.error('Error al crear directivo:', error);
+    return {
+      success: false,
+      error: error.message,
+      code: error.code
+    };
+  }
+};
+

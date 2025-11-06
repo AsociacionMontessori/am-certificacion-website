@@ -62,8 +62,8 @@ const DashboardRedirect = () => {
     );
   }
   
-  // Si el usuario es admin, redirigir al panel de administración
-  if (userData.rol === 'admin') {
+  // Si el usuario es admin o directivo, redirigir al panel de administración
+  if (userData.rol === 'admin' || userData.rol === 'directivo') {
     return <Navigate to="/admin" replace />;
   }
   

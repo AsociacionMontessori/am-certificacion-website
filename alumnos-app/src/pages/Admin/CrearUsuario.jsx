@@ -1,14 +1,22 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { crearUsuarioAlumno } from '../../services/adminService';
 import { UserPlusIcon, ArrowLeftIcon } from '@heroicons/react/24/outline';
 import { Link } from 'react-router-dom';
+import useCanEdit from '../../hooks/useCanEdit';
 
 const CrearUsuario = () => {
   const navigate = useNavigate();
   const { currentUser } = useAuth();
+  const canEdit = useCanEdit();
   const [loading, setLoading] = useState(false);
+  
+  useEffect(() => {
+    if (!canEdit) {
+      navigate('/admin');
+    }
+  }, [canEdit, navigate]);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const [formData, setFormData] = useState({

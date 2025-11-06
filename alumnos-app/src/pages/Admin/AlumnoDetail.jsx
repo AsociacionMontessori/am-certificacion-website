@@ -6,10 +6,12 @@ import { db, auth } from '../../config/firebase';
 import { ArrowLeftIcon, CalendarIcon, ChartBarIcon, AcademicCapIcon, PencilIcon, CheckIcon, XMarkIcon, EyeIcon, EyeSlashIcon, ClipboardDocumentIcon, ArrowRightOnRectangleIcon } from '@heroicons/react/24/outline';
 import { formatearFechaLarga, formatearFechaInput } from '../../utils/formatearFecha';
 import { useNotifications } from '../../contexts/NotificationContext';
+import useCanEdit from '../../hooks/useCanEdit';
 
 const AlumnoDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const canEdit = useCanEdit();
   const [alumno, setAlumno] = useState(null);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
@@ -264,7 +266,7 @@ const AlumnoDetail = () => {
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
               Información Personal
             </h2>
-            {!editing ? (
+            {canEdit && !editing ? (
               <button
                 onClick={() => setEditing(true)}
                 className="p-2 text-blue hover:bg-blue/10 rounded-lg transition-colors"
@@ -272,7 +274,7 @@ const AlumnoDetail = () => {
               >
                 <PencilIcon className="w-5 h-5" />
               </button>
-            ) : (
+            ) : canEdit && editing ? (
               <div className="flex gap-2">
                 <button
                   onClick={handleSave}
@@ -300,7 +302,7 @@ const AlumnoDetail = () => {
             </div>
             <div>
               <dt className="text-sm font-medium text-gray-500">Matrícula</dt>
-              {editing ? (
+              {editing && canEdit ? (
                 <input
                   type="text"
                   value={formData.matricula}
@@ -314,7 +316,7 @@ const AlumnoDetail = () => {
             </div>
             <div>
               <dt className="text-sm font-medium text-gray-500">Email</dt>
-              {editing ? (
+              {editing && canEdit ? (
                 <input
                   type="email"
                   value={formData.email}
@@ -329,7 +331,7 @@ const AlumnoDetail = () => {
             </div>
             <div>
               <dt className="text-sm font-medium text-gray-500">Email de recuperación</dt>
-              {editing ? (
+              {editing && canEdit ? (
                 <input
                   type="email"
                   value={formData.emailContacto}
@@ -343,7 +345,7 @@ const AlumnoDetail = () => {
             </div>
             <div>
               <dt className="text-sm font-medium text-gray-500">Teléfono</dt>
-              {editing ? (
+              {editing && canEdit ? (
                 <input
                   type="tel"
                   value={formData.telefono}
@@ -374,7 +376,7 @@ const AlumnoDetail = () => {
           <dl className="space-y-3">
             <div>
               <dt className="text-sm font-medium text-gray-500">Nivel</dt>
-              {editing ? (
+              {editing && canEdit ? (
                 <select
                   value={formData.nivel}
                   onChange={(e) => setFormData({ ...formData, nivel: e.target.value })}
@@ -392,7 +394,7 @@ const AlumnoDetail = () => {
             </div>
             <div>
               <dt className="text-sm font-medium text-gray-500">Fecha de ingreso</dt>
-              {editing ? (
+              {editing && canEdit ? (
                 <input
                   type="date"
                   value={formData.fechaIngreso}
@@ -407,7 +409,7 @@ const AlumnoDetail = () => {
             </div>
             <div>
               <dt className="text-sm font-medium text-gray-500">Fecha estimada de egreso</dt>
-              {editing ? (
+              {editing && canEdit ? (
                 <input
                   type="date"
                   value={formData.fechaEgresoEstimada}
@@ -422,7 +424,7 @@ const AlumnoDetail = () => {
             </div>
             <div>
               <dt className="text-sm font-medium text-gray-500">Estado</dt>
-              {editing ? (
+              {editing && canEdit ? (
                 <select
                   value={formData.estado}
                   onChange={(e) => setFormData({ ...formData, estado: e.target.value })}
@@ -448,7 +450,7 @@ const AlumnoDetail = () => {
             </div>
             <div>
               <dt className="text-sm font-medium text-gray-500">Usuario de Classroom</dt>
-              {editing ? (
+              {editing && canEdit ? (
                 <input
                   type="email"
                   value={formData.mailClassroom}
@@ -478,7 +480,7 @@ const AlumnoDetail = () => {
             </div>
             <div>
               <dt className="text-sm font-medium text-gray-500">Contraseña de Classroom</dt>
-              {editing ? (
+              {editing && canEdit ? (
                 <input
                   type="text"
                   value={formData.passwordClassroom}

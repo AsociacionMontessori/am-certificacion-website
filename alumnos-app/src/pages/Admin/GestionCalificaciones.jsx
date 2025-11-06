@@ -7,9 +7,11 @@ import { ArrowLeftIcon, PlusIcon, PencilIcon, TrashIcon, ChartBarIcon, DocumentD
 import LoadingSpinner from '../../components/LoadingSpinner';
 import LoadingButton from '../../components/LoadingButton';
 import { useNotifications } from '../../contexts/NotificationContext';
+import useCanEdit from '../../hooks/useCanEdit';
 
 const GestionCalificaciones = () => {
   const { id } = useParams();
+  const canEdit = useCanEdit();
   const { success, error: showError, confirm } = useNotifications();
   const [alumno, setAlumno] = useState(null);
   const [calificaciones, setCalificaciones] = useState([]);
@@ -353,32 +355,36 @@ const GestionCalificaciones = () => {
           </p>
         </div>
         <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
-          <button
-            onClick={() => {
-              setCalificacionEditando(null);
-              setFormData({
-                materia: '',
-                calificacion: ''
-              });
-              setShowModal(true);
-            }}
-            className="inline-flex items-center justify-center px-4 py-2.5 sm:px-6 sm:py-3 text-sm sm:text-base font-semibold text-white bg-blue rounded-lg shadow-sm hover:bg-blue/90 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue focus:ring-offset-2 transition-all duration-200"
-          >
-            <PlusIcon className="w-5 h-5 mr-2" />
-            Agregar Calificación
-          </button>
-          <button
-            onClick={() => {
-              setShowBulkModal(true);
-              setBulkData('');
-              setBulkPreview([]);
-              setBulkError('');
-            }}
-            className="inline-flex items-center justify-center px-4 py-2.5 sm:px-6 sm:py-3 text-sm sm:text-base font-semibold text-gray-900 bg-green rounded-lg shadow-sm hover:bg-green/90 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-green focus:ring-offset-2 transition-all duration-200"
-          >
-            <DocumentDuplicateIcon className="w-5 h-5 mr-2" />
-            Agregar por Lotes
-          </button>
+          {canEdit && (
+            <>
+              <button
+                onClick={() => {
+                  setCalificacionEditando(null);
+                  setFormData({
+                    materia: '',
+                    calificacion: ''
+                  });
+                  setShowModal(true);
+                }}
+                className="inline-flex items-center justify-center px-4 py-2.5 sm:px-6 sm:py-3 text-sm sm:text-base font-semibold text-white bg-blue rounded-lg shadow-sm hover:bg-blue/90 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue focus:ring-offset-2 transition-all duration-200"
+              >
+                <PlusIcon className="w-5 h-5 mr-2" />
+                Agregar Calificación
+              </button>
+              <button
+                onClick={() => {
+                  setShowBulkModal(true);
+                  setBulkData('');
+                  setBulkPreview([]);
+                  setBulkError('');
+                }}
+                className="inline-flex items-center justify-center px-4 py-2.5 sm:px-6 sm:py-3 text-sm sm:text-base font-semibold text-gray-900 bg-green rounded-lg shadow-sm hover:bg-green/90 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-green focus:ring-offset-2 transition-all duration-200"
+              >
+                <DocumentDuplicateIcon className="w-5 h-5 mr-2" />
+                Agregar por Lotes
+              </button>
+            </>
+          )}
         </div>
       </div>
 
@@ -460,7 +466,7 @@ const GestionCalificaciones = () => {
                         </div>
                       </div>
                     </div>
-                    {!isSelecting && (
+                    {!isSelecting && canEdit && (
                       <div className="flex gap-2">
                         <button
                           onClick={() => handleEdit(calificacion)}

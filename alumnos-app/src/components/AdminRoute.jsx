@@ -20,7 +20,8 @@ const AdminRoute = ({ children }) => {
     return <Navigate to="/login" replace />;
   }
 
-  if (userData?.rol !== 'admin') {
+  // Permitir acceso a admin y directivo
+  if (userData?.rol !== 'admin' && userData?.rol !== 'directivo') {
     return <Navigate to="/" replace />;
   }
 

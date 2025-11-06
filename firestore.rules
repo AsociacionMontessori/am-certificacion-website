@@ -8,6 +8,17 @@ service cloud.firestore {
              exists(/databases/$(database)/documents/admins/$(request.auth.uid));
     }
     
+    // Función helper para verificar si el usuario es directivo
+    function isDirectivo() {
+      return request.auth != null && 
+             exists(/databases/$(database)/documents/directivos/$(request.auth.uid));
+    }
+    
+    // Función helper para verificar si el usuario es admin o directivo (lectura)
+    function canReadAdmin() {
+      return isAdmin() || isDirectivo();
+    }
+    
     // Función helper para verificar si es el propio alumno
     function isOwnAlumno(alumnoId) {
       return request.auth != null && request.auth.uid == alumnoId;
@@ -31,10 +42,22 @@ service cloud.firestore {
       allow write: if false;
     }
     
+    // Colección: directivos
+    // PERMITE que un usuario autenticado lea su propio documento de directivo
+    match /directivos/{directivoId} {
+      // Cualquier usuario autenticado puede leer SU PROPIO documento
+      // Esto es necesario para que el sistema pueda verificar si es directivo
+      allow read: if request.auth != null && request.auth.uid == directivoId;
+      // Solo desde Admin SDK o consola
+      allow write: if false;
+    }
+    
     // Colección: alumnos
     match /alumnos/{alumnoId} {
       // El alumno puede leer/editar su propio documento
-      allow read, write: if isOwnAlumno(alumnoId) || isAdmin();
+      // Admin puede leer y escribir, directivo solo puede leer
+      allow read: if isOwnAlumno(alumnoId) || canReadAdmin();
+      allow write: if isOwnAlumno(alumnoId) || isAdmin();
       
       // Permitir lectura pública SOLO para verificación de certificados
       // Esto permite que cualquiera verifique un certificado usando folio y código
@@ -53,9 +76,10 @@ service cloud.firestore {
     // Colección: materias
     match /materias/{materiaId} {
       // Lectura: propio alumno o pública si el alumno tiene certificado válido
+      // Admin y directivo pueden leer todas las materias
       allow read: if (request.auth != null && resource.data.alumnoId == request.auth.uid)
                    || (request.auth == null && hasValidCertificate(resource.data.alumnoId))
-                   || isAdmin();
+                   || canReadAdmin();
       // Escritura solo admin
       allow write: if isAdmin();
     }
@@ -63,9 +87,10 @@ service cloud.firestore {
     // Colección: calificaciones
     match /calificaciones/{calificacionId} {
       // Lectura: propio alumno o pública si el alumno tiene certificado válido
+      // Admin y directivo pueden leer todas las calificaciones
       allow read: if (request.auth != null && resource.data.alumnoId == request.auth.uid)
                    || (request.auth == null && hasValidCertificate(resource.data.alumnoId))
-                   || isAdmin();
+                   || canReadAdmin();
       // Escritura solo admin
       allow write: if isAdmin();
     }
@@ -73,7 +98,8 @@ service cloud.firestore {
     // Colección: graduacion
     match /graduacion/{alumnoId} {
       // El alumno solo puede leer su propia información
-      allow read: if isOwnAlumno(alumnoId) || isAdmin();
+      // Admin y directivo pueden leer todas las graduaciones
+      allow read: if isOwnAlumno(alumnoId) || canReadAdmin();
       // Solo admin puede escribir
       allow write: if isAdmin();
     }
@@ -82,11 +108,12 @@ service cloud.firestore {
     match /inscripciones/{inscripcionId} {
       // Cualquiera autenticado puede crear una inscripción
       allow create: if request.auth != null;
-      // Solo el admin puede leer y actualizar
-      allow read, update: if isAdmin();
+      // Admin y directivo pueden leer todas las inscripciones
+      // Solo admin puede actualizar
+      allow read: if canReadAdmin() || 
+                     (request.auth != null && resource.data.email == request.auth.token.email);
+      allow update: if isAdmin();
       // Los usuarios solo pueden leer sus propias inscripciones
-      allow read: if request.auth != null && 
-                     resource.data.email == request.auth.token.email;
     }
     
     // Denegar acceso a todo lo demás por defecto

@@ -6,9 +6,11 @@ import { ArrowLeftIcon, AcademicCapIcon, CheckCircleIcon, ClockIcon } from '@her
 import LoadingSpinner from '../../components/LoadingSpinner';
 import LoadingButton from '../../components/LoadingButton';
 import { useNotifications } from '../../contexts/NotificationContext';
+import useCanEdit from '../../hooks/useCanEdit';
 
 const GestionGraduacion = () => {
   const { id } = useParams();
+  const canEdit = useCanEdit();
   const { success, error: showError } = useNotifications();
   const [alumno, setAlumno] = useState(null);
   const [infoGraduacion, setInfoGraduacion] = useState(null);
@@ -164,12 +166,13 @@ const GestionGraduacion = () => {
           </h2>
           <div className="space-y-3">
             {requisitos.map((requisito) => (
-              <label key={requisito.key} className="flex items-center cursor-pointer">
+              <label key={requisito.key} className={`flex items-center ${canEdit ? 'cursor-pointer' : 'cursor-not-allowed'}`}>
                 <input
                   type="checkbox"
                   checked={requisito.completado}
                   onChange={(e) => setFormData({ ...formData, [requisito.key]: e.target.checked })}
-                  className="w-5 h-5 text-blue border-gray-300 rounded focus:ring-blue"
+                  disabled={!canEdit}
+                  className="w-5 h-5 text-blue border-gray-300 rounded focus:ring-blue disabled:opacity-50 disabled:cursor-not-allowed"
                 />
                 <span className="ml-3 text-sm text-gray-900 dark:text-white">
                   {requisito.nombre}
@@ -179,16 +182,18 @@ const GestionGraduacion = () => {
           </div>
         </div>
 
-        <div className="flex justify-end pt-4">
-          <LoadingButton
-            type="submit"
-            isLoading={saving}
-            variant="primary"
-            size="lg"
-          >
-            Guardar Información
-          </LoadingButton>
-        </div>
+        {canEdit && (
+          <div className="flex justify-end pt-4">
+            <LoadingButton
+              type="submit"
+              isLoading={saving}
+              variant="primary"
+              size="lg"
+            >
+              Guardar Información
+            </LoadingButton>
+          </div>
+        )}
       </form>
     </div>
   );

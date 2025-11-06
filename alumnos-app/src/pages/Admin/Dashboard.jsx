@@ -13,8 +13,10 @@ import {
 } from '@heroicons/react/24/outline';
 import { Link } from 'react-router-dom';
 import AlertasMateriasProximas from '../../components/AlertasMateriasProximas';
+import useCanEdit from '../../hooks/useCanEdit';
 
 const AdminDashboard = () => {
+  const canEdit = useCanEdit();
   const [alumnos, setAlumnos] = useState([]);
   const [ultimoAlumnoId, setUltimoAlumnoId] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -119,13 +121,15 @@ const AdminDashboard = () => {
             Gestión de alumnos y certificaciones
           </p>
         </div>
-        <Link
-          to="/admin/crear-usuario"
-          className="inline-flex items-center justify-center px-4 py-2.5 sm:px-6 sm:py-3 text-sm sm:text-base font-semibold text-white bg-blue rounded-lg shadow-sm hover:bg-blue/90 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue focus:ring-offset-2 transition-all duration-200 self-start sm:self-auto"
-        >
-          <UserPlusIcon className="w-5 h-5 mr-2" />
-          Crear Usuario
-        </Link>
+        {canEdit && (
+          <Link
+            to="/admin/crear-usuario"
+            className="inline-flex items-center justify-center px-4 py-2.5 sm:px-6 sm:py-3 text-sm sm:text-base font-semibold text-white bg-blue rounded-lg shadow-sm hover:bg-blue/90 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue focus:ring-offset-2 transition-all duration-200 self-start sm:self-auto"
+          >
+            <UserPlusIcon className="w-5 h-5 mr-2" />
+            Crear Usuario
+          </Link>
+        )}
       </div>
 
       {/* Estadísticas */}

@@ -1,6 +1,7 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
+import useCanEdit from '../hooks/useCanEdit';
 import { 
   HomeIcon, 
   UserGroupIcon,
@@ -17,18 +18,19 @@ const AdminLayout = ({ children }) => {
   const { userData, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const location = useLocation();
+  const canEdit = useCanEdit();
 
   const navigation = [
     { name: 'Dashboard', href: '/admin', icon: HomeIcon },
-    { name: 'Crear Usuario', href: '/admin/crear-usuario', icon: UserGroupIcon },
+    ...(canEdit ? [{ name: 'Crear Usuario', href: '/admin/crear-usuario', icon: UserGroupIcon }] : []),
     { name: 'Inscripciones', href: '/admin/inscripciones', icon: DocumentTextIcon },
     { name: 'Generador QR', href: '/admin/generador-qr', icon: QrCodeIcon },
   ];
 
-  const herramientasAvanzadas = [
+  const herramientasAvanzadas = canEdit ? [
     { name: 'Regenerar Códigos', href: '/admin/regenerar-codigos', icon: ArrowPathIcon },
     { name: 'Diagnóstico', href: '/admin/diagnostico-codigos', icon: DocumentTextIcon },
-  ];
+  ] : [];
 
   const handleLogout = async () => {
     await logout();
@@ -120,7 +122,9 @@ const AdminLayout = ({ children }) => {
                   <p className="text-sm font-medium text-gray-900 dark:text-white truncate max-w-[150px]">
                     {userData.nombre || userData.email}
                   </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">Administrador</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    {userData.rol === 'admin' ? 'Administrador' : userData.rol === 'directivo' ? 'Directivo' : 'Usuario'}
+                  </p>
                 </div>
               )}
               <button
