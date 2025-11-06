@@ -474,10 +474,12 @@ const PublicProfile = () => {
                                 <td className="px-2 sm:px-4 py-2">
                                   <span className={`inline-flex items-center px-1.5 sm:px-2 py-0.5 rounded-full text-xs font-medium whitespace-nowrap ${
                                     item.estado === 'Completada' 
-                                      ? 'bg-green text-white'
+                                      ? 'bg-green text-gray-900'
                                       : item.estado === 'En curso'
                                       ? 'bg-blue text-white'
-                                      : 'bg-gray text-white'
+                                      : item.estado === 'Con atraso'
+                                      ? 'bg-red text-white'
+                                      : 'bg-gray-600 text-white'
                                   }`}>
                                     {item.estado}
                                   </span>
@@ -578,15 +580,15 @@ const PublicProfile = () => {
                     Calificaciones
                   </h2>
                 </div>
-                <div className="space-y-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   {calificaciones.map((c) => (
                     <div key={c.id} className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 border border-gray-200 dark:border-gray-600">
-                      <div className="flex items-center justify-between">
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                         <div className="flex-1 min-w-0">
                           <p className="text-sm text-gray-500 dark:text-gray-400 truncate">{c.periodo || 'Período'}</p>
                           <h3 className="text-base font-semibold text-gray-900 dark:text-white truncate">{c.materia || 'Materia'}</h3>
                         </div>
-                        <div className="ml-4">
+                        <div className="sm:ml-4 flex-shrink-0">
                           <span className="text-xl font-bold text-gray-900 dark:text-white">{c.calificacion ?? 'N/A'}</span>
                         </div>
                       </div>

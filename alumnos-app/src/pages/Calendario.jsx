@@ -127,10 +127,12 @@ const Calendario = () => {
                           <div className="mt-2">
                             <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                               materia.estado === 'Completada' 
-                                ? 'bg-green text-white'
+                                ? 'bg-green text-gray-900'
                                 : materia.estado === 'En curso'
                                 ? 'bg-blue text-white'
-                                : 'bg-gray text-white'
+                                : materia.estado === 'Con atraso'
+                                ? 'bg-red text-white'
+                                : 'bg-gray-600 text-white'
                             }`}>
                               {materia.estado}
                             </span>
