@@ -251,3 +251,37 @@ html.dark .bg-gray-200:not([class*="dark:bg-"]) {
     padding-right: 1rem;
   }
 }
+
+/* WhatsApp Button Animations */
+.whatsapp-button {
+  animation: whatsappFloat 3s ease-in-out infinite;
+}
+
+.whatsapp-button::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: rgba(37, 211, 102, 0.4);
+  animation: whatsappPulse 2s ease-out infinite;
+}
+
+@keyframes whatsappFloat {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes whatsappPulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+}

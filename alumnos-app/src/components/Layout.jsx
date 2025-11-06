@@ -1,6 +1,7 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
+import WhatsAppButton from './WhatsAppButton';
 import { 
   HomeIcon, 
   AcademicCapIcon, 
@@ -146,6 +147,9 @@ const Layout = ({ children }) => {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 pb-16 md:pb-8 animate-fade-in">
         {children}
       </main>
+
+      {/* WhatsApp Button */}
+      <WhatsAppButton />
 
       {/* Bottom Navigation - Mobile (Glassmorphism Style) */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50">
