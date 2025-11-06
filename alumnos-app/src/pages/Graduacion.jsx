@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { Link } from 'react-router-dom';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../config/firebase';
-import { AcademicCapIcon, CheckCircleIcon, ClockIcon } from '@heroicons/react/24/outline';
+import { AcademicCapIcon, CheckCircleIcon, ClockIcon, DocumentTextIcon } from '@heroicons/react/24/outline';
 
 const Graduacion = () => {
   const { currentUser } = useAuth();
@@ -158,6 +159,35 @@ const Graduacion = () => {
               </p>
             </div>
           )}
+        </div>
+      )}
+
+      {/* Certificado Digital */}
+      {currentUser && (
+        <div className="mb-6 bg-gradient-to-r from-green to-green/90 rounded-lg shadow-md p-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <DocumentTextIcon className="w-8 h-8 text-white mr-4" />
+              <div>
+                <h2 className="text-xl font-semibold text-white mb-1">
+                  Certificado Digital
+                </h2>
+                <p className="text-white/90 text-sm">
+                  Accede a tu certificado digital verificable
+                </p>
+              </div>
+            </div>
+            <Link
+              to={`/certificado/${currentUser.uid}`}
+              target="_blank"
+              className="inline-flex items-center px-6 py-3 bg-white text-green rounded-lg hover:bg-white/90 font-semibold transition-all duration-200 shadow-lg hover:shadow-xl"
+            >
+              Ver Certificado
+              <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+              </svg>
+            </Link>
+          </div>
         </div>
       )}
 

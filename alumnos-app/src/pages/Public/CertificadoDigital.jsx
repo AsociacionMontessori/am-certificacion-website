@@ -84,6 +84,9 @@ const CertificadoDigital = () => {
                 {esGraduado ? 'CERTIFICADO DIGITAL' : 'CONSTANCIA DE ESTUDIOS'}
               </h1>
               <p className="text-white/90 text-lg">Asociación Montessori de México A.C.</p>
+              {!esGraduado && (
+                <p className="text-white/80 text-sm mt-2">Certificado Digital Verificable</p>
+              )}
             </div>
           </div>
 
