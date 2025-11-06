@@ -95,7 +95,7 @@ const GestionGraduacion = () => {
   const requisitos = [
     { nombre: 'Completar todas las materias', completado: formData.materiasCompletadas, key: 'materiasCompletadas' },
     { nombre: 'Promedio mínimo de 8.0', completado: formData.promedioMinimo, key: 'promedioMinimo' },
-    { nombre: 'Tesis o proyecto final', completado: formData.tesisCompletada, key: 'tesisCompletada' },
+    { nombre: 'Entrega de Album Montessori (proyecto final)', completado: formData.tesisCompletada, key: 'tesisCompletada' },
     { nombre: 'Prácticas profesionales', completado: formData.practicasCompletadas, key: 'practicasCompletadas' },
     { nombre: 'Pago de derechos de titulación', completado: formData.pagoRealizado, key: 'pagoRealizado' },
   ];

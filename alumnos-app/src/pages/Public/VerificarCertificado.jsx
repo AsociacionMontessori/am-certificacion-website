@@ -12,12 +12,16 @@ const VerificarCertificado = () => {
     const verificar = async () => {
       if (folio && codigo) {
         try {
-          const resultado = await verificarCertificado(folio, codigo);
+          // Normalizar el código (mayúsculas y sin espacios)
+          const codigoNormalizado = codigo.toUpperCase().trim();
+          const resultado = await verificarCertificado(folio, codigoNormalizado);
           setResultado(resultado);
         } catch (error) {
           console.error('Error al verificar:', error);
-          setResultado({ valido: false });
+          setResultado({ valido: false, error: error.message });
         }
+      } else {
+        setResultado({ valido: false, error: 'Faltan parámetros de verificación' });
       }
       setLoading(false);
     };

@@ -28,9 +28,14 @@ export const generarFolio = (alumnoId) => {
  * Genera un código de verificación único
  */
 export const generarCodigoVerificacion = (alumnoId, folio) => {
-  const data = `${alumnoId}-${folio}-${Date.now()}`;
+  const data = `${alumnoId}-${folio}`;
   const hash = hashString(data);
-  return hash.substring(0, 16).padStart(16, '0');
+  // Asegurar que siempre tenga 16 caracteres
+  let codigo = hash.substring(0, 16).toUpperCase();
+  if (codigo.length < 16) {
+    codigo = codigo.padEnd(16, '0');
+  }
+  return codigo;
 };
 
 /**
@@ -81,9 +86,14 @@ export const obtenerCertificado = async (alumnoId) => {
     let codigoVerificacion = alumnoData.codigoVerificacion;
     
     // Si no tiene folio, generar uno nuevo
-    if (!folio) {
-      folio = generarFolio(alumnoId);
-      codigoVerificacion = generarCodigoVerificacion(alumnoId, folio);
+    if (!folio || !codigoVerificacion) {
+      if (!folio) {
+        folio = generarFolio(alumnoId);
+      }
+      // Si no tiene código o el folio cambió, regenerar código
+      if (!codigoVerificacion) {
+        codigoVerificacion = generarCodigoVerificacion(alumnoId, folio);
+      }
       
       // Guardar en Firestore
       await updateDoc(doc(db, 'alumnos', alumnoId), {
@@ -120,20 +130,34 @@ export const obtenerCertificado = async (alumnoId) => {
  */
 export const verificarCertificado = async (folio, codigoVerificacion) => {
   try {
+    // Normalizar parámetros
+    const folioNormalizado = folio?.trim().toUpperCase();
+    const codigoNormalizado = codigoVerificacion?.trim().toUpperCase();
+    
+    if (!folioNormalizado || !codigoNormalizado) {
+      return { valido: false, error: 'Folio o código de verificación inválido' };
+    }
+
+    // Primero buscar por folio
     const alumnosQuery = query(
       collection(db, 'alumnos'),
-      where('folioCertificado', '==', folio),
-      where('codigoVerificacion', '==', codigoVerificacion)
+      where('folioCertificado', '==', folioNormalizado)
     );
     
     const querySnapshot = await getDocs(alumnosQuery);
     
     if (querySnapshot.empty) {
-      return { valido: false };
+      return { valido: false, error: 'No se encontró un certificado con ese folio' };
     }
 
+    // Verificar que el código coincida
     const alumnoDoc = querySnapshot.docs[0];
     const alumnoData = alumnoDoc.data();
+    const codigoGuardado = alumnoData.codigoVerificacion?.trim().toUpperCase();
+    
+    if (codigoGuardado !== codigoNormalizado) {
+      return { valido: false, error: 'El código de verificación no coincide' };
+    }
     
     return {
       valido: true,
@@ -148,7 +172,7 @@ export const verificarCertificado = async (folio, codigoVerificacion) => {
     };
   } catch (error) {
     console.error('Error al verificar certificado:', error);
-    return { valido: false };
+    return { valido: false, error: error.message };
   }
 };
 

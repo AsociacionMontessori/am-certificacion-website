@@ -39,7 +39,7 @@ const Graduacion = () => {
   const requisitos = [
     { nombre: 'Completar todas las materias', completado: infoGraduacion?.materiasCompletadas || false },
     { nombre: 'Promedio mínimo de 8.0', completado: infoGraduacion?.promedioMinimo || false },
-    { nombre: 'Tesis o proyecto final', completado: infoGraduacion?.tesisCompletada || false },
+    { nombre: 'Entrega de Album Montessori (proyecto final)', completado: infoGraduacion?.tesisCompletada || false },
     { nombre: 'Prácticas profesionales', completado: infoGraduacion?.practicasCompletadas || false },
     { nombre: 'Pago de derechos de titulación', completado: infoGraduacion?.pagoRealizado || false },
   ];
