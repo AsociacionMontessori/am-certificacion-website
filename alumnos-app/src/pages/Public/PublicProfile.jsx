@@ -474,12 +474,12 @@ const PublicProfile = () => {
                                 <td className="px-2 sm:px-4 py-2">
                                   <span className={`inline-flex items-center px-1.5 sm:px-2 py-0.5 rounded-full text-xs font-medium whitespace-nowrap ${
                                     item.estado === 'Completada' 
-                                      ? 'bg-green text-gray-900 dark:text-white'
+                                      ? 'bg-green text-gray-900 dark:bg-green/80 dark:text-white'
                                       : item.estado === 'En curso'
                                       ? 'bg-blue text-white'
                                       : item.estado === 'Con atraso'
                                       ? 'bg-red text-white'
-                                      : 'bg-gray-700 text-white'
+                                      : 'bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-white'
                                   }`}>
                                     {item.estado}
                                   </span>
@@ -624,10 +624,10 @@ const PublicProfile = () => {
                       <dd className="mt-1">
                         <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                           alumno.estado === 'Activo' 
-                            ? 'bg-green text-gray-900 dark:text-white'
+                            ? 'bg-green text-gray-900 dark:bg-green/80 dark:text-white'
                             : alumno.estado === 'Graduado'
-                            ? 'bg-yellow text-gray-900 dark:text-white'
-                            : 'bg-gray-700 text-white'
+                            ? 'bg-yellow text-gray-900 dark:bg-yellow/80 dark:text-gray-900'
+                            : 'bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-white'
                         }`}>
                           {alumno.estado}
                         </span>

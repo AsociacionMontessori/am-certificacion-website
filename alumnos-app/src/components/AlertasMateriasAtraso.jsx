@@ -108,7 +108,7 @@ const AlertasMateriasAtraso = () => {
           href={whatsappUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center justify-center w-full sm:w-auto px-4 py-2.5 bg-green text-gray-900 dark:text-white rounded-lg hover:bg-green/90 font-medium transition-colors mb-3"
+          className="inline-flex items-center justify-center w-full sm:w-auto px-4 py-2.5 bg-green text-gray-900 dark:bg-green/80 dark:text-white rounded-lg hover:bg-green/90 dark:hover:bg-green/70 font-medium transition-colors mb-3"
         >
           <PhoneIcon className="w-5 h-5 mr-2" />
           Contactar por WhatsApp
