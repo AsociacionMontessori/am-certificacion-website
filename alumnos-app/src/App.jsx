@@ -22,6 +22,7 @@ import GestionGraduacion from './pages/Admin/GestionGraduacion';
 import PublicProfile from './pages/Public/PublicProfile';
 import CertificadoDigital from './pages/Public/CertificadoDigital';
 import VerificarCertificado from './pages/Public/VerificarCertificado';
+import RegenerarCodigos from './pages/Admin/RegenerarCodigos';
 
 // Componente para redirigir según el rol
 const DashboardRedirect = () => {
@@ -117,6 +118,16 @@ function App() {
               <AdminRoute>
                 <AdminLayout>
                   <CrearUsuario />
+                </AdminLayout>
+              </AdminRoute>
+            }
+          />
+          <Route
+            path="/admin/regenerar-codigos"
+            element={
+              <AdminRoute>
+                <AdminLayout>
+                  <RegenerarCodigos />
                 </AdminLayout>
               </AdminRoute>
             }

@@ -5,6 +5,7 @@ import {
   HomeIcon, 
   UserGroupIcon,
   DocumentTextIcon,
+  ArrowPathIcon,
   ArrowRightOnRectangleIcon,
   SunIcon,
   MoonIcon
@@ -19,6 +20,7 @@ const AdminLayout = ({ children }) => {
     { name: 'Dashboard', href: '/admin', icon: HomeIcon },
     { name: 'Crear Usuario', href: '/admin/crear-usuario', icon: UserGroupIcon },
     { name: 'Inscripciones', href: '/admin/inscripciones', icon: DocumentTextIcon },
+    { name: 'Regenerar Códigos', href: '/admin/regenerar-codigos', icon: ArrowPathIcon },
   ];
 
   const handleLogout = async () => {
