@@ -97,7 +97,8 @@ certificacionMontessori/
 ├── gatsby-config.js        # Configuración de Gatsby
 ├── tailwind.config.js      # Configuración de Tailwind
 ├── package.json            # Dependencias y scripts
-└── vercel.json            # Configuración de Vercel
+├── firebase.json          # Configuración de Firebase Hosting
+└── .firebaserc            # Configuración del proyecto Firebase
 ```
 
 ## 🚀 Instalación y Configuración
@@ -188,14 +189,71 @@ Los componentes están organizados de forma modular:
 
 ## 📦 Despliegue
 
-El proyecto está configurado para desplegarse en **Vercel**:
+El proyecto está configurado para desplegarse en **Firebase Hosting**.
 
+### Configuración del Proyecto Firebase
+
+- **Nombre del Proyecto**: CertificacionMontessori
+- **ID del Proyecto**: certificacionmontessori
+- **Número del Proyecto**: 77935287015
+- **Organización**: asociacionmontessori.mx
+
+### Comandos de Despliegue
+
+#### Primer Despliegue
 ```bash
-npm run build
-vercel deploy
+# 1. Asegúrate de estar autenticado
+npm run firebase:login
+
+# 2. Seleccionar el proyecto (si no está seleccionado)
+npm run firebase:use
+
+# 3. Build y deploy
+npm run deploy
 ```
 
-O mediante integración continua con GitHub.
+#### Despliegues Subsecuentes
+```bash
+# Deploy a producción
+npm run deploy
+
+# O paso a paso
+npm run build
+firebase deploy --only hosting
+```
+
+#### Deploy de Preview (canales)
+```bash
+npm run deploy:preview
+```
+
+### Scripts Disponibles para Firebase
+
+- `npm run deploy` - Build y deploy a producción
+- `npm run deploy:preview` - Deploy a canal de preview
+- `npm run firebase:login` - Autenticarse en Firebase
+- `npm run firebase:use` - Seleccionar proyecto Firebase
+
+### Configuración de Firebase Hosting
+
+El archivo `firebase.json` está configurado con:
+- **Directorio público**: `public` (generado por Gatsby build)
+- **Rewrites**: Todas las rutas se redirigen a `index.html` (SPA)
+- **Headers de caché**: Optimizados para assets estáticos
+- **Cache-Control**: Configurado para mejor performance
+
+### URLs del Proyecto
+
+Después del deploy, el sitio estará disponible en:
+- **URL Principal**: `https://certificacionmontessori.web.app`
+- **URL Alternativa**: `https://certificacionmontessori.firebaseapp.com`
+
+### Integración Continua
+
+Para configurar CI/CD con GitHub Actions, puedes usar el siguiente flujo:
+1. Build del proyecto
+2. Deploy automático a Firebase Hosting
+3. Notificaciones de estado del deploy
 
 ## 🤝 Contribución
 
