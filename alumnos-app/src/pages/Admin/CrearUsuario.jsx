@@ -31,7 +31,8 @@ const CrearUsuario = () => {
     'Propedéutico',
     'Nido & Comunidad infantil',
     'Casa de Niños',
-    'Taller'
+    'Taller',
+    'Neuroeducación'
   ];
 
   const handleChange = (e) => {
