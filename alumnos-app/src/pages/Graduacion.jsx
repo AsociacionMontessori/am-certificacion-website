@@ -5,6 +5,7 @@ import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import { AcademicCapIcon, CheckCircleIcon, ClockIcon, DocumentTextIcon } from '@heroicons/react/24/outline';
 import LoadingSpinner from '../components/LoadingSpinner';
+import { formatearFechaLarga } from '../utils/formatearFecha';
 
 const Graduacion = () => {
   const { currentUser } = useAuth();
@@ -118,15 +119,7 @@ const Graduacion = () => {
               Fecha de Ceremonia
             </h3>
             <p className="text-gray-600 dark:text-gray-400">
-              {infoGraduacion.fechaCeremonia.toDate ? 
-                new Date(infoGraduacion.fechaCeremonia.toDate()).toLocaleDateString('es-MX', {
-                  weekday: 'long',
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric'
-                }) :
-                infoGraduacion.fechaCeremonia
-              }
+              {formatearFechaLarga(infoGraduacion.fechaCeremonia)}
             </p>
           </div>
           )}

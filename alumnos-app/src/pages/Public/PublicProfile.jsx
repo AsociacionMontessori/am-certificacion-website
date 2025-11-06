@@ -4,6 +4,7 @@ import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firesto
 import { db } from '../../config/firebase';
 import { AcademicCapIcon, UserIcon, CalendarIcon, DocumentTextIcon, PrinterIcon, ClipboardDocumentIcon, LinkIcon } from '@heroicons/react/24/outline';
 import LoadingSpinner from '../../components/LoadingSpinner';
+import { formatearFechaLarga } from '../../utils/formatearFecha';
 
 const PublicProfile = () => {
   const { id } = useParams();
@@ -59,27 +60,7 @@ const PublicProfile = () => {
     loadAlumno();
   }, [id]);
 
-  const formatearFecha = (fecha) => {
-    if (!fecha) return '';
-    if (fecha.toDate) {
-      return new Date(fecha.toDate()).toLocaleDateString('es-MX', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-      });
-    }
-    if (typeof fecha === 'string') {
-      const fechaObj = new Date(fecha);
-      if (!isNaN(fechaObj.getTime())) {
-        return fechaObj.toLocaleDateString('es-MX', {
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric'
-        });
-      }
-    }
-    return fecha;
-  };
+  // Usar la función utilitaria para formatear fechas
 
   // Preparar materias para la tabla
   const tablaMaterias = () => {
@@ -428,13 +409,13 @@ const PublicProfile = () => {
                   
                   {alumno.fechaIngreso && (
                     <p className="text-justify">
-                      Fecha de ingreso: <strong className="text-gray-900 dark:text-white">{formatearFecha(alumno.fechaIngreso)}</strong>
+                      Fecha de ingreso: <strong className="text-gray-900 dark:text-white">{formatearFechaLarga(alumno.fechaIngreso)}</strong>
                     </p>
                   )}
                   
                   {alumno.fechaEgresoEstimada && (
                     <p className="text-justify">
-                      Fecha de egreso estimada: <strong className="text-gray-900 dark:text-white">{formatearFecha(alumno.fechaEgresoEstimada)}</strong>
+                      Fecha de egreso estimada: <strong className="text-gray-900 dark:text-white">{formatearFechaLarga(alumno.fechaEgresoEstimada)}</strong>
                     </p>
                   )}
                   
@@ -498,10 +479,10 @@ const PublicProfile = () => {
                                   </span>
                                 </td>
                                 <td className="px-2 sm:px-4 py-2 text-gray-700 dark:text-gray-300">
-                                  {item.fechaInicio ? formatearFecha(item.fechaInicio) : '-'}
+                                  {item.fechaInicio ? formatearFechaLarga(item.fechaInicio) : '-'}
                                 </td>
                                 <td className="px-2 sm:px-4 py-2 text-gray-700 dark:text-gray-300">
-                                  {item.fechaFin ? formatearFecha(item.fechaFin) : '-'}
+                                  {item.fechaFin ? formatearFechaLarga(item.fechaFin) : '-'}
                                 </td>
                               </tr>
                             ))}
@@ -577,11 +558,7 @@ const PublicProfile = () => {
                       </p>
                     )}
                     <p className="text-gray-600 dark:text-gray-400">
-                      {formatearFecha(alumno.fechaEmisionCertificado) || new Date().toLocaleDateString('es-MX', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric'
-                      })}
+                      {formatearFechaLarga(alumno.fechaEmisionCertificado) || formatearFechaLarga(new Date())}
                     </p>
                   </div>
                 </div>
@@ -628,14 +605,7 @@ const PublicProfile = () => {
                     <div>
                       <dt className="text-sm font-medium text-gray-500">Fecha de Graduación</dt>
                       <dd className="text-sm text-gray-900 dark:text-white mt-1">
-                        {alumno.fechaGraduacion.toDate ? 
-                          new Date(alumno.fechaGraduacion.toDate()).toLocaleDateString('es-MX', {
-                            year: 'numeric',
-                            month: 'long',
-                            day: 'numeric'
-                          }) :
-                          alumno.fechaGraduacion
-                        }
+                        {formatearFechaLarga(alumno.fechaGraduacion)}
                       </dd>
                     </div>
                   )}

@@ -3,6 +3,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import { CalendarIcon, ClockIcon, MapPinIcon, UserIcon } from '@heroicons/react/24/outline';
+import { formatearFechaLarga } from '../utils/formatearFecha';
 
 const Calendario = () => {
   const { currentUser } = useAuth();
@@ -45,7 +46,7 @@ const Calendario = () => {
   // Agrupar materias por fecha de inicio
   const materiasPorFecha = materias.reduce((acc, materia) => {
     const fechaInicio = materia.fechaInicio 
-      ? (materia.fechaInicio.toDate ? materia.fechaInicio.toDate().toLocaleDateString() : materia.fechaInicio)
+      ? formatearFechaLarga(materia.fechaInicio)
       : 'Sin fecha';
     
     if (!acc[fechaInicio]) {
@@ -101,7 +102,7 @@ const Calendario = () => {
                         {materia.fechaFin && (
                           <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
                             <ClockIcon className="w-4 h-4 mr-2 flex-shrink-0" />
-                            <span>Fin: {materia.fechaFin.toDate ? materia.fechaFin.toDate().toLocaleDateString() : materia.fechaFin}</span>
+                            <span>Fin: {formatearFechaLarga(materia.fechaFin)}</span>
                           </div>
                         )}
                         {materia.profesor && (

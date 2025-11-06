@@ -6,6 +6,7 @@ import { getMateriasPorNivel } from '../../data/materiasPorNivel';
 import { ArrowLeftIcon, PlusIcon, PencilIcon, TrashIcon, CalendarIcon, DocumentDuplicateIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import LoadingButton from '../../components/LoadingButton';
+import { formatearFechaLarga, formatearFechaInput } from '../../utils/formatearFecha';
 
 const GestionMaterias = () => {
   const { id } = useParams();
@@ -133,8 +134,8 @@ const GestionMaterias = () => {
     setMateriaEditando(materia);
     setFormData({
       nombre: materia.nombre,
-      fechaInicio: materia.fechaInicio?.toDate ? materia.fechaInicio.toDate().toISOString().split('T')[0] : '',
-      fechaFin: materia.fechaFin?.toDate ? materia.fechaFin.toDate().toISOString().split('T')[0] : '',
+      fechaInicio: formatearFechaInput(materia.fechaInicio),
+      fechaFin: formatearFechaInput(materia.fechaFin),
       aula: materia.aula || '',
       estado: materia.estado || 'Pendiente'
     });
@@ -501,13 +502,13 @@ const GestionMaterias = () => {
                       {materia.fechaInicio && (
                         <div className="flex items-center">
                           <CalendarIcon className="w-4 h-4 mr-2" />
-                          <span>Inicio: {materia.fechaInicio.toDate ? materia.fechaInicio.toDate().toLocaleDateString() : materia.fechaInicio}</span>
+                          <span>Inicio: {formatearFechaLarga(materia.fechaInicio)}</span>
                         </div>
                       )}
                       {materia.fechaFin && (
                         <div className="flex items-center">
                           <CalendarIcon className="w-4 h-4 mr-2" />
-                          <span>Fin: {materia.fechaFin.toDate ? materia.fechaFin.toDate().toLocaleDateString() : materia.fechaFin}</span>
+                          <span>Fin: {formatearFechaLarga(materia.fechaFin)}</span>
                         </div>
                       )}
                       {materia.aula && (

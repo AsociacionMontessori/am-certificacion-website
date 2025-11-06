@@ -4,6 +4,7 @@ import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import { DocumentTextIcon, UserIcon, AcademicCapIcon, LinkIcon, ShareIcon, EyeIcon } from '@heroicons/react/24/outline';
 import LoadingSpinner from '../components/LoadingSpinner';
+import { formatearFechaLarga } from '../utils/formatearFecha';
 
 const Expediente = () => {
   const { currentUser, userData } = useAuth();
@@ -94,7 +95,7 @@ const Expediente = () => {
               <div>
                 <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Fecha de nacimiento</dt>
                 <dd className="text-sm text-gray-900 dark:text-white mt-1">
-                  {new Date(expediente.fechaNacimiento.seconds * 1000).toLocaleDateString()}
+                  {formatearFechaLarga(expediente.fechaNacimiento)}
                 </dd>
               </div>
             )}
@@ -138,7 +139,7 @@ const Expediente = () => {
               <div>
                 <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Fecha de ingreso</dt>
                 <dd className="text-sm text-gray-900 dark:text-white mt-1">
-                  {new Date(expediente.fechaIngreso.seconds * 1000).toLocaleDateString()}
+                  {formatearFechaLarga(expediente.fechaIngreso)}
                 </dd>
               </div>
             )}

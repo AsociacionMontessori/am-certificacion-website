@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { QRCodeSVG } from 'qrcode.react';
 import { obtenerCertificado } from '../../services/certificadoService';
 import { AcademicCapIcon, ShieldCheckIcon, ShareIcon } from '@heroicons/react/24/outline';
+import { formatearFechaLarga } from '../../utils/formatearFecha';
 
 const CertificadoDigital = () => {
   const { id } = useParams();
@@ -54,28 +55,11 @@ const CertificadoDigital = () => {
   const urlVerificacion = codigoVerificacion 
     ? `${window.location.origin}/verificar/${folio}/${codigoVerificacion}`
     : `${window.location.origin}/verificar/${folio}/PENDIENTE`;
-  const fechaEmision = new Date().toLocaleDateString('es-MX', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  });
+  const fechaEmision = formatearFechaLarga(new Date());
   const lugarEmision = 'Ciudad de México, México';
 
-  const fechaIngreso = alumno.fechaIngreso?.toDate 
-    ? new Date(alumno.fechaIngreso.toDate()).toLocaleDateString('es-MX', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-      })
-    : 'N/A';
-
-  const fechaEgreso = alumno.fechaEgreso?.toDate 
-    ? new Date(alumno.fechaEgreso.toDate()).toLocaleDateString('es-MX', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-      })
-    : alumno.fechaEgreso || 'N/A';
+  const fechaIngreso = formatearFechaLarga(alumno.fechaIngreso);
+  const fechaEgreso = formatearFechaLarga(alumno.fechaEgreso || alumno.fechaEgresoEstimada);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8 px-4 sm:px-6 lg:px-8">

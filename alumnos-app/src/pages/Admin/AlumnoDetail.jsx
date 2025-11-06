@@ -4,6 +4,7 @@ import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { db, auth } from '../../config/firebase';
 import { ArrowLeftIcon, CalendarIcon, ChartBarIcon, AcademicCapIcon, PencilIcon, CheckIcon, XMarkIcon, EyeIcon, EyeSlashIcon, ClipboardDocumentIcon, ArrowRightOnRectangleIcon } from '@heroicons/react/24/outline';
+import { formatearFechaLarga, formatearFechaInput } from '../../utils/formatearFecha';
 
 const AlumnoDetail = () => {
   const { id } = useParams();
@@ -47,12 +48,8 @@ const AlumnoDetail = () => {
           setAlumno(data);
           
           // Formatear fechas para inputs
-          const fechaIngreso = data.fechaIngreso?.toDate 
-            ? new Date(data.fechaIngreso.toDate()).toISOString().split('T')[0]
-            : '';
-          const fechaEgresoEstimada = data.fechaEgresoEstimada?.toDate 
-            ? new Date(data.fechaEgresoEstimada.toDate()).toISOString().split('T')[0]
-            : (data.fechaEgresoEstimada || '');
+          const fechaIngreso = formatearFechaInput(data.fechaIngreso);
+          const fechaEgresoEstimada = formatearFechaInput(data.fechaEgresoEstimada);
           
           setFormData({
             matricula: data.matricula || '',
@@ -113,12 +110,8 @@ const AlumnoDetail = () => {
   const handleCancel = () => {
     // Restaurar valores originales
     if (alumno) {
-      const fechaIngreso = alumno.fechaIngreso?.toDate 
-        ? new Date(alumno.fechaIngreso.toDate()).toISOString().split('T')[0]
-        : '';
-      const fechaEgresoEstimada = alumno.fechaEgresoEstimada?.toDate 
-        ? new Date(alumno.fechaEgresoEstimada.toDate()).toISOString().split('T')[0]
-        : (alumno.fechaEgresoEstimada || '');
+      const fechaIngreso = formatearFechaInput(alumno.fechaIngreso);
+      const fechaEgresoEstimada = formatearFechaInput(alumno.fechaEgresoEstimada);
       
       setFormData({
         matricula: alumno.matricula || '',
@@ -349,10 +342,7 @@ const AlumnoDetail = () => {
               <div>
                 <dt className="text-sm font-medium text-gray-500">Fecha de nacimiento</dt>
                 <dd className="text-sm text-gray-900 dark:text-white mt-1">
-                  {alumno.fechaNacimiento.toDate ? 
-                    new Date(alumno.fechaNacimiento.toDate()).toLocaleDateString() :
-                    alumno.fechaNacimiento
-                  }
+                  {formatearFechaLarga(alumno.fechaNacimiento)}
                 </dd>
               </div>
             )}
@@ -394,10 +384,7 @@ const AlumnoDetail = () => {
                 />
               ) : (
                 <dd className="text-sm text-gray-900 dark:text-white mt-1">
-                  {alumno.fechaIngreso?.toDate ? 
-                    new Date(alumno.fechaIngreso.toDate()).toLocaleDateString() :
-                    (alumno.fechaIngreso || 'N/A')
-                  }
+                  {formatearFechaLarga(alumno.fechaIngreso)}
                 </dd>
               )}
             </div>
@@ -412,10 +399,7 @@ const AlumnoDetail = () => {
                 />
               ) : (
                 <dd className="text-sm text-gray-900 dark:text-white mt-1">
-                  {alumno.fechaEgresoEstimada?.toDate ? 
-                    new Date(alumno.fechaEgresoEstimada.toDate()).toLocaleDateString() :
-                    (alumno.fechaEgresoEstimada || 'N/A')
-                  }
+                  {formatearFechaLarga(alumno.fechaEgresoEstimada)}
                 </dd>
               )}
             </div>
