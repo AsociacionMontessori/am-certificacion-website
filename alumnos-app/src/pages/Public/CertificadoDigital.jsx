@@ -61,6 +61,13 @@ const CertificadoDigital = () => {
   const fechaIngreso = formatearFechaLarga(alumno.fechaIngreso);
   const fechaEgreso = formatearFechaLarga(alumno.fechaEgreso || alumno.fechaEgresoEstimada);
 
+  const nivelesGuia = new Set([
+    'Nido & Comunidad infantil',
+    'Casa de Niños',
+    'Taller'
+  ]);
+  const esNivelGuia = nivelesGuia.has(alumno.nivel);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto certificado-print">
@@ -100,7 +107,7 @@ const CertificadoDigital = () => {
                   <p className="text-lg font-semibold text-center my-6">
                     <strong>CERTIFICAN</strong> que <strong>{alumno.nombreCompleto}</strong> ha 
                     cumplido satisfactoriamente con los requisitos académicos y prácticos del 
-                    programa de formación de Guía Montessori en el nivel <strong>{alumno.nivel}</strong>, 
+                    programa de formación {esNivelGuia ? 'de Guía Montessori ' : ''}en el nivel <strong>{alumno.nivel}</strong>, 
                     con fecha de ingreso <strong>{fechaIngreso}</strong> y fecha de egreso{' '}
                     <strong>{fechaEgreso}</strong>.
                   </p>
@@ -114,7 +121,7 @@ const CertificadoDigital = () => {
                 <>
                   <p className="text-lg font-semibold text-center my-6">
                     <strong>CONSTAN</strong> que <strong>{alumno.nombreCompleto}</strong> se encuentra 
-                    inscrito en el programa de formación de Guía Montessori en el nivel{' '}
+                    inscrito en el programa de formación {esNivelGuia ? 'de Guía Montessori ' : ''}en el nivel{' '}
                     <strong>{alumno.nivel}</strong>, con fecha de ingreso{' '}
                     <strong>{fechaIngreso}</strong>.
                   </p>
