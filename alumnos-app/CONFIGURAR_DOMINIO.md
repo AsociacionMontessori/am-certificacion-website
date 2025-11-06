@@ -1,63 +1,63 @@
-# 🌐 Configurar Dominio Personalizado en Firebase
+# 🌐 Configuración de Dominio Personalizado
 
-## Pasos para Configurar el Dominio
+## ✅ Estado Actual
 
-### 1. Ir a Firebase Hosting Console
+**El dominio personalizado está configurado y activo:**
 
-Ve a: https://console.firebase.google.com/project/certificacionmontessori/hosting
+- **URL Principal**: `https://alumnos.certificacionmontessori.com` ✅
+- **URL Alternativa**: `https://alumnos-certificacionmontessori.web.app`
+- **Site ID**: `alumnos-certificacionmontessori`
+- **Estado**: Verificado y funcionando ✅
 
-### 2. Agregar Dominio Personalizado
+## 📋 Información de Configuración
 
-1. En la lista de sitios, encuentra **"alumnos-certificacionmontessori"**
-2. Haz clic en los **3 puntos** (⋮) → **"Agregar dominio personalizado"**
-3. Ingresa: `alumnos.certificacionmontessori.com`
-4. Haz clic en **"Continuar"**
+### DNS Configurado (Siteground)
 
-### 3. Firebase te dará instrucciones de DNS
-
-Firebase te mostrará algo como:
-
-**Opción A - Registro CNAME (recomendado):**
+El DNS está configurado con:
 ```
 Tipo: CNAME
 Nombre: alumnos
 Valor: alumnos-certificacionmontessori.web.app
 ```
 
-**O Opción B - Registro A:**
+### Firebase Hosting
+
+- **Proyecto**: `certificacionmontessori`
+- **Sitio**: `alumnos-certificacionmontessori`
+- **Dominio personalizado**: `alumnos.certificacionmontessori.com` ✅ Verificado
+- **Certificado SSL**: Automático (gestioneado por Firebase)
+
+## 🔍 Verificar Configuración
+
+### Verificar en Firebase Console
+
+1. Ve a: https://console.firebase.google.com/project/certificacionmontessori/hosting
+2. Selecciona el sitio **"alumnos-certificacionmontessori"**
+3. Verifica que el dominio `alumnos.certificacionmontessori.com` aparezca como **"Verificado"**
+
+### Verificar DNS desde Terminal
+
+```bash
+# Verificar registro CNAME
+dig alumnos.certificacionmontessori.com CNAME +short
+# Debe mostrar: alumnos-certificacionmontessori.web.app
+
+# Verificar resolución final
+dig alumnos.certificacionmontessori.com +short
+# Debe mostrar la IP de Firebase (no la IP de Siteground)
+
+# Verificar desde diferentes servidores DNS
+nslookup alumnos.certificacionmontessori.com 8.8.8.8
 ```
-Tipo: A
-Nombre: alumnos
-Valor: [IP que Firebase te proporcione]
-```
 
-### 4. Verificar en Siteground
+## 🔄 Si Necesitas Reconfigurar
 
-Si ya configuraste el DNS en Siteground, verifica que coincida con lo que Firebase te pide.
+Si por alguna razón necesitas reconfigurar el dominio:
 
-**Si Firebase pide CNAME:**
-- Ve a Siteground → DNS Zone Editor
-- Verifica que tengas:
-  ```
-  Tipo: CNAME
-  Nombre: alumnos
-  Valor: alumnos-certificacionmontessori.web.app
-  ```
-
-**Si Firebase pide registro A:**
-- Actualiza el registro A existente con la IP que Firebase te proporcione
-
-### 5. Esperar Verificación
-
-Firebase verificará automáticamente el dominio. Esto puede tardar:
-- 15 minutos a 2 horas normalmente
-- Hasta 48 horas en casos excepcionales
-
-### 6. Verificar Estado
-
-Puedes verificar el estado del dominio en:
-- Firebase Console → Hosting → alumnos-certificacionmontessori
-- Debe mostrar "Verificado" cuando esté listo
+1. Ve a Firebase Console → Hosting → alumnos-certificacionmontessori
+2. Haz clic en el dominio personalizado
+3. Firebase te dará las instrucciones de DNS actualizadas
+4. Actualiza el registro DNS en Siteground según las instrucciones
 
 ## 🔍 Verificar DNS desde Terminal
 
@@ -74,9 +74,9 @@ nslookup alumnos.certificacionmontessori.com 8.8.8.8
 
 ## ✅ Checklist
 
-- [ ] Configurado DNS en Siteground
-- [ ] Agregado dominio en Firebase Console
-- [ ] DNS propagado correctamente
-- [ ] Dominio verificado en Firebase
-- [ ] Certificado SSL generado (automático, puede tardar hasta 24h)
+- [x] Configurado DNS en Siteground ✅
+- [x] Agregado dominio en Firebase Console ✅
+- [x] DNS propagado correctamente ✅
+- [x] Dominio verificado en Firebase ✅
+- [x] Certificado SSL generado ✅
 

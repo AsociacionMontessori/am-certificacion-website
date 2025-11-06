@@ -28,19 +28,16 @@ Los otros valores ya están correctos:
 - `VITE_FIREBASE_STORAGE_BUCKET=certificacionmontessori.appspot.com` ✅
 - `VITE_FIREBASE_MESSAGING_SENDER_ID=77935287015` ✅
 
-## Paso 3: Configurar Dominio en Firebase Console
+## Paso 3: Verificar Dominio (Ya Configurado) ✅
 
+**El dominio personalizado ya está configurado:**
+- **URL Principal**: `https://alumnos.certificacionmontessori.com` ✅
+- **URL Alternativa**: `https://alumnos-certificacionmontessori.web.app`
+
+Si necesitas verificar o reconfigurar el dominio:
 1. Ve a: https://console.firebase.google.com/project/certificacionmontessori/hosting
 2. Encuentra el sitio **"alumnos-certificacionmontessori"**
-3. Haz clic en los **3 puntos (⋮)** → **"Agregar dominio personalizado"**
-4. Ingresa: `alumnos.certificacionmontessori.com`
-5. Sigue las instrucciones que Firebase te dé
-
-**IMPORTANTE:** Si Firebase te pide un registro CNAME, debe ser:
-```
-Nombre: alumnos
-Valor: alumnos-certificacionmontessori.web.app
-```
+3. Verifica que el dominio `alumnos.certificacionmontessori.com` aparezca como "Verificado"
 
 ## Paso 4: Deploy
 

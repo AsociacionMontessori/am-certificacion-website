@@ -127,26 +127,28 @@ Los alumnos deben tener una cuenta creada en Firebase Authentication con:
 
 ## 🚀 Deploy
 
-### Configurar Firebase Hosting para subdominio
+### URL de Producción
 
-1. Crear un nuevo sitio en Firebase Hosting llamado `alumnos`:
-```bash
-firebase hosting:sites:create alumnos
-```
+La aplicación está disponible en:
+- **URL Principal**: `https://alumnos.certificacionmontessori.com` ✅
+- **URL Alternativa**: `https://alumnos-certificacionmontessori.web.app`
 
-2. Configurar el dominio personalizado en Firebase Console:
-   - Ve a: https://console.firebase.google.com/project/certificacionmontessori/hosting
-   - Agrega el dominio: `alumnos.certificacionmontessori.com`
+### Configuración de Firebase Hosting
 
-3. Configurar DNS en Siteground:
-   - Agregar registro CNAME:
-     - Nombre: `alumnos`
-     - Valor: `alumnos.certificacionmontessori.web.app`
+El sitio está configurado en Firebase Hosting:
+- **Site ID**: `alumnos-certificacionmontessori`
+- **Dominio personalizado**: `alumnos.certificacionmontessori.com` ✅ Configurado
 
-4. Deploy:
+### Deploy a Producción
+
 ```bash
 npm run deploy
 ```
+
+El comando anterior realiza:
+1. Build de la aplicación
+2. Deploy a Firebase Hosting
+3. Actualización automática en el dominio personalizado
 
 ## 🎨 Paleta de Colores
 

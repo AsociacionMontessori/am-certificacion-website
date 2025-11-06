@@ -7,5 +7,5 @@ npm run deploy
 # 1. Build de la aplicación
 # 2. Deploy a Firebase Hosting
 # 3. El sitio estará disponible en:
-#    - https://alumnos-certificacionmontessori.web.app
-#    - https://alumnos.certificacionmontessori.com (después de verificar DNS)
+#    - https://alumnos.certificacionmontessori.com (URL principal) ✅
+#    - https://alumnos-certificacionmontessori.web.app (URL alternativa)
