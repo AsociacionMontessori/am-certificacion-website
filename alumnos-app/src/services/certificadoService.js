@@ -86,14 +86,10 @@ export const obtenerCertificado = async (alumnoId) => {
     let codigoVerificacion = alumnoData.codigoVerificacion;
     
     // Si no tiene folio, generar uno nuevo
-    if (!folio || !codigoVerificacion) {
-      if (!folio) {
-        folio = generarFolio(alumnoId);
-      }
-      // Si no tiene código o el folio cambió, regenerar código
-      if (!codigoVerificacion) {
-        codigoVerificacion = generarCodigoVerificacion(alumnoId, folio);
-      }
+    if (!folio) {
+      folio = generarFolio(alumnoId);
+      // Generar código para el nuevo folio
+      codigoVerificacion = generarCodigoVerificacion(alumnoId, folio);
       
       // Guardar en Firestore
       await updateDoc(doc(db, 'alumnos', alumnoId), {
@@ -101,6 +97,21 @@ export const obtenerCertificado = async (alumnoId) => {
         codigoVerificacion: codigoVerificacion,
         fechaEmisionCertificado: serverTimestamp()
       });
+    } else {
+      // Si tiene folio, validar que el código sea correcto (determinístico)
+      const codigoEsperado = generarCodigoVerificacion(alumnoId, folio);
+      const codigoActual = codigoVerificacion?.trim().toUpperCase();
+      
+      // Si el código no coincide con el determinístico, regenerarlo
+      if (!codigoVerificacion || codigoActual !== codigoEsperado) {
+        codigoVerificacion = codigoEsperado;
+        
+        // Actualizar en Firestore
+        await updateDoc(doc(db, 'alumnos', alumnoId), {
+          codigoVerificacion: codigoVerificacion,
+          fechaActualizacionCodigo: serverTimestamp()
+        });
+      }
     }
 
     // Calcular promedio

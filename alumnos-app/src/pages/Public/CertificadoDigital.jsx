@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { QRCodeSVG } from 'qrcode.react';
 import { obtenerCertificado } from '../../services/certificadoService';
-import { AcademicCapIcon, ShieldCheckIcon } from '@heroicons/react/24/outline';
+import { AcademicCapIcon, ShieldCheckIcon, ShareIcon } from '@heroicons/react/24/outline';
 
 const CertificadoDigital = () => {
   const { id } = useParams();
@@ -194,8 +194,8 @@ const CertificadoDigital = () => {
           </div>
         </div>
 
-        {/* Botón de impresión */}
-        <div className="mt-6 text-center">
+        {/* Botones de acción */}
+        <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-4">
           <button
             onClick={() => window.print()}
             className="inline-flex items-center px-6 py-3 bg-blue text-white rounded-lg hover:bg-blue/90 transition-colors shadow-lg"
@@ -204,6 +204,32 @@ const CertificadoDigital = () => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
             </svg>
             Imprimir Certificado
+          </button>
+          <button
+            onClick={() => {
+              const url = window.location.href;
+              if (navigator.share) {
+                navigator.share({
+                  title: `${esGraduado ? 'Certificado Digital' : 'Constancia de Estudios'} - ${alumno.nombreCompleto}`,
+                  text: `Certificado digital de ${alumno.nombreCompleto}`,
+                  url: url
+                }).catch(err => {
+                  // Si falla, copiar al portapapeles
+                  navigator.clipboard.writeText(url).then(() => {
+                    alert('URL copiada al portapapeles');
+                  });
+                });
+              } else {
+                // Fallback: copiar al portapapeles
+                navigator.clipboard.writeText(url).then(() => {
+                  alert('URL copiada al portapapeles');
+                });
+              }
+            }}
+            className="inline-flex items-center px-6 py-3 bg-green text-white rounded-lg hover:bg-green/90 transition-colors shadow-lg"
+          >
+            <ShareIcon className="w-5 h-5 mr-2" />
+            Compartir Certificado
           </button>
         </div>
       </div>

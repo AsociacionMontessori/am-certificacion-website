@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../config/firebase';
-import { DocumentTextIcon, UserIcon, AcademicCapIcon } from '@heroicons/react/24/outline';
+import { DocumentTextIcon, UserIcon, AcademicCapIcon, LinkIcon, ShareIcon, EyeIcon } from '@heroicons/react/24/outline';
 
 const Expediente = () => {
   const { currentUser, userData } = useAuth();
@@ -156,16 +156,86 @@ const Expediente = () => {
         </div>
       </div>
 
-      {/* Documentos */}
+      {/* Enlaces Públicos */}
       <div className="mt-6 bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
         <div className="flex items-center mb-4">
-          <DocumentTextIcon className="w-6 h-6 text-orange mr-2" />
+          <LinkIcon className="w-6 h-6 text-blue mr-2" />
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-            Documentos
+            Enlaces Públicos
           </h2>
         </div>
-        <div className="text-sm text-gray-600 dark:text-gray-400">
-          Los documentos académicos estarán disponibles aquí.
+        <div className="space-y-4">
+          {/* Vista Pública */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Vista pública del perfil
+            </label>
+            <div className="flex items-center space-x-2">
+              <input
+                type="text"
+                readOnly
+                value={`${window.location.origin}/public/alumno/${currentUser?.uid}`}
+                className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white text-sm"
+              />
+              <a
+                href={`/public/alumno/${currentUser?.uid}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center px-4 py-2 bg-blue text-white rounded-lg hover:bg-blue/90 transition-colors text-sm"
+              >
+                <EyeIcon className="w-4 h-4 mr-1" />
+                Ver
+              </a>
+              <button
+                onClick={() => {
+                  const url = `${window.location.origin}/public/alumno/${currentUser?.uid}`;
+                  navigator.clipboard.writeText(url).then(() => {
+                    alert('URL copiada al portapapeles');
+                  });
+                }}
+                className="inline-flex items-center px-4 py-2 bg-green text-white rounded-lg hover:bg-green/90 transition-colors text-sm"
+              >
+                <ShareIcon className="w-4 h-4 mr-1" />
+                Compartir
+              </button>
+            </div>
+          </div>
+
+          {/* Certificado Digital */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Certificado digital / Constancia de estudios
+            </label>
+            <div className="flex items-center space-x-2">
+              <input
+                type="text"
+                readOnly
+                value={`${window.location.origin}/certificado/${currentUser?.uid}`}
+                className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white text-sm"
+              />
+              <a
+                href={`/certificado/${currentUser?.uid}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center px-4 py-2 bg-green text-white rounded-lg hover:bg-green/90 transition-colors text-sm"
+              >
+                <EyeIcon className="w-4 h-4 mr-1" />
+                Ver
+              </a>
+              <button
+                onClick={() => {
+                  const url = `${window.location.origin}/certificado/${currentUser?.uid}`;
+                  navigator.clipboard.writeText(url).then(() => {
+                    alert('URL copiada al portapapeles');
+                  });
+                }}
+                className="inline-flex items-center px-4 py-2 bg-green text-white rounded-lg hover:bg-green/90 transition-colors text-sm"
+              >
+                <ShareIcon className="w-4 h-4 mr-1" />
+                Compartir
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>

@@ -1,12 +1,27 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeftIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
 import { regenerarTodosLosCodigos } from '../../utils/regenerarCodigosVerificacion';
+
+const STORAGE_KEY = 'regenerarCodigos_historial';
 
 const RegenerarCodigos = () => {
   const [loading, setLoading] = useState(false);
   const [resultado, setResultado] = useState(null);
   const [ejecutando, setEjecutando] = useState(false);
+
+  // Cargar historial guardado al montar el componente
+  useEffect(() => {
+    const historialGuardado = localStorage.getItem(STORAGE_KEY);
+    if (historialGuardado) {
+      try {
+        const parsed = JSON.parse(historialGuardado);
+        setResultado(parsed);
+      } catch (error) {
+        console.error('Error al cargar historial:', error);
+      }
+    }
+  }, []);
 
   const handleRegenerar = async () => {
     if (!window.confirm('¿Estás seguro de regenerar todos los códigos de verificación? Esto actualizará los códigos de todos los alumnos que tienen folio.')) {
@@ -19,13 +34,24 @@ const RegenerarCodigos = () => {
 
     try {
       const resultado = await regenerarTodosLosCodigos();
-      setResultado(resultado);
+      const resultadoConFecha = {
+        ...resultado,
+        fecha: new Date().toISOString()
+      };
+      setResultado(resultadoConFecha);
+      // Guardar en localStorage
+      if (resultadoConFecha) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(resultadoConFecha));
+      }
     } catch (error) {
       console.error('Error:', error);
-      setResultado({
+      const errorResult = {
         success: false,
-        error: error.message
-      });
+        error: error.message,
+        fecha: new Date().toISOString()
+      };
+      setResultado(errorResult);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(errorResult));
     } finally {
       setLoading(false);
       setEjecutando(false);
@@ -74,23 +100,38 @@ const RegenerarCodigos = () => {
       </div>
 
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
-        <button
-          onClick={handleRegenerar}
-          disabled={loading || ejecutando}
-          className="inline-flex items-center justify-center px-6 py-3 bg-blue text-white rounded-lg hover:bg-blue/90 font-semibold transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {loading ? (
-            <>
-              <ArrowPathIcon className="w-5 h-5 mr-2 animate-spin" />
-              Regenerando...
-            </>
-          ) : (
-            <>
-              <ArrowPathIcon className="w-5 h-5 mr-2" />
-              Regenerar Todos los Códigos
-            </>
+        <div className="flex items-center justify-between">
+          <button
+            onClick={handleRegenerar}
+            disabled={loading || ejecutando}
+            className="inline-flex items-center justify-center px-6 py-3 bg-blue text-white rounded-lg hover:bg-blue/90 font-semibold transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {loading ? (
+              <>
+                <ArrowPathIcon className="w-5 h-5 mr-2 animate-spin" />
+                Regenerando...
+              </>
+            ) : (
+              <>
+                <ArrowPathIcon className="w-5 h-5 mr-2" />
+                Regenerar Todos los Códigos
+              </>
+            )}
+          </button>
+          {resultado && (
+            <button
+              onClick={() => {
+                if (window.confirm('¿Deseas limpiar el historial guardado?')) {
+                  localStorage.removeItem(STORAGE_KEY);
+                  setResultado(null);
+                }
+              }}
+              className="inline-flex items-center justify-center px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors text-sm"
+            >
+              Limpiar Historial
+            </button>
           )}
-        </button>
+        </div>
       </div>
 
       {resultado && (
@@ -99,9 +140,16 @@ const RegenerarCodigos = () => {
             ? 'bg-green/10 dark:bg-green/20 border-green/30' 
             : 'bg-red/10 dark:bg-red/20 border-red/30'
         }`}>
-          <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">
-            {resultado.success ? '✅ Proceso Completado' : '❌ Error en el Proceso'}
-          </h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+              {resultado.success ? '✅ Proceso Completado' : '❌ Error en el Proceso'}
+            </h2>
+            {resultado.fecha && (
+              <span className="text-xs text-gray-500 dark:text-gray-400">
+                {new Date(resultado.fecha).toLocaleString('es-MX')}
+              </span>
+            )}
+          </div>
           
           {resultado.success ? (
             <div className="space-y-4">
