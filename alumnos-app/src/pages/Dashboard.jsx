@@ -203,13 +203,16 @@ const Dashboard = () => {
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
               Accede a tu correo institucional para recibir comunicaciones importantes.
             </p>
+            <p className="text-xs text-gray-500 dark:text-gray-500 mb-3 italic">
+              Usa tus accesos de Classroom para entrar y usar este servicio.
+            </p>
             <a
-              href="http://mail.certificacionmontessori.com/"
+              href="https://mail.google.com"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center justify-center w-full px-4 py-2.5 bg-green text-white rounded-lg hover:bg-green/90 font-medium transition-colors"
             >
-              Abrir Correo Escolar
+              Abrir Gmail
             </a>
           </div>
 
@@ -224,8 +227,11 @@ const Dashboard = () => {
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
               Gestiona tus documentos de clases y materiales académicos.
             </p>
+            <p className="text-xs text-gray-500 dark:text-gray-500 mb-3 italic">
+              Usa tus accesos de Classroom para entrar y usar este servicio.
+            </p>
             <a
-              href="https://drive.certificacionmontessori.com"
+              href="https://drive.google.com"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center justify-center w-full px-4 py-2.5 bg-yellow text-white rounded-lg hover:bg-yellow/90 font-medium transition-colors"
@@ -245,13 +251,16 @@ const Dashboard = () => {
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
               Consulta eventos, fechas importantes y actividades académicas.
             </p>
+            <p className="text-xs text-gray-500 dark:text-gray-500 mb-3 italic">
+              Usa tus accesos de Classroom para entrar y usar este servicio.
+            </p>
             <a
-              href="https://calendario.certificacionmontessori.com"
+              href="https://calendar.google.com"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center justify-center w-full px-4 py-2.5 bg-orange text-white rounded-lg hover:bg-orange/90 font-medium transition-colors"
             >
-              Abrir Calendario
+              Abrir Google Calendar
             </a>
           </div>
 
