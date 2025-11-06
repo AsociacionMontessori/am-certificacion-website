@@ -419,10 +419,10 @@ const AlumnoDetail = () => {
                 <dd className="mt-1">
                   <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                     alumno.estado === 'Activo' 
-                      ? 'bg-green text-white'
+                      ? 'bg-green text-gray-900 dark:text-white'
                       : alumno.estado === 'Graduado'
-                      ? 'bg-yellow text-white'
-                      : 'bg-gray text-white'
+                      ? 'bg-yellow text-gray-900 dark:text-white'
+                      : 'bg-gray-700 text-white'
                   }`}>
                     {alumno.estado || 'N/A'}
                   </span>

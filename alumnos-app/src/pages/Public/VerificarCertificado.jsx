@@ -87,7 +87,7 @@ const VerificarCertificado = () => {
                     <dd className="mt-1">
                       <span className={`px-3 py-1 rounded-full text-sm font-medium ${
                         resultado.alumno.estado === 'Graduado' 
-                          ? 'bg-green text-white'
+                          ? 'bg-green text-gray-900 dark:text-white'
                           : 'bg-blue text-white'
                       }`}>
                         {resultado.alumno.estado}

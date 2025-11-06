@@ -259,10 +259,10 @@ const AdminDashboard = () => {
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`badge ${
                       alumno.estado === 'Activo' 
-                        ? 'bg-green text-white'
+                        ? 'bg-green text-gray-900 dark:text-white'
                         : alumno.estado === 'Graduado'
-                        ? 'bg-yellow text-white'
-                        : 'bg-gray text-white'
+                        ? 'bg-yellow text-gray-900 dark:text-white'
+                        : 'bg-gray-700 text-white'
                     }`}>
                       {alumno.estado || 'N/A'}
                     </span>
@@ -319,10 +319,10 @@ const AdminDashboard = () => {
                 </div>
                 <span className={`badge ml-2 flex-shrink-0 ${
                   alumno.estado === 'Activo' 
-                    ? 'bg-green text-white'
+                    ? 'bg-green text-gray-900 dark:text-white'
                     : alumno.estado === 'Graduado'
-                    ? 'bg-yellow text-white'
-                    : 'bg-gray text-white'
+                    ? 'bg-yellow text-gray-900 dark:text-white'
+                    : 'bg-gray-700 text-white'
                 }`}>
                   {alumno.estado || 'N/A'}
                 </span>

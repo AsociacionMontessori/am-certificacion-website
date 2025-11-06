@@ -149,8 +149,8 @@ const Expediente = () => {
                 <dd className="text-sm text-gray-900 dark:text-white mt-1">
                   <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                     expediente.estado === 'Activo' 
-                      ? 'bg-green text-white' 
-                      : 'bg-gray text-white'
+                      ? 'bg-green text-gray-900 dark:text-white' 
+                      : 'bg-gray-700 text-white'
                   }`}>
                     {expediente.estado}
                   </span>
