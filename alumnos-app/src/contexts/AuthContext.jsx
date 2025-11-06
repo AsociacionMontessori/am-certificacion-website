@@ -1,0 +1,102 @@
+import { createContext, useContext, useEffect, useState } from 'react';
+import { 
+  onAuthStateChanged, 
+  signInWithEmailAndPassword, 
+  signOut
+} from 'firebase/auth';
+import { auth } from '../config/firebase';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '../config/firebase';
+
+const AuthContext = createContext({});
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth debe usarse dentro de AuthProvider');
+  }
+  return context;
+};
+
+export const AuthProvider = ({ children }) => {
+  const [currentUser, setCurrentUser] = useState(null);
+  const [userData, setUserData] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        setCurrentUser(user);
+        // Cargar datos adicionales del usuario desde Firestore
+        try {
+          // Primero intentar cargar como admin
+          const adminDoc = await getDoc(doc(db, 'admins', user.uid));
+          if (adminDoc.exists()) {
+            setUserData({ 
+              id: adminDoc.id, 
+              ...adminDoc.data(), 
+              rol: 'admin' 
+            });
+          } else {
+            // Si no es admin, intentar como alumno
+            const alumnoDoc = await getDoc(doc(db, 'alumnos', user.uid));
+            if (alumnoDoc.exists()) {
+              setUserData({ 
+                id: alumnoDoc.id, 
+                ...alumnoDoc.data(), 
+                rol: 'alumno' 
+              });
+            }
+          }
+        } catch (error) {
+          console.error('Error al cargar datos del usuario:', error);
+        }
+      } else {
+        setCurrentUser(null);
+        setUserData(null);
+      }
+      setLoading(false);
+    });
+
+    return unsubscribe;
+  }, []);
+
+  const login = async (email, password) => {
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      return { success: true, user: userCredential.user };
+    } catch (error) {
+      console.error('Error al iniciar sesión:', error);
+      return { 
+        success: false, 
+        error: error.message 
+      };
+    }
+  };
+
+  const logout = async () => {
+    try {
+      await signOut(auth);
+      setUserData(null);
+      return { success: true };
+    } catch (error) {
+      console.error('Error al cerrar sesión:', error);
+      return { success: false, error: error.message };
+    }
+  };
+
+  const value = {
+    currentUser,
+    userData,
+    login,
+    logout,
+    loading
+  };
+
+  return (
+    <AuthContext.Provider value={value}>
+      {!loading && children}
+    </AuthContext.Provider>
+  );
+};
+

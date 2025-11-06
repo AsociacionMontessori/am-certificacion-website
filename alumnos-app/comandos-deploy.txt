@@ -1,0 +1,11 @@
+# Una vez que tengas las credenciales en .env, ejecuta:
+
+cd alumnos-app
+npm run deploy
+
+# Esto hará:
+# 1. Build de la aplicación
+# 2. Deploy a Firebase Hosting
+# 3. El sitio estará disponible en:
+#    - https://alumnos-certificacionmontessori.web.app
+#    - https://alumnos.certificacionmontessori.com (después de verificar DNS)

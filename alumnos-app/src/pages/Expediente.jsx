@@ -1,0 +1,158 @@
+import { useState, useEffect } from 'react';
+import { useAuth } from '../contexts/AuthContext';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '../config/firebase';
+import { DocumentTextIcon, UserIcon, AcademicCapIcon } from '@heroicons/react/24/outline';
+
+const Expediente = () => {
+  const { currentUser, userData } = useAuth();
+  const [expediente, setExpediente] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadExpediente = async () => {
+      if (currentUser) {
+        try {
+          const expedienteDoc = await getDoc(doc(db, 'alumnos', currentUser.uid));
+          if (expedienteDoc.exists()) {
+            setExpediente({ id: expedienteDoc.id, ...expedienteDoc.data() });
+          }
+        } catch (error) {
+          console.error('Error al cargar expediente:', error);
+        }
+      }
+      setLoading(false);
+    };
+
+    loadExpediente();
+  }, [currentUser]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue"></div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="px-4 py-6 sm:px-0">
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+          Mi Expediente
+        </h1>
+        <p className="mt-2 text-gray-600 dark:text-gray-400">
+          Información personal y documentos académicos
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        {/* Información Personal */}
+        <div className="lg:col-span-2 bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+          <div className="flex items-center mb-4">
+            <UserIcon className="w-6 h-6 text-blue mr-2" />
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+              Información Personal
+            </h2>
+          </div>
+          <dl className="space-y-4">
+            {expediente?.nombre && (
+              <div>
+                <dt className="text-sm font-medium text-gray-500">Nombre completo</dt>
+                <dd className="text-sm text-gray-900 dark:text-white mt-1">{expediente.nombre}</dd>
+              </div>
+            )}
+            {expediente?.matricula && (
+              <div>
+                <dt className="text-sm font-medium text-gray-500">Matrícula</dt>
+                <dd className="text-sm text-gray-900 dark:text-white mt-1">{expediente.matricula}</dd>
+              </div>
+            )}
+            {expediente?.email && (
+              <div>
+                <dt className="text-sm font-medium text-gray-500">Correo electrónico</dt>
+                <dd className="text-sm text-gray-900 dark:text-white mt-1">{expediente.email}</dd>
+              </div>
+            )}
+            {expediente?.telefono && (
+              <div>
+                <dt className="text-sm font-medium text-gray-500">Teléfono</dt>
+                <dd className="text-sm text-gray-900 dark:text-white mt-1">{expediente.telefono}</dd>
+              </div>
+            )}
+            {expediente?.fechaNacimiento && (
+              <div>
+                <dt className="text-sm font-medium text-gray-500">Fecha de nacimiento</dt>
+                <dd className="text-sm text-gray-900 dark:text-white mt-1">
+                  {new Date(expediente.fechaNacimiento.seconds * 1000).toLocaleDateString()}
+                </dd>
+              </div>
+            )}
+          </dl>
+        </div>
+
+        {/* Información Académica */}
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+          <div className="flex items-center mb-4">
+            <AcademicCapIcon className="w-6 h-6 text-green mr-2" />
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+              Información Académica
+            </h2>
+          </div>
+          <dl className="space-y-4">
+            {expediente?.programa && (
+              <div>
+                <dt className="text-sm font-medium text-gray-500">Programa</dt>
+                <dd className="text-sm text-gray-900 dark:text-white mt-1">{expediente.programa}</dd>
+              </div>
+            )}
+            {expediente?.cohorte && (
+              <div>
+                <dt className="text-sm font-medium text-gray-500">Cohorte</dt>
+                <dd className="text-sm text-gray-900 dark:text-white mt-1">{expediente.cohorte}</dd>
+              </div>
+            )}
+            {expediente?.fechaIngreso && (
+              <div>
+                <dt className="text-sm font-medium text-gray-500">Fecha de ingreso</dt>
+                <dd className="text-sm text-gray-900 dark:text-white mt-1">
+                  {new Date(expediente.fechaIngreso.seconds * 1000).toLocaleDateString()}
+                </dd>
+              </div>
+            )}
+            {expediente?.estado && (
+              <div>
+                <dt className="text-sm font-medium text-gray-500">Estado</dt>
+                <dd className="text-sm text-gray-900 dark:text-white mt-1">
+                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                    expediente.estado === 'Activo' 
+                      ? 'bg-green text-white' 
+                      : 'bg-gray text-white'
+                  }`}>
+                    {expediente.estado}
+                  </span>
+                </dd>
+              </div>
+            )}
+          </dl>
+        </div>
+      </div>
+
+      {/* Documentos */}
+      <div className="mt-6 bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+        <div className="flex items-center mb-4">
+          <DocumentTextIcon className="w-6 h-6 text-orange mr-2" />
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+            Documentos
+          </h2>
+        </div>
+        <div className="text-sm text-gray-600 dark:text-gray-400">
+          Los documentos académicos estarán disponibles aquí.
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Expediente;
+
