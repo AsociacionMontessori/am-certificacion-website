@@ -23,6 +23,7 @@ import PublicProfile from './pages/Public/PublicProfile';
 import CertificadoDigital from './pages/Public/CertificadoDigital';
 import VerificarCertificado from './pages/Public/VerificarCertificado';
 import RegenerarCodigos from './pages/Admin/RegenerarCodigos';
+import GeneradorQR from './pages/Admin/GeneradorQR';
 
 // Componente para redirigir según el rol
 const DashboardRedirect = () => {
@@ -128,6 +129,16 @@ function App() {
               <AdminRoute>
                 <AdminLayout>
                   <RegenerarCodigos />
+                </AdminLayout>
+              </AdminRoute>
+            }
+          />
+          <Route
+            path="/admin/generador-qr"
+            element={
+              <AdminRoute>
+                <AdminLayout>
+                  <GeneradorQR />
                 </AdminLayout>
               </AdminRoute>
             }

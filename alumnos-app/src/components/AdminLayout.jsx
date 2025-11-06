@@ -6,6 +6,7 @@ import {
   UserGroupIcon,
   DocumentTextIcon,
   ArrowPathIcon,
+  QrCodeIcon,
   ArrowRightOnRectangleIcon,
   SunIcon,
   MoonIcon
@@ -21,6 +22,7 @@ const AdminLayout = ({ children }) => {
     { name: 'Crear Usuario', href: '/admin/crear-usuario', icon: UserGroupIcon },
     { name: 'Inscripciones', href: '/admin/inscripciones', icon: DocumentTextIcon },
     { name: 'Regenerar Códigos', href: '/admin/regenerar-codigos', icon: ArrowPathIcon },
+    { name: 'Generador QR', href: '/admin/generador-qr', icon: QrCodeIcon },
   ];
 
   const handleLogout = async () => {

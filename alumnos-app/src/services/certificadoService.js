@@ -84,33 +84,40 @@ export const obtenerCertificado = async (alumnoId) => {
     // Si ya tiene folio, usar ese
     let folio = alumnoData.folioCertificado;
     let codigoVerificacion = alumnoData.codigoVerificacion;
+    let necesitaGuardar = false;
     
     // Si no tiene folio, generar uno nuevo
     if (!folio) {
       folio = generarFolio(alumnoId);
       // Generar código para el nuevo folio
       codigoVerificacion = generarCodigoVerificacion(alumnoId, folio);
-      
-      // Guardar en Firestore
-      await updateDoc(doc(db, 'alumnos', alumnoId), {
-        folioCertificado: folio,
-        codigoVerificacion: codigoVerificacion,
-        fechaEmisionCertificado: serverTimestamp()
-      });
+      necesitaGuardar = true;
     } else {
       // Si tiene folio, validar que el código sea correcto (determinístico)
       const codigoEsperado = generarCodigoVerificacion(alumnoId, folio);
       const codigoActual = codigoVerificacion?.trim().toUpperCase();
       
-      // Si el código no coincide con el determinístico, regenerarlo
+      // Si el código no existe o no coincide con el determinístico, regenerarlo
       if (!codigoVerificacion || codigoActual !== codigoEsperado) {
         codigoVerificacion = codigoEsperado;
-        
-        // Actualizar en Firestore
-        await updateDoc(doc(db, 'alumnos', alumnoId), {
-          codigoVerificacion: codigoVerificacion,
-          fechaActualizacionCodigo: serverTimestamp()
-        });
+        necesitaGuardar = true;
+      }
+    }
+    
+    // Guardar en Firestore si es necesario
+    if (necesitaGuardar) {
+      const updateData = {};
+      if (!alumnoData.folioCertificado) {
+        updateData.folioCertificado = folio;
+        updateData.fechaEmisionCertificado = serverTimestamp();
+      }
+      if (!alumnoData.codigoVerificacion || alumnoData.codigoVerificacion?.trim().toUpperCase() !== codigoVerificacion) {
+        updateData.codigoVerificacion = codigoVerificacion;
+        updateData.fechaActualizacionCodigo = serverTimestamp();
+      }
+      
+      if (Object.keys(updateData).length > 0) {
+        await updateDoc(doc(db, 'alumnos', alumnoId), updateData);
       }
     }
 
