@@ -51,6 +51,8 @@ export const crearUsuarioAlumno = async (datosUsuario) => {
       estado: datosAdicionales.estado || 'Activo',
       mailClassroom: datosAdicionales.mailClassroom || null,
       passwordClassroom: datosAdicionales.passwordClassroom || null,
+      // Guardar la contraseña para que el admin pueda iniciar sesión como este usuario
+      passwordTemporal: password,
       fechaCreacion: serverTimestamp(),
       creadoPor: datosAdicionales.creadoPor || null,
     };
@@ -83,20 +85,8 @@ export const crearUsuarioAlumno = async (datosUsuario) => {
       }
     }
 
-    // 5. Guardar la contraseña temporalmente en localStorage para que el admin pueda iniciar sesión como este usuario después
-    // La contraseña se guarda con el UID del usuario como clave
-    try {
-      const tempPasswordKey = `temp_password_${user.uid}`;
-      localStorage.setItem(tempPasswordKey, password);
-      // Limpiar después de 24 horas (opcional, por seguridad)
-      setTimeout(() => {
-        localStorage.removeItem(tempPasswordKey);
-      }, 24 * 60 * 60 * 1000);
-    } catch (storageError) {
-      console.warn('No se pudo guardar la contraseña temporal:', storageError);
-    }
-
-    // 6. NO cerrar sesión automáticamente - el admin puede elegir si quiere iniciar sesión como el nuevo usuario
+    // 5. La contraseña ya está guardada en Firestore en el campo passwordTemporal
+    // NO cerrar sesión automáticamente - el admin puede elegir si quiere iniciar sesión como el nuevo usuario
     // Si el admin quiere volver a su sesión, puede hacerlo manualmente
 
     return {

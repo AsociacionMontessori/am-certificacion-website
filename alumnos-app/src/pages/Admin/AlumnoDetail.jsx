@@ -143,13 +143,12 @@ const AlumnoDetail = () => {
       return;
     }
 
-    // Obtener la contraseña temporal guardada en localStorage
-    const tempPasswordKey = `temp_password_${id}`;
-    const tempPassword = localStorage.getItem(tempPasswordKey);
+    // Obtener la contraseña del documento del alumno en Firestore
+    const password = alumno.passwordTemporal;
 
-    if (!tempPassword) {
+    if (!password) {
       const userPassword = prompt(
-        'La contraseña temporal no está disponible. Por favor, ingresa la contraseña del usuario:',
+        'La contraseña no está disponible en el sistema. Por favor, ingresa la contraseña del usuario:',
         ''
       );
       if (!userPassword) {
@@ -171,14 +170,14 @@ const AlumnoDetail = () => {
 
     try {
       setSigningIn(true);
-      await signInWithEmailAndPassword(auth, alumno.email, tempPassword);
+      await signInWithEmailAndPassword(auth, alumno.email, password);
       // Redirigir al dashboard del alumno
       navigate('/');
     } catch (error) {
       console.error('Error al iniciar sesión:', error);
-      // Si la contraseña temporal no funciona, pedirla manualmente
+      // Si la contraseña no funciona, pedirla manualmente
       const userPassword = prompt(
-        'La contraseña temporal no funcionó. Por favor, ingresa la contraseña del usuario:',
+        'La contraseña registrada no funcionó. Por favor, ingresa la contraseña del usuario:',
         ''
       );
       if (userPassword) {
