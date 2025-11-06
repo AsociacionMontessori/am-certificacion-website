@@ -70,8 +70,14 @@ const Expediente = () => {
             )}
             {expediente?.email && (
               <div>
-                <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Correo electrónico</dt>
+                <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Email de inicio de sesión</dt>
                 <dd className="text-sm text-gray-900 dark:text-white mt-1">{expediente.email}</dd>
+              </div>
+            )}
+            {expediente?.emailContacto && (
+              <div>
+                <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Email de contacto (y recuperación)</dt>
+                <dd className="text-sm text-gray-900 dark:text-white mt-1">{expediente.emailContacto}</dd>
               </div>
             )}
             {expediente?.telefono && (

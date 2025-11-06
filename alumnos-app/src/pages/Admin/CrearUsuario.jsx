@@ -13,6 +13,7 @@ const CrearUsuario = () => {
   const [success, setSuccess] = useState(false);
   const [formData, setFormData] = useState({
     nombreCompleto: '',
+    emailContacto: '',
     email: '',
     password: '',
     confirmPassword: '',
@@ -79,6 +80,7 @@ const CrearUsuario = () => {
         nombre: formData.nombreCompleto,
         email: formData.email,
         password: formData.password,
+        emailContacto: formData.emailContacto,
         telefono: formData.telefono,
         nivel: formData.nivel,
         fechaIngreso: formData.fechaIngreso || new Date().toISOString().split('T')[0],
@@ -165,6 +167,19 @@ const CrearUsuario = () => {
                 value={formData.nombreCompleto}
                 onChange={handleChange}
                 placeholder="Ej: Juan Pérez García"
+                className="w-full px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue transition-all duration-200"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Email de contacto (y recuperación)
+              </label>
+              <input
+                type="email"
+                name="emailContacto"
+                value={formData.emailContacto}
+                onChange={handleChange}
+                placeholder="contacto@ejemplo.com"
                 className="w-full px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue transition-all duration-200"
               />
             </div>
