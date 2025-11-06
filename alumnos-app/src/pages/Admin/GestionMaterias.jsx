@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { collection, query, where, getDocs, getDoc, doc, updateDoc, deleteDoc, addDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, query, where, getDocs, getDoc, doc, updateDoc, deleteDoc, addDoc, serverTimestamp, writeBatch } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { getMateriasPorNivel } from '../../data/materiasPorNivel';
-import { ArrowLeftIcon, PlusIcon, PencilIcon, TrashIcon, CalendarIcon } from '@heroicons/react/24/outline';
+import { ArrowLeftIcon, PlusIcon, PencilIcon, TrashIcon, CalendarIcon, DocumentDuplicateIcon } from '@heroicons/react/24/outline';
 import LoadingSpinner from '../../components/LoadingSpinner';
+import LoadingButton from '../../components/LoadingButton';
 
 const GestionMaterias = () => {
   const { id } = useParams();
@@ -12,7 +13,12 @@ const GestionMaterias = () => {
   const [materias, setMaterias] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
+  const [showBulkModal, setShowBulkModal] = useState(false);
   const [materiaEditando, setMateriaEditando] = useState(null);
+  const [bulkData, setBulkData] = useState('');
+  const [bulkProcessing, setBulkProcessing] = useState(false);
+  const [bulkPreview, setBulkPreview] = useState([]);
+  const [bulkError, setBulkError] = useState('');
   const [formData, setFormData] = useState({
     nombre: '',
     fechaInicio: '',
@@ -145,6 +151,173 @@ const GestionMaterias = () => {
     }
   };
 
+  // Funciones para agregar por lotes
+  const parsearFecha = (fechaStr) => {
+    if (!fechaStr || fechaStr.trim() === '') return null;
+    
+    // Intentar diferentes formatos de fecha comunes en Excel
+    const fechaStrTrimmed = fechaStr.trim();
+    
+    // Formato YYYY-MM-DD
+    if (/^\d{4}-\d{2}-\d{2}$/.test(fechaStrTrimmed)) {
+      return fechaStrTrimmed;
+    }
+    
+    // Formato DD/MM/YYYY o DD-MM-YYYY
+    const formatoDMY = /^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/;
+    const matchDMY = fechaStrTrimmed.match(formatoDMY);
+    if (matchDMY) {
+      const [, dia, mes, año] = matchDMY;
+      return `${año}-${mes.padStart(2, '0')}-${dia.padStart(2, '0')}`;
+    }
+    
+    // Formato MM/DD/YYYY o MM-DD-YYYY
+    const formatoMDY = /^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/;
+    const matchMDY = fechaStrTrimmed.match(formatoMDY);
+    if (matchMDY) {
+      const [, mes, dia, año] = matchMDY;
+      return `${año}-${mes.padStart(2, '0')}-${dia.padStart(2, '0')}`;
+    }
+    
+    // Intentar parsear como fecha de JavaScript
+    const fecha = new Date(fechaStrTrimmed);
+    if (!isNaN(fecha.getTime())) {
+      return fecha.toISOString().split('T')[0];
+    }
+    
+    return null;
+  };
+
+  const parsearBulkData = (texto) => {
+    setBulkError('');
+    const lineas = texto.split('\n').filter(linea => linea.trim() !== '');
+    const materiasParseadas = [];
+    
+    lineas.forEach((linea, index) => {
+      const columnas = linea.split('\t').map(col => col.trim());
+      
+      // Detectar si es encabezado (primera línea)
+      if (index === 0 && (
+        columnas[0]?.toLowerCase().includes('materia') ||
+        columnas[0]?.toLowerCase().includes('nombre') ||
+        columnas[0]?.toLowerCase().includes('asignatura')
+      )) {
+        return; // Saltar encabezado
+      }
+      
+      // Esperamos: Materia | Fecha Inicio | Fecha Fin | Aula | Estado
+      const materia = {
+        nombre: columnas[0] || '',
+        fechaInicio: parsearFecha(columnas[1]),
+        fechaFin: parsearFecha(columnas[2]),
+        aula: columnas[3] || '',
+        estado: columnas[4] || 'Pendiente'
+      };
+      
+      // Validar
+      if (!materia.nombre) {
+        setBulkError(`Error en línea ${index + 1}: Falta el nombre de la materia`);
+        return;
+      }
+      
+      if (!materia.fechaInicio) {
+        setBulkError(`Error en línea ${index + 1}: Fecha de inicio inválida: "${columnas[1]}"`);
+        return;
+      }
+      
+      // Validar estado
+      const estadosValidos = ['Pendiente', 'En curso', 'Completada'];
+      if (materia.estado && !estadosValidos.includes(materia.estado)) {
+        materia.estado = 'Pendiente';
+      }
+      
+      materiasParseadas.push(materia);
+    });
+    
+    setBulkPreview(materiasParseadas);
+    return materiasParseadas;
+  };
+
+  const handleBulkPaste = (e) => {
+    const texto = e.clipboardData.getData('text');
+    setBulkData(texto);
+    parsearBulkData(texto);
+  };
+
+  const handleBulkChange = (e) => {
+    const texto = e.target.value;
+    setBulkData(texto);
+    if (texto.trim()) {
+      parsearBulkData(texto);
+    } else {
+      setBulkPreview([]);
+      setBulkError('');
+    }
+  };
+
+  const handleBulkSubmit = async () => {
+    if (bulkPreview.length === 0) {
+      setBulkError('No hay materias válidas para agregar');
+      return;
+    }
+
+    setBulkProcessing(true);
+    setBulkError('');
+
+    try {
+      const batch = writeBatch(db);
+      const materiasRef = collection(db, 'materias');
+
+      bulkPreview.forEach((materia) => {
+        const nuevaMateriaRef = doc(materiasRef);
+        batch.set(nuevaMateriaRef, {
+          alumnoId: id,
+          nombre: materia.nombre,
+          nivel: alumno?.nivel || '',
+          fechaInicio: materia.fechaInicio ? new Date(materia.fechaInicio) : null,
+          fechaFin: materia.fechaFin ? new Date(materia.fechaFin) : null,
+          aula: materia.aula || null,
+          estado: materia.estado,
+          fechaCreacion: serverTimestamp(),
+          fechaActualizacion: serverTimestamp()
+        });
+      });
+
+      await batch.commit();
+
+      // Recargar materias
+      const materiasQuery = query(
+        collection(db, 'materias'),
+        where('alumnoId', '==', id)
+      );
+      const materiasSnapshot = await getDocs(materiasQuery);
+      const materiasData = materiasSnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      
+      materiasData.sort((a, b) => {
+        const fechaA = a.fechaInicio?.toDate ? a.fechaInicio.toDate() : null;
+        const fechaB = b.fechaInicio?.toDate ? b.fechaInicio.toDate() : null;
+        if (!fechaA && !fechaB) return 0;
+        if (!fechaA) return 1;
+        if (!fechaB) return -1;
+        return fechaA - fechaB;
+      });
+      
+      setMaterias(materiasData);
+      setShowBulkModal(false);
+      setBulkData('');
+      setBulkPreview([]);
+      alert(`✅ ${bulkPreview.length} materias agregadas exitosamente`);
+    } catch (error) {
+      console.error('Error al agregar materias por lotes:', error);
+      setBulkError('Error al guardar las materias: ' + error.message);
+    } finally {
+      setBulkProcessing(false);
+    }
+  };
+
   const materiasDisponibles = alumno?.nivel ? getMateriasPorNivel(alumno.nivel) : [];
 
   if (loading) {
@@ -176,25 +349,37 @@ const GestionMaterias = () => {
             {alumno?.nombre} - {alumno?.nivel}
           </p>
         </div>
-        <button
-          onClick={() => {
-            setMateriaEditando(null);
-            setFormData({
-              nombre: '',
-              fechaInicio: '',
-              fechaFin: '',
-              profesor: '',
-              aula: '',
-              horario: '',
-              estado: 'Pendiente'
-            });
-            setShowModal(true);
-          }}
-          className="inline-flex items-center justify-center px-4 py-2.5 sm:px-6 sm:py-3 text-sm sm:text-base font-semibold text-white bg-blue rounded-lg shadow-sm hover:bg-blue/90 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue focus:ring-offset-2 transition-all duration-200"
-        >
-          <PlusIcon className="w-5 h-5 mr-2" />
-          Agregar Materia
-        </button>
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+          <button
+            onClick={() => {
+              setMateriaEditando(null);
+              setFormData({
+                nombre: '',
+                fechaInicio: '',
+                fechaFin: '',
+                aula: '',
+                estado: 'Pendiente'
+              });
+              setShowModal(true);
+            }}
+            className="inline-flex items-center justify-center px-4 py-2.5 sm:px-6 sm:py-3 text-sm sm:text-base font-semibold text-white bg-blue rounded-lg shadow-sm hover:bg-blue/90 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue focus:ring-offset-2 transition-all duration-200"
+          >
+            <PlusIcon className="w-5 h-5 mr-2" />
+            Agregar Materia
+          </button>
+          <button
+            onClick={() => {
+              setShowBulkModal(true);
+              setBulkData('');
+              setBulkPreview([]);
+              setBulkError('');
+            }}
+            className="inline-flex items-center justify-center px-4 py-2.5 sm:px-6 sm:py-3 text-sm sm:text-base font-semibold text-white bg-green rounded-lg shadow-sm hover:bg-green/90 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-green focus:ring-offset-2 transition-all duration-200"
+          >
+            <DocumentDuplicateIcon className="w-5 h-5 mr-2" />
+            Agregar por Lotes
+          </button>
+        </div>
       </div>
 
       {/* Lista de materias */}
@@ -373,6 +558,110 @@ const GestionMaterias = () => {
                   </button>
                 </div>
               </form>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal para agregar por lotes */}
+      {showBulkModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+                Agregar Materias por Lotes
+              </h2>
+              
+              <div className="mb-4 p-4 bg-blue/10 dark:bg-blue/20 rounded-lg border border-blue/20">
+                <p className="text-sm text-gray-700 dark:text-gray-300 mb-2">
+                  <strong>Instrucciones:</strong>
+                </p>
+                <ol className="text-sm text-gray-600 dark:text-gray-400 list-decimal list-inside space-y-1">
+                  <li>En Excel, selecciona las columnas: <strong>Materia | Fecha Inicio | Fecha Fin | Aula | Estado</strong></li>
+                  <li>Copia las celdas (Ctrl+C o Cmd+C)</li>
+                  <li>Pega aquí abajo (Ctrl+V o Cmd+V)</li>
+                  <li>Revisa la vista previa y guarda</li>
+                </ol>
+                <p className="text-xs text-gray-500 dark:text-gray-500 mt-2">
+                  Formatos de fecha aceptados: DD/MM/YYYY, MM/DD/YYYY, YYYY-MM-DD
+                </p>
+              </div>
+
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Pega los datos de Excel aquí:
+                </label>
+                <textarea
+                  value={bulkData}
+                  onChange={handleBulkChange}
+                  onPaste={handleBulkPaste}
+                  placeholder="Materia	01/01/2024	30/06/2024	Aula 1	En curso"
+                  rows={8}
+                  className="w-full px-4 py-2.5 text-sm font-mono border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue"
+                />
+              </div>
+
+              {bulkError && (
+                <div className="mb-4 p-3 bg-red/10 dark:bg-red/20 border border-red/30 rounded-lg">
+                  <p className="text-sm text-red dark:text-red-300">{bulkError}</p>
+                </div>
+              )}
+
+              {bulkPreview.length > 0 && (
+                <div className="mb-4">
+                  <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Vista previa ({bulkPreview.length} materias):
+                  </p>
+                  <div className="max-h-60 overflow-y-auto border border-gray-200 dark:border-gray-700 rounded-lg">
+                    <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700 text-sm">
+                      <thead className="bg-gray-50 dark:bg-gray-700 sticky top-0">
+                        <tr>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Materia</th>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Inicio</th>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Fin</th>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Aula</th>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Estado</th>
+                        </tr>
+                      </thead>
+                      <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                        {bulkPreview.map((materia, index) => (
+                          <tr key={index}>
+                            <td className="px-3 py-2 text-gray-900 dark:text-white">{materia.nombre}</td>
+                            <td className="px-3 py-2 text-gray-600 dark:text-gray-400">{materia.fechaInicio || '-'}</td>
+                            <td className="px-3 py-2 text-gray-600 dark:text-gray-400">{materia.fechaFin || '-'}</td>
+                            <td className="px-3 py-2 text-gray-600 dark:text-gray-400">{materia.aula || '-'}</td>
+                            <td className="px-3 py-2 text-gray-600 dark:text-gray-400">{materia.estado}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+
+              <div className="flex justify-end gap-3 pt-4">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowBulkModal(false);
+                    setBulkData('');
+                    setBulkPreview([]);
+                    setBulkError('');
+                  }}
+                  className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+                  disabled={bulkProcessing}
+                >
+                  Cancelar
+                </button>
+                <LoadingButton
+                  onClick={handleBulkSubmit}
+                  isLoading={bulkProcessing}
+                  variant="success"
+                  disabled={bulkPreview.length === 0}
+                >
+                  Agregar {bulkPreview.length > 0 ? `${bulkPreview.length} ` : ''}Materias
+                </LoadingButton>
+              </div>
             </div>
           </div>
         </div>
