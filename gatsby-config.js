@@ -3,7 +3,7 @@ module.exports = {
     title: `Asociacion Montessori De Mexico, A.C.`,
     description: `Certificaciones en en el método Montessori. Certificaciones, cursos y diplomados. Asociacion Montessori De Mexico, A.C. `,
     author: `@AsociacionMontessori`,
-    siteUrl: `https://gatsbystarterdefaultsource.gatsbyjs.io/`,
+    siteUrl: `https://certificacionmontessori.com/`,
   },
   plugins: [
     'gatsby-plugin-postcss',
