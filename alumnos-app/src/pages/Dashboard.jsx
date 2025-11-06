@@ -17,6 +17,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
+import AlertasMateriasAtraso from '../components/AlertasMateriasAtraso';
 
 const Dashboard = () => {
   const { userData } = useAuth();
@@ -102,6 +103,9 @@ const Dashboard = () => {
           </div>
         </div>
       )}
+
+      {/* Alertas de Materias con Atraso */}
+      {userData?.estado !== 'Inactivo' && <AlertasMateriasAtraso />}
 
       {/* Cards de navegación */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
