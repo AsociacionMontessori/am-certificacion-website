@@ -9,7 +9,11 @@ import {
   FolderIcon,
   CalendarDaysIcon,
   EyeIcon,
-  EyeSlashIcon
+  EyeSlashIcon,
+  ClipboardDocumentIcon,
+  ShieldCheckIcon,
+  LinkIcon,
+  ExternalLinkIcon
 } from '@heroicons/react/24/outline';
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
@@ -17,6 +21,25 @@ import { useState } from 'react';
 const Dashboard = () => {
   const { userData } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
+
+  // Función para copiar al portapapeles
+  const handleCopyToClipboard = async (texto, tipo = '') => {
+    try {
+      await navigator.clipboard.writeText(texto);
+      alert(`${tipo ? tipo + ' ' : ''}copiado al portapapeles`);
+    } catch (error) {
+      console.error('Error al copiar:', error);
+      prompt(`Copia este ${tipo || 'texto'}:`, texto);
+    }
+  };
+
+  // Función para copiar el enlace de verificación
+  const handleCopyVerificationLink = async () => {
+    if (userData?.folioCertificado && userData?.codigoVerificacion) {
+      const link = `alumnos.certificacionmontessori.com/verificar?folio=${userData.folioCertificado}&t=${userData.codigoVerificacion}`;
+      await handleCopyToClipboard(link, 'Enlace de verificación');
+    }
+  };
 
   const cards = [
     {
@@ -104,10 +127,18 @@ const Dashboard = () => {
                   <label className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1 block">
                     Mail de Classroom
                   </label>
-                  <div className="bg-white dark:bg-gray-700 rounded-lg p-3 border border-gray-200 dark:border-gray-600">
-                    <p className="text-sm text-gray-900 dark:text-white font-mono">
+                  <div className="bg-white dark:bg-gray-700 rounded-lg p-3 border border-gray-200 dark:border-gray-600 flex items-center justify-between">
+                    <p className="text-sm text-gray-900 dark:text-white font-mono flex-1">
                       {userData.mailClassroom}
                     </p>
+                    <button
+                      type="button"
+                      onClick={() => handleCopyToClipboard(userData.mailClassroom, 'Mail de Classroom')}
+                      className="ml-2 p-1.5 text-gray-600 dark:text-gray-400 hover:text-blue dark:hover:text-blue transition-colors"
+                      title="Copiar mail"
+                    >
+                      <ClipboardDocumentIcon className="w-5 h-5" />
+                    </button>
                   </div>
                 </div>
                 <div>
@@ -119,18 +150,29 @@ const Dashboard = () => {
                       <p className="text-sm text-gray-900 dark:text-white font-mono flex-1">
                         {showPassword ? userData.passwordClassroom : '••••••••'}
                       </p>
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="ml-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
-                        aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
-                      >
-                        {showPassword ? (
-                          <EyeSlashIcon className="w-5 h-5" />
-                        ) : (
-                          <EyeIcon className="w-5 h-5" />
-                        )}
-                      </button>
+                      <div className="flex items-center gap-1 ml-2">
+                        <button
+                          type="button"
+                          onClick={() => handleCopyToClipboard(userData.passwordClassroom, 'Contraseña de Classroom')}
+                          className="p-1.5 text-gray-600 dark:text-gray-400 hover:text-blue dark:hover:text-blue transition-colors"
+                          title="Copiar contraseña"
+                        >
+                          <ClipboardDocumentIcon className="w-5 h-5" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="p-1.5 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
+                          aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                          title={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                        >
+                          {showPassword ? (
+                            <EyeSlashIcon className="w-5 h-5" />
+                          ) : (
+                            <EyeIcon className="w-5 h-5" />
+                          )}
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -212,6 +254,153 @@ const Dashboard = () => {
               Abrir Calendario
             </a>
           </div>
+
+          {/* Verificación de Certificado */}
+          {(userData?.folioCertificado || userData?.codigoVerificacion) && (
+            <div className="bg-blue/10 dark:bg-blue/20 rounded-lg p-5 border border-blue/20">
+              <div className="flex items-center mb-4">
+                <ShieldCheckIcon className="w-6 h-6 text-blue mr-3" />
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  Verificación de Certificado
+                </h3>
+              </div>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                Tu folio y código de verificación para validar tu constancia de estudios.
+              </p>
+              <div className="space-y-3">
+                {userData.folioCertificado && (
+                  <div className="bg-white dark:bg-gray-700 rounded-lg p-3 border border-gray-200 dark:border-gray-600">
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1">
+                        <label className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1 block">
+                          Folio
+                        </label>
+                        <p className="text-sm text-gray-900 dark:text-white font-mono">
+                          {userData.folioCertificado}
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => handleCopyToClipboard(userData.folioCertificado, 'Folio')}
+                        className="ml-2 p-1.5 text-gray-600 dark:text-gray-400 hover:text-blue dark:hover:text-blue transition-colors"
+                        title="Copiar folio"
+                      >
+                        <ClipboardDocumentIcon className="w-5 h-5" />
+                      </button>
+                    </div>
+                  </div>
+                )}
+                {userData.codigoVerificacion && (
+                  <div className="bg-white dark:bg-gray-700 rounded-lg p-3 border border-gray-200 dark:border-gray-600">
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1">
+                        <label className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1 block">
+                          Código de Verificación
+                        </label>
+                        <p className="text-sm text-gray-900 dark:text-white font-mono">
+                          {userData.codigoVerificacion}
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => handleCopyToClipboard(userData.codigoVerificacion, 'Código')}
+                        className="ml-2 p-1.5 text-gray-600 dark:text-gray-400 hover:text-blue dark:hover:text-blue transition-colors"
+                        title="Copiar código"
+                      >
+                        <ClipboardDocumentIcon className="w-5 h-5" />
+                      </button>
+                    </div>
+                  </div>
+                )}
+                {userData.folioCertificado && userData.codigoVerificacion && (
+                  <button
+                    onClick={handleCopyVerificationLink}
+                    className="w-full inline-flex items-center justify-center px-4 py-2.5 bg-blue text-white rounded-lg hover:bg-blue/90 font-medium transition-colors"
+                  >
+                    <ClipboardDocumentIcon className="w-4 h-4 mr-2" />
+                    Copiar Enlace de Verificación
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Enlaces Públicos */}
+          <div className="bg-green/10 dark:bg-green/20 rounded-lg p-5 border border-green/20">
+            <div className="flex items-center mb-4">
+              <LinkIcon className="w-6 h-6 text-green mr-3" />
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                Enlaces Públicos
+              </h3>
+            </div>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+              Comparte estos enlaces para que otros puedan ver tu información académica pública.
+            </p>
+            <div className="space-y-3">
+              {/* Vista Pública del Perfil */}
+              <div className="bg-white dark:bg-gray-700 rounded-lg p-3 border border-gray-200 dark:border-gray-600">
+                <div className="flex items-center justify-between">
+                  <div className="flex-1 min-w-0">
+                    <label className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1 block">
+                      Vista Pública del Perfil
+                    </label>
+                    <p className="text-xs text-gray-900 dark:text-white font-mono truncate">
+                      {`${window.location.origin}/public/alumno/${userData?.id || ''}`}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-1 ml-2">
+                    <button
+                      onClick={() => handleCopyToClipboard(`${window.location.origin}/public/alumno/${userData?.id || ''}`, 'Enlace público')}
+                      className="p-1.5 text-gray-600 dark:text-gray-400 hover:text-green dark:hover:text-green transition-colors"
+                      title="Copiar enlace"
+                    >
+                      <ClipboardDocumentIcon className="w-5 h-5" />
+                    </button>
+                    <a
+                      href={`/public/alumno/${userData?.id || ''}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-1.5 text-gray-600 dark:text-gray-400 hover:text-green dark:hover:text-green transition-colors"
+                      title="Abrir en nueva pestaña"
+                    >
+                      <ExternalLinkIcon className="w-5 h-5" />
+                    </a>
+                  </div>
+                </div>
+              </div>
+              {/* Certificado Digital */}
+              <div className="bg-white dark:bg-gray-700 rounded-lg p-3 border border-gray-200 dark:border-gray-600">
+                <div className="flex items-center justify-between">
+                  <div className="flex-1 min-w-0">
+                    <label className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1 block">
+                      Certificado Digital
+                    </label>
+                    <p className="text-xs text-gray-900 dark:text-white font-mono truncate">
+                      {`${window.location.origin}/certificado/${userData?.id || ''}`}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-1 ml-2">
+                    <button
+                      onClick={() => handleCopyToClipboard(`${window.location.origin}/certificado/${userData?.id || ''}`, 'Enlace de certificado')}
+                      className="p-1.5 text-gray-600 dark:text-gray-400 hover:text-green dark:hover:text-green transition-colors"
+                      title="Copiar enlace"
+                    >
+                      <ClipboardDocumentIcon className="w-5 h-5" />
+                    </button>
+                    <a
+                      href={`/certificado/${userData?.id || ''}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-1.5 text-gray-600 dark:text-gray-400 hover:text-green dark:hover:text-green transition-colors"
+                      title="Abrir en nueva pestaña"
+                    >
+                      <ExternalLinkIcon className="w-5 h-5" />
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
         </div>
       </div>
 

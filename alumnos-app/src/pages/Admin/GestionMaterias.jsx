@@ -3,7 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { collection, query, where, getDocs, getDoc, doc, updateDoc, deleteDoc, addDoc, serverTimestamp, writeBatch } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { getMateriasPorNivel } from '../../data/materiasPorNivel';
-import { ArrowLeftIcon, PlusIcon, PencilIcon, TrashIcon, CalendarIcon, DocumentDuplicateIcon } from '@heroicons/react/24/outline';
+import { ArrowLeftIcon, PlusIcon, PencilIcon, TrashIcon, CalendarIcon, DocumentDuplicateIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import LoadingButton from '../../components/LoadingButton';
 
@@ -19,6 +19,8 @@ const GestionMaterias = () => {
   const [bulkProcessing, setBulkProcessing] = useState(false);
   const [bulkPreview, setBulkPreview] = useState([]);
   const [bulkError, setBulkError] = useState('');
+  const [selectedMaterias, setSelectedMaterias] = useState([]);
+  const [isSelecting, setIsSelecting] = useState(false);
   const [formData, setFormData] = useState({
     nombre: '',
     fechaInicio: '',
@@ -148,6 +150,49 @@ const GestionMaterias = () => {
         console.error('Error al eliminar materia:', error);
         alert('Error al eliminar la materia');
       }
+    }
+  };
+
+  const handleToggleSelect = (materiaId) => {
+    setSelectedMaterias(prev => 
+      prev.includes(materiaId)
+        ? prev.filter(id => id !== materiaId)
+        : [...prev, materiaId]
+    );
+  };
+
+  const handleSelectAll = () => {
+    if (selectedMaterias.length === materias.length) {
+      setSelectedMaterias([]);
+    } else {
+      setSelectedMaterias(materias.map(m => m.id));
+    }
+  };
+
+  const handleDeleteSelected = async () => {
+    if (selectedMaterias.length === 0) return;
+    
+    const confirmMessage = selectedMaterias.length === 1
+      ? '¿Estás seguro de eliminar esta materia?'
+      : `¿Estás seguro de eliminar ${selectedMaterias.length} materias?`;
+    
+    if (!window.confirm(confirmMessage)) return;
+
+    try {
+      const batch = writeBatch(db);
+      selectedMaterias.forEach(materiaId => {
+        batch.delete(doc(db, 'materias', materiaId));
+      });
+      
+      await batch.commit();
+      
+      setMaterias(materias.filter(m => !selectedMaterias.includes(m.id)));
+      setSelectedMaterias([]);
+      setIsSelecting(false);
+      alert(`✅ ${selectedMaterias.length} materia(s) eliminada(s) exitosamente`);
+    } catch (error) {
+      console.error('Error al eliminar materias:', error);
+      alert('Error al eliminar las materias');
     }
   };
 
@@ -385,11 +430,70 @@ const GestionMaterias = () => {
       {/* Lista de materias */}
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
         <div className="p-4 sm:p-6">
+          {/* Barra de acciones de selección múltiple */}
+          {isSelecting && (
+            <div className="mb-4 p-3 bg-blue/10 dark:bg-blue/20 rounded-lg border border-blue/20 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={handleSelectAll}
+                  className="text-sm font-medium text-blue hover:text-blue/80"
+                >
+                  {selectedMaterias.length === materias.length ? 'Deseleccionar todas' : 'Seleccionar todas'}
+                </button>
+                <span className="text-sm text-gray-600 dark:text-gray-400">
+                  {selectedMaterias.length} de {materias.length} seleccionadas
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                {selectedMaterias.length > 0 && (
+                  <button
+                    onClick={handleDeleteSelected}
+                    className="inline-flex items-center px-3 py-1.5 text-sm font-medium text-red bg-red/10 hover:bg-red/20 rounded-lg transition-colors"
+                  >
+                    <TrashIcon className="w-4 h-4 mr-1" />
+                    Eliminar ({selectedMaterias.length})
+                  </button>
+                )}
+                <button
+                  onClick={() => {
+                    setIsSelecting(false);
+                    setSelectedMaterias([]);
+                  }}
+                  className="inline-flex items-center px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                >
+                  <XMarkIcon className="w-4 h-4 mr-1" />
+                  Cancelar
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Botón para activar selección múltiple */}
+          {!isSelecting && materias.length > 0 && (
+            <div className="mb-4">
+              <button
+                onClick={() => setIsSelecting(true)}
+                className="inline-flex items-center px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors"
+              >
+                Seleccionar múltiples
+              </button>
+            </div>
+          )}
+
           <div className="space-y-4">
             {materias.map((materia) => (
-              <div key={materia.id} className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 border border-gray-200 dark:border-gray-600">
+              <div key={materia.id} className={`bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 border ${isSelecting && selectedMaterias.includes(materia.id) ? 'border-blue ring-2 ring-blue' : 'border-gray-200 dark:border-gray-600'}`}>
                 <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
-                  <div className="flex-1">
+                  <div className="flex items-start gap-3 flex-1">
+                    {isSelecting && (
+                      <input
+                        type="checkbox"
+                        checked={selectedMaterias.includes(materia.id)}
+                        onChange={() => handleToggleSelect(materia.id)}
+                        className="mt-1 w-5 h-5 text-blue border-gray-300 rounded focus:ring-blue"
+                      />
+                    )}
+                    <div className="flex-1">
                     <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-2">
                       {materia.nombre}
                     </h3>
@@ -423,23 +527,26 @@ const GestionMaterias = () => {
                         </span>
                       </div>
                     )}
+                    </div>
                   </div>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => handleEdit(materia)}
-                      className="p-2 text-blue hover:bg-blue/10 rounded-lg transition-colors"
-                      aria-label="Editar"
-                    >
-                      <PencilIcon className="w-5 h-5" />
-                    </button>
-                    <button
-                      onClick={() => handleDelete(materia.id)}
-                      className="p-2 text-red hover:bg-red/10 rounded-lg transition-colors"
-                      aria-label="Eliminar"
-                    >
-                      <TrashIcon className="w-5 h-5" />
-                    </button>
-                  </div>
+                  {!isSelecting && (
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => handleEdit(materia)}
+                        className="p-2 text-blue hover:bg-blue/10 rounded-lg transition-colors"
+                        aria-label="Editar"
+                      >
+                        <PencilIcon className="w-5 h-5" />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(materia.id)}
+                        className="p-2 text-red hover:bg-red/10 rounded-lg transition-colors"
+                        aria-label="Eliminar"
+                      >
+                        <TrashIcon className="w-5 h-5" />
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
             ))}

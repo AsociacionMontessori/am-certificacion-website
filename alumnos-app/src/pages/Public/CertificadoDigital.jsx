@@ -221,7 +221,7 @@ const CertificadoDigital = () => {
         </div>
 
         {/* Botones de acción */}
-        <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
+        <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 no-print">
           <button
             onClick={() => window.print()}
             className="inline-flex items-center px-6 py-3 bg-blue text-white rounded-lg hover:bg-blue/90 transition-colors shadow-lg"
@@ -263,20 +263,131 @@ const CertificadoDigital = () => {
       {/* Estilos para impresión */}
       <style>{`
         @media print {
+          @page {
+            size: A4;
+            margin: 1.5cm 1.5cm;
+          }
+          
+          body {
+            background: white !important;
+            margin: 0;
+            padding: 0;
+          }
+          
           body * {
             visibility: hidden;
           }
+          
           .certificado-print, .certificado-print * {
             visibility: visible;
           }
+          
           .certificado-print {
             position: absolute;
             left: 0;
             top: 0;
             width: 100%;
+            max-width: 100%;
+            margin: 0;
+            padding: 0;
+            page-break-inside: avoid;
           }
-          button {
-            display: none;
+          
+          .certificado-print > div {
+            margin: 0 !important;
+            padding: 0.8cm !important;
+            box-shadow: none !important;
+            border: 1px solid #000 !important;
+            border-radius: 0 !important;
+            page-break-inside: avoid;
+          }
+          
+          .certificado-print h1 {
+            font-size: 24pt !important;
+            margin: 0.5cm 0 0.3cm 0 !important;
+            page-break-after: avoid;
+          }
+          
+          .certificado-print p {
+            font-size: 11pt !important;
+            line-height: 1.4 !important;
+            margin: 0.3cm 0 !important;
+            page-break-inside: avoid;
+          }
+          
+          .certificado-print .text-base {
+            font-size: 10pt !important;
+          }
+          
+          .certificado-print .text-lg {
+            font-size: 12pt !important;
+          }
+          
+          .certificado-print .text-sm {
+            font-size: 9pt !important;
+          }
+          
+          .certificado-print .text-xs {
+            font-size: 8pt !important;
+          }
+          
+          .certificado-print .space-y-8 > * {
+            margin-top: 0.4cm !important;
+            margin-bottom: 0.4cm !important;
+          }
+          
+          .certificado-print .space-y-4 > * {
+            margin-top: 0.2cm !important;
+            margin-bottom: 0.2cm !important;
+          }
+          
+          .certificado-print .py-12 {
+            padding-top: 0.5cm !important;
+            padding-bottom: 0.5cm !important;
+          }
+          
+          .certificado-print .px-8 {
+            padding-left: 0.5cm !important;
+            padding-right: 0.5cm !important;
+          }
+          
+          .certificado-print .grid {
+            page-break-inside: avoid;
+          }
+          
+          .certificado-print .grid > div {
+            page-break-inside: avoid;
+          }
+          
+          .certificado-print button,
+          .certificado-print .no-print,
+          .certificado-print a:not([href^="http"]):not([href^="#"]):not([href^="/"]) {
+            display: none !important;
+          }
+          
+          .certificado-print .bg-gradient-to-r,
+          .certificado-print .bg-gray-50,
+          .certificado-print .bg-gray-100 {
+            background: white !important;
+          }
+          
+          .certificado-print .text-white {
+            color: #000 !important;
+          }
+          
+          .certificado-print .border-4,
+          .certificado-print .border-2 {
+            border-width: 1px !important;
+          }
+          
+          .certificado-print .rounded-lg,
+          .certificado-print .rounded-2xl {
+            border-radius: 0 !important;
+          }
+          
+          .certificado-print svg[class*="QRCode"] {
+            width: 100px !important;
+            height: 100px !important;
           }
         }
       `}</style>
