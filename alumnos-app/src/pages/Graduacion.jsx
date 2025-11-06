@@ -41,7 +41,7 @@ const Graduacion = () => {
     { nombre: 'Promedio mínimo de 8.0', completado: infoGraduacion?.promedioMinimo || false },
     { nombre: 'Entrega de Album Montessori (proyecto final)', completado: infoGraduacion?.tesisCompletada || false },
     { nombre: 'Prácticas profesionales', completado: infoGraduacion?.practicasCompletadas || false },
-    { nombre: 'Pago de derechos de titulación', completado: infoGraduacion?.pagoRealizado || false },
+    { nombre: 'Pago de derechos de certificado', completado: infoGraduacion?.pagoRealizado || false },
   ];
 
   const completados = requisitos.filter(r => r.completado).length;
