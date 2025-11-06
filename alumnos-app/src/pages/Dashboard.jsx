@@ -84,6 +84,25 @@ const Dashboard = () => {
         </p>
       </div>
 
+      {/* Estado: Inactivo */}
+      {userData?.estado === 'Inactivo' && (
+        <div className="bg-red/10 dark:bg-red/20 border border-red/30 rounded-xl p-5 sm:p-6">
+          <h2 className="text-lg sm:text-xl font-semibold text-red mb-2">Usuario inactivo</h2>
+          <p className="text-sm text-gray-700 dark:text-gray-200 mb-3">
+            Tu cuenta se encuentra inactiva. Por favor, contacta con administración para mayor información.
+          </p>
+          <div className="text-sm text-gray-700 dark:text-gray-300">
+            <p className="font-medium mb-2">Posibles causas:</p>
+            <ul className="list-disc ml-5 space-y-1">
+              <li>Baja solicitada por el alumno</li>
+              <li>Falta de pago</li>
+              <li>No asistió a clases o no entregó actividades</li>
+              <li>No ingresó al sistema en los últimos tres meses</li>
+            </ul>
+          </div>
+        </div>
+      )}
+
       {/* Cards de navegación */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         {cards.map((card, index) => (
@@ -264,8 +283,8 @@ const Dashboard = () => {
             </a>
           </div>
 
-          {/* Verificación de Certificado */}
-          {(userData?.folioCertificado || userData?.codigoVerificacion) && (
+          {/* Verificación de Certificado - Oculto si usuario inactivo */}
+          {userData?.estado !== 'Inactivo' && (userData?.folioCertificado || userData?.codigoVerificacion) && (
             <div className="bg-blue/10 dark:bg-blue/20 rounded-lg p-5 border border-blue/20">
               <div className="flex items-center mb-4">
                 <ShieldCheckIcon className="w-6 h-6 text-blue mr-3" />
