@@ -127,12 +127,22 @@ const CertificadoDigital = () => {
                   )}
                 </>
               ) : (
-                <p className="text-lg font-semibold text-center my-6">
-                  <strong>CONSTAN</strong> que <strong>{alumno.nombreCompleto}</strong> se encuentra 
-                  inscrito en el programa de formación de Guía Montessori en el nivel{' '}
-                  <strong>{alumno.nivel}</strong>, con fecha de ingreso{' '}
-                  <strong>{fechaIngreso}</strong>.
-                </p>
+                <>
+                  <p className="text-lg font-semibold text-center my-6">
+                    <strong>CONSTAN</strong> que <strong>{alumno.nombreCompleto}</strong> se encuentra 
+                    inscrito en el programa de formación de Guía Montessori en el nivel{' '}
+                    <strong>{alumno.nivel}</strong>, con fecha de ingreso{' '}
+                    <strong>{fechaIngreso}</strong>.
+                  </p>
+                  <div className="bg-yellow/10 border-l-4 border-yellow p-4 my-6 rounded-r">
+                    <p className="text-sm text-gray-700 leading-relaxed">
+                      <strong className="font-semibold">Importante:</strong> La presente constancia únicamente hace constar 
+                      la inscripción del alumno en el programa de formación. Este documento <strong>no constituye un certificado 
+                      ni un diploma</strong> que acredite la certificación Montessori. La certificación oficial se otorgará 
+                      únicamente una vez completados satisfactoriamente todos los requisitos académicos y prácticos del programa.
+                    </p>
+                  </div>
+                </>
               )}
 
               <div className="border-t-2 border-gray-300 pt-6 mt-8 space-y-4">
