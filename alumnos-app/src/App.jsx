@@ -1,3 +1,4 @@
+import { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { ThemeProvider } from './contexts/ThemeContext';
@@ -6,41 +7,35 @@ import AdminRoute from './components/AdminRoute';
 import Layout from './components/Layout';
 import AdminLayout from './components/AdminLayout';
 import LoadingSpinner from './components/LoadingSpinner';
-import Login from './pages/Login';
-import Dashboard from './pages/Dashboard';
-import Expediente from './pages/Expediente';
-import Calendario from './pages/Calendario';
-import Calificaciones from './pages/Calificaciones';
-import Graduacion from './pages/Graduacion';
-import Inscripcion from './pages/Inscripcion';
-import AdminDashboard from './pages/Admin/Dashboard';
-import AlumnoDetail from './pages/Admin/AlumnoDetail';
-import Inscripciones from './pages/Admin/Inscripciones';
-import CrearUsuario from './pages/Admin/CrearUsuario';
-import GestionMaterias from './pages/Admin/GestionMaterias';
-import GestionCalificaciones from './pages/Admin/GestionCalificaciones';
-import GestionGraduacion from './pages/Admin/GestionGraduacion';
-import PublicProfile from './pages/Public/PublicProfile';
-import CertificadoDigital from './pages/Public/CertificadoDigital';
-import VerificarCertificado from './pages/Public/VerificarCertificado';
-import RegenerarCodigos from './pages/Admin/RegenerarCodigos';
-import GeneradorQR from './pages/Admin/GeneradorQR';
-import DiagnosticoCodigos from './pages/Admin/DiagnosticoCodigos';
+
+// Lazy loading de todas las páginas para reducir el bundle inicial
+const Login = lazy(() => import('./pages/Login'));
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const Expediente = lazy(() => import('./pages/Expediente'));
+const Calendario = lazy(() => import('./pages/Calendario'));
+const Calificaciones = lazy(() => import('./pages/Calificaciones'));
+const Graduacion = lazy(() => import('./pages/Graduacion'));
+const Inscripcion = lazy(() => import('./pages/Inscripcion'));
+const AdminDashboard = lazy(() => import('./pages/Admin/Dashboard'));
+const AlumnoDetail = lazy(() => import('./pages/Admin/AlumnoDetail'));
+const Inscripciones = lazy(() => import('./pages/Admin/Inscripciones'));
+const CrearUsuario = lazy(() => import('./pages/Admin/CrearUsuario'));
+const GestionMaterias = lazy(() => import('./pages/Admin/GestionMaterias'));
+const GestionCalificaciones = lazy(() => import('./pages/Admin/GestionCalificaciones'));
+const GestionGraduacion = lazy(() => import('./pages/Admin/GestionGraduacion'));
+const PublicProfile = lazy(() => import('./pages/Public/PublicProfile'));
+const CertificadoDigital = lazy(() => import('./pages/Public/CertificadoDigital'));
+const VerificarCertificado = lazy(() => import('./pages/Public/VerificarCertificado'));
+const RegenerarCodigos = lazy(() => import('./pages/Admin/RegenerarCodigos'));
+const GeneradorQR = lazy(() => import('./pages/Admin/GeneradorQR'));
+const DiagnosticoCodigos = lazy(() => import('./pages/Admin/DiagnosticoCodigos'));
 
 // Componente para redirigir según el rol
 const DashboardRedirect = () => {
   const { userData, loading, currentUser } = useAuth();
   
-  console.log('🔄 DashboardRedirect - Estado:', { 
-    loading, 
-    hasUserData: !!userData, 
-    rol: userData?.rol,
-    userData
-  });
-  
   // Esperar a que se carguen los datos del usuario
   if (loading) {
-    console.log('⏳ DashboardRedirect - Esperando carga...');
     return (
       <LoadingSpinner 
         fullScreen 
@@ -53,25 +48,30 @@ const DashboardRedirect = () => {
   
   // Si no hay usuario autenticado, no debería llegar aquí por ProtectedRoute
   if (!currentUser) {
-    console.log('❌ DashboardRedirect - No hay usuario autenticado');
     return <Navigate to="/login" replace />;
   }
   
   // Si no hay userData, puede ser que el documento no existe
   if (!userData) {
     console.warn('⚠️ DashboardRedirect - No hay userData, mostrando dashboard de alumno por defecto');
-    return <Dashboard />;
+    return (
+      <Suspense fallback={<LoadingSpinner fullScreen size="xl" variant="montessori" message="Cargando..." />}>
+        <Dashboard />
+      </Suspense>
+    );
   }
   
   // Si el usuario es admin, redirigir al panel de administración
   if (userData.rol === 'admin') {
-    console.log('✅ DashboardRedirect - Redirigiendo a /admin');
     return <Navigate to="/admin" replace />;
   }
   
   // Si no es admin, mostrar dashboard de alumno
-  console.log('👤 DashboardRedirect - Mostrando dashboard de alumno');
-  return <Dashboard />;
+  return (
+    <Suspense fallback={<LoadingSpinner fullScreen size="xl" variant="montessori" message="Cargando..." />}>
+      <Dashboard />
+    </Suspense>
+  );
 };
 
 function App() {
@@ -81,11 +81,46 @@ function App() {
         <Router>
         <Routes>
           {/* Rutas públicas */}
-          <Route path="/login" element={<Login />} />
-          <Route path="/inscripcion" element={<Inscripcion />} />
-          <Route path="/public/alumno/:id" element={<PublicProfile />} />
-          <Route path="/certificado/:id" element={<CertificadoDigital />} />
-          <Route path="/verificar/:folio/:codigo" element={<VerificarCertificado />} />
+          <Route 
+            path="/login" 
+            element={
+              <Suspense fallback={<LoadingSpinner fullScreen size="xl" variant="montessori" message="Cargando..." />}>
+                <Login />
+              </Suspense>
+            } 
+          />
+          <Route 
+            path="/inscripcion" 
+            element={
+              <Suspense fallback={<LoadingSpinner fullScreen size="xl" variant="montessori" message="Cargando..." />}>
+                <Inscripcion />
+              </Suspense>
+            } 
+          />
+          <Route 
+            path="/public/alumno/:id" 
+            element={
+              <Suspense fallback={<LoadingSpinner fullScreen size="xl" variant="montessori" message="Cargando..." />}>
+                <PublicProfile />
+              </Suspense>
+            } 
+          />
+          <Route 
+            path="/certificado/:id" 
+            element={
+              <Suspense fallback={<LoadingSpinner fullScreen size="xl" variant="montessori" message="Cargando..." />}>
+                <CertificadoDigital />
+              </Suspense>
+            } 
+          />
+          <Route 
+            path="/verificar/:folio/:codigo" 
+            element={
+              <Suspense fallback={<LoadingSpinner fullScreen size="xl" variant="montessori" message="Cargando..." />}>
+                <VerificarCertificado />
+              </Suspense>
+            } 
+          />
           
           {/* Rutas protegidas - Admin */}
           <Route
@@ -93,7 +128,9 @@ function App() {
             element={
               <AdminRoute>
                 <AdminLayout>
-                  <AdminDashboard />
+                  <Suspense fallback={<LoadingSpinner fullScreen size="xl" variant="montessori" message="Cargando..." />}>
+                    <AdminDashboard />
+                  </Suspense>
                 </AdminLayout>
               </AdminRoute>
             }
@@ -103,7 +140,9 @@ function App() {
             element={
               <AdminRoute>
                 <AdminLayout>
-                  <AlumnoDetail />
+                  <Suspense fallback={<LoadingSpinner fullScreen size="xl" variant="montessori" message="Cargando..." />}>
+                    <AlumnoDetail />
+                  </Suspense>
                 </AdminLayout>
               </AdminRoute>
             }
@@ -113,7 +152,9 @@ function App() {
             element={
               <AdminRoute>
                 <AdminLayout>
-                  <Inscripciones />
+                  <Suspense fallback={<LoadingSpinner fullScreen size="xl" variant="montessori" message="Cargando..." />}>
+                    <Inscripciones />
+                  </Suspense>
                 </AdminLayout>
               </AdminRoute>
             }
@@ -123,7 +164,9 @@ function App() {
             element={
               <AdminRoute>
                 <AdminLayout>
-                  <CrearUsuario />
+                  <Suspense fallback={<LoadingSpinner fullScreen size="xl" variant="montessori" message="Cargando..." />}>
+                    <CrearUsuario />
+                  </Suspense>
                 </AdminLayout>
               </AdminRoute>
             }
@@ -133,7 +176,9 @@ function App() {
             element={
               <AdminRoute>
                 <AdminLayout>
-                  <RegenerarCodigos />
+                  <Suspense fallback={<LoadingSpinner fullScreen size="xl" variant="montessori" message="Cargando..." />}>
+                    <RegenerarCodigos />
+                  </Suspense>
                 </AdminLayout>
               </AdminRoute>
             }
@@ -143,7 +188,9 @@ function App() {
             element={
               <AdminRoute>
                 <AdminLayout>
-                  <GeneradorQR />
+                  <Suspense fallback={<LoadingSpinner fullScreen size="xl" variant="montessori" message="Cargando..." />}>
+                    <GeneradorQR />
+                  </Suspense>
                 </AdminLayout>
               </AdminRoute>
             }
@@ -153,7 +200,9 @@ function App() {
             element={
               <AdminRoute>
                 <AdminLayout>
-                  <DiagnosticoCodigos />
+                  <Suspense fallback={<LoadingSpinner fullScreen size="xl" variant="montessori" message="Cargando..." />}>
+                    <DiagnosticoCodigos />
+                  </Suspense>
                 </AdminLayout>
               </AdminRoute>
             }
@@ -163,7 +212,9 @@ function App() {
             element={
               <AdminRoute>
                 <AdminLayout>
-                  <GestionMaterias />
+                  <Suspense fallback={<LoadingSpinner fullScreen size="xl" variant="montessori" message="Cargando..." />}>
+                    <GestionMaterias />
+                  </Suspense>
                 </AdminLayout>
               </AdminRoute>
             }
@@ -173,7 +224,9 @@ function App() {
             element={
               <AdminRoute>
                 <AdminLayout>
-                  <GestionCalificaciones />
+                  <Suspense fallback={<LoadingSpinner fullScreen size="xl" variant="montessori" message="Cargando..." />}>
+                    <GestionCalificaciones />
+                  </Suspense>
                 </AdminLayout>
               </AdminRoute>
             }
@@ -183,7 +236,9 @@ function App() {
             element={
               <AdminRoute>
                 <AdminLayout>
-                  <GestionGraduacion />
+                  <Suspense fallback={<LoadingSpinner fullScreen size="xl" variant="montessori" message="Cargando..." />}>
+                    <GestionGraduacion />
+                  </Suspense>
                 </AdminLayout>
               </AdminRoute>
             }
@@ -205,7 +260,9 @@ function App() {
             element={
               <ProtectedRoute>
                 <Layout>
-                  <Expediente />
+                  <Suspense fallback={<LoadingSpinner fullScreen size="xl" variant="montessori" message="Cargando..." />}>
+                    <Expediente />
+                  </Suspense>
                 </Layout>
               </ProtectedRoute>
             }
@@ -215,7 +272,9 @@ function App() {
             element={
               <ProtectedRoute>
                 <Layout>
-                  <Calendario />
+                  <Suspense fallback={<LoadingSpinner fullScreen size="xl" variant="montessori" message="Cargando..." />}>
+                    <Calendario />
+                  </Suspense>
                 </Layout>
               </ProtectedRoute>
             }
@@ -225,7 +284,9 @@ function App() {
             element={
               <ProtectedRoute>
                 <Layout>
-                  <Calificaciones />
+                  <Suspense fallback={<LoadingSpinner fullScreen size="xl" variant="montessori" message="Cargando..." />}>
+                    <Calificaciones />
+                  </Suspense>
                 </Layout>
               </ProtectedRoute>
             }
@@ -235,7 +296,9 @@ function App() {
             element={
               <ProtectedRoute>
                 <Layout>
-                  <Graduacion />
+                  <Suspense fallback={<LoadingSpinner fullScreen size="xl" variant="montessori" message="Cargando..." />}>
+                    <Graduacion />
+                  </Suspense>
                 </Layout>
               </ProtectedRoute>
             }

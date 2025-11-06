@@ -31,45 +31,27 @@ export const AuthProvider = ({ children }) => {
         // Cargar datos adicionales del usuario desde Firestore
         try {
           // Primero intentar cargar como admin
-          console.log('🔍 Buscando admin con UID:', user.uid);
           const adminDoc = await getDoc(doc(db, 'admins', user.uid));
-          console.log('📄 Resultado de adminDoc.exists():', adminDoc.exists());
           
           if (adminDoc.exists()) {
             const adminData = adminDoc.data();
-            console.log('✅ Admin encontrado:', { 
-              uid: user.uid, 
-              docId: adminDoc.id,
-              data: adminData,
-              rolAsignado: 'admin'
-            });
             const userDataWithRole = { 
               id: adminDoc.id, 
               ...adminData, 
               rol: 'admin' 
             };
-            console.log('👤 userData final:', userDataWithRole);
             setUserData(userDataWithRole);
           } else {
-            console.log('❌ No es admin, buscando como alumno...');
             // Si no es admin, intentar como alumno
             const alumnoDoc = await getDoc(doc(db, 'alumnos', user.uid));
-            console.log('📄 Resultado de alumnoDoc.exists():', alumnoDoc.exists());
             
             if (alumnoDoc.exists()) {
               const alumnoData = alumnoDoc.data();
-              console.log('✅ Alumno encontrado:', { 
-                uid: user.uid, 
-                docId: alumnoDoc.id,
-                data: alumnoData,
-                rolAsignado: 'alumno'
-              });
               const userDataWithRole = { 
                 id: alumnoDoc.id, 
                 ...alumnoData, 
                 rol: 'alumno' 
               };
-              console.log('👤 userData final:', userDataWithRole);
               setUserData(userDataWithRole);
             } else {
               console.warn('⚠️ Usuario no encontrado en admins ni alumnos:', user.uid);

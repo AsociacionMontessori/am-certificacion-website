@@ -125,13 +125,11 @@ export const obtenerCertificado = async (alumnoId) => {
       // Guardar en Firestore
       try {
         await updateDoc(doc(db, 'alumnos', alumnoId), updateData);
-        console.log(`✅ Código de verificación guardado para alumno ${alumnoId}:`, codigoVerificacion);
       } catch (error) {
         console.error('❌ Error al guardar código de verificación:', error);
         // Intentar con setDoc como fallback
         try {
           await setDoc(doc(db, 'alumnos', alumnoId), updateData, { merge: true });
-          console.log(`✅ Código guardado con setDoc para alumno ${alumnoId}`);
         } catch (setDocError) {
           console.error('❌ Error al guardar con setDoc:', setDocError);
         }
@@ -169,10 +167,8 @@ export const verificarCertificado = async (folio, codigoVerificacion) => {
     const folioNormalizado = folio?.trim().toUpperCase();
     const codigoNormalizado = codigoVerificacion?.trim().toUpperCase();
     
-    console.log('🔍 Verificando certificado:', { folio: folioNormalizado, codigo: codigoNormalizado });
-    
     if (!folioNormalizado || !codigoNormalizado) {
-      console.error('❌ Parámetros inválidos');
+      console.error('❌ Parámetros inválidos en verificación de certificado');
       return { valido: false, error: 'Folio o código de verificación inválido' };
     }
 
@@ -182,13 +178,10 @@ export const verificarCertificado = async (folio, codigoVerificacion) => {
       where('folioCertificado', '==', folioNormalizado)
     );
     
-    console.log('📋 Ejecutando consulta por folio...');
     const querySnapshot = await getDocs(alumnosQuery);
     
-    console.log('📊 Resultados de consulta:', querySnapshot.size);
-    
     if (querySnapshot.empty) {
-      console.error('❌ No se encontró certificado con ese folio');
+      console.error('❌ No se encontró certificado con ese folio:', folioNormalizado);
       return { valido: false, error: 'No se encontró un certificado con ese folio' };
     }
 
@@ -197,23 +190,15 @@ export const verificarCertificado = async (folio, codigoVerificacion) => {
     const alumnoData = alumnoDoc.data();
     const codigoGuardado = alumnoData.codigoVerificacion?.trim().toUpperCase();
     
-    console.log('🔑 Comparando códigos:', {
-      guardado: codigoGuardado,
-      recibido: codigoNormalizado,
-      coinciden: codigoGuardado === codigoNormalizado
-    });
-    
     if (!codigoGuardado) {
       console.error('❌ El documento no tiene código de verificación guardado');
       return { valido: false, error: 'El certificado no tiene código de verificación. Contacte al administrador.' };
     }
     
     if (codigoGuardado !== codigoNormalizado) {
-      console.error('❌ Los códigos no coinciden');
+      console.error('❌ Los códigos no coinciden en verificación');
       return { valido: false, error: 'El código de verificación no coincide con el folio proporcionado' };
     }
-    
-    console.log('✅ Certificado verificado correctamente');
     return {
       valido: true,
       alumno: {

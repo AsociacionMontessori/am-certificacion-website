@@ -8,12 +8,14 @@ import {
   AcademicCapIcon,
   UserPlusIcon,
   Squares2X2Icon,
-  TableCellsIcon
+  TableCellsIcon,
+  SparklesIcon
 } from '@heroicons/react/24/outline';
 import { Link } from 'react-router-dom';
 
 const AdminDashboard = () => {
   const [alumnos, setAlumnos] = useState([]);
+  const [ultimoAlumnoId, setUltimoAlumnoId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [viewMode, setViewMode] = useState(() => {
@@ -36,6 +38,26 @@ const AdminDashboard = () => {
           ...doc.data()
         }));
         setAlumnos(alumnosData);
+
+        // Determinar el último alumno agregado por fechaCreacion
+        let latest = null;
+        for (const a of alumnosData) {
+          const fc = a?.fechaCreacion;
+          let date;
+          if (fc?.toDate) {
+            date = fc.toDate();
+          } else if (fc?.seconds) {
+            date = new Date(fc.seconds * 1000);
+          } else if (fc instanceof Date) {
+            date = fc;
+          } else {
+            continue;
+          }
+          if (!latest || date > latest.date) {
+            latest = { id: a.id, date };
+          }
+        }
+        setUltimoAlumnoId(latest?.id || null);
       } catch (error) {
         console.error('Error al cargar alumnos:', error);
       }
@@ -45,15 +67,26 @@ const AdminDashboard = () => {
     loadAlumnos();
   }, []);
 
-  const filteredAlumnos = alumnos.filter(alumno => {
-    const search = searchTerm.toLowerCase();
-    return (
-      alumno.nombre?.toLowerCase().includes(search) ||
-      alumno.email?.toLowerCase().includes(search) ||
-      alumno.matricula?.toLowerCase().includes(search) ||
-      alumno.nivel?.toLowerCase().includes(search)
-    );
-  });
+  // Solo resaltar el último alumno agregado
+  const esUltimoAlumno = (alumno) => alumno?.id === ultimoAlumnoId;
+
+  const filteredAlumnos = alumnos
+    .filter(alumno => {
+      const search = searchTerm.toLowerCase();
+      return (
+        alumno.nombre?.toLowerCase().includes(search) ||
+        alumno.email?.toLowerCase().includes(search) ||
+        alumno.matricula?.toLowerCase().includes(search) ||
+        alumno.nivel?.toLowerCase().includes(search)
+      );
+    })
+    .sort((a, b) => {
+      // El último alumno agregado siempre va primero
+      if (a.id === ultimoAlumnoId) return -1;
+      if (b.id === ultimoAlumnoId) return 1;
+      // El resto se mantiene en orden alfabético
+      return (a.nombre || '').localeCompare(b.nombre || '');
+    });
 
   const stats = {
     total: alumnos.length,
@@ -195,10 +228,20 @@ const AdminDashboard = () => {
               </tr>
             </thead>
             <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-              {filteredAlumnos.map((alumno) => (
-                <tr key={alumno.id} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+              {filteredAlumnos.map((alumno) => {
+                const esReciente = esUltimoAlumno(alumno);
+                return (
+                <tr key={alumno.id} className={`hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors ${esReciente ? 'bg-yellow/5 dark:bg-yellow/10' : ''}`}>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
-                    {alumno.nombre || 'N/A'}
+                    <div className="flex items-center gap-2">
+                      {alumno.nombre || 'N/A'}
+                      {esReciente && (
+                        <SparklesIcon 
+                          className="w-5 h-5 text-yellow animate-pulse" 
+                          title="Último alumno agregado"
+                        />
+                      )}
+                    </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                     {alumno.matricula || 'N/A'}
@@ -236,7 +279,8 @@ const AdminDashboard = () => {
                     </Link>
                   </td>
                 </tr>
-              ))}
+              );
+              })}
             </tbody>
           </table>
         </div>
@@ -245,19 +289,27 @@ const AdminDashboard = () => {
         <div className={`${viewMode === 'table' ? 'hidden' : viewMode === 'auto' ? 'block lg:hidden' : 'block'} ${
           viewMode === 'cards' ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 p-4 sm:p-6' : 'divide-y divide-gray-200 dark:divide-gray-700'
         }`}>
-          {filteredAlumnos.map((alumno) => (
+          {filteredAlumnos.map((alumno) => {
+            const esReciente = esUltimoAlumno(alumno);
+            return (
             <div 
               key={alumno.id} 
               className={`${
                 viewMode === 'cards' 
-                  ? 'bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4 sm:p-5 hover:shadow-md transition-all duration-200 border border-gray-200 dark:border-gray-600' 
-                  : 'p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors'
+                  ? `bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4 sm:p-5 hover:shadow-md transition-all duration-200 border ${esReciente ? 'border-yellow/50 dark:border-yellow/30 bg-yellow/5 dark:bg-yellow/10' : 'border-gray-200 dark:border-gray-600'}` 
+                  : `p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors ${esReciente ? 'bg-yellow/5 dark:bg-yellow/10' : ''}`
               }`}
             >
               <div className="flex items-start justify-between mb-3">
                 <div className="flex-1 min-w-0">
-                  <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-1 truncate">
+                  <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-1 truncate flex items-center gap-2">
                     {alumno.nombre || 'N/A'}
+                    {esReciente && (
+                      <SparklesIcon 
+                        className="w-5 h-5 text-yellow animate-pulse flex-shrink-0" 
+                        title="Último alumno agregado"
+                      />
+                    )}
                   </h3>
                   <p className="text-sm text-gray-500 dark:text-gray-400 truncate">{alumno.email || 'N/A'}</p>
                 </div>
@@ -301,7 +353,8 @@ const AdminDashboard = () => {
                 </Link>
               </div>
             </div>
-          ))}
+          );
+          })}
         </div>
 
         {filteredAlumnos.length === 0 && (

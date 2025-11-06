@@ -14,17 +14,10 @@ const VerificarCertificado = () => {
         try {
           // Normalizar el código (mayúsculas y sin espacios)
           const codigoNormalizado = codigo.toUpperCase().trim();
-          console.log('🔍 Iniciando verificación desde componente:', { folio, codigo: codigoNormalizado });
           const resultado = await verificarCertificado(folio, codigoNormalizado);
-          console.log('📊 Resultado de verificación:', resultado);
           setResultado(resultado);
         } catch (error) {
-          console.error('❌ Error al verificar:', error);
-          console.error('Detalles del error:', {
-            code: error.code,
-            message: error.message,
-            stack: error.stack
-          });
+          console.error('❌ Error al verificar certificado:', error);
           setResultado({ 
             valido: false, 
             error: error.message || 'Error al verificar el certificado',
