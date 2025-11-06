@@ -154,6 +154,18 @@ const PublicProfile = () => {
     );
   }
 
+  // Bloqueo para alumno inactivo en vista pública
+  if (alumno?.estado === 'Inactivo') {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-red/10">
+        <div className="bg-white rounded-xl shadow p-6 border border-red/30 max-w-md text-center">
+          <h1 className="text-xl font-semibold text-red mb-2">Usuario inactivo</h1>
+          <p className="text-gray-700">El perfil público no está disponible porque la cuenta se encuentra inactiva.</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <>
       <style>{`

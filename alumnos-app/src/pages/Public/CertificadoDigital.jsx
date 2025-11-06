@@ -34,6 +34,18 @@ const CertificadoDigital = () => {
     );
   }
 
+  // Capa adicional: si el alumno está inactivo, bloquear visualización
+  if (certificado?.alumno?.estado === 'Inactivo') {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-red/10">
+        <div className="bg-white rounded-xl shadow p-6 border border-red/30 max-w-md text-center">
+          <h1 className="text-xl font-semibold text-red mb-2">Usuario inactivo</h1>
+          <p className="text-gray-700">La constancia/certificado no está disponible porque la cuenta se encuentra inactiva.</p>
+        </div>
+      </div>
+    );
+  }
+
   if (!certificado) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">

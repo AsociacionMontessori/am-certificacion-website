@@ -351,7 +351,8 @@ const Dashboard = () => {
             </div>
           )}
 
-          {/* Enlaces Públicos */}
+          {/* Enlaces Públicos - Oculto si usuario inactivo */}
+          {userData?.estado !== 'Inactivo' && (
           <div className="bg-green/10 dark:bg-green/20 rounded-lg p-5 border border-green/20">
             <div className="flex items-center mb-4">
               <LinkIcon className="w-6 h-6 text-green mr-3" />
@@ -427,6 +428,7 @@ const Dashboard = () => {
               </div>
             </div>
           </div>
+          )}
         </div>
       </div>
 
