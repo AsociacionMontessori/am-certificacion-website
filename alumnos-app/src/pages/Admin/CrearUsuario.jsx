@@ -95,8 +95,10 @@ const CrearUsuario = () => {
 
       if (resultado.success) {
         setSuccess(true);
+        // Nota: El servicio cierra la sesión automáticamente para evitar que el admin quede logueado como el nuevo usuario
+        // Redirigir al login después de un breve delay para que el usuario vea el mensaje de éxito
         setTimeout(() => {
-          navigate('/admin');
+          navigate('/login');
         }, 2000);
       } else {
         setError(resultado.error || 'Error al crear el usuario');
@@ -115,11 +117,14 @@ const CrearUsuario = () => {
           <UserPlusIcon className="w-16 h-16 mx-auto mb-4" />
           <h2 className="text-2xl font-bold mb-2">¡Usuario creado exitosamente!</h2>
           <p className="mb-4">El alumno ha sido registrado correctamente.</p>
+          <p className="mb-4 text-sm opacity-90">
+            Por seguridad, tu sesión se ha cerrado. Serás redirigido al inicio de sesión.
+          </p>
           <Link
-            to="/admin"
+            to="/login"
             className="inline-block px-6 py-2 bg-white text-green rounded-lg hover:bg-gray-100 transition-colors"
           >
-            Volver al Panel
+            Ir al Inicio de Sesión
           </Link>
         </div>
       </div>

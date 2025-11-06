@@ -1,6 +1,7 @@
 import { 
   createUserWithEmailAndPassword,
-  updateProfile
+  updateProfile,
+  signOut
 } from 'firebase/auth';
 import { 
   doc, 
@@ -14,12 +15,19 @@ import { getMateriasPorNivel } from '../data/materiasPorNivel';
 
 /**
  * Crea un nuevo usuario en Firebase Authentication y su documento en Firestore
+ * Nota: Después de crear el usuario, Firebase automáticamente inicia sesión con el nuevo usuario.
+ * Este servicio cierra la sesión del nuevo usuario para que el admin no quede logueado como el nuevo usuario.
  */
 export const crearUsuarioAlumno = async (datosUsuario) => {
+  // Guardar el usuario actual (admin) antes de crear el nuevo usuario
+  const adminUserBefore = auth.currentUser;
+  const adminEmail = adminUserBefore?.email;
+
   try {
     const { email, password, nombre, ...datosAdicionales } = datosUsuario;
 
     // 1. Crear usuario en Firebase Authentication
+    // Nota: createUserWithEmailAndPassword automáticamente inicia sesión con el nuevo usuario
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
 
@@ -75,14 +83,28 @@ export const crearUsuarioAlumno = async (datosUsuario) => {
       }
     }
 
+    // 5. IMPORTANTE: Cerrar sesión del nuevo usuario creado
+    // Esto evita que el admin quede logueado como el nuevo usuario
+    // El admin necesitará volver a iniciar sesión manualmente
+    await signOut(auth);
+
     return {
       success: true,
       uid: user.uid,
       email: user.email,
-      message: 'Usuario creado exitosamente'
+      message: 'Usuario creado exitosamente',
+      adminEmail: adminEmail // Devolver el email del admin para referencia
     };
   } catch (error) {
     console.error('Error al crear usuario:', error);
+    // Si hay un error, intentar restaurar la sesión del admin si estaba logueado
+    if (adminUserBefore && auth.currentUser?.uid !== adminUserBefore.uid) {
+      try {
+        await signOut(auth);
+      } catch (signOutError) {
+        console.warn('Error al cerrar sesión después de error:', signOutError);
+      }
+    }
     return {
       success: false,
       error: error.message,
