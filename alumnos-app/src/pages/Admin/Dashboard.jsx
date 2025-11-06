@@ -12,6 +12,7 @@ import {
   SparklesIcon
 } from '@heroicons/react/24/outline';
 import { Link } from 'react-router-dom';
+import AlertasMateriasProximas from '../../components/AlertasMateriasProximas';
 
 const AdminDashboard = () => {
   const [alumnos, setAlumnos] = useState([]);
@@ -105,6 +106,9 @@ const AdminDashboard = () => {
 
   return (
     <div className="space-y-6 sm:space-y-8 animate-fade-in">
+      {/* Alertas de Materias Próximas */}
+      <AlertasMateriasProximas />
+
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
