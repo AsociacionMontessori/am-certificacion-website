@@ -4,6 +4,7 @@ import { collection, query, where, getDocs, getDoc, doc, updateDoc, deleteDoc, a
 import { db } from '../../config/firebase';
 import { getMateriasPorNivel } from '../../data/materiasPorNivel';
 import { ArrowLeftIcon, PlusIcon, PencilIcon, TrashIcon, ChartBarIcon } from '@heroicons/react/24/outline';
+import LoadingSpinner from '../../components/LoadingSpinner';
 
 const GestionCalificaciones = () => {
   const { id } = useParams();
@@ -134,9 +135,12 @@ const GestionCalificaciones = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue"></div>
-      </div>
+      <LoadingSpinner 
+        size="lg" 
+        variant="montessori"
+        message="Cargando calificaciones..."
+        className="h-64"
+      />
     );
   }
 

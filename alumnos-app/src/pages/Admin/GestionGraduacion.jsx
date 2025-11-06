@@ -3,12 +3,15 @@ import { useParams, Link } from 'react-router-dom';
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { ArrowLeftIcon, AcademicCapIcon, CheckCircleIcon, ClockIcon } from '@heroicons/react/24/outline';
+import LoadingSpinner from '../../components/LoadingSpinner';
+import LoadingButton from '../../components/LoadingButton';
 
 const GestionGraduacion = () => {
   const { id } = useParams();
   const [alumno, setAlumno] = useState(null);
   const [infoGraduacion, setInfoGraduacion] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState({
     materiasCompletadas: false,
     promedioMinimo: false,
@@ -50,6 +53,7 @@ const GestionGraduacion = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setSaving(true);
     try {
       const graduacionData = {
         alumnoId: id,
@@ -75,6 +79,8 @@ const GestionGraduacion = () => {
     } catch (error) {
       console.error('Error al guardar información de graduación:', error);
       alert('Error al guardar la información de graduación');
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -91,9 +97,12 @@ const GestionGraduacion = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue"></div>
-      </div>
+      <LoadingSpinner 
+        size="lg" 
+        variant="montessori"
+        message="Cargando información de graduación..."
+        className="h-64"
+      />
     );
   }
 
@@ -166,12 +175,14 @@ const GestionGraduacion = () => {
         </div>
 
         <div className="flex justify-end pt-4">
-          <button
+          <LoadingButton
             type="submit"
-            className="px-6 py-3 bg-blue text-white rounded-lg hover:bg-blue/90 font-semibold transition-colors"
+            isLoading={saving}
+            variant="primary"
+            size="lg"
           >
             Guardar Información
-          </button>
+          </LoadingButton>
         </div>
       </form>
     </div>

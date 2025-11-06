@@ -5,6 +5,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import AdminRoute from './components/AdminRoute';
 import Layout from './components/Layout';
 import AdminLayout from './components/AdminLayout';
+import LoadingSpinner from './components/LoadingSpinner';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Expediente from './pages/Expediente';
@@ -41,9 +42,12 @@ const DashboardRedirect = () => {
   if (loading) {
     console.log('⏳ DashboardRedirect - Esperando carga...');
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue"></div>
-      </div>
+      <LoadingSpinner 
+        fullScreen 
+        size="xl" 
+        variant="montessori"
+        message="Cargando información..."
+      />
     );
   }
   

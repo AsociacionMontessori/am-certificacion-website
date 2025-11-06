@@ -3,6 +3,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import { DocumentTextIcon, UserIcon, AcademicCapIcon, LinkIcon, ShareIcon, EyeIcon } from '@heroicons/react/24/outline';
+import LoadingSpinner from '../components/LoadingSpinner';
 
 const Expediente = () => {
   const { currentUser, userData } = useAuth();
@@ -29,9 +30,12 @@ const Expediente = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue"></div>
-      </div>
+      <LoadingSpinner 
+        size="lg" 
+        variant="montessori"
+        message="Cargando expediente..."
+        className="h-64"
+      />
     );
   }
 

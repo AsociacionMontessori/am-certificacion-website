@@ -4,6 +4,7 @@ import { collection, query, where, getDocs, getDoc, doc, updateDoc, deleteDoc, a
 import { db } from '../../config/firebase';
 import { getMateriasPorNivel } from '../../data/materiasPorNivel';
 import { ArrowLeftIcon, PlusIcon, PencilIcon, TrashIcon, CalendarIcon } from '@heroicons/react/24/outline';
+import LoadingSpinner from '../../components/LoadingSpinner';
 
 const GestionMaterias = () => {
   const { id } = useParams();
@@ -156,9 +157,12 @@ const GestionMaterias = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue"></div>
-      </div>
+      <LoadingSpinner 
+        size="lg" 
+        variant="montessori"
+        message="Cargando materias..."
+        className="h-64"
+      />
     );
   }
 

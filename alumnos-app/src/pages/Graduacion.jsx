@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import { AcademicCapIcon, CheckCircleIcon, ClockIcon, DocumentTextIcon } from '@heroicons/react/24/outline';
+import LoadingSpinner from '../components/LoadingSpinner';
 
 const Graduacion = () => {
   const { currentUser } = useAuth();
@@ -30,9 +31,12 @@ const Graduacion = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue"></div>
-      </div>
+      <LoadingSpinner 
+        size="lg" 
+        variant="montessori"
+        message="Cargando información de graduación..."
+        className="h-64"
+      />
     );
   }
 
