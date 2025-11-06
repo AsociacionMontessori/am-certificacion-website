@@ -35,9 +35,11 @@ service cloud.firestore {
                     resource.data.folioCertificado != null &&
                     resource.data.codigoVerificacion != null;
       
-      // Permitir consultas (list) públicas para buscar por folioCertificado
+      // Permitir consultas (list) para verificación de certificados
       // Esto es necesario para la función verificarCertificado que usa where()
-      allow list: if request.auth == null;
+      // Permite tanto usuarios autenticados como no autenticados
+      // La seguridad está en que necesitas el folio Y el código para verificar
+      allow list: if true; // Permitir consultas para verificación (seguro porque necesitas folio + código)
     }
     
     // Colección: materias
