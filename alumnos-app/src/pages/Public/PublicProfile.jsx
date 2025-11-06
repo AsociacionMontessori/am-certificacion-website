@@ -474,12 +474,12 @@ const PublicProfile = () => {
                                 <td className="px-2 sm:px-4 py-2">
                                   <span className={`inline-flex items-center px-1.5 sm:px-2 py-0.5 rounded-full text-xs font-medium whitespace-nowrap ${
                                     item.estado === 'Completada' 
-                                      ? 'bg-green text-gray-900'
+                                      ? 'bg-green text-gray-900 dark:text-white'
                                       : item.estado === 'En curso'
                                       ? 'bg-blue text-white'
                                       : item.estado === 'Con atraso'
                                       ? 'bg-red text-white'
-                                      : 'bg-gray-600 text-white'
+                                      : 'bg-gray-700 text-white'
                                   }`}>
                                     {item.estado}
                                   </span>
