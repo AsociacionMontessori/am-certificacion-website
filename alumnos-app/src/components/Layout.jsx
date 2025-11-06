@@ -30,9 +30,9 @@ const Layout = ({ children }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* Navbar */}
-      <nav className="shadow-sm border-b border-gray-100 dark:border-gray-700 sticky top-0 z-50 backdrop-blur-sm bg-white/95 dark:bg-gray-800/95">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-20 md:pb-0">
+      {/* Navbar Superior - Desktop */}
+      <nav className="hidden md:block shadow-sm border-b border-gray-100 dark:border-gray-700 sticky top-0 z-50 backdrop-blur-sm bg-white/95 dark:bg-gray-800/95">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16 sm:h-20">
             <div className="flex items-center flex-1">
@@ -99,27 +99,43 @@ const Layout = ({ children }) => {
             </div>
           </div>
         </div>
+      </nav>
 
-        {/* Mobile menu */}
-        <div className="md:hidden border-t border-gray-100 dark:border-gray-700">
-          <div className="px-2 pt-2 pb-3 space-y-1">
-            {navigation.map((item) => {
-              const isActive = location.pathname === item.href;
-              return (
-                <Link
-                  key={item.name}
-                  to={item.href}
-                  className={`${
-                    isActive
-                      ? 'bg-blue text-white shadow-sm'
-                      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
-                  } flex items-center px-4 py-3 rounded-lg text-base font-medium transition-all duration-200`}
-                >
-                  <item.icon className="w-5 h-5 mr-3" />
-                  {item.name}
-                </Link>
-              );
-            })}
+      {/* Navbar Superior - Mobile (solo logo y acciones) */}
+      <nav className="md:hidden shadow-sm border-b border-gray-100 dark:border-gray-700 sticky top-0 z-50 backdrop-blur-md bg-white/80 dark:bg-gray-800/80">
+        <div className="px-4">
+          <div className="flex justify-between items-center h-16">
+            <div className="flex items-center space-x-3">
+              <img 
+                src="/images/lasc.png" 
+                alt="Logo" 
+                className="h-8 w-8 object-contain"
+              />
+              <div>
+                <h1 className="text-sm font-bold text-blue leading-tight">Portal Alumnos</h1>
+                <p className="text-xs text-gray-500 dark:text-gray-400 leading-tight">Certificación Montessori</p>
+              </div>
+            </div>
+            <div className="flex items-center space-x-2">
+              <button
+                onClick={toggleTheme}
+                className="p-2 rounded-lg bg-white/50 dark:bg-gray-700/50 backdrop-blur-sm hover:bg-white/70 dark:hover:bg-gray-700/70 transition-colors"
+                aria-label="Cambiar tema"
+              >
+                {theme === 'dark' ? (
+                  <SunIcon className="w-5 h-5 text-yellow" />
+                ) : (
+                  <MoonIcon className="w-5 h-5 text-gray-700 dark:text-gray-300" />
+                )}
+              </button>
+              <button
+                onClick={handleLogout}
+                className="p-2 rounded-lg bg-white/50 dark:bg-gray-700/50 backdrop-blur-sm hover:bg-red/20 dark:hover:bg-red/20 transition-colors"
+                aria-label="Salir"
+              >
+                <ArrowRightOnRectangleIcon className="w-5 h-5 text-red" />
+              </button>
+            </div>
           </div>
         </div>
       </nav>
@@ -128,9 +144,40 @@ const Layout = ({ children }) => {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 animate-fade-in">
         {children}
       </main>
+
+      {/* Bottom Navigation - Mobile (Glassmorphism Style) */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50">
+        <div className="backdrop-blur-xl bg-white/70 dark:bg-gray-800/70 border-t border-white/20 dark:border-gray-700/50 shadow-[0_-4px_20px_rgba(0,0,0,0.1)] dark:shadow-[0_-4px_20px_rgba(0,0,0,0.3)]">
+          <div className="px-2 py-2">
+            <div className="flex justify-around items-center">
+              {navigation.map((item) => {
+                const isActive = location.pathname === item.href;
+                return (
+                  <Link
+                    key={item.name}
+                    to={item.href}
+                    className={`relative flex flex-col items-center justify-center w-16 h-16 rounded-2xl transition-all duration-300 ${
+                      isActive
+                        ? 'bg-blue/20 dark:bg-blue/30 text-blue scale-110'
+                        : 'text-gray-600 dark:text-gray-400 hover:text-blue dark:hover:text-blue-300'
+                    }`}
+                  >
+                    {isActive && (
+                      <div className="absolute -top-1 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-blue rounded-full"></div>
+                    )}
+                    <item.icon className={`w-6 h-6 ${isActive ? 'scale-110' : ''} transition-transform duration-300`} />
+                    <span className="text-[10px] font-medium mt-0.5 leading-tight text-center">
+                      {item.name.split(' ')[0]}
+                    </span>
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      </nav>
     </div>
   );
 };
 
 export default Layout;
-
