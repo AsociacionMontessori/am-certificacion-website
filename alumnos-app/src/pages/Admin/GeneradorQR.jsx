@@ -237,7 +237,7 @@ const GeneradorQR = () => {
               <div className="flex flex-col sm:flex-row gap-3">
                 <button
                   onClick={handleDescargarQR}
-                  className="flex-1 inline-flex items-center justify-center px-4 py-2 bg-green text-gray-900 rounded-lg hover:bg-green/90 transition-colors"
+                  className="flex-1 inline-flex items-center justify-center px-4 py-2 bg-green text-gray-900 dark:text-white rounded-lg hover:bg-green/90 transition-colors"
                 >
                   <ArrowDownTrayIcon className="w-5 h-5 mr-2" />
                   Descargar QR

@@ -149,7 +149,7 @@ const Expediente = () => {
                 <dd className="text-sm text-gray-900 dark:text-white mt-1">
                   <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                     expediente.estado === 'Activo' 
-                      ? 'bg-green text-gray-900' 
+                      ? 'bg-green text-gray-900 dark:text-white' 
                       : 'bg-gray-700 text-white'
                   }`}>
                     {expediente.estado}
@@ -200,7 +200,7 @@ const Expediente = () => {
                         alert('URL copiada al portapapeles');
                       });
                     }}
-                    className="inline-flex items-center justify-center px-3 sm:px-4 py-2 bg-green text-gray-900 rounded-lg hover:bg-green/90 transition-colors text-sm whitespace-nowrap"
+                    className="inline-flex items-center justify-center px-3 sm:px-4 py-2 bg-green text-gray-900 dark:text-white rounded-lg hover:bg-green/90 transition-colors text-sm whitespace-nowrap"
                   >
                     <ShareIcon className="w-4 h-4 mr-1" />
                     Compartir
@@ -226,7 +226,7 @@ const Expediente = () => {
                     href={`/certificado/${currentUser?.uid}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center px-3 sm:px-4 py-2 bg-green text-gray-900 rounded-lg hover:bg-green/90 transition-colors text-sm whitespace-nowrap"
+                    className="inline-flex items-center justify-center px-3 sm:px-4 py-2 bg-green text-gray-900 dark:text-white rounded-lg hover:bg-green/90 transition-colors text-sm whitespace-nowrap"
                   >
                     <EyeIcon className="w-4 h-4 mr-1" />
                     Ver
@@ -238,7 +238,7 @@ const Expediente = () => {
                         alert('URL copiada al portapapeles');
                       });
                     }}
-                    className="inline-flex items-center justify-center px-3 sm:px-4 py-2 bg-green text-gray-900 rounded-lg hover:bg-green/90 transition-colors text-sm whitespace-nowrap"
+                    className="inline-flex items-center justify-center px-3 sm:px-4 py-2 bg-green text-gray-900 dark:text-white rounded-lg hover:bg-green/90 transition-colors text-sm whitespace-nowrap"
                   >
                     <ShareIcon className="w-4 h-4 mr-1" />
                     Compartir

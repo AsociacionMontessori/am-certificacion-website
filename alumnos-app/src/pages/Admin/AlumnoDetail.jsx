@@ -419,7 +419,7 @@ const AlumnoDetail = () => {
                 <dd className="mt-1">
                   <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                     alumno.estado === 'Activo' 
-                      ? 'bg-green text-gray-900'
+                      ? 'bg-green text-gray-900 dark:text-white'
                       : alumno.estado === 'Graduado'
                       ? 'bg-yellow text-gray-900 dark:text-white'
                       : 'bg-gray-700 text-white'
@@ -588,7 +588,7 @@ const AlumnoDetail = () => {
               <Link
                 to={`/certificado/${alumno.id}`}
                 target="_blank"
-                className="px-4 py-2 bg-green text-gray-900 rounded-lg hover:bg-green/90 transition-colors text-sm whitespace-nowrap sm:flex-shrink-0"
+                className="px-4 py-2 bg-green text-gray-900 dark:text-white rounded-lg hover:bg-green/90 transition-colors text-sm whitespace-nowrap sm:flex-shrink-0"
               >
                 Ver Certificado
               </Link>

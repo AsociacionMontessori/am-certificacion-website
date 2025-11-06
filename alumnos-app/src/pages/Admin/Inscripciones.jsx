@@ -48,7 +48,7 @@ const Inscripciones = () => {
       case 'Pendiente':
         return 'bg-yellow text-white';
       case 'Aprobada':
-        return 'bg-green text-gray-900';
+        return 'bg-green text-gray-900 dark:text-white';
       case 'Rechazada':
         return 'bg-red text-white';
       default:

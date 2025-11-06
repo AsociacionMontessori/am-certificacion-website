@@ -159,7 +159,7 @@ const Layout = ({ children }) => {
               href={`https://api.whatsapp.com/send?phone=5215548885013&text=${encodeURIComponent(`Hola, soy ${userData?.nombre || 'Alumno'} del nivel ${userData?.nivel || ''} mi cuenta está inactiva, necesito ayuda`)}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center px-3 py-2 bg-green text-gray-900 rounded-lg text-sm hover:bg-green/90 transition-colors"
+              className="inline-flex items-center px-3 py-2 bg-green text-gray-900 dark:text-white rounded-lg text-sm hover:bg-green/90 transition-colors"
             >
               Contactar por WhatsApp
             </a>

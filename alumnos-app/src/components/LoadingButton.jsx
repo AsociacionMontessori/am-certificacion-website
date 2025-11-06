@@ -17,7 +17,7 @@ const LoadingButton = ({
     primary: 'bg-blue text-white hover:bg-blue/90 focus:ring-blue',
     secondary: 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white hover:bg-gray-300 dark:hover:bg-gray-600',
     danger: 'bg-red text-white hover:bg-red/90 focus:ring-red',
-    success: 'bg-green text-gray-900 hover:bg-green/90 focus:ring-green'
+    success: 'bg-green text-gray-900 dark:text-white hover:bg-green/90 focus:ring-green'
   };
 
   const sizeClasses = {

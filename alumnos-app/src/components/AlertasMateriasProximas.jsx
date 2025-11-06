@@ -190,7 +190,7 @@ const AlertasMateriasProximas = () => {
           disabled={enviandoEmail || emailEnviado}
           className={`inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
             emailEnviado
-              ? 'bg-green text-gray-900 cursor-not-allowed'
+              ? 'bg-green text-gray-900 dark:text-white cursor-not-allowed'
               : enviandoEmail
               ? 'bg-gray-400 text-white cursor-not-allowed'
               : 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600'
