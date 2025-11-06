@@ -10,6 +10,7 @@ const PublicProfile = () => {
   const { id } = useParams();
   const [alumno, setAlumno] = useState(null);
   const [materias, setMaterias] = useState([]);
+  const [calificaciones, setCalificaciones] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -50,6 +51,25 @@ const PublicProfile = () => {
             ...doc.data()
           }));
           setMaterias(materiasData);
+        }
+        // Cargar calificaciones públicas del alumno
+        try {
+          const calificacionesQuery = query(
+            collection(db, 'calificaciones'),
+            where('alumnoId', '==', id)
+          );
+          const califsSnap = await getDocs(calificacionesQuery);
+          const califsData = califsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+          // Ordenar: período desc, materia asc
+          califsData.sort((a, b) => {
+            if (a.periodo !== b.periodo) {
+              return (b.periodo || '').localeCompare(a.periodo || '');
+            }
+            return (a.materia || '').localeCompare(b.materia || '');
+          });
+          setCalificaciones(califsData);
+        } catch (e) {
+          // si no hay colección o permisos, simplemente no mostrar
         }
       } catch (error) {
         console.error('Error al cargar alumno:', error);
@@ -536,6 +556,33 @@ const PublicProfile = () => {
                 </div>
               </div>
             </div>
+
+            {/* Calificaciones (público) */}
+            {calificaciones.length > 0 && (
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8">
+                <div className="flex items-center mb-4">
+                  <DocumentTextIcon className="w-6 h-6 text-yellow mr-2" />
+                  <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                    Calificaciones
+                  </h2>
+                </div>
+                <div className="space-y-3">
+                  {calificaciones.map((c) => (
+                    <div key={c.id} className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 border border-gray-200 dark:border-gray-600">
+                      <div className="flex items-center justify-between">
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm text-gray-500 dark:text-gray-400 truncate">{c.periodo || 'Período'}</p>
+                          <h3 className="text-base font-semibold text-gray-900 dark:text-white truncate">{c.materia || 'Materia'}</h3>
+                        </div>
+                        <div className="ml-4">
+                          <span className="text-xl font-bold text-gray-900 dark:text-white">{c.calificacion ?? 'N/A'}</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Información Académica */}

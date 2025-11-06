@@ -77,7 +77,7 @@ const Dashboard = () => {
       {/* Header */}
       <div className="space-y-2">
         <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white">
-          Bienvenido, {userData?.nombre || 'Alumno'}
+          Hola, {userData?.nombre || 'Alumno'}
         </h1>
         <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">
           Portal Alumnos de Certificación Montessori - Asociación Montessori de México A.C.
