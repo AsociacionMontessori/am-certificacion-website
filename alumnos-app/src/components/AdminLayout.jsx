@@ -141,7 +141,9 @@ const AdminLayout = ({ children }) => {
 
       {/* Bottom Navigation - Mobile (Glassmorphism Style) */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50">
-        <div className="backdrop-blur-xl bg-white/70 dark:bg-gray-800/70 border-t border-white/20 dark:border-gray-700/50 shadow-[0_-4px_20px_rgba(0,0,0,0.1)] dark:shadow-[0_-4px_20px_rgba(0,0,0,0.3)]">
+        <div className="backdrop-blur-2xl bg-white/30 dark:bg-gray-900/30 border-t border-white/30 dark:border-white/10 shadow-[0_-8px_32px_rgba(0,0,0,0.12)] dark:shadow-[0_-8px_32px_rgba(0,0,0,0.5)]">
+          {/* Efecto de brillo sutil en el borde superior */}
+          <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/50 to-transparent"></div>
           <div className="px-2 py-2">
             <div className="flex justify-around items-center">
               {navigation.map((item) => {
@@ -152,12 +154,12 @@ const AdminLayout = ({ children }) => {
                     to={item.href}
                     className={`relative flex flex-col items-center justify-center w-16 h-16 rounded-2xl transition-all duration-300 ${
                       isActive
-                        ? 'bg-blue/20 dark:bg-blue/30 text-blue scale-110'
-                        : 'text-gray-600 dark:text-gray-400 hover:text-blue dark:hover:text-blue-300'
+                        ? 'bg-blue/20 dark:bg-blue/30 backdrop-blur-sm text-blue scale-110 shadow-lg shadow-blue/20'
+                        : 'text-gray-600 dark:text-gray-400 hover:text-blue dark:hover:text-blue-300 hover:bg-white/10 dark:hover:bg-white/5'
                     }`}
                   >
                     {isActive && (
-                      <div className="absolute -top-1 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-blue rounded-full"></div>
+                      <div className="absolute -top-1 left-1/2 transform -translate-x-1/2 w-1.5 h-1.5 bg-blue rounded-full shadow-lg shadow-blue/50"></div>
                     )}
                     <item.icon className={`w-6 h-6 ${isActive ? 'scale-110' : ''} transition-transform duration-300`} />
                     <span className="text-[10px] font-medium mt-0.5 leading-tight text-center">
