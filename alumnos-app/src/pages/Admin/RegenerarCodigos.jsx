@@ -196,7 +196,7 @@ const RegenerarCodigos = () => {
                               <td className="px-4 py-3 text-sm">
                                 <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                                   item.estado === 'actualizado' 
-                                    ? 'bg-green text-gray-900 dark:text-white'
+                                    ? 'bg-green text-gray-900'
                                     : item.estado === 'ya_correcto'
                                     ? 'bg-yellow text-gray-900 dark:text-white'
                                     : 'bg-red text-white'

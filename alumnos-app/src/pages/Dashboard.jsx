@@ -233,7 +233,7 @@ const Dashboard = () => {
               href="https://mail.google.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center justify-center w-full px-4 py-2.5 bg-green text-white rounded-lg hover:bg-green/90 font-medium transition-colors"
+              className="inline-flex items-center justify-center w-full px-4 py-2.5 bg-green text-gray-900 rounded-lg hover:bg-green/90 font-medium transition-colors"
             >
               Abrir Gmail
             </a>

@@ -420,7 +420,7 @@ const GestionMaterias = () => {
               setBulkPreview([]);
               setBulkError('');
             }}
-            className="inline-flex items-center justify-center px-4 py-2.5 sm:px-6 sm:py-3 text-sm sm:text-base font-semibold text-white bg-green rounded-lg shadow-sm hover:bg-green/90 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-green focus:ring-offset-2 transition-all duration-200"
+            className="inline-flex items-center justify-center px-4 py-2.5 sm:px-6 sm:py-3 text-sm sm:text-base font-semibold text-gray-900 bg-green rounded-lg shadow-sm hover:bg-green/90 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-green focus:ring-offset-2 transition-all duration-200"
           >
             <DocumentDuplicateIcon className="w-5 h-5 mr-2" />
             Agregar por Lotes
@@ -519,7 +519,7 @@ const GestionMaterias = () => {
                       <div className="mt-2">
                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                           materia.estado === 'Completada' 
-                            ? 'bg-green text-gray-900 dark:text-white'
+                            ? 'bg-green text-gray-900'
                             : materia.estado === 'En curso'
                             ? 'bg-blue text-white'
                             : materia.estado === 'Con atraso'

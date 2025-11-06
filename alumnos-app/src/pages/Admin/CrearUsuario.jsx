@@ -115,7 +115,7 @@ const CrearUsuario = () => {
   if (success) {
     return (
       <div className="px-4 py-6 sm:px-0">
-        <div className="bg-green text-white rounded-lg p-8 text-center">
+        <div className="bg-green text-gray-900 rounded-lg p-8 text-center">
           <UserPlusIcon className="w-16 h-16 mx-auto mb-4" />
           <h2 className="text-2xl font-bold mb-2">¡Usuario creado exitosamente!</h2>
           <p className="mb-4">El alumno ha sido registrado correctamente.</p>
