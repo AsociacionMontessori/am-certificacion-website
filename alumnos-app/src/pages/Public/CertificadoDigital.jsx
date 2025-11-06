@@ -221,7 +221,7 @@ const CertificadoDigital = () => {
         </div>
 
         {/* Botones de acción */}
-        <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-4">
+        <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
           <button
             onClick={() => window.print()}
             className="inline-flex items-center px-6 py-3 bg-blue text-white rounded-lg hover:bg-blue/90 transition-colors shadow-lg"

@@ -28,17 +28,25 @@ const GestionCalificaciones = () => {
           setAlumno({ id: alumnoDoc.id, ...alumnoDoc.data() });
         }
 
+        // Consulta simplificada: solo por alumnoId, ordenamos en el cliente
         const calificacionesQuery = query(
           collection(db, 'calificaciones'),
-          where('alumnoId', '==', id),
-          orderBy('periodo', 'desc'),
-          orderBy('materia', 'asc')
+          where('alumnoId', '==', id)
         );
         const calificacionesSnapshot = await getDocs(calificacionesQuery);
         const calificacionesData = calificacionesSnapshot.docs.map(doc => ({
           id: doc.id,
           ...doc.data()
         }));
+        
+        // Ordenar en el cliente: primero por período (desc), luego por materia (asc)
+        calificacionesData.sort((a, b) => {
+          if (a.periodo !== b.periodo) {
+            return (b.periodo || '').localeCompare(a.periodo || '');
+          }
+          return (a.materia || '').localeCompare(b.materia || '');
+        });
+        
         setCalificaciones(calificacionesData);
       } catch (error) {
         console.error('Error al cargar datos:', error);
@@ -76,15 +84,22 @@ const GestionCalificaciones = () => {
       // Recargar calificaciones
       const calificacionesQuery = query(
         collection(db, 'calificaciones'),
-        where('alumnoId', '==', id),
-        orderBy('periodo', 'desc'),
-        orderBy('materia', 'asc')
+        where('alumnoId', '==', id)
       );
       const calificacionesSnapshot = await getDocs(calificacionesQuery);
       const calificacionesData = calificacionesSnapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data()
       }));
+      
+      // Ordenar en el cliente
+      calificacionesData.sort((a, b) => {
+        if (a.periodo !== b.periodo) {
+          return (b.periodo || '').localeCompare(a.periodo || '');
+        }
+        return (a.materia || '').localeCompare(b.materia || '');
+      });
+      
       setCalificaciones(calificacionesData);
 
       setShowModal(false);

@@ -170,34 +170,36 @@ const Expediente = () => {
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Vista pública del perfil
             </label>
-            <div className="flex items-center space-x-2">
+            <div className="flex flex-col sm:flex-row gap-2">
               <input
                 type="text"
                 readOnly
                 value={`${window.location.origin}/public/alumno/${currentUser?.uid}`}
-                className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white text-sm"
+                className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white text-sm min-w-0"
               />
-              <a
-                href={`/public/alumno/${currentUser?.uid}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center px-4 py-2 bg-blue text-white rounded-lg hover:bg-blue/90 transition-colors text-sm"
-              >
-                <EyeIcon className="w-4 h-4 mr-1" />
-                Ver
-              </a>
-              <button
-                onClick={() => {
-                  const url = `${window.location.origin}/public/alumno/${currentUser?.uid}`;
-                  navigator.clipboard.writeText(url).then(() => {
-                    alert('URL copiada al portapapeles');
-                  });
-                }}
-                className="inline-flex items-center px-4 py-2 bg-green text-white rounded-lg hover:bg-green/90 transition-colors text-sm"
-              >
-                <ShareIcon className="w-4 h-4 mr-1" />
-                Compartir
-              </button>
+              <div className="flex gap-2 sm:flex-shrink-0">
+                <a
+                  href={`/public/alumno/${currentUser?.uid}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center px-3 sm:px-4 py-2 bg-blue text-white rounded-lg hover:bg-blue/90 transition-colors text-sm whitespace-nowrap"
+                >
+                  <EyeIcon className="w-4 h-4 mr-1" />
+                  Ver
+                </a>
+                <button
+                  onClick={() => {
+                    const url = `${window.location.origin}/public/alumno/${currentUser?.uid}`;
+                    navigator.clipboard.writeText(url).then(() => {
+                      alert('URL copiada al portapapeles');
+                    });
+                  }}
+                  className="inline-flex items-center justify-center px-3 sm:px-4 py-2 bg-green text-white rounded-lg hover:bg-green/90 transition-colors text-sm whitespace-nowrap"
+                >
+                  <ShareIcon className="w-4 h-4 mr-1" />
+                  Compartir
+                </button>
+              </div>
             </div>
           </div>
 
@@ -206,34 +208,36 @@ const Expediente = () => {
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Certificado digital / Constancia de estudios
             </label>
-            <div className="flex items-center space-x-2">
+            <div className="flex flex-col sm:flex-row gap-2">
               <input
                 type="text"
                 readOnly
                 value={`${window.location.origin}/certificado/${currentUser?.uid}`}
-                className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white text-sm"
+                className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white text-sm min-w-0"
               />
-              <a
-                href={`/certificado/${currentUser?.uid}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center px-4 py-2 bg-green text-white rounded-lg hover:bg-green/90 transition-colors text-sm"
-              >
-                <EyeIcon className="w-4 h-4 mr-1" />
-                Ver
-              </a>
-              <button
-                onClick={() => {
-                  const url = `${window.location.origin}/certificado/${currentUser?.uid}`;
-                  navigator.clipboard.writeText(url).then(() => {
-                    alert('URL copiada al portapapeles');
-                  });
-                }}
-                className="inline-flex items-center px-4 py-2 bg-green text-white rounded-lg hover:bg-green/90 transition-colors text-sm"
-              >
-                <ShareIcon className="w-4 h-4 mr-1" />
-                Compartir
-              </button>
+              <div className="flex gap-2 sm:flex-shrink-0">
+                <a
+                  href={`/certificado/${currentUser?.uid}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center px-3 sm:px-4 py-2 bg-green text-white rounded-lg hover:bg-green/90 transition-colors text-sm whitespace-nowrap"
+                >
+                  <EyeIcon className="w-4 h-4 mr-1" />
+                  Ver
+                </a>
+                <button
+                  onClick={() => {
+                    const url = `${window.location.origin}/certificado/${currentUser?.uid}`;
+                    navigator.clipboard.writeText(url).then(() => {
+                      alert('URL copiada al portapapeles');
+                    });
+                  }}
+                  className="inline-flex items-center justify-center px-3 sm:px-4 py-2 bg-green text-white rounded-lg hover:bg-green/90 transition-colors text-sm whitespace-nowrap"
+                >
+                  <ShareIcon className="w-4 h-4 mr-1" />
+                  Compartir
+                </button>
+              </div>
             </div>
           </div>
         </div>

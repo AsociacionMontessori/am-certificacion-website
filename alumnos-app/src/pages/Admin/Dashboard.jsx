@@ -97,7 +97,7 @@ const AdminDashboard = () => {
             style={{ animationDelay: `${index * 50}ms` }}
           >
             <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3 sm:space-x-4">
+              <div className="flex flex-wrap items-center gap-2 sm:gap-3 sm:gap-4">
                 <div className={`${stat.iconBg} p-3 rounded-xl`}>
                   <stat.icon className={`w-6 h-6 sm:w-8 sm:h-8 ${stat.iconColor}`} />
                 </div>
@@ -234,7 +234,7 @@ const AdminDashboard = () => {
                   </div>
                 )}
               </div>
-              <div className="flex space-x-3">
+              <div className="flex flex-wrap gap-2 sm:gap-3">
                 <Link
                   to={`/admin/alumno/${alumno.id}`}
                   className="inline-flex items-center justify-center px-3 py-1.5 text-sm font-semibold text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200"

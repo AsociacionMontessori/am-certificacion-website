@@ -13,17 +13,28 @@ const Calificaciones = () => {
     const loadCalificaciones = async () => {
       if (currentUser) {
         try {
+          // Consulta simplificada: solo por alumnoId, ordenamos en el cliente
+          // Esto evita la necesidad de un índice compuesto
           const calificacionesQuery = query(
             collection(db, 'calificaciones'),
-            where('alumnoId', '==', currentUser.uid),
-            orderBy('periodo', 'desc'),
-            orderBy('materia', 'asc')
+            where('alumnoId', '==', currentUser.uid)
           );
           const querySnapshot = await getDocs(calificacionesQuery);
           const calificacionesData = querySnapshot.docs.map(doc => ({
             id: doc.id,
             ...doc.data()
           }));
+          
+          // Ordenar en el cliente: primero por período (desc), luego por materia (asc)
+          calificacionesData.sort((a, b) => {
+            // Comparar períodos (descendente)
+            if (a.periodo !== b.periodo) {
+              return (b.periodo || '').localeCompare(a.periodo || '');
+            }
+            // Si el período es igual, ordenar por materia (ascendente)
+            return (a.materia || '').localeCompare(b.materia || '');
+          });
+          
           setCalificaciones(calificacionesData);
         } catch (error) {
           console.error('Error al cargar calificaciones:', error);

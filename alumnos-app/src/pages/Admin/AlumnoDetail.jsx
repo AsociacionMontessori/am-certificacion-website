@@ -189,17 +189,17 @@ const AlumnoDetail = () => {
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
               Vista pública del perfil:
             </p>
-            <div className="flex items-center space-x-4">
+            <div className="flex flex-col sm:flex-row gap-2">
               <input
                 type="text"
                 readOnly
                 value={`${window.location.origin}/public/alumno/${alumno.id}`}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white dark:border-gray-600 text-sm"
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white dark:border-gray-600 text-sm min-w-0"
               />
               <Link
                 to={`/public/alumno/${alumno.id}`}
                 target="_blank"
-                className="px-4 py-2 bg-blue text-white rounded-lg hover:bg-blue/90 transition-colors text-sm"
+                className="px-4 py-2 bg-blue text-white rounded-lg hover:bg-blue/90 transition-colors text-sm whitespace-nowrap sm:flex-shrink-0"
               >
                 Ver
               </Link>
@@ -211,17 +211,17 @@ const AlumnoDetail = () => {
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
               Certificado digital / Constancia de estudios:
             </p>
-            <div className="flex items-center space-x-4">
+            <div className="flex flex-col sm:flex-row gap-2">
               <input
                 type="text"
                 readOnly
                 value={`${window.location.origin}/certificado/${alumno.id}`}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white dark:border-gray-600 text-sm"
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white dark:border-gray-600 text-sm min-w-0"
               />
               <Link
                 to={`/certificado/${alumno.id}`}
                 target="_blank"
-                className="px-4 py-2 bg-green text-white rounded-lg hover:bg-green/90 transition-colors text-sm"
+                className="px-4 py-2 bg-green text-white rounded-lg hover:bg-green/90 transition-colors text-sm whitespace-nowrap sm:flex-shrink-0"
               >
                 Ver Certificado
               </Link>
