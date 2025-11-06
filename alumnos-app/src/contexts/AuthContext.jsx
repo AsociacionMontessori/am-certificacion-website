@@ -27,29 +27,60 @@ export const AuthProvider = ({ children }) => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
         setCurrentUser(user);
+        setLoading(true);
         // Cargar datos adicionales del usuario desde Firestore
         try {
           // Primero intentar cargar como admin
+          console.log('🔍 Buscando admin con UID:', user.uid);
           const adminDoc = await getDoc(doc(db, 'admins', user.uid));
+          console.log('📄 Resultado de adminDoc.exists():', adminDoc.exists());
+          
           if (adminDoc.exists()) {
-            setUserData({ 
-              id: adminDoc.id, 
-              ...adminDoc.data(), 
-              rol: 'admin' 
+            const adminData = adminDoc.data();
+            console.log('✅ Admin encontrado:', { 
+              uid: user.uid, 
+              docId: adminDoc.id,
+              data: adminData,
+              rolAsignado: 'admin'
             });
+            const userDataWithRole = { 
+              id: adminDoc.id, 
+              ...adminData, 
+              rol: 'admin' 
+            };
+            console.log('👤 userData final:', userDataWithRole);
+            setUserData(userDataWithRole);
           } else {
+            console.log('❌ No es admin, buscando como alumno...');
             // Si no es admin, intentar como alumno
             const alumnoDoc = await getDoc(doc(db, 'alumnos', user.uid));
+            console.log('📄 Resultado de alumnoDoc.exists():', alumnoDoc.exists());
+            
             if (alumnoDoc.exists()) {
-              setUserData({ 
-                id: alumnoDoc.id, 
-                ...alumnoDoc.data(), 
-                rol: 'alumno' 
+              const alumnoData = alumnoDoc.data();
+              console.log('✅ Alumno encontrado:', { 
+                uid: user.uid, 
+                docId: alumnoDoc.id,
+                data: alumnoData,
+                rolAsignado: 'alumno'
               });
+              const userDataWithRole = { 
+                id: alumnoDoc.id, 
+                ...alumnoData, 
+                rol: 'alumno' 
+              };
+              console.log('👤 userData final:', userDataWithRole);
+              setUserData(userDataWithRole);
+            } else {
+              console.warn('⚠️ Usuario no encontrado en admins ni alumnos:', user.uid);
+              console.warn('⚠️ Verifica que exista un documento en Firestore con ID =', user.uid);
+              // Si no existe en ninguna colección, no establecer userData
+              setUserData(null);
             }
           }
         } catch (error) {
-          console.error('Error al cargar datos del usuario:', error);
+          console.error('❌ Error al cargar datos del usuario:', error);
+          setUserData(null);
         }
       } else {
         setCurrentUser(null);

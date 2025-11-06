@@ -142,7 +142,7 @@ const CrearUsuario = () => {
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 space-y-6">
+      <form onSubmit={handleSubmit} className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 sm:p-8 space-y-6 sm:space-y-8">
         {error && (
           <div className="bg-red-light border border-red rounded-md p-3 text-red text-sm">
             {error}
@@ -165,7 +165,7 @@ const CrearUsuario = () => {
                 required
                 value={formData.nombre}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue focus:border-blue dark:bg-gray-700 dark:text-white dark:border-gray-600"
+                className="w-full px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue transition-all duration-200"
               />
             </div>
             <div>
@@ -178,7 +178,7 @@ const CrearUsuario = () => {
                 required
                 value={formData.email}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue focus:border-blue dark:bg-gray-700 dark:text-white dark:border-gray-600"
+                className="w-full px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue transition-all duration-200"
               />
             </div>
             <div>
@@ -199,7 +199,7 @@ const CrearUsuario = () => {
                 value={formData.password}
                 onChange={handleChange}
                 minLength={6}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue focus:border-blue dark:bg-gray-700 dark:text-white dark:border-gray-600"
+                className="w-full px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue transition-all duration-200"
               />
             </div>
             <div>
@@ -213,7 +213,7 @@ const CrearUsuario = () => {
                 value={formData.confirmPassword}
                 onChange={handleChange}
                 minLength={6}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue focus:border-blue dark:bg-gray-700 dark:text-white dark:border-gray-600"
+                className="w-full px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue transition-all duration-200"
               />
             </div>
           </div>
@@ -234,7 +234,7 @@ const CrearUsuario = () => {
                 name="matricula"
                 value={formData.matricula}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue focus:border-blue dark:bg-gray-700 dark:text-white dark:border-gray-600"
+                className="w-full px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue transition-all duration-200"
               />
             </div>
             <div>
@@ -246,7 +246,7 @@ const CrearUsuario = () => {
                 required
                 value={formData.programa}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue focus:border-blue dark:bg-gray-700 dark:text-white dark:border-gray-600"
+                className="w-full px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue transition-all duration-200"
               >
                 <option value="">Selecciona un programa</option>
                 <option value="Diplomado Guía Montessori">Diplomado Guía Montessori</option>
@@ -264,7 +264,7 @@ const CrearUsuario = () => {
                 value={formData.cohorte}
                 onChange={handleChange}
                 placeholder="Ej: 2024-1"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue focus:border-blue dark:bg-gray-700 dark:text-white dark:border-gray-600"
+                className="w-full px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue transition-all duration-200"
               />
             </div>
             <div>
@@ -275,7 +275,7 @@ const CrearUsuario = () => {
                 name="nivelEducativo"
                 value={formData.nivelEducativo}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue focus:border-blue dark:bg-gray-700 dark:text-white dark:border-gray-600"
+                className="w-full px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue transition-all duration-200"
               >
                 <option value="">Selecciona</option>
                 <option value="Licenciatura">Licenciatura</option>
@@ -293,7 +293,7 @@ const CrearUsuario = () => {
                 name="fechaIngreso"
                 value={formData.fechaIngreso}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue focus:border-blue dark:bg-gray-700 dark:text-white dark:border-gray-600"
+                className="w-full px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue transition-all duration-200"
               />
             </div>
             <div>
@@ -305,7 +305,7 @@ const CrearUsuario = () => {
                 required
                 value={formData.estado}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue focus:border-blue dark:bg-gray-700 dark:text-white dark:border-gray-600"
+                className="w-full px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue transition-all duration-200"
               >
                 <option value="Activo">Activo</option>
                 <option value="Inactivo">Inactivo</option>
@@ -330,7 +330,7 @@ const CrearUsuario = () => {
                 name="telefono"
                 value={formData.telefono}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue focus:border-blue dark:bg-gray-700 dark:text-white dark:border-gray-600"
+                className="w-full px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue transition-all duration-200"
               />
             </div>
             <div className="md:col-span-2">
@@ -342,7 +342,7 @@ const CrearUsuario = () => {
                 name="direccion"
                 value={formData.direccion}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue focus:border-blue dark:bg-gray-700 dark:text-white dark:border-gray-600"
+                className="w-full px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue transition-all duration-200"
               />
             </div>
             <div>
@@ -354,7 +354,7 @@ const CrearUsuario = () => {
                 name="ciudad"
                 value={formData.ciudad}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue focus:border-blue dark:bg-gray-700 dark:text-white dark:border-gray-600"
+                className="w-full px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue transition-all duration-200"
               />
             </div>
             <div>
@@ -366,7 +366,7 @@ const CrearUsuario = () => {
                 name="estadoDireccion"
                 value={formData.estadoDireccion}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue focus:border-blue dark:bg-gray-700 dark:text-white dark:border-gray-600"
+                className="w-full px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue transition-all duration-200"
               />
             </div>
             <div>
@@ -378,7 +378,7 @@ const CrearUsuario = () => {
                 name="codigoPostal"
                 value={formData.codigoPostal}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue focus:border-blue dark:bg-gray-700 dark:text-white dark:border-gray-600"
+                className="w-full px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue transition-all duration-200"
               />
             </div>
           </div>
@@ -424,7 +424,7 @@ const CrearUsuario = () => {
                 value={formData.nombrePublico}
                 onChange={handleChange}
                 placeholder="Dejar vacío para usar nombre completo"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue focus:border-blue dark:bg-gray-700 dark:text-white dark:border-gray-600"
+                className="w-full px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue transition-all duration-200"
               />
             </div>
           </div>

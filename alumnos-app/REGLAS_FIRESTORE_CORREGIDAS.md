@@ -1,6 +1,15 @@
-# 🔒 Reglas de Seguridad de Firestore
+# 🔒 Reglas de Firestore CORREGIDAS - Solución Inmediata
 
-## Reglas Completas para el Portal de Alumnos
+## ⚠️ Problema Actual
+Error: "Missing or insufficient permissions" al intentar leer el documento de admin.
+
+## ✅ Solución
+
+### Reglas Corregidas para Firestore
+
+Ve a: https://console.firebase.google.com/project/certificacionmontessori/firestore/rules
+
+**COPIA Y PEGA ESTAS REGLAS COMPLETAS:**
 
 ```javascript
 rules_version = '2';
@@ -19,10 +28,9 @@ service cloud.firestore {
     }
     
     // Colección: admins
-    // PERMITE que un usuario autenticado lea su propio documento de admin
+    // PERMITE que un usuario lea su propio documento de admin
     match /admins/{adminId} {
       // Cualquier usuario autenticado puede leer SU PROPIO documento
-      // Esto es necesario para que el sistema pueda verificar si es admin
       allow read: if request.auth != null && request.auth.uid == adminId;
       // Solo desde Admin SDK o consola
       allow write: if false;
@@ -32,9 +40,6 @@ service cloud.firestore {
     match /alumnos/{alumnoId} {
       // El alumno puede leer/editar su propio documento
       allow read, write: if isOwnAlumno(alumnoId) || isAdmin();
-      
-      // Permitir lectura pública de campos específicos (para vista pública)
-      // Esto se maneja mejor con una colección separada o campos específicos
     }
     
     // Colección: materias
@@ -44,8 +49,6 @@ service cloud.firestore {
                      resource.data.alumnoId == request.auth.uid;
       // Admin puede leer todas y escribir
       allow read, write: if isAdmin();
-      // Los alumnos no pueden escribir
-      allow write: if false;
     }
     
     // Colección: calificaciones
@@ -55,8 +58,6 @@ service cloud.firestore {
                      resource.data.alumnoId == request.auth.uid;
       // Admin puede leer todas y escribir
       allow read, write: if isAdmin();
-      // Los alumnos no pueden escribir
-      allow write: if false;
     }
     
     // Colección: graduacion
@@ -76,8 +77,6 @@ service cloud.firestore {
       // Los usuarios solo pueden leer sus propias inscripciones
       allow read: if request.auth != null && 
                      resource.data.email == request.auth.token.email;
-      // No se pueden eliminar inscripciones
-      allow delete: if false;
     }
     
     // Denegar acceso a todo lo demás por defecto
@@ -88,42 +87,37 @@ service cloud.firestore {
 }
 ```
 
-## 📋 Índices Necesarios en Firestore
+## 📋 Pasos para Aplicar
 
-### Colección: `materias`
-1. **Índice compuesto:**
-   - Campo 1: `alumnoId` (Ascending)
-   - Campo 2: `dia` (Ascending)
-   - Campo 3: `horaInicio` (Ascending)
+1. **Ve a Firestore Rules:**
+   https://console.firebase.google.com/project/certificacionmontessori/firestore/rules
 
-### Colección: `calificaciones`
-1. **Índice compuesto:**
-   - Campo 1: `alumnoId` (Ascending)
-   - Campo 2: `periodo` (Descending)
-   - Campo 3: `materia` (Ascending)
+2. **Elimina TODO el contenido actual** del editor de reglas
 
-### Colección: `inscripciones`
-1. **Índice compuesto:**
-   - Campo 1: `estado` (Ascending)
-   - Campo 2: `fechaInscripcion` (Descending)
+3. **Copia y pega** las reglas de arriba completas
 
-## 🔧 Cómo Aplicar las Reglas
+4. **Haz clic en "Publicar"** (botón azul arriba a la derecha)
 
-1. Ve a: https://console.firebase.google.com/project/certificacionmontessori/firestore/rules
-2. Copia y pega las reglas de arriba
-3. Haz clic en "Publicar"
+5. **Espera unos segundos** para que las reglas se propaguen
 
-## 📝 Notas Importantes
+6. **Recarga la página** en localhost y prueba de nuevo
 
-- Las reglas usan una función `isAdmin()` que verifica si existe un documento en la colección `admins` con el UID del usuario
-- Para crear un admin, debes crear manualmente un documento en la colección `admins` con el UID del usuario de Firebase Auth
-- Los índices se crean automáticamente cuando Firebase detecta que son necesarios, o puedes crearlos manualmente desde la consola
+## 🔍 Verificación
 
-## 🆘 Solución de Problemas
+Después de aplicar las reglas:
+- Recarga la página en localhost
+- Inicia sesión
+- Deberías ver en la consola: `✅ Admin encontrado:`
+- Deberías ser redirigido a `/admin`
 
-Si ves errores de "Missing or insufficient permissions":
-1. Verifica que el usuario esté autenticado
-2. Verifica que el usuario tenga el rol correcto (admin o alumno)
-3. Verifica que el documento en `admins` o `alumnos` exista con el UID correcto
-4. Revisa la consola de Firebase para ver qué regla está fallando
+## ⚠️ Nota Importante
+
+La regla clave es esta:
+```javascript
+match /admins/{adminId} {
+  allow read: if request.auth != null && request.auth.uid == adminId;
+}
+```
+
+Esto permite que **cualquier usuario autenticado pueda leer su propio documento** en la colección `admins` si el ID del documento coincide con su UID.
 

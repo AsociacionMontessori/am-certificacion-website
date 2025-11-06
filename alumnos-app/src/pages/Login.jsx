@@ -19,11 +19,10 @@ const Login = () => {
     const result = await login(email, password);
     
     if (result.success) {
-      // Esperar a que se carguen los datos del usuario
-      setTimeout(() => {
-        // La redirección se manejará en el componente según el rol
-        navigate('/');
-      }, 500);
+      // Esperar a que se carguen los datos del usuario desde Firestore
+      // El AuthContext cargará automáticamente el rol
+      // La redirección se manejará en DashboardRedirect según el rol
+      navigate('/');
     } else {
       setError(result.error || 'Error al iniciar sesión');
       setLoading(false);
@@ -48,7 +47,7 @@ const Login = () => {
             Asociación Montessori de México A.C.
           </p>
         </div>
-        <form className="mt-8 space-y-6 bg-white dark:bg-gray-800 rounded-lg shadow-xl p-8" onSubmit={handleSubmit}>
+        <form className="mt-8 space-y-6 bg-white rounded-lg shadow-xl p-8" onSubmit={handleSubmit}>
           {error && (
             <div className="bg-red-light border border-red rounded-md p-3 text-red text-sm">
               {error}
@@ -56,7 +55,7 @@ const Login = () => {
           )}
           <div className="space-y-4">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
                 Correo electrónico
               </label>
               <input
@@ -67,12 +66,12 @@ const Login = () => {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 placeholder-gray-400 dark:placeholder-gray-500 bg-white dark:bg-gray-700 !text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue focus:z-10 sm:text-sm"
+                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-400 bg-white !text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue focus:z-10 sm:text-sm"
                 placeholder="tu@email.com"
               />
             </div>
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
                 Contraseña
               </label>
               <input
@@ -83,7 +82,7 @@ const Login = () => {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 placeholder-gray-400 dark:placeholder-gray-500 bg-white dark:bg-gray-700 !text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue focus:z-10 sm:text-sm"
+                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-400 bg-white !text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue focus:z-10 sm:text-sm"
                 placeholder="••••••••"
               />
             </div>

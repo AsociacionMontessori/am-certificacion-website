@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { ThemeProvider } from './contexts/ThemeContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminRoute from './components/AdminRoute';
 import Layout from './components/Layout';
@@ -19,19 +20,53 @@ import PublicProfile from './pages/Public/PublicProfile';
 
 // Componente para redirigir según el rol
 const DashboardRedirect = () => {
-  const { userData } = useAuth();
+  const { userData, loading, currentUser } = useAuth();
   
-  if (userData?.rol === 'admin') {
+  console.log('🔄 DashboardRedirect - Estado:', { 
+    loading, 
+    hasUserData: !!userData, 
+    rol: userData?.rol,
+    userData
+  });
+  
+  // Esperar a que se carguen los datos del usuario
+  if (loading) {
+    console.log('⏳ DashboardRedirect - Esperando carga...');
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue"></div>
+      </div>
+    );
+  }
+  
+  // Si no hay usuario autenticado, no debería llegar aquí por ProtectedRoute
+  if (!currentUser) {
+    console.log('❌ DashboardRedirect - No hay usuario autenticado');
+    return <Navigate to="/login" replace />;
+  }
+  
+  // Si no hay userData, puede ser que el documento no existe
+  if (!userData) {
+    console.warn('⚠️ DashboardRedirect - No hay userData, mostrando dashboard de alumno por defecto');
+    return <Dashboard />;
+  }
+  
+  // Si el usuario es admin, redirigir al panel de administración
+  if (userData.rol === 'admin') {
+    console.log('✅ DashboardRedirect - Redirigiendo a /admin');
     return <Navigate to="/admin" replace />;
   }
   
+  // Si no es admin, mostrar dashboard de alumno
+  console.log('👤 DashboardRedirect - Mostrando dashboard de alumno');
   return <Dashboard />;
 };
 
 function App() {
   return (
-    <AuthProvider>
-      <Router>
+    <ThemeProvider>
+      <AuthProvider>
+        <Router>
         <Routes>
           {/* Rutas públicas */}
           <Route path="/login" element={<Login />} />
@@ -134,8 +169,9 @@ function App() {
           
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
-      </Router>
-    </AuthProvider>
+        </Router>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
 
