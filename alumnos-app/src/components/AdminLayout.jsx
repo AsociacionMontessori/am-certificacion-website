@@ -141,9 +141,9 @@ const AdminLayout = ({ children }) => {
 
       {/* Bottom Navigation - Mobile (Glassmorphism Style) */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50">
-        <div className="backdrop-blur-2xl bg-white/30 dark:bg-gray-900/30 border-t border-white/30 dark:border-white/10 shadow-[0_-8px_32px_rgba(0,0,0,0.12)] dark:shadow-[0_-8px_32px_rgba(0,0,0,0.5)]">
+        <div className="backdrop-blur-2xl bg-white/30 dark:bg-blue-950/40 border-t border-white/30 dark:border-blue-500/20 shadow-[0_-8px_32px_rgba(0,0,0,0.12)] dark:shadow-[0_-8px_32px_rgba(59,130,246,0.15)]">
           {/* Efecto de brillo sutil en el borde superior */}
-          <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/50 to-transparent"></div>
+          <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/50 to-transparent dark:via-blue-400/30"></div>
           <div className="px-2 py-2">
             <div className="flex justify-around items-center">
               {navigation.map((item) => {
