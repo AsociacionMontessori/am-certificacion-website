@@ -169,7 +169,10 @@ export const verificarCertificado = async (folio, codigoVerificacion) => {
     const folioNormalizado = folio?.trim().toUpperCase();
     const codigoNormalizado = codigoVerificacion?.trim().toUpperCase();
     
+    console.log('🔍 Verificando certificado:', { folio: folioNormalizado, codigo: codigoNormalizado });
+    
     if (!folioNormalizado || !codigoNormalizado) {
+      console.error('❌ Parámetros inválidos');
       return { valido: false, error: 'Folio o código de verificación inválido' };
     }
 
@@ -179,9 +182,13 @@ export const verificarCertificado = async (folio, codigoVerificacion) => {
       where('folioCertificado', '==', folioNormalizado)
     );
     
+    console.log('📋 Ejecutando consulta por folio...');
     const querySnapshot = await getDocs(alumnosQuery);
     
+    console.log('📊 Resultados de consulta:', querySnapshot.size);
+    
     if (querySnapshot.empty) {
+      console.error('❌ No se encontró certificado con ese folio');
       return { valido: false, error: 'No se encontró un certificado con ese folio' };
     }
 
@@ -190,10 +197,23 @@ export const verificarCertificado = async (folio, codigoVerificacion) => {
     const alumnoData = alumnoDoc.data();
     const codigoGuardado = alumnoData.codigoVerificacion?.trim().toUpperCase();
     
-    if (codigoGuardado !== codigoNormalizado) {
-      return { valido: false, error: 'El código de verificación no coincide' };
+    console.log('🔑 Comparando códigos:', {
+      guardado: codigoGuardado,
+      recibido: codigoNormalizado,
+      coinciden: codigoGuardado === codigoNormalizado
+    });
+    
+    if (!codigoGuardado) {
+      console.error('❌ El documento no tiene código de verificación guardado');
+      return { valido: false, error: 'El certificado no tiene código de verificación. Contacte al administrador.' };
     }
     
+    if (codigoGuardado !== codigoNormalizado) {
+      console.error('❌ Los códigos no coinciden');
+      return { valido: false, error: 'El código de verificación no coincide con el folio proporcionado' };
+    }
+    
+    console.log('✅ Certificado verificado correctamente');
     return {
       valido: true,
       alumno: {
@@ -206,8 +226,24 @@ export const verificarCertificado = async (folio, codigoVerificacion) => {
       }
     };
   } catch (error) {
-    console.error('Error al verificar certificado:', error);
-    return { valido: false, error: error.message };
+    console.error('❌ Error al verificar certificado:', error);
+    console.error('Detalles del error:', {
+      code: error.code,
+      message: error.message,
+      stack: error.stack
+    });
+    
+    // Proporcionar mensajes de error más específicos
+    let mensajeError = 'Error al verificar el certificado';
+    if (error.code === 'permission-denied') {
+      mensajeError = 'No tienes permisos para verificar este certificado. Por favor, contacta al administrador.';
+    } else if (error.code === 'unavailable') {
+      mensajeError = 'El servicio no está disponible en este momento. Por favor, intenta más tarde.';
+    } else {
+      mensajeError = error.message || 'Error desconocido al verificar el certificado';
+    }
+    
+    return { valido: false, error: mensajeError };
   }
 };
 
