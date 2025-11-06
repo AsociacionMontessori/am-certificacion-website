@@ -26,6 +26,10 @@ const Layout = ({ children }) => {
     { name: 'Graduación', href: '/graduacion', icon: AcademicCapIcon },
   ];
 
+  const filteredNavigation = userData?.estado === 'Inactivo'
+    ? navigation.filter((n) => n.name !== 'Graduación')
+    : navigation;
+
   const handleLogout = async () => {
     await logout();
   };
@@ -49,7 +53,7 @@ const Layout = ({ children }) => {
                 </div>
               </div>
               <div className="hidden md:ml-8 md:flex md:space-x-1">
-                {navigation.map((item) => {
+                {filteredNavigation.map((item) => {
                   const isActive = location.pathname === item.href;
                   return (
                     <Link
@@ -145,6 +149,22 @@ const Layout = ({ children }) => {
 
       {/* Main content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 pb-16 md:pb-8 animate-fade-in">
+        {userData?.estado === 'Inactivo' && (
+          <div className="mb-4 sm:mb-6 bg-red/10 dark:bg-red/20 border border-red/30 rounded-xl p-4 sm:p-5">
+            <h2 className="text-base sm:text-lg font-semibold text-red mb-1">Usuario inactivo</h2>
+            <p className="text-sm text-gray-700 dark:text-gray-200 mb-2">
+              Tu cuenta está inactiva. Contacta con administración para reactivarla.
+            </p>
+            <a
+              href={`https://api.whatsapp.com/send?phone=5215548885013&text=${encodeURIComponent(`Hola, soy ${userData?.nombre || 'Alumno'} del nivel ${userData?.nivel || ''} mi cuenta está inactiva, necesito ayuda`)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center px-3 py-2 bg-green text-white rounded-lg text-sm hover:bg-green/90 transition-colors"
+            >
+              Contactar por WhatsApp
+            </a>
+          </div>
+        )}
         {children}
       </main>
 
@@ -158,7 +178,7 @@ const Layout = ({ children }) => {
           <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/50 to-transparent"></div>
           <div className="px-2 py-1.5">
             <div className="flex justify-around items-center">
-              {navigation.map((item) => {
+              {filteredNavigation.map((item) => {
                 const isActive = location.pathname === item.href;
                 return (
                   <Link

@@ -8,7 +8,7 @@ import LoadingSpinner from '../components/LoadingSpinner';
 import { formatearFechaLarga } from '../utils/formatearFecha';
 
 const Graduacion = () => {
-  const { currentUser } = useAuth();
+  const { currentUser, userData } = useAuth();
   const [infoGraduacion, setInfoGraduacion] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -51,6 +51,23 @@ const Graduacion = () => {
 
   const completados = requisitos.filter(r => r.completado).length;
   const porcentaje = (completados / requisitos.length) * 100;
+
+  if (userData?.estado === 'Inactivo') {
+    return (
+      <div className="px-4 py-6 sm:px-0">
+        <div className="mb-6">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Información de Graduación</h1>
+          <p className="mt-2 text-gray-600 dark:text-gray-400">Progreso y requisitos para tu graduación</p>
+        </div>
+        <div className="bg-red/10 dark:bg-red/20 border border-red/30 rounded-xl p-5">
+          <h2 className="text-lg font-semibold text-red mb-1">Usuario inactivo</h2>
+          <p className="text-sm text-gray-700 dark:text-gray-200">
+            Tu cuenta está inactiva. Contacta con administración para reactivarla.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="px-4 py-6 sm:px-0">
