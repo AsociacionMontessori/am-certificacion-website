@@ -96,7 +96,7 @@ const AdminLayout = ({ children }) => {
       </nav>
 
       {/* Navbar Superior - Mobile (solo logo y acciones) */}
-      <nav className="md:hidden sticky top-0 z-50 backdrop-blur-lg bg-blue bg-opacity-70 dark:bg-opacity-50 border-b border-blue/30 shadow-lg shadow-[0_4px_32px_rgba(0,151,178,0.3)] dark:shadow-[0_4px_32px_rgba(0,151,178,0.2)]">
+      <nav className="md:hidden sticky top-0 z-50 backdrop-blur-lg bg-blue/70 dark:bg-blue/50 border-b border-blue/30 shadow-lg shadow-[0_4px_32px_rgba(0,151,178,0.3)] dark:shadow-[0_4px_32px_rgba(0,151,178,0.2)]">
         {/* Efecto de brillo sutil en el borde inferior */}
         <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/50 to-transparent"></div>
         <div className="px-4">
@@ -143,7 +143,7 @@ const AdminLayout = ({ children }) => {
 
       {/* Bottom Navigation - Mobile (Glassmorphism Style) */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50">
-        <div className="backdrop-blur-lg bg-blue bg-opacity-70 dark:bg-opacity-50 border-t border-blue/30 shadow-lg shadow-[0_-8px_32px_rgba(0,151,178,0.3)] dark:shadow-[0_-8px_32px_rgba(0,151,178,0.2)]">
+        <div className="backdrop-blur-lg bg-blue/70 dark:bg-blue/50 border-t border-blue/30 shadow-lg shadow-[0_-8px_32px_rgba(0,151,178,0.3)] dark:shadow-[0_-8px_32px_rgba(0,151,178,0.2)]">
           {/* Efecto de brillo sutil en el borde superior */}
           <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/50 to-transparent"></div>
           <div className="px-2 py-2">
