@@ -3,12 +3,20 @@ import {
   DocumentTextIcon, 
   CalendarIcon, 
   ChartBarIcon, 
-  AcademicCapIcon 
+  AcademicCapIcon,
+  BookOpenIcon,
+  EnvelopeIcon,
+  FolderIcon,
+  CalendarDaysIcon,
+  EyeIcon,
+  EyeSlashIcon
 } from '@heroicons/react/24/outline';
 import { Link } from 'react-router-dom';
+import { useState } from 'react';
 
 const Dashboard = () => {
   const { userData } = useAuth();
+  const [showPassword, setShowPassword] = useState(false);
 
   const cards = [
     {
@@ -75,24 +83,136 @@ const Dashboard = () => {
         ))}
       </div>
 
-      {/* Link a Inscripción */}
-      <div className="bg-gradient-to-r from-green to-green/90 rounded-xl shadow-sm border border-green/20 p-6 transition-all duration-300 hover:shadow-md">
-        <Link
-          to="/inscripcion"
-          className="flex items-center justify-between group"
-        >
-          <div className="flex-1">
-            <h3 className="text-lg font-semibold text-white mb-1">Completa tu Información</h3>
-            <p className="text-sm text-white/90">Asegúrate de tener todos tus datos actualizados</p>
-          </div>
-          <div className="ml-4 flex-shrink-0">
-            <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center group-hover:bg-white/30 transition-colors">
-              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
+      {/* Accesos Rápidos */}
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+        <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
+          Accesos Rápidos
+        </h2>
+        
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+          {/* Classroom */}
+          <div className="bg-blue/10 dark:bg-blue/20 rounded-lg p-5 border border-blue/20">
+            <div className="flex items-center mb-4">
+              <BookOpenIcon className="w-6 h-6 text-blue mr-3" />
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                Accede a tus clases
+              </h3>
             </div>
+            {userData?.mailClassroom && userData?.passwordClassroom ? (
+              <div className="space-y-3">
+                <div>
+                  <label className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1 block">
+                    Mail de Classroom
+                  </label>
+                  <div className="bg-white dark:bg-gray-700 rounded-lg p-3 border border-gray-200 dark:border-gray-600">
+                    <p className="text-sm text-gray-900 dark:text-white font-mono">
+                      {userData.mailClassroom}
+                    </p>
+                  </div>
+                </div>
+                <div>
+                  <label className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1 block">
+                    Contraseña de Classroom
+                  </label>
+                  <div className="relative">
+                    <div className="bg-white dark:bg-gray-700 rounded-lg p-3 border border-gray-200 dark:border-gray-600 flex items-center justify-between">
+                      <p className="text-sm text-gray-900 dark:text-white font-mono flex-1">
+                        {showPassword ? userData.passwordClassroom : '••••••••'}
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="ml-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
+                        aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                      >
+                        {showPassword ? (
+                          <EyeSlashIcon className="w-5 h-5" />
+                        ) : (
+                          <EyeIcon className="w-5 h-5" />
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <a
+                  href="https://classroom.google.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center w-full px-4 py-2.5 bg-blue text-white rounded-lg hover:bg-blue/90 font-medium transition-colors"
+                >
+                  Ir a Google Classroom
+                </a>
+              </div>
+            ) : (
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Las credenciales de Classroom estarán disponibles próximamente.
+              </p>
+            )}
           </div>
-        </Link>
+
+          {/* Correo Escolar */}
+          <div className="bg-green/10 dark:bg-green/20 rounded-lg p-5 border border-green/20">
+            <div className="flex items-center mb-4">
+              <EnvelopeIcon className="w-6 h-6 text-green mr-3" />
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                Ingresa a tu correo escolar
+              </h3>
+            </div>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+              Accede a tu correo institucional para recibir comunicaciones importantes.
+            </p>
+            <a
+              href="http://mail.certificacionmontessori.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center w-full px-4 py-2.5 bg-green text-white rounded-lg hover:bg-green/90 font-medium transition-colors"
+            >
+              Abrir Correo Escolar
+            </a>
+          </div>
+
+          {/* Drive */}
+          <div className="bg-yellow/10 dark:bg-yellow/20 rounded-lg p-5 border border-yellow/20">
+            <div className="flex items-center mb-4">
+              <FolderIcon className="w-6 h-6 text-yellow mr-3" />
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                Drive
+              </h3>
+            </div>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+              Gestiona tus documentos de clases y materiales académicos.
+            </p>
+            <a
+              href="https://drive.certificacionmontessori.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center w-full px-4 py-2.5 bg-yellow text-white rounded-lg hover:bg-yellow/90 font-medium transition-colors"
+            >
+              Abrir Google Drive
+            </a>
+          </div>
+
+          {/* Calendario */}
+          <div className="bg-orange/10 dark:bg-orange/20 rounded-lg p-5 border border-orange/20">
+            <div className="flex items-center mb-4">
+              <CalendarDaysIcon className="w-6 h-6 text-orange mr-3" />
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                Calendario
+              </h3>
+            </div>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+              Consulta eventos, fechas importantes y actividades académicas.
+            </p>
+            <a
+              href="https://calendario.certificacionmontessori.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center w-full px-4 py-2.5 bg-orange text-white rounded-lg hover:bg-orange/90 font-medium transition-colors"
+            >
+              Abrir Calendario
+            </a>
+          </div>
+        </div>
       </div>
 
       {/* Información rápida */}
