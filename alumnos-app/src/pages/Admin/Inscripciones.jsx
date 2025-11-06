@@ -79,32 +79,40 @@ const Inscripciones = () => {
       <div className="mb-6 flex flex-wrap gap-4">
         <button
           onClick={() => setFilter('todas')}
-          className={`px-4 py-2 rounded-lg ${
-            filter === 'todas' ? 'bg-blue text-white' : 'bg-gray-200 text-gray-700'
+          className={`px-4 py-2 rounded-lg transition-colors ${
+            filter === 'todas' 
+              ? 'bg-blue text-white' 
+              : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
           }`}
         >
           Todas
         </button>
         <button
           onClick={() => setFilter('Pendiente')}
-          className={`px-4 py-2 rounded-lg ${
-            filter === 'Pendiente' ? 'bg-blue text-white' : 'bg-gray-200 text-gray-700'
+          className={`px-4 py-2 rounded-lg transition-colors ${
+            filter === 'Pendiente' 
+              ? 'bg-blue text-white' 
+              : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
           }`}
         >
           Pendientes
         </button>
         <button
           onClick={() => setFilter('Aprobada')}
-          className={`px-4 py-2 rounded-lg ${
-            filter === 'Aprobada' ? 'bg-blue text-white' : 'bg-gray-200 text-gray-700'
+          className={`px-4 py-2 rounded-lg transition-colors ${
+            filter === 'Aprobada' 
+              ? 'bg-blue text-white' 
+              : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
           }`}
         >
           Aprobadas
         </button>
         <button
           onClick={() => setFilter('Rechazada')}
-          className={`px-4 py-2 rounded-lg ${
-            filter === 'Rechazada' ? 'bg-blue text-white' : 'bg-gray-200 text-gray-700'
+          className={`px-4 py-2 rounded-lg transition-colors ${
+            filter === 'Rechazada' 
+              ? 'bg-blue text-white' 
+              : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
           }`}
         >
           Rechazadas

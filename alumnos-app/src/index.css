@@ -34,10 +34,21 @@
     min-width: 320px;
     min-height: 100vh;
     background-color: #f9fafb;
+    color: #1f2937;
     transition: background-color 0.3s ease, color 0.3s ease;
   }
 
-  /* Mejoras de tipografía */
+  /* MODE OSCURO - Fondos base */
+  html.dark {
+    color-scheme: dark;
+  }
+
+  html.dark body {
+    background-color: #111827;
+    color: #f9fafb;
+  }
+
+  /* Tipografía */
   h1, h2, h3, h4, h5, h6 {
     font-weight: 700;
     line-height: 1.2;
@@ -87,6 +98,19 @@
 
   ::-webkit-scrollbar-thumb:hover {
     background: #94a3b8;
+  }
+
+  /* Scrollbar para modo oscuro */
+  html.dark ::-webkit-scrollbar-track {
+    background: #1f2937;
+  }
+
+  html.dark ::-webkit-scrollbar-thumb {
+    background: #4b5563;
+  }
+
+  html.dark ::-webkit-scrollbar-thumb:hover {
+    background: #6b7280;
   }
 }
 
@@ -140,6 +164,84 @@
     transform: translateY(0);
     opacity: 1;
   }
+}
+
+/* MODE OSCURO - Reglas específicas fuera de @layer para máxima prioridad */
+/* NAVBAR - Forzar modo oscuro */
+html.dark nav {
+  background-color: rgba(31, 41, 55, 0.95) !important;
+}
+
+html.dark nav[class*="backdrop-blur"] {
+  background-color: rgba(31, 41, 55, 0.95) !important;
+}
+
+/* Aplicar a elementos con bg-white/95 o dark:bg-gray-800/95 */
+html.dark [class*="bg-white/95"],
+html.dark [class*="dark:bg-gray-800/95"] {
+  background-color: rgba(31, 41, 55, 0.95) !important;
+}
+
+/* TARJETAS Y CONTENEDORES - Forzar modo oscuro cuando tienen bg-white */
+html.dark .bg-white {
+  background-color: #1f2937 !important;
+}
+
+/* Específicamente para tarjetas con rounded-xl o rounded-lg */
+html.dark .rounded-xl.bg-white,
+html.dark .rounded-lg.bg-white,
+html.dark .bg-white.rounded-xl,
+html.dark .bg-white.rounded-lg,
+html.dark div.bg-white.rounded-xl,
+html.dark div.bg-white.rounded-lg {
+  background-color: #1f2937 !important;
+}
+
+/* Tablas y tbody */
+html.dark table .bg-white,
+html.dark tbody.bg-white,
+html.dark thead.bg-gray-50 {
+  background-color: #1f2937 !important;
+}
+
+html.dark thead.bg-gray-50 {
+  background-color: #374151 !important;
+}
+
+/* Textos dentro de elementos con bg-white en modo oscuro */
+html.dark .bg-white .text-gray-900,
+html.dark .bg-white h1,
+html.dark .bg-white h2,
+html.dark .bg-white h3,
+html.dark .bg-white h4,
+html.dark .bg-white h5,
+html.dark .bg-white h6,
+html.dark .bg-white p {
+  color: #f9fafb !important;
+}
+
+html.dark .bg-white .text-gray-600,
+html.dark .bg-white .text-gray-500,
+html.dark .bg-white .text-gray-700,
+html.dark .bg-white .text-gray-800 {
+  color: #d1d5db !important;
+}
+
+html.dark .bg-white .text-gray-400 {
+  color: #9ca3af !important;
+}
+
+/* Asegurar que bg-gray-50, bg-gray-100, bg-gray-200 cambien en modo oscuro cuando no tienen dark: */
+html.dark .bg-gray-50:not([class*="dark:bg-"]) {
+  background-color: #111827 !important;
+}
+
+html.dark .bg-gray-100:not([class*="dark:bg-"]) {
+  background-color: #1f2937 !important;
+}
+
+html.dark .bg-gray-200:not([class*="dark:bg-"]) {
+  background-color: #374151 !important;
 }
 
 /* Mejoras para móvil */

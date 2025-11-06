@@ -70,7 +70,7 @@ const AdminDashboard = () => {
           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white">
             Panel de Administración
           </h1>
-          <p className="mt-1 sm:mt-2 text-sm sm:text-base text-gray-600 dark:text-gray-400">
+          <p className="mt-1 sm:mt-2 text-sm sm:text-base text-gray-600 dark:text-gray-300">
             Gestión de alumnos y certificaciones
           </p>
         </div>
@@ -86,10 +86,10 @@ const AdminDashboard = () => {
       {/* Estadísticas */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         {[
-          { label: 'Total Alumnos', value: stats.total, icon: UserGroupIcon, iconBg: 'bg-blue/10', iconColor: 'text-blue', valueColor: 'text-blue' },
-          { label: 'Activos', value: stats.activos, icon: AcademicCapIcon, iconBg: 'bg-green/10', iconColor: 'text-green', valueColor: 'text-green' },
-          { label: 'Graduados', value: stats.graduados, icon: DocumentTextIcon, iconBg: 'bg-yellow/10', iconColor: 'text-yellow', valueColor: 'text-yellow' },
-          { label: 'Inactivos', value: stats.inactivos, icon: UserGroupIcon, iconBg: 'bg-gray/10', iconColor: 'text-gray', valueColor: 'text-gray' },
+          { label: 'Total Alumnos', value: stats.total, icon: UserGroupIcon, iconBg: 'bg-blue/10 dark:bg-blue/20', iconColor: 'text-blue', valueColor: 'text-blue' },
+          { label: 'Activos', value: stats.activos, icon: AcademicCapIcon, iconBg: 'bg-green/10 dark:bg-green/20', iconColor: 'text-green', valueColor: 'text-green' },
+          { label: 'Graduados', value: stats.graduados, icon: DocumentTextIcon, iconBg: 'bg-yellow/10 dark:bg-yellow/20', iconColor: 'text-yellow', valueColor: 'text-yellow' },
+          { label: 'Inactivos', value: stats.inactivos, icon: UserGroupIcon, iconBg: 'bg-gray/10 dark:bg-gray/20', iconColor: 'text-gray', valueColor: 'text-gray' },
         ].map((stat, index) => (
           <div
             key={stat.label}
@@ -102,7 +102,7 @@ const AdminDashboard = () => {
                   <stat.icon className={`w-6 h-6 sm:w-8 sm:h-8 ${stat.iconColor}`} />
                 </div>
                 <div>
-                  <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 font-medium">{stat.label}</p>
+                  <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 font-medium">{stat.label}</p>
                   <p className={`text-2xl sm:text-3xl font-bold ${stat.valueColor} mt-1`}>{stat.value}</p>
                 </div>
               </div>

@@ -32,7 +32,7 @@ const Layout = ({ children }) => {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Navbar */}
-      <nav className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-100 dark:border-gray-700 sticky top-0 z-50 backdrop-blur-sm bg-white/95 dark:bg-gray-800/95">
+      <nav className="shadow-sm border-b border-gray-100 dark:border-gray-700 sticky top-0 z-50 backdrop-blur-sm bg-white/95 dark:bg-gray-800/95">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16 sm:h-20">
             <div className="flex items-center flex-1">
@@ -86,7 +86,7 @@ const Layout = ({ children }) => {
                 {theme === 'dark' ? (
                   <SunIcon className="w-5 h-5 text-yellow" />
                 ) : (
-                  <MoonIcon className="w-5 h-5 text-gray-600" />
+                  <MoonIcon className="w-5 h-5 text-gray-700 dark:text-gray-300" />
                 )}
               </button>
               <button

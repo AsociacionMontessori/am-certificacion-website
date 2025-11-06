@@ -14,18 +14,39 @@ export const ThemeProvider = ({ children }) => {
   const [theme, setTheme] = useState(() => {
     // Verificar si hay un tema guardado en localStorage
     const savedTheme = localStorage.getItem('theme');
-    if (savedTheme) {
+    if (savedTheme === 'dark' || savedTheme === 'light') {
       return savedTheme;
     }
     // Si no hay tema guardado, usar preferencia del sistema
     return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
   });
 
+  // Aplicar tema inmediatamente al montar
   useEffect(() => {
-    // Aplicar el tema al documento
     const root = window.document.documentElement;
-    root.classList.remove('light', 'dark');
-    root.classList.add(theme);
+    const initialTheme = localStorage.getItem('theme') || 
+      (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    
+    if (initialTheme === 'dark') {
+      root.classList.add('dark');
+      root.classList.remove('light');
+    } else {
+      root.classList.remove('dark');
+      root.classList.add('light');
+    }
+  }, []);
+
+  useEffect(() => {
+    // Aplicar el tema al documento cuando cambia
+    const root = window.document.documentElement;
+    
+    if (theme === 'dark') {
+      root.classList.add('dark');
+      root.classList.remove('light');
+    } else {
+      root.classList.remove('dark');
+      root.classList.add('light');
+    }
     
     // Guardar en localStorage
     localStorage.setItem('theme', theme);

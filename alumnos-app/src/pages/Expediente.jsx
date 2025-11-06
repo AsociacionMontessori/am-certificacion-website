@@ -58,31 +58,31 @@ const Expediente = () => {
           <dl className="space-y-4">
             {expediente?.nombre && (
               <div>
-                <dt className="text-sm font-medium text-gray-500">Nombre completo</dt>
+                <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Nombre completo</dt>
                 <dd className="text-sm text-gray-900 dark:text-white mt-1">{expediente.nombre}</dd>
               </div>
             )}
             {expediente?.matricula && (
               <div>
-                <dt className="text-sm font-medium text-gray-500">Matrícula</dt>
+                <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Matrícula</dt>
                 <dd className="text-sm text-gray-900 dark:text-white mt-1">{expediente.matricula}</dd>
               </div>
             )}
             {expediente?.email && (
               <div>
-                <dt className="text-sm font-medium text-gray-500">Correo electrónico</dt>
+                <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Correo electrónico</dt>
                 <dd className="text-sm text-gray-900 dark:text-white mt-1">{expediente.email}</dd>
               </div>
             )}
             {expediente?.telefono && (
               <div>
-                <dt className="text-sm font-medium text-gray-500">Teléfono</dt>
+                <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Teléfono</dt>
                 <dd className="text-sm text-gray-900 dark:text-white mt-1">{expediente.telefono}</dd>
               </div>
             )}
             {expediente?.fechaNacimiento && (
               <div>
-                <dt className="text-sm font-medium text-gray-500">Fecha de nacimiento</dt>
+                <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Fecha de nacimiento</dt>
                 <dd className="text-sm text-gray-900 dark:text-white mt-1">
                   {new Date(expediente.fechaNacimiento.seconds * 1000).toLocaleDateString()}
                 </dd>
@@ -102,19 +102,19 @@ const Expediente = () => {
           <dl className="space-y-4">
             {expediente?.programa && (
               <div>
-                <dt className="text-sm font-medium text-gray-500">Programa</dt>
+                <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Programa</dt>
                 <dd className="text-sm text-gray-900 dark:text-white mt-1">{expediente.programa}</dd>
               </div>
             )}
             {expediente?.cohorte && (
               <div>
-                <dt className="text-sm font-medium text-gray-500">Cohorte</dt>
+                <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Cohorte</dt>
                 <dd className="text-sm text-gray-900 dark:text-white mt-1">{expediente.cohorte}</dd>
               </div>
             )}
             {expediente?.fechaIngreso && (
               <div>
-                <dt className="text-sm font-medium text-gray-500">Fecha de ingreso</dt>
+                <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Fecha de ingreso</dt>
                 <dd className="text-sm text-gray-900 dark:text-white mt-1">
                   {new Date(expediente.fechaIngreso.seconds * 1000).toLocaleDateString()}
                 </dd>
@@ -122,7 +122,7 @@ const Expediente = () => {
             )}
             {expediente?.estado && (
               <div>
-                <dt className="text-sm font-medium text-gray-500">Estado</dt>
+                <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Estado</dt>
                 <dd className="text-sm text-gray-900 dark:text-white mt-1">
                   <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                     expediente.estado === 'Activo' 
