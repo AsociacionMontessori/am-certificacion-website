@@ -13,7 +13,7 @@ import {
   ClipboardDocumentIcon,
   ShieldCheckIcon,
   LinkIcon,
-  ExternalLinkIcon
+  ArrowTopRightOnSquareIcon
 } from '@heroicons/react/24/outline';
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
@@ -361,7 +361,7 @@ const Dashboard = () => {
                       className="p-1.5 text-gray-600 dark:text-gray-400 hover:text-green dark:hover:text-green transition-colors"
                       title="Abrir en nueva pestaña"
                     >
-                      <ExternalLinkIcon className="w-5 h-5" />
+                      <ArrowTopRightOnSquareIcon className="w-5 h-5" />
                     </a>
                   </div>
                 </div>
@@ -392,15 +392,13 @@ const Dashboard = () => {
                       className="p-1.5 text-gray-600 dark:text-gray-400 hover:text-green dark:hover:text-green transition-colors"
                       title="Abrir en nueva pestaña"
                     >
-                      <ExternalLinkIcon className="w-5 h-5" />
+                      <ArrowTopRightOnSquareIcon className="w-5 h-5" />
                     </a>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      </div>
         </div>
       </div>
 
