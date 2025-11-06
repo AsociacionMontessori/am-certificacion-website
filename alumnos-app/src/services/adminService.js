@@ -1,7 +1,6 @@
 import { 
   createUserWithEmailAndPassword,
-  updateProfile,
-  sendPasswordResetEmail
+  updateProfile
 } from 'firebase/auth';
 import { 
   doc, 
@@ -72,16 +71,6 @@ export const crearUsuarioAlumno = async (datosUsuario) => {
         await Promise.all(promises);
       } catch (materiasError) {
         console.warn('No se pudieron inicializar las materias:', materiasError);
-      }
-    }
-
-    // 5. Enviar email de restablecimiento de contraseña (opcional)
-    // El usuario puede cambiar su contraseña después del primer login
-    if (datosAdicionales.enviarEmailBienvenida) {
-      try {
-        await sendPasswordResetEmail(auth, email);
-      } catch (emailError) {
-        console.warn('No se pudo enviar email de bienvenida:', emailError);
       }
     }
 

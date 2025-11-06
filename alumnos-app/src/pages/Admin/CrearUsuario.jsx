@@ -24,7 +24,6 @@ const CrearUsuario = () => {
     estado: 'Activo',
     mailClassroom: '',
     passwordClassroom: '',
-    enviarEmailBienvenida: true,
   });
 
   const niveles = [
@@ -352,22 +351,6 @@ const CrearUsuario = () => {
                 className="w-full px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue transition-all duration-200"
               />
             </div>
-          </div>
-        </section>
-
-        {/* Opciones */}
-        <section>
-          <div className="flex items-center">
-            <input
-              type="checkbox"
-              name="enviarEmailBienvenida"
-              checked={formData.enviarEmailBienvenida}
-              onChange={handleChange}
-              className="w-4 h-4 text-blue border-gray-300 rounded focus:ring-blue"
-            />
-            <label className="ml-2 text-sm text-gray-700 dark:text-gray-300">
-              Enviar email de bienvenida con instrucciones para cambiar contraseña
-            </label>
           </div>
         </section>
 
