@@ -1,0 +1,154 @@
+import { doc, getDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
+import { db } from '../config/firebase';
+import { collection, query, where, getDocs } from 'firebase/firestore';
+
+/**
+ * Genera un hash simple compatible con navegador
+ */
+const hashString = (str) => {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash; // Convert to 32bit integer
+  }
+  return Math.abs(hash).toString(16).toUpperCase();
+};
+
+/**
+ * Genera un folio único para el certificado
+ */
+export const generarFolio = (alumnoId) => {
+  const timestamp = Date.now();
+  const random = Math.random().toString(36).substring(2, 8).toUpperCase();
+  return `CERT-${timestamp.toString(36).toUpperCase().substring(0, 6)}-${random}`;
+};
+
+/**
+ * Genera un código de verificación único
+ */
+export const generarCodigoVerificacion = (alumnoId, folio) => {
+  const data = `${alumnoId}-${folio}-${Date.now()}`;
+  const hash = hashString(data);
+  return hash.substring(0, 16).padStart(16, '0');
+};
+
+/**
+ * Calcula el promedio final del alumno
+ */
+export const calcularPromedioFinal = async (alumnoId) => {
+  try {
+    const calificacionesQuery = query(
+      collection(db, 'calificaciones'),
+      where('alumnoId', '==', alumnoId)
+    );
+    const querySnapshot = await getDocs(calificacionesQuery);
+    
+    if (querySnapshot.empty) {
+      return null;
+    }
+
+    const calificaciones = querySnapshot.docs.map(doc => doc.data().calificacion).filter(c => c != null);
+    
+    if (calificaciones.length === 0) {
+      return null;
+    }
+
+    const suma = calificaciones.reduce((acc, cal) => acc + parseFloat(cal), 0);
+    const promedio = suma / calificaciones.length;
+    return parseFloat(promedio.toFixed(2));
+  } catch (error) {
+    console.error('Error al calcular promedio:', error);
+    return null;
+  }
+};
+
+/**
+ * Obtiene o genera el certificado del alumno
+ */
+export const obtenerCertificado = async (alumnoId) => {
+  try {
+    const alumnoDoc = await getDoc(doc(db, 'alumnos', alumnoId));
+    
+    if (!alumnoDoc.exists()) {
+      return null;
+    }
+
+    const alumnoData = alumnoDoc.data();
+    
+    // Si ya tiene folio, usar ese
+    let folio = alumnoData.folioCertificado;
+    let codigoVerificacion = alumnoData.codigoVerificacion;
+    
+    // Si no tiene folio, generar uno nuevo
+    if (!folio) {
+      folio = generarFolio(alumnoId);
+      codigoVerificacion = generarCodigoVerificacion(alumnoId, folio);
+      
+      // Guardar en Firestore
+      await updateDoc(doc(db, 'alumnos', alumnoId), {
+        folioCertificado: folio,
+        codigoVerificacion: codigoVerificacion,
+        fechaEmisionCertificado: serverTimestamp()
+      });
+    }
+
+    // Calcular promedio
+    const promedio = await calcularPromedioFinal(alumnoId);
+
+    return {
+      folio,
+      codigoVerificacion,
+      promedio,
+      alumno: {
+        id: alumnoDoc.id,
+        nombreCompleto: alumnoData.nombre,
+        nivel: alumnoData.nivel,
+        fechaIngreso: alumnoData.fechaIngreso,
+        fechaEgreso: alumnoData.fechaEgresoEstimada || alumnoData.fechaEgreso,
+        estado: alumnoData.estado
+      }
+    };
+  } catch (error) {
+    console.error('Error al obtener certificado:', error);
+    return null;
+  }
+};
+
+/**
+ * Verifica un certificado usando el folio y código
+ */
+export const verificarCertificado = async (folio, codigoVerificacion) => {
+  try {
+    const alumnosQuery = query(
+      collection(db, 'alumnos'),
+      where('folioCertificado', '==', folio),
+      where('codigoVerificacion', '==', codigoVerificacion)
+    );
+    
+    const querySnapshot = await getDocs(alumnosQuery);
+    
+    if (querySnapshot.empty) {
+      return { valido: false };
+    }
+
+    const alumnoDoc = querySnapshot.docs[0];
+    const alumnoData = alumnoDoc.data();
+    
+    return {
+      valido: true,
+      alumno: {
+        id: alumnoDoc.id,
+        nombre: alumnoData.nombre,
+        nivel: alumnoData.nivel,
+        fechaIngreso: alumnoData.fechaIngreso,
+        fechaEgreso: alumnoData.fechaEgresoEstimada || alumnoData.fechaEgreso,
+        estado: alumnoData.estado
+      }
+    };
+  } catch (error) {
+    console.error('Error al verificar certificado:', error);
+    return { valido: false };
+  }
+};
+

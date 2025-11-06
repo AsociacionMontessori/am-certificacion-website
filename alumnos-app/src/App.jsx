@@ -20,6 +20,8 @@ import GestionMaterias from './pages/Admin/GestionMaterias';
 import GestionCalificaciones from './pages/Admin/GestionCalificaciones';
 import GestionGraduacion from './pages/Admin/GestionGraduacion';
 import PublicProfile from './pages/Public/PublicProfile';
+import CertificadoDigital from './pages/Public/CertificadoDigital';
+import VerificarCertificado from './pages/Public/VerificarCertificado';
 
 // Componente para redirigir según el rol
 const DashboardRedirect = () => {
@@ -75,6 +77,8 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/inscripcion" element={<Inscripcion />} />
           <Route path="/public/alumno/:id" element={<PublicProfile />} />
+          <Route path="/certificado/:id" element={<CertificadoDigital />} />
+          <Route path="/verificar/:folio/:codigo" element={<VerificarCertificado />} />
           
           {/* Rutas protegidas - Admin */}
           <Route
