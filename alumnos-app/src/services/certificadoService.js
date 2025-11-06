@@ -1,4 +1,4 @@
-import { doc, getDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 
@@ -25,7 +25,7 @@ export const generarFolio = (alumnoId) => {
 };
 
 /**
- * Genera un código de verificación único
+ * Genera un código de verificación único (determinístico)
  */
 export const generarCodigoVerificacion = (alumnoId, folio) => {
   const data = `${alumnoId}-${folio}`;
@@ -104,20 +104,37 @@ export const obtenerCertificado = async (alumnoId) => {
       }
     }
     
-    // Guardar en Firestore si es necesario
-    if (necesitaGuardar) {
+    // SIEMPRE guardar el código de verificación (asegurar que esté en la BD)
+    // Verificar si necesita guardar
+    const necesitaGuardarFolio = !alumnoData.folioCertificado;
+    const codigoActual = alumnoData.codigoVerificacion?.trim().toUpperCase();
+    const codigoEsperado = codigoVerificacion.trim().toUpperCase();
+    const necesitaGuardarCodigo = !alumnoData.codigoVerificacion || codigoActual !== codigoEsperado;
+    
+    if (necesitaGuardarFolio || necesitaGuardarCodigo) {
       const updateData = {};
-      if (!alumnoData.folioCertificado) {
+      if (necesitaGuardarFolio) {
         updateData.folioCertificado = folio;
         updateData.fechaEmisionCertificado = serverTimestamp();
       }
-      if (!alumnoData.codigoVerificacion || alumnoData.codigoVerificacion?.trim().toUpperCase() !== codigoVerificacion) {
+      if (necesitaGuardarCodigo) {
         updateData.codigoVerificacion = codigoVerificacion;
         updateData.fechaActualizacionCodigo = serverTimestamp();
       }
       
-      if (Object.keys(updateData).length > 0) {
+      // Guardar en Firestore
+      try {
         await updateDoc(doc(db, 'alumnos', alumnoId), updateData);
+        console.log(`✅ Código de verificación guardado para alumno ${alumnoId}:`, codigoVerificacion);
+      } catch (error) {
+        console.error('❌ Error al guardar código de verificación:', error);
+        // Intentar con setDoc como fallback
+        try {
+          await setDoc(doc(db, 'alumnos', alumnoId), updateData, { merge: true });
+          console.log(`✅ Código guardado con setDoc para alumno ${alumnoId}`);
+        } catch (setDocError) {
+          console.error('❌ Error al guardar con setDoc:', setDocError);
+        }
       }
     }
 

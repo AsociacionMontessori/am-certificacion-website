@@ -147,11 +147,20 @@ const CertificadoDigital = () => {
               <div className="flex flex-col items-center">
                 <h3 className="text-sm font-semibold text-gray-700 mb-4">Código de Verificación</h3>
                 <div className="bg-gray-100 rounded-lg p-4 font-mono text-lg font-bold text-gray-800">
-                  {codigoVerificacion}
+                  {codigoVerificacion || 'Generando...'}
                 </div>
                 <p className="text-xs text-gray-500 mt-2 text-center">
                   Use este código junto con el folio para verificar
                 </p>
+                <a
+                  href={urlVerificacion}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-4 inline-flex items-center px-4 py-2 bg-green text-white rounded-lg hover:bg-green/90 transition-colors text-sm"
+                >
+                  <ShieldCheckIcon className="w-4 h-4 mr-2" />
+                  Verificar Certificado
+                </a>
               </div>
               <div className="flex flex-col items-center">
                 <h3 className="text-sm font-semibold text-gray-700 mb-4">Código QR</h3>
@@ -166,6 +175,15 @@ const CertificadoDigital = () => {
                 <p className="text-xs text-gray-500 mt-2 text-center">
                   Escanee para verificar el certificado
                 </p>
+                <a
+                  href={urlVerificacion}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-4 inline-flex items-center px-4 py-2 bg-blue text-white rounded-lg hover:bg-blue/90 transition-colors text-sm"
+                >
+                  <ShieldCheckIcon className="w-4 h-4 mr-2" />
+                  Verificar Ahora
+                </a>
               </div>
             </div>
 

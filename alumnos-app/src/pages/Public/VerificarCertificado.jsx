@@ -118,13 +118,25 @@ const VerificarCertificado = () => {
                     El certificado no pudo ser verificado. Por favor, verifica que el folio y código de verificación sean correctos.
                   </p>
                 </div>
-                <div className="bg-gray-50 rounded-lg p-6 text-left">
-                  <p className="text-sm text-gray-600">
-                    <strong>Folio ingresado:</strong> {folio || 'N/A'}
-                  </p>
-                  <p className="text-sm text-gray-600 mt-2">
-                    <strong>Código ingresado:</strong> {codigo || 'N/A'}
-                  </p>
+                <div className="bg-gray-50 rounded-lg p-6 text-left space-y-3">
+                  <div>
+                    <p className="text-sm font-medium text-gray-700 mb-1">Folio ingresado:</p>
+                    <p className="text-sm font-mono text-gray-900">{folio || 'N/A'}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-700 mb-1">Código ingresado:</p>
+                    <p className="text-sm font-mono text-gray-900">{codigo || 'N/A'}</p>
+                  </div>
+                  {resultado?.error && (
+                    <div className="mt-3 p-3 bg-red/10 border border-red/30 rounded">
+                      <p className="text-sm text-red font-medium">
+                        Error: {resultado.error}
+                      </p>
+                      <p className="text-xs text-gray-600 mt-2">
+                        Por favor, verifica que el folio y código sean correctos. Si el problema persiste, contacta al administrador.
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
             )}

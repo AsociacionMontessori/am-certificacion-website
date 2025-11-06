@@ -23,6 +23,7 @@ const AdminLayout = ({ children }) => {
     { name: 'Inscripciones', href: '/admin/inscripciones', icon: DocumentTextIcon },
     { name: 'Regenerar Códigos', href: '/admin/regenerar-codigos', icon: ArrowPathIcon },
     { name: 'Generador QR', href: '/admin/generador-qr', icon: QrCodeIcon },
+    { name: 'Diagnóstico', href: '/admin/diagnostico-codigos', icon: DocumentTextIcon },
   ];
 
   const handleLogout = async () => {

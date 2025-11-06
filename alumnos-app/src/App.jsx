@@ -24,6 +24,7 @@ import CertificadoDigital from './pages/Public/CertificadoDigital';
 import VerificarCertificado from './pages/Public/VerificarCertificado';
 import RegenerarCodigos from './pages/Admin/RegenerarCodigos';
 import GeneradorQR from './pages/Admin/GeneradorQR';
+import DiagnosticoCodigos from './pages/Admin/DiagnosticoCodigos';
 
 // Componente para redirigir según el rol
 const DashboardRedirect = () => {
@@ -139,6 +140,16 @@ function App() {
               <AdminRoute>
                 <AdminLayout>
                   <GeneradorQR />
+                </AdminLayout>
+              </AdminRoute>
+            }
+          />
+          <Route
+            path="/admin/diagnostico-codigos"
+            element={
+              <AdminRoute>
+                <AdminLayout>
+                  <DiagnosticoCodigos />
                 </AdminLayout>
               </AdminRoute>
             }

@@ -1,4 +1,4 @@
-import { collection, getDocs, updateDoc, doc, serverTimestamp } from 'firebase/firestore';
+import { collection, getDocs, updateDoc, setDoc, doc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../config/firebase';
 
 /**
@@ -71,11 +71,26 @@ export const regenerarTodosLosCodigos = async () => {
           continue;
         }
 
-        // Actualizar el código
-        await updateDoc(doc(db, 'alumnos', alumnoId), {
-          codigoVerificacion: nuevoCodigo,
-          fechaActualizacionCodigo: serverTimestamp()
-        });
+        // Actualizar el código - usar setDoc con merge como fallback
+        try {
+          await updateDoc(doc(db, 'alumnos', alumnoId), {
+            codigoVerificacion: nuevoCodigo,
+            fechaActualizacionCodigo: serverTimestamp()
+          });
+          console.log(`✅ Código actualizado en Firestore para ${alumnoData.nombre || alumnoId}`);
+        } catch (updateError) {
+          // Si updateDoc falla, intentar con setDoc
+          console.warn(`⚠️ updateDoc falló, intentando con setDoc para ${alumnoData.nombre || alumnoId}:`, updateError);
+          try {
+            await setDoc(doc(db, 'alumnos', alumnoId), {
+              codigoVerificacion: nuevoCodigo,
+              fechaActualizacionCodigo: serverTimestamp()
+            }, { merge: true });
+            console.log(`✅ Código guardado con setDoc para ${alumnoData.nombre || alumnoId}`);
+          } catch (setDocError) {
+            throw setDocError;
+          }
+        }
 
         actualizados++;
         console.log(`✅ Alumno ${alumnoData.nombre || alumnoId}: Código regenerado`);
