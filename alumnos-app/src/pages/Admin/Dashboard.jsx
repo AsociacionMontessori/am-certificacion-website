@@ -43,7 +43,7 @@ const AdminDashboard = () => {
       alumno.nombre?.toLowerCase().includes(search) ||
       alumno.email?.toLowerCase().includes(search) ||
       alumno.matricula?.toLowerCase().includes(search) ||
-      alumno.programa?.toLowerCase().includes(search)
+      alumno.nivel?.toLowerCase().includes(search)
     );
   });
 
@@ -117,7 +117,7 @@ const AdminDashboard = () => {
           <MagnifyingGlassIcon className="absolute left-3 sm:left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
           <input
             type="text"
-            placeholder="Buscar por nombre, email, matrícula o programa..."
+            placeholder="Buscar por nombre, email, matrícula o nivel..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full px-4 py-2.5 sm:py-3 pl-10 sm:pl-12 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue transition-all duration-200"
@@ -142,7 +142,7 @@ const AdminDashboard = () => {
                   Email
                 </th>
                 <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  Programa
+                  Nivel
                 </th>
                 <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                   Estado
@@ -165,7 +165,7 @@ const AdminDashboard = () => {
                     {alumno.email || 'N/A'}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                    {alumno.programa || 'N/A'}
+                    {alumno.nivel || 'N/A'}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`badge ${
@@ -227,10 +227,10 @@ const AdminDashboard = () => {
                     <span className="text-gray-900 dark:text-white font-medium">{alumno.matricula}</span>
                   </div>
                 )}
-                {alumno.programa && (
+                {alumno.nivel && (
                   <div className="flex items-center text-sm">
-                    <span className="text-gray-500 dark:text-gray-400 mr-2">Programa:</span>
-                    <span className="text-gray-900 dark:text-white font-medium">{alumno.programa}</span>
+                    <span className="text-gray-500 dark:text-gray-400 mr-2">Nivel:</span>
+                    <span className="text-gray-900 dark:text-white font-medium">{alumno.nivel}</span>
                   </div>
                 )}
               </div>

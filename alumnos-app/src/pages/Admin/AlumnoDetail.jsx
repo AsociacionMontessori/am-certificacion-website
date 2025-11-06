@@ -2,19 +2,51 @@ import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../../config/firebase';
-import { ArrowLeftIcon, CalendarIcon, ChartBarIcon, AcademicCapIcon } from '@heroicons/react/24/outline';
+import { ArrowLeftIcon, CalendarIcon, ChartBarIcon, AcademicCapIcon, PencilIcon, CheckIcon, XMarkIcon } from '@heroicons/react/24/outline';
 
 const AlumnoDetail = () => {
   const { id } = useParams();
   const [alumno, setAlumno] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [editing, setEditing] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [formData, setFormData] = useState({
+    matricula: '',
+    email: '',
+    emailContacto: '',
+    telefono: '',
+    nivel: '',
+    fechaIngreso: '',
+    fechaEgresoEstimada: '',
+    estado: 'Activo'
+  });
 
   useEffect(() => {
     const loadAlumno = async () => {
       try {
         const alumnoDoc = await getDoc(doc(db, 'alumnos', id));
         if (alumnoDoc.exists()) {
-          setAlumno({ id: alumnoDoc.id, ...alumnoDoc.data() });
+          const data = { id: alumnoDoc.id, ...alumnoDoc.data() };
+          setAlumno(data);
+          
+          // Formatear fechas para inputs
+          const fechaIngreso = data.fechaIngreso?.toDate 
+            ? new Date(data.fechaIngreso.toDate()).toISOString().split('T')[0]
+            : '';
+          const fechaEgresoEstimada = data.fechaEgresoEstimada?.toDate 
+            ? new Date(data.fechaEgresoEstimada.toDate()).toISOString().split('T')[0]
+            : (data.fechaEgresoEstimada || '');
+          
+          setFormData({
+            matricula: data.matricula || '',
+            email: data.email || '',
+            emailContacto: data.emailContacto || '',
+            telefono: data.telefono || '',
+            nivel: data.nivel || '',
+            fechaIngreso: fechaIngreso,
+            fechaEgresoEstimada: fechaEgresoEstimada,
+            estado: data.estado || 'Activo'
+          });
         }
       } catch (error) {
         console.error('Error al cargar alumno:', error);
@@ -24,6 +56,62 @@ const AlumnoDetail = () => {
 
     loadAlumno();
   }, [id]);
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      const updateData = {
+        matricula: formData.matricula || null,
+        email: formData.email,
+        emailContacto: formData.emailContacto || null,
+        telefono: formData.telefono || null,
+        nivel: formData.nivel || null,
+        fechaIngreso: formData.fechaIngreso ? new Date(formData.fechaIngreso) : null,
+        fechaEgresoEstimada: formData.fechaEgresoEstimada ? new Date(formData.fechaEgresoEstimada) : null,
+        estado: formData.estado
+      };
+
+      await updateDoc(doc(db, 'alumnos', id), updateData);
+      
+      // Recargar datos
+      const alumnoDoc = await getDoc(doc(db, 'alumnos', id));
+      if (alumnoDoc.exists()) {
+        const data = { id: alumnoDoc.id, ...alumnoDoc.data() };
+        setAlumno(data);
+      }
+      
+      setEditing(false);
+      alert('Datos guardados exitosamente');
+    } catch (error) {
+      console.error('Error al guardar:', error);
+      alert('Error al guardar los datos');
+    }
+    setSaving(false);
+  };
+
+  const handleCancel = () => {
+    // Restaurar valores originales
+    if (alumno) {
+      const fechaIngreso = alumno.fechaIngreso?.toDate 
+        ? new Date(alumno.fechaIngreso.toDate()).toISOString().split('T')[0]
+        : '';
+      const fechaEgresoEstimada = alumno.fechaEgresoEstimada?.toDate 
+        ? new Date(alumno.fechaEgresoEstimada.toDate()).toISOString().split('T')[0]
+        : (alumno.fechaEgresoEstimada || '');
+      
+      setFormData({
+        matricula: alumno.matricula || '',
+        email: alumno.email || '',
+        emailContacto: alumno.emailContacto || '',
+        telefono: alumno.telefono || '',
+        nivel: alumno.nivel || '',
+        fechaIngreso: fechaIngreso,
+        fechaEgresoEstimada: fechaEgresoEstimada,
+        estado: alumno.estado || 'Activo'
+      });
+    }
+    setEditing(false);
+  };
 
   if (loading) {
     return (
@@ -63,9 +151,39 @@ const AlumnoDetail = () => {
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {/* Información Personal */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-            Información Personal
-          </h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+              Información Personal
+            </h2>
+            {!editing ? (
+              <button
+                onClick={() => setEditing(true)}
+                className="p-2 text-blue hover:bg-blue/10 rounded-lg transition-colors"
+                title="Editar"
+              >
+                <PencilIcon className="w-5 h-5" />
+              </button>
+            ) : (
+              <div className="flex gap-2">
+                <button
+                  onClick={handleSave}
+                  disabled={saving}
+                  className="p-2 text-green hover:bg-green/10 rounded-lg transition-colors"
+                  title="Guardar"
+                >
+                  <CheckIcon className="w-5 h-5" />
+                </button>
+                <button
+                  onClick={handleCancel}
+                  disabled={saving}
+                  className="p-2 text-red hover:bg-red/10 rounded-lg transition-colors"
+                  title="Cancelar"
+                >
+                  <XMarkIcon className="w-5 h-5" />
+                </button>
+              </div>
+            )}
+          </div>
           <dl className="space-y-3">
             <div>
               <dt className="text-sm font-medium text-gray-500">Nombre completo</dt>
@@ -73,15 +191,60 @@ const AlumnoDetail = () => {
             </div>
             <div>
               <dt className="text-sm font-medium text-gray-500">Matrícula</dt>
-              <dd className="text-sm text-gray-900 dark:text-white mt-1">{alumno.matricula || 'N/A'}</dd>
+              {editing ? (
+                <input
+                  type="text"
+                  value={formData.matricula}
+                  onChange={(e) => setFormData({ ...formData, matricula: e.target.value })}
+                  className="mt-1 w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
+                  placeholder="Matrícula"
+                />
+              ) : (
+                <dd className="text-sm text-gray-900 dark:text-white mt-1">{alumno.matricula || 'N/A'}</dd>
+              )}
             </div>
             <div>
               <dt className="text-sm font-medium text-gray-500">Email</dt>
-              <dd className="text-sm text-gray-900 dark:text-white mt-1">{alumno.email}</dd>
+              {editing ? (
+                <input
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  className="mt-1 w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
+                  placeholder="Email"
+                  required
+                />
+              ) : (
+                <dd className="text-sm text-gray-900 dark:text-white mt-1">{alumno.email}</dd>
+              )}
+            </div>
+            <div>
+              <dt className="text-sm font-medium text-gray-500">Email de recuperación</dt>
+              {editing ? (
+                <input
+                  type="email"
+                  value={formData.emailContacto}
+                  onChange={(e) => setFormData({ ...formData, emailContacto: e.target.value })}
+                  className="mt-1 w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
+                  placeholder="Email de recuperación"
+                />
+              ) : (
+                <dd className="text-sm text-gray-900 dark:text-white mt-1">{alumno.emailContacto || 'N/A'}</dd>
+              )}
             </div>
             <div>
               <dt className="text-sm font-medium text-gray-500">Teléfono</dt>
-              <dd className="text-sm text-gray-900 dark:text-white mt-1">{alumno.telefono || 'N/A'}</dd>
+              {editing ? (
+                <input
+                  type="tel"
+                  value={formData.telefono}
+                  onChange={(e) => setFormData({ ...formData, telefono: e.target.value })}
+                  className="mt-1 w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
+                  placeholder="Teléfono"
+                />
+              ) : (
+                <dd className="text-sm text-gray-900 dark:text-white mt-1">{alumno.telefono || 'N/A'}</dd>
+              )}
             </div>
             {alumno.fechaNacimiento && (
               <div>
@@ -104,37 +267,84 @@ const AlumnoDetail = () => {
           </h2>
           <dl className="space-y-3">
             <div>
-              <dt className="text-sm font-medium text-gray-500">Programa</dt>
-              <dd className="text-sm text-gray-900 dark:text-white mt-1">{alumno.programa || 'N/A'}</dd>
+              <dt className="text-sm font-medium text-gray-500">Nivel</dt>
+              {editing ? (
+                <select
+                  value={formData.nivel}
+                  onChange={(e) => setFormData({ ...formData, nivel: e.target.value })}
+                  className="mt-1 w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
+                >
+                  <option value="">Seleccionar nivel</option>
+                  <option value="Casa de Niños (3-6 años)">Casa de Niños (3-6 años)</option>
+                  <option value="Taller 1 (6-9 años)">Taller 1 (6-9 años)</option>
+                  <option value="Taller 2 (9-12 años)">Taller 2 (9-12 años)</option>
+                  <option value="Comunidad Infantil (0-3 años)">Comunidad Infantil (0-3 años)</option>
+                </select>
+              ) : (
+                <dd className="text-sm text-gray-900 dark:text-white mt-1">{alumno.nivel || 'N/A'}</dd>
+              )}
             </div>
             <div>
-              <dt className="text-sm font-medium text-gray-500">Cohorte</dt>
-              <dd className="text-sm text-gray-900 dark:text-white mt-1">{alumno.cohorte || 'N/A'}</dd>
-            </div>
-            {alumno.fechaIngreso && (
-              <div>
-                <dt className="text-sm font-medium text-gray-500">Fecha de ingreso</dt>
+              <dt className="text-sm font-medium text-gray-500">Fecha de ingreso</dt>
+              {editing ? (
+                <input
+                  type="date"
+                  value={formData.fechaIngreso}
+                  onChange={(e) => setFormData({ ...formData, fechaIngreso: e.target.value })}
+                  className="mt-1 w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
+                />
+              ) : (
                 <dd className="text-sm text-gray-900 dark:text-white mt-1">
-                  {alumno.fechaIngreso.toDate ? 
+                  {alumno.fechaIngreso?.toDate ? 
                     new Date(alumno.fechaIngreso.toDate()).toLocaleDateString() :
-                    alumno.fechaIngreso
+                    (alumno.fechaIngreso || 'N/A')
                   }
                 </dd>
-              </div>
-            )}
+              )}
+            </div>
+            <div>
+              <dt className="text-sm font-medium text-gray-500">Fecha estimada de egreso</dt>
+              {editing ? (
+                <input
+                  type="date"
+                  value={formData.fechaEgresoEstimada}
+                  onChange={(e) => setFormData({ ...formData, fechaEgresoEstimada: e.target.value })}
+                  className="mt-1 w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
+                />
+              ) : (
+                <dd className="text-sm text-gray-900 dark:text-white mt-1">
+                  {alumno.fechaEgresoEstimada?.toDate ? 
+                    new Date(alumno.fechaEgresoEstimada.toDate()).toLocaleDateString() :
+                    (alumno.fechaEgresoEstimada || 'N/A')
+                  }
+                </dd>
+              )}
+            </div>
             <div>
               <dt className="text-sm font-medium text-gray-500">Estado</dt>
-              <dd className="mt-1">
-                <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                  alumno.estado === 'Activo' 
-                    ? 'bg-green text-white'
-                    : alumno.estado === 'Graduado'
-                    ? 'bg-yellow text-white'
-                    : 'bg-gray text-white'
-                }`}>
-                  {alumno.estado || 'N/A'}
-                </span>
-              </dd>
+              {editing ? (
+                <select
+                  value={formData.estado}
+                  onChange={(e) => setFormData({ ...formData, estado: e.target.value })}
+                  className="mt-1 w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
+                >
+                  <option value="Activo">Activo</option>
+                  <option value="Graduado">Graduado</option>
+                  <option value="Inactivo">Inactivo</option>
+                </select>
+              ) : (
+                <dd className="mt-1">
+                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                    alumno.estado === 'Activo' 
+                      ? 'bg-green text-white'
+                      : alumno.estado === 'Graduado'
+                      ? 'bg-yellow text-white'
+                      : 'bg-gray text-white'
+                  }`}>
+                    {alumno.estado || 'N/A'}
+                  </span>
+                </dd>
+              )}
             </div>
           </dl>
         </div>

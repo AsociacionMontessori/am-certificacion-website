@@ -402,40 +402,24 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Información rápida */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 transition-all duration-300 hover:shadow-md hover:border-gray-200 dark:hover:border-gray-600 p-5 sm:p-6">
-          <h2 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white mb-4 pb-3 border-b border-gray-200 dark:border-gray-700">
-            Información del Alumno
-          </h2>
-          <dl className="space-y-3">
-            {userData?.matricula && (
-              <div className="flex justify-between items-center py-2">
-                <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Matrícula</dt>
-                <dd className="text-sm font-semibold text-gray-900 dark:text-white">{userData.matricula}</dd>
-              </div>
-            )}
-            {userData?.programa && (
-              <div className="flex justify-between items-center py-2">
-                <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Programa</dt>
-                <dd className="text-sm font-semibold text-gray-900 dark:text-white">{userData.programa}</dd>
-              </div>
-            )}
-            {userData?.cohorte && (
-              <div className="flex justify-between items-center py-2">
-                <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Cohorte</dt>
-                <dd className="text-sm font-semibold text-gray-900 dark:text-white">{userData.cohorte}</dd>
-              </div>
-            )}
-          </dl>
-        </div>
-
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 transition-all duration-300 hover:shadow-md hover:border-gray-200 dark:hover:border-gray-600 p-5 sm:p-6">
-          <h2 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white mb-4 pb-3 border-b border-gray-200 dark:border-gray-700">
-            Estado Académico
-          </h2>
-          <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
-            Aquí encontrarás información sobre tu progreso académico y próximos pasos en tu camino hacia la certificación.
+      {/* Footer */}
+      <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
+        <div className="text-center space-y-2">
+          <p className="text-sm text-gray-600 dark:text-gray-400">
+            <a 
+              href="https://asociacionmontessori.com.mx" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-blue hover:underline"
+            >
+              asociacionmontessori.com.mx
+            </a>
+          </p>
+          <p className="text-xs text-gray-500 dark:text-gray-500">
+            © {new Date().getFullYear()} Asociación Montessori de México. Todos los derechos reservados.
+          </p>
+          <p className="text-xs text-gray-500 dark:text-gray-500 italic">
+            Esta aplicación es una donación de un exalumno Montessori.
           </p>
         </div>
       </div>
