@@ -7,6 +7,7 @@ import {
   DocumentTextIcon,
   ArrowPathIcon,
   QrCodeIcon,
+  WrenchScrewdriverIcon,
   ArrowRightOnRectangleIcon,
   SunIcon,
   MoonIcon
@@ -22,9 +23,11 @@ const AdminLayout = ({ children }) => {
     { name: 'Crear Usuario', href: '/admin/crear-usuario', icon: UserGroupIcon },
     { name: 'Inscripciones', href: '/admin/inscripciones', icon: DocumentTextIcon },
     { name: 'Generador QR', href: '/admin/generador-qr', icon: QrCodeIcon },
-    // Herramientas de mantenimiento (ocultas del menú principal, pero accesibles directamente)
-    // { name: 'Regenerar Códigos', href: '/admin/regenerar-codigos', icon: ArrowPathIcon },
-    // { name: 'Diagnóstico', href: '/admin/diagnostico-codigos', icon: DocumentTextIcon },
+  ];
+
+  const herramientasAvanzadas = [
+    { name: 'Regenerar Códigos', href: '/admin/regenerar-codigos', icon: ArrowPathIcon },
+    { name: 'Diagnóstico', href: '/admin/diagnostico-codigos', icon: DocumentTextIcon },
   ];
 
   const handleLogout = async () => {
@@ -49,7 +52,7 @@ const AdminLayout = ({ children }) => {
                   <p className="text-xs text-gray-500 dark:text-gray-400 leading-tight">Certificación Montessori</p>
                 </div>
               </div>
-              <div className="hidden md:ml-8 md:flex md:space-x-1">
+              <div className="hidden md:ml-8 md:flex md:space-x-1 md:items-center">
                 {navigation.map((item) => {
                   const isActive = location.pathname === item.href;
                   return (
@@ -67,6 +70,48 @@ const AdminLayout = ({ children }) => {
                     </Link>
                   );
                 })}
+                
+                {/* Separador visual */}
+                <div className="hidden lg:block h-6 w-px bg-gray-300 dark:bg-gray-600 mx-2"></div>
+                
+                {/* Herramientas Avanzadas - Dropdown */}
+                <div className="hidden lg:block relative group">
+                  <button className="inline-flex items-center px-3 py-2 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white transition-all duration-200">
+                    <WrenchScrewdriverIcon className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+                    <span className="hidden lg:inline">Herramientas Avanzadas</span>
+                    <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+                  
+                  {/* Dropdown Menu */}
+                  <div className="absolute left-0 mt-2 w-56 rounded-lg shadow-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                    <div className="py-2">
+                      <div className="px-4 py-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-700">
+                        Mantenimiento
+                      </div>
+                      {herramientasAvanzadas.map((item) => {
+                        const isActive = location.pathname === item.href;
+                        return (
+                          <Link
+                            key={item.name}
+                            to={item.href}
+                            className={`${
+                              isActive
+                                ? 'bg-blue/5 dark:bg-blue/20 text-blue dark:text-blue-300'
+                                : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
+                            } block px-4 py-2 text-sm transition-colors duration-150`}
+                          >
+                            <div className="flex items-center">
+                              <item.icon className="w-4 h-4 mr-2" />
+                              <span>{item.name}</span>
+                            </div>
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
             <div className="flex items-center space-x-2 sm:space-x-3">
@@ -176,6 +221,53 @@ const AdminLayout = ({ children }) => {
                   </Link>
                 );
               })}
+              
+              {/* Herramientas Avanzadas - Mobile (solo icono) */}
+              <div className="relative group">
+                <button
+                  className={`relative flex flex-col items-center justify-center w-14 h-14 rounded-2xl transition-all duration-300 active:scale-90 ${
+                    herramientasAvanzadas.some(item => location.pathname === item.href)
+                      ? 'bg-white/20 backdrop-blur-sm text-white scale-110 shadow-lg shadow-white/20'
+                      : 'text-white/80 hover:text-yellow hover:scale-[1.2] hover:bg-white/10'
+                  }`}
+                >
+                  {herramientasAvanzadas.some(item => location.pathname === item.href) && (
+                    <div className="absolute -top-1 left-1/2 transform -translate-x-1/2 w-1.5 h-1.5 bg-yellow rounded-full shadow-lg shadow-yellow/50"></div>
+                  )}
+                  <WrenchScrewdriverIcon className="w-5 h-5 transition-transform duration-300" />
+                  <span className="text-[9px] font-medium mt-0.5 leading-tight text-center px-0.5">
+                    Más
+                  </span>
+                </button>
+                
+                {/* Dropdown Menu Mobile */}
+                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-48 rounded-lg shadow-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                  <div className="py-2">
+                    <div className="px-4 py-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-700">
+                      Avanzadas
+                    </div>
+                    {herramientasAvanzadas.map((item) => {
+                      const isActive = location.pathname === item.href;
+                      return (
+                        <Link
+                          key={item.name}
+                          to={item.href}
+                          className={`${
+                            isActive
+                              ? 'bg-blue/5 dark:bg-blue/20 text-blue dark:text-blue-300'
+                              : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
+                          } block px-4 py-2 text-sm transition-colors duration-150`}
+                        >
+                          <div className="flex items-center">
+                            <item.icon className="w-4 h-4 mr-2" />
+                            <span>{item.name}</span>
+                          </div>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
