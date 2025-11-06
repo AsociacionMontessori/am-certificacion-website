@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../../config/firebase';
-import { ArrowLeftIcon, CalendarIcon, ChartBarIcon, AcademicCapIcon, PencilIcon, CheckIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import { ArrowLeftIcon, CalendarIcon, ChartBarIcon, AcademicCapIcon, PencilIcon, CheckIcon, XMarkIcon, EyeIcon, EyeSlashIcon, ClipboardDocumentIcon } from '@heroicons/react/24/outline';
 
 const AlumnoDetail = () => {
   const { id } = useParams();
@@ -18,8 +18,22 @@ const AlumnoDetail = () => {
     nivel: '',
     fechaIngreso: '',
     fechaEgresoEstimada: '',
-    estado: 'Activo'
+    estado: 'Activo',
+    mailClassroom: '',
+    passwordClassroom: ''
   });
+  const [showPassword, setShowPassword] = useState(false);
+
+  // Función para copiar al portapapeles
+  const handleCopyToClipboard = async (texto, tipo = '') => {
+    try {
+      await navigator.clipboard.writeText(texto);
+      alert(`${tipo ? tipo + ' ' : ''}copiado al portapapeles`);
+    } catch (error) {
+      console.error('Error al copiar:', error);
+      prompt(`Copia este ${tipo || 'texto'}:`, texto);
+    }
+  };
 
   useEffect(() => {
     const loadAlumno = async () => {
@@ -45,7 +59,9 @@ const AlumnoDetail = () => {
             nivel: data.nivel || '',
             fechaIngreso: fechaIngreso,
             fechaEgresoEstimada: fechaEgresoEstimada,
-            estado: data.estado || 'Activo'
+            estado: data.estado || 'Activo',
+            mailClassroom: data.mailClassroom || '',
+            passwordClassroom: data.passwordClassroom || ''
           });
         }
       } catch (error) {
@@ -68,7 +84,9 @@ const AlumnoDetail = () => {
         nivel: formData.nivel || null,
         fechaIngreso: formData.fechaIngreso ? new Date(formData.fechaIngreso) : null,
         fechaEgresoEstimada: formData.fechaEgresoEstimada ? new Date(formData.fechaEgresoEstimada) : null,
-        estado: formData.estado
+        estado: formData.estado,
+        mailClassroom: formData.mailClassroom || null,
+        passwordClassroom: formData.passwordClassroom || null
       };
 
       await updateDoc(doc(db, 'alumnos', id), updateData);
@@ -107,7 +125,9 @@ const AlumnoDetail = () => {
         nivel: alumno.nivel || '',
         fechaIngreso: fechaIngreso,
         fechaEgresoEstimada: fechaEgresoEstimada,
-        estado: alumno.estado || 'Activo'
+        estado: alumno.estado || 'Activo',
+        mailClassroom: alumno.mailClassroom || '',
+        passwordClassroom: alumno.passwordClassroom || ''
       });
     }
     setEditing(false);
@@ -343,6 +363,80 @@ const AlumnoDetail = () => {
                   }`}>
                     {alumno.estado || 'N/A'}
                   </span>
+                </dd>
+              )}
+            </div>
+            <div>
+              <dt className="text-sm font-medium text-gray-500">Usuario de Classroom</dt>
+              {editing ? (
+                <input
+                  type="email"
+                  value={formData.mailClassroom}
+                  onChange={(e) => setFormData({ ...formData, mailClassroom: e.target.value })}
+                  className="mt-1 w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
+                  placeholder="usuario@classroom.com"
+                />
+              ) : (
+                <dd className="text-sm text-gray-900 dark:text-white mt-1">
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono flex-1">
+                      {alumno.mailClassroom || 'N/A'}
+                    </span>
+                    {alumno.mailClassroom && (
+                      <button
+                        type="button"
+                        onClick={() => handleCopyToClipboard(alumno.mailClassroom, 'Usuario de Classroom')}
+                        className="p-1 text-gray-500 dark:text-gray-400 hover:text-blue dark:hover:text-blue"
+                        title="Copiar usuario"
+                      >
+                        <ClipboardDocumentIcon className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
+                </dd>
+              )}
+            </div>
+            <div>
+              <dt className="text-sm font-medium text-gray-500">Contraseña de Classroom</dt>
+              {editing ? (
+                <input
+                  type="text"
+                  value={formData.passwordClassroom}
+                  onChange={(e) => setFormData({ ...formData, passwordClassroom: e.target.value })}
+                  className="mt-1 w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
+                  placeholder="Contraseña de Classroom"
+                />
+              ) : (
+                <dd className="text-sm text-gray-900 dark:text-white mt-1">
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono flex-1">
+                      {showPassword ? (alumno.passwordClassroom || 'N/A') : (alumno.passwordClassroom ? '••••••••' : 'N/A')}
+                    </span>
+                    {alumno.passwordClassroom && (
+                      <div className="flex items-center gap-1">
+                        <button
+                          type="button"
+                          onClick={() => handleCopyToClipboard(alumno.passwordClassroom, 'Contraseña de Classroom')}
+                          className="p-1 text-gray-500 dark:text-gray-400 hover:text-blue dark:hover:text-blue"
+                          title="Copiar contraseña"
+                        >
+                          <ClipboardDocumentIcon className="w-4 h-4" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="p-1 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
+                          title={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                        >
+                          {showPassword ? (
+                            <EyeSlashIcon className="w-4 h-4" />
+                          ) : (
+                            <EyeIcon className="w-4 h-4" />
+                          )}
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 </dd>
               )}
             </div>
