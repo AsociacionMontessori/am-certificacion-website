@@ -141,9 +141,9 @@ const AdminLayout = ({ children }) => {
 
       {/* Bottom Navigation - Mobile (Glassmorphism Style) */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50">
-        <div className="backdrop-blur-2xl bg-white/30 dark:bg-blue-950/40 border-t border-white/30 dark:border-blue-500/20 shadow-[0_-8px_32px_rgba(0,0,0,0.12)] dark:shadow-[0_-8px_32px_rgba(59,130,246,0.15)]">
+        <div className="backdrop-blur-lg bg-blue bg-opacity-70 border-t border-blue/30 shadow-lg shadow-[0_-8px_32px_rgba(0,151,178,0.3)]">
           {/* Efecto de brillo sutil en el borde superior */}
-          <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/50 to-transparent dark:via-blue-400/30"></div>
+          <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/50 to-transparent"></div>
           <div className="px-2 py-2">
             <div className="flex justify-around items-center">
               {navigation.map((item) => {
@@ -152,16 +152,16 @@ const AdminLayout = ({ children }) => {
                   <Link
                     key={item.name}
                     to={item.href}
-                    className={`relative flex flex-col items-center justify-center w-16 h-16 rounded-2xl transition-all duration-300 ${
+                    className={`relative flex flex-col items-center justify-center w-16 h-16 rounded-2xl transition-all duration-300 active:scale-90 ${
                       isActive
-                        ? 'bg-blue/20 dark:bg-blue/30 backdrop-blur-sm text-blue scale-110 shadow-lg shadow-blue/20'
-                        : 'text-gray-600 dark:text-gray-400 hover:text-blue dark:hover:text-blue-300 hover:bg-white/10 dark:hover:bg-white/5'
+                        ? 'bg-white/20 backdrop-blur-sm text-white scale-110 shadow-lg shadow-white/20'
+                        : 'text-white/80 hover:text-yellow hover:scale-[1.2] hover:bg-white/10'
                     }`}
                   >
                     {isActive && (
-                      <div className="absolute -top-1 left-1/2 transform -translate-x-1/2 w-1.5 h-1.5 bg-blue rounded-full shadow-lg shadow-blue/50"></div>
+                      <div className="absolute -top-1 left-1/2 transform -translate-x-1/2 w-1.5 h-1.5 bg-yellow rounded-full shadow-lg shadow-yellow/50"></div>
                     )}
-                    <item.icon className={`w-6 h-6 ${isActive ? 'scale-110' : ''} transition-transform duration-300`} />
+                    <item.icon className={`w-6 h-6 transition-transform duration-300 ${isActive ? 'scale-110' : ''}`} />
                     <span className="text-[10px] font-medium mt-0.5 leading-tight text-center">
                       {item.name.split(' ')[0]}
                     </span>
