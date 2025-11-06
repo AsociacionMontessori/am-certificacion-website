@@ -96,7 +96,7 @@ const AdminLayout = ({ children }) => {
       </nav>
 
       {/* Navbar Superior - Mobile (solo logo y acciones) */}
-      <nav className="md:hidden sticky top-0 z-50 backdrop-blur-lg bg-blue bg-opacity-70 border-b border-blue/30 shadow-lg shadow-[0_4px_32px_rgba(0,151,178,0.3)]">
+      <nav className="md:hidden sticky top-0 z-50 backdrop-blur-lg bg-blue bg-opacity-70 dark:bg-opacity-50 border-b border-blue/30 shadow-lg shadow-[0_4px_32px_rgba(0,151,178,0.3)] dark:shadow-[0_4px_32px_rgba(0,151,178,0.2)]">
         {/* Efecto de brillo sutil en el borde inferior */}
         <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/50 to-transparent"></div>
         <div className="px-4">
