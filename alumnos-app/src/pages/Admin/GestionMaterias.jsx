@@ -17,9 +17,7 @@ const GestionMaterias = () => {
     nombre: '',
     fechaInicio: '',
     fechaFin: '',
-    profesor: '',
     aula: '',
-    horario: '',
     estado: 'Pendiente'
   });
 
@@ -73,9 +71,7 @@ const GestionMaterias = () => {
         nivel: alumno?.nivel || '',
         fechaInicio: formData.fechaInicio ? new Date(formData.fechaInicio) : null,
         fechaFin: formData.fechaFin ? new Date(formData.fechaFin) : null,
-        profesor: formData.profesor || null,
         aula: formData.aula || null,
-        horario: formData.horario || null,
         estado: formData.estado,
         fechaActualizacion: serverTimestamp()
       };
@@ -116,9 +112,7 @@ const GestionMaterias = () => {
         nombre: '',
         fechaInicio: '',
         fechaFin: '',
-        profesor: '',
         aula: '',
-        horario: '',
         estado: 'Pendiente'
       });
     } catch (error) {
@@ -133,9 +127,7 @@ const GestionMaterias = () => {
       nombre: materia.nombre,
       fechaInicio: materia.fechaInicio?.toDate ? materia.fechaInicio.toDate().toISOString().split('T')[0] : '',
       fechaFin: materia.fechaFin?.toDate ? materia.fechaFin.toDate().toISOString().split('T')[0] : '',
-      profesor: materia.profesor || '',
       aula: materia.aula || '',
-      horario: materia.horario || '',
       estado: materia.estado || 'Pendiente'
     });
     setShowModal(true);
@@ -229,14 +221,8 @@ const GestionMaterias = () => {
                           <span>Fin: {materia.fechaFin.toDate ? materia.fechaFin.toDate().toLocaleDateString() : materia.fechaFin}</span>
                         </div>
                       )}
-                      {materia.profesor && (
-                        <div>Profesor: {materia.profesor}</div>
-                      )}
                       {materia.aula && (
                         <div>Aula: {materia.aula}</div>
-                      )}
-                      {materia.horario && (
-                        <div>Horario: {materia.horario}</div>
                       )}
                     </div>
                     {materia.estado && (
@@ -342,38 +328,12 @@ const GestionMaterias = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Profesor
-                    </label>
-                    <input
-                      type="text"
-                      value={formData.profesor}
-                      onChange={(e) => setFormData({ ...formData, profesor: e.target.value })}
-                      className="w-full px-4 py-2.5 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Aula
                     </label>
                     <input
                       type="text"
                       value={formData.aula}
                       onChange={(e) => setFormData({ ...formData, aula: e.target.value })}
-                      className="w-full px-4 py-2.5 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Horario
-                    </label>
-                    <input
-                      type="text"
-                      value={formData.horario}
-                      onChange={(e) => setFormData({ ...formData, horario: e.target.value })}
-                      placeholder="Ej: Lunes y Miércoles 10:00-12:00"
                       className="w-full px-4 py-2.5 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue"
                     />
                   </div>
