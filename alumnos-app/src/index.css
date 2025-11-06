@@ -167,12 +167,12 @@
 }
 
 /* MODE OSCURO - Reglas específicas fuera de @layer para máxima prioridad */
-/* NAVBAR - Forzar modo oscuro */
-html.dark nav {
+/* NAVBAR - Forzar modo oscuro (solo para navs desktop, no móviles) */
+html.dark nav:not([class*="md:hidden"]):not([class*="fixed bottom-0"]) {
   background-color: rgba(31, 41, 55, 0.95) !important;
 }
 
-html.dark nav[class*="backdrop-blur"] {
+html.dark nav[class*="backdrop-blur"]:not([class*="md:hidden"]):not([class*="fixed bottom-0"]) {
   background-color: rgba(31, 41, 55, 0.95) !important;
 }
 

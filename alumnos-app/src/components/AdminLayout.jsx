@@ -26,7 +26,7 @@ const AdminLayout = ({ children }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-20 md:pb-0">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-16 md:pb-0">
       {/* Navbar Superior - Desktop */}
       <nav className="hidden md:block shadow-sm border-b border-gray-100 dark:border-gray-700 sticky top-0 z-50 backdrop-blur-sm bg-white/95 dark:bg-gray-800/95">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -96,7 +96,7 @@ const AdminLayout = ({ children }) => {
       </nav>
 
       {/* Navbar Superior - Mobile (solo logo y acciones) */}
-      <nav className="md:hidden sticky top-0 z-50 backdrop-blur-lg bg-blue/70 dark:bg-blue/50 border-b border-blue/30 shadow-lg shadow-[0_4px_32px_rgba(0,151,178,0.3)] dark:shadow-[0_4px_32px_rgba(0,151,178,0.2)]">
+      <nav className="md:hidden sticky top-0 z-50 backdrop-blur-lg bg-blue/60 dark:bg-blue/40 border-b border-blue/30 shadow-lg shadow-[0_4px_32px_rgba(0,151,178,0.3)] dark:shadow-[0_4px_32px_rgba(0,151,178,0.2)]" style={{ backgroundColor: 'rgba(0, 151, 178, 0.6)' }}>
         {/* Efecto de brillo sutil en el borde inferior */}
         <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/50 to-transparent"></div>
         <div className="px-4">
@@ -137,16 +137,16 @@ const AdminLayout = ({ children }) => {
       </nav>
 
       {/* Main content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 animate-fade-in">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 pb-16 md:pb-8 animate-fade-in">
         {children}
       </main>
 
       {/* Bottom Navigation - Mobile (Glassmorphism Style) */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50">
-        <div className="backdrop-blur-lg bg-blue/70 dark:bg-blue/50 border-t border-blue/30 shadow-lg shadow-[0_-8px_32px_rgba(0,151,178,0.3)] dark:shadow-[0_-8px_32px_rgba(0,151,178,0.2)]">
+        <div className="backdrop-blur-lg bg-blue/60 dark:bg-blue/40 border-t border-blue/30 shadow-lg shadow-[0_-8px_32px_rgba(0,151,178,0.3)] dark:shadow-[0_-8px_32px_rgba(0,151,178,0.2)]" style={{ backgroundColor: theme === 'dark' ? 'rgba(0, 151, 178, 0.4)' : 'rgba(0, 151, 178, 0.6)' }}>
           {/* Efecto de brillo sutil en el borde superior */}
           <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/50 to-transparent"></div>
-          <div className="px-2 py-2">
+          <div className="px-2 py-1.5">
             <div className="flex justify-around items-center">
               {navigation.map((item) => {
                 const isActive = location.pathname === item.href;
@@ -154,7 +154,7 @@ const AdminLayout = ({ children }) => {
                   <Link
                     key={item.name}
                     to={item.href}
-                    className={`relative flex flex-col items-center justify-center w-16 h-16 rounded-2xl transition-all duration-300 active:scale-90 ${
+                    className={`relative flex flex-col items-center justify-center w-14 h-14 rounded-2xl transition-all duration-300 active:scale-90 ${
                       isActive
                         ? 'bg-white/20 backdrop-blur-sm text-white scale-110 shadow-lg shadow-white/20'
                         : 'text-white/80 hover:text-yellow hover:scale-[1.2] hover:bg-white/10'
@@ -163,9 +163,9 @@ const AdminLayout = ({ children }) => {
                     {isActive && (
                       <div className="absolute -top-1 left-1/2 transform -translate-x-1/2 w-1.5 h-1.5 bg-yellow rounded-full shadow-lg shadow-yellow/50"></div>
                     )}
-                    <item.icon className={`w-6 h-6 transition-transform duration-300 ${isActive ? 'scale-110' : ''}`} />
-                    <span className="text-[10px] font-medium mt-0.5 leading-tight text-center">
-                      {item.name.split(' ')[0]}
+                    <item.icon className={`w-5 h-5 transition-transform duration-300 ${isActive ? 'scale-110' : ''}`} />
+                    <span className="text-[9px] font-medium mt-0.5 leading-tight text-center px-0.5">
+                      {item.name}
                     </span>
                   </Link>
                 );
