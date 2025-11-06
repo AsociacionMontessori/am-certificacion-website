@@ -14,6 +14,8 @@ const Inscripcion = () => {
     nivel: '',
     fechaIngreso: '',
     fechaEgresoEstimada: '',
+    mailClassroom: '',
+    passwordClassroom: '',
   });
 
   const niveles = [
@@ -41,6 +43,8 @@ const Inscripcion = () => {
         nivel: formData.nivel,
         fechaIngreso: formData.fechaIngreso ? new Date(formData.fechaIngreso) : null,
         fechaEgresoEstimada: formData.fechaEgresoEstimada ? new Date(formData.fechaEgresoEstimada) : null,
+        mailClassroom: formData.mailClassroom || null,
+        passwordClassroom: formData.passwordClassroom || null,
         estadoInscripcion: 'Pendiente',
         fechaInscripcion: new Date(),
       };
@@ -171,6 +175,41 @@ const Inscripcion = () => {
                 onChange={handleChange}
                 className="w-full px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue transition-all duration-200"
               />
+            </div>
+
+            {/* Credenciales de Google Classroom */}
+            <div className="space-y-4">
+              <h3 className="text-base font-semibold text-gray-900 dark:text-white">
+                Credenciales de Google Classroom (Opcional)
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Mail de Classroom
+                  </label>
+                  <input
+                    type="email"
+                    name="mailClassroom"
+                    value={formData.mailClassroom}
+                    onChange={handleChange}
+                    placeholder="ejemplo@classroom.com"
+                    className="w-full px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue transition-all duration-200"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Contraseña de Classroom
+                  </label>
+                  <input
+                    type="password"
+                    name="passwordClassroom"
+                    value={formData.passwordClassroom}
+                    onChange={handleChange}
+                    placeholder="Contraseña de Classroom"
+                    className="w-full px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue transition-all duration-200"
+                  />
+                </div>
+              </div>
             </div>
 
             {/* Botones */}

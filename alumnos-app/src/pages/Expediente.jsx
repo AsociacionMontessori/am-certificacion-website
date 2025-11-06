@@ -88,6 +88,18 @@ const Expediente = () => {
                 </dd>
               </div>
             )}
+            {expediente?.mailClassroom && (
+              <div>
+                <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Mail de Classroom</dt>
+                <dd className="text-sm text-gray-900 dark:text-white mt-1">{expediente.mailClassroom}</dd>
+              </div>
+            )}
+            {expediente?.passwordClassroom && (
+              <div>
+                <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Contraseña de Classroom</dt>
+                <dd className="text-sm text-gray-900 dark:text-white mt-1 font-mono">{expediente.passwordClassroom}</dd>
+              </div>
+            )}
           </dl>
         </div>
 

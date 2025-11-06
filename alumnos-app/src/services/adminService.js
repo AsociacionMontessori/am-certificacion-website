@@ -37,6 +37,8 @@ export const crearUsuarioAlumno = async (datosUsuario) => {
       fechaIngreso: datosAdicionales.fechaIngreso ? new Date(datosAdicionales.fechaIngreso) : serverTimestamp(),
       fechaEgresoEstimada: datosAdicionales.fechaEgresoEstimada ? new Date(datosAdicionales.fechaEgresoEstimada) : null,
       estado: datosAdicionales.estado || 'Activo',
+      mailClassroom: datosAdicionales.mailClassroom || null,
+      passwordClassroom: datosAdicionales.passwordClassroom || null,
       fechaCreacion: serverTimestamp(),
       creadoPor: datosAdicionales.creadoPor || null,
     };

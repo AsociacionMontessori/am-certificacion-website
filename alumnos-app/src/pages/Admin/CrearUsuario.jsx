@@ -21,6 +21,8 @@ const CrearUsuario = () => {
     fechaIngreso: '',
     fechaEgresoEstimada: '',
     estado: 'Activo',
+    mailClassroom: '',
+    passwordClassroom: '',
     enviarEmailBienvenida: true,
   });
 
@@ -82,6 +84,8 @@ const CrearUsuario = () => {
         fechaIngreso: formData.fechaIngreso || new Date().toISOString().split('T')[0],
         fechaEgresoEstimada: formData.fechaEgresoEstimada,
         estado: formData.estado,
+        mailClassroom: formData.mailClassroom,
+        passwordClassroom: formData.passwordClassroom,
         creadoPor: currentUser?.uid,
       });
 
@@ -294,6 +298,41 @@ const CrearUsuario = () => {
                 value={formData.confirmPassword}
                 onChange={handleChange}
                 minLength={6}
+                className="w-full px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue transition-all duration-200"
+              />
+            </div>
+          </div>
+        </section>
+
+        {/* Credenciales de Google Classroom */}
+        <section>
+          <h2 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white mb-4">
+            Credenciales de Google Classroom
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Mail de Classroom
+              </label>
+              <input
+                type="email"
+                name="mailClassroom"
+                value={formData.mailClassroom}
+                onChange={handleChange}
+                placeholder="ejemplo@classroom.com"
+                className="w-full px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue transition-all duration-200"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Contraseña de Classroom
+              </label>
+              <input
+                type="password"
+                name="passwordClassroom"
+                value={formData.passwordClassroom}
+                onChange={handleChange}
+                placeholder="Contraseña de Classroom"
                 className="w-full px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue transition-all duration-200"
               />
             </div>
