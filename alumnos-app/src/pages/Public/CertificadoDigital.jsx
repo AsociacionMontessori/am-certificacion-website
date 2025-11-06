@@ -56,7 +56,7 @@ const CertificadoDigital = () => {
     );
   }
 
-  const { folio, codigoVerificacion, promedio, alumno, materias = [], calificaciones = [] } = certificado;
+  const { folio, codigoVerificacion, promedio, alumno } = certificado;
   const esGraduado = alumno.estado === 'Graduado';
   
   // Asegurar que el código esté presente antes de generar la URL
@@ -161,63 +161,6 @@ const CertificadoDigital = () => {
                   Estándar: EC0301, Folio CONOCER: D-0009441521.
                 </p>
               </div>
-            </div>
-
-            {/* Materias y calificaciones (públicas) */}
-            <div className="pt-8 border-t-2 border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-800 mb-4">
-                Materias y calificaciones
-              </h3>
-              {materias.length === 0 && calificaciones.length === 0 ? (
-                <p className="text-sm text-gray-600">No hay materias ni calificaciones registradas.</p>
-              ) : (
-                <div className="space-y-6">
-                  {materias.length > 0 && (
-                    <div>
-                      <h4 className="text-sm font-semibold text-gray-700 mb-3">Materias</h4>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        {materias.map((m) => (
-                          <div key={m.id} className="p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
-                            <p className="text-gray-900 font-medium truncate">{m.nombre || m.materia || 'Materia'}</p>
-                            {m.periodo && (
-                              <p className="text-xs text-gray-600 mt-1">Período: {m.periodo}</p>
-                            )}
-                            {m.fechaInicio && (
-                              <p className="text-xs text-gray-600 mt-1">Inicio: {formatearFechaLarga(m.fechaInicio)}</p>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {calificaciones.length > 0 && (
-                    <div>
-                      <h4 className="text-sm font-semibold text-gray-700 mb-3">Calificaciones</h4>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        {calificaciones.map((c) => (
-                          <div key={c.id} className="p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
-                            <div className="flex items-center justify-between">
-                              <p className="text-gray-900 font-medium truncate mr-2">{c.materia || 'Materia'}</p>
-                              {typeof c.calificacion !== 'undefined' && c.calificacion !== null && (
-                                <span className="inline-flex items-center justify-center px-2 py-1 text-xs font-semibold rounded-full bg-blue text-white min-w-[44px]">
-                                  {c.calificacion}
-                                </span>
-                              )}
-                            </div>
-                            {c.periodo && (
-                              <p className="text-xs text-gray-600 mt-1">Período: {c.periodo}</p>
-                            )}
-                            {c.observaciones && (
-                              <p className="text-xs text-gray-600 mt-2 line-clamp-2">{c.observaciones}</p>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )}
             </div>
 
             {/* Código QR y verificación */}
