@@ -21,9 +21,10 @@ const AdminLayout = ({ children }) => {
     { name: 'Dashboard', href: '/admin', icon: HomeIcon },
     { name: 'Crear Usuario', href: '/admin/crear-usuario', icon: UserGroupIcon },
     { name: 'Inscripciones', href: '/admin/inscripciones', icon: DocumentTextIcon },
-    { name: 'Regenerar Códigos', href: '/admin/regenerar-codigos', icon: ArrowPathIcon },
     { name: 'Generador QR', href: '/admin/generador-qr', icon: QrCodeIcon },
-    { name: 'Diagnóstico', href: '/admin/diagnostico-codigos', icon: DocumentTextIcon },
+    // Herramientas de mantenimiento (ocultas del menú principal, pero accesibles directamente)
+    // { name: 'Regenerar Códigos', href: '/admin/regenerar-codigos', icon: ArrowPathIcon },
+    // { name: 'Diagnóstico', href: '/admin/diagnostico-codigos', icon: DocumentTextIcon },
   ];
 
   const handleLogout = async () => {
