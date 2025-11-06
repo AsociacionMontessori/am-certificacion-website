@@ -102,7 +102,9 @@ const Layout = ({ children }) => {
       </nav>
 
       {/* Navbar Superior - Mobile (solo logo y acciones) */}
-      <nav className="md:hidden shadow-sm border-b border-gray-100 dark:border-gray-700 sticky top-0 z-50 backdrop-blur-md bg-white/80 dark:bg-gray-800/80">
+      <nav className="md:hidden sticky top-0 z-50 backdrop-blur-lg bg-blue bg-opacity-70 border-b border-blue/30 shadow-lg shadow-[0_4px_32px_rgba(0,151,178,0.3)]">
+        {/* Efecto de brillo sutil en el borde inferior */}
+        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/50 to-transparent"></div>
         <div className="px-4">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-3">
@@ -112,28 +114,28 @@ const Layout = ({ children }) => {
                 className="h-8 w-8 object-contain"
               />
               <div>
-                <h1 className="text-sm font-bold text-blue leading-tight">Portal Alumnos</h1>
-                <p className="text-xs text-gray-500 dark:text-gray-400 leading-tight">Certificación Montessori</p>
+                <h1 className="text-sm font-bold text-white leading-tight">Portal Alumnos</h1>
+                <p className="text-xs text-white/80 leading-tight">Certificación Montessori</p>
               </div>
             </div>
             <div className="flex items-center space-x-2">
               <button
                 onClick={toggleTheme}
-                className="p-2 rounded-lg bg-white/50 dark:bg-gray-700/50 backdrop-blur-sm hover:bg-white/70 dark:hover:bg-gray-700/70 transition-colors"
+                className="p-2 rounded-lg bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white transition-all duration-300 hover:scale-110 active:scale-90"
                 aria-label="Cambiar tema"
               >
                 {theme === 'dark' ? (
                   <SunIcon className="w-5 h-5 text-yellow" />
                 ) : (
-                  <MoonIcon className="w-5 h-5 text-gray-700 dark:text-gray-300" />
+                  <MoonIcon className="w-5 h-5 text-white" />
                 )}
               </button>
               <button
                 onClick={handleLogout}
-                className="p-2 rounded-lg bg-white/50 dark:bg-gray-700/50 backdrop-blur-sm hover:bg-red/20 dark:hover:bg-red/20 transition-colors"
+                className="p-2 rounded-lg bg-white/20 backdrop-blur-sm hover:bg-red/30 text-white transition-all duration-300 hover:scale-110 active:scale-90"
                 aria-label="Salir"
               >
-                <ArrowRightOnRectangleIcon className="w-5 h-5 text-red" />
+                <ArrowRightOnRectangleIcon className="w-5 h-5" />
               </button>
             </div>
           </div>
@@ -147,7 +149,7 @@ const Layout = ({ children }) => {
 
       {/* Bottom Navigation - Mobile (Glassmorphism Style) */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50">
-        <div className="backdrop-blur-lg bg-blue bg-opacity-70 border-t border-blue/30 shadow-lg shadow-[0_-8px_32px_rgba(0,151,178,0.3)]">
+        <div className="backdrop-blur-lg bg-blue bg-opacity-70 dark:bg-opacity-50 border-t border-blue/30 shadow-lg shadow-[0_-8px_32px_rgba(0,151,178,0.3)] dark:shadow-[0_-8px_32px_rgba(0,151,178,0.2)]">
           {/* Efecto de brillo sutil en el borde superior */}
           <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/50 to-transparent"></div>
           <div className="px-2 py-2">
