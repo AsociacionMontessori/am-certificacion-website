@@ -272,7 +272,7 @@ const GestionMaterias = () => {
       }
       
       // Validar estado
-      const estadosValidos = ['Pendiente', 'En curso', 'Completada'];
+      const estadosValidos = ['Pendiente', 'En curso', 'Con atraso', 'Completada'];
       if (materia.estado && !estadosValidos.includes(materia.estado)) {
         materia.estado = 'Pendiente';
       }
@@ -522,6 +522,8 @@ const GestionMaterias = () => {
                             ? 'bg-green text-white'
                             : materia.estado === 'En curso'
                             ? 'bg-blue text-white'
+                            : materia.estado === 'Con atraso'
+                            ? 'bg-yellow text-gray-900'
                             : 'bg-gray text-white'
                         }`}>
                           {materia.estado}
@@ -642,6 +644,7 @@ const GestionMaterias = () => {
                     >
                       <option value="Pendiente">Pendiente</option>
                       <option value="En curso">En curso</option>
+                      <option value="Con atraso">Con atraso</option>
                       <option value="Completada">Completada</option>
                     </select>
                   </div>
