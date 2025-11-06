@@ -24,17 +24,20 @@ const AlertasMateriasAtraso = () => {
       }
 
       try {
+        // Consultar todas las materias del alumno y filtrar por estado en el cliente
+        // Esto evita la necesidad de un índice compuesto en Firestore
         const materiasQuery = query(
           collection(db, 'materias'),
-          where('alumnoId', '==', currentUser.uid),
-          where('estado', '==', 'Con atraso')
+          where('alumnoId', '==', currentUser.uid)
         );
         const querySnapshot = await getDocs(materiasQuery);
-        const materiasData = querySnapshot.docs.map(doc => ({
+        const todasLasMaterias = querySnapshot.docs.map(doc => ({
           id: doc.id,
           ...doc.data()
         }));
-        setMateriasAtraso(materiasData);
+        // Filtrar materias con atraso en el cliente
+        const materiasConAtraso = todasLasMaterias.filter(m => m.estado === 'Con atraso');
+        setMateriasAtraso(materiasConAtraso);
       } catch (error) {
         console.error('Error al cargar materias con atraso:', error);
       } finally {
