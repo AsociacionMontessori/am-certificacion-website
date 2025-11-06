@@ -127,14 +127,14 @@ const Dashboard = () => {
                   <label className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1 block">
                     Mail de Classroom
                   </label>
-                  <div className="bg-white dark:bg-gray-700 rounded-lg p-3 border border-gray-200 dark:border-gray-600 flex items-center justify-between">
-                    <p className="text-sm text-gray-900 dark:text-white font-mono flex-1">
+                  <div className="bg-white dark:bg-gray-700 rounded-lg p-3 border border-gray-200 dark:border-gray-600 flex items-center justify-between gap-2">
+                    <p className="text-sm text-gray-900 dark:text-white font-mono flex-1 min-w-0 break-words overflow-hidden">
                       {userData.mailClassroom}
                     </p>
                     <button
                       type="button"
                       onClick={() => handleCopyToClipboard(userData.mailClassroom, 'Mail de Classroom')}
-                      className="ml-2 p-1.5 text-gray-600 dark:text-gray-400 hover:text-blue dark:hover:text-blue transition-colors"
+                      className="flex-shrink-0 p-1.5 text-gray-600 dark:text-gray-400 hover:text-blue dark:hover:text-blue transition-colors"
                       title="Copiar mail"
                     >
                       <ClipboardDocumentIcon className="w-5 h-5" />
@@ -146,11 +146,11 @@ const Dashboard = () => {
                     Contraseña de Classroom
                   </label>
                   <div className="relative">
-                    <div className="bg-white dark:bg-gray-700 rounded-lg p-3 border border-gray-200 dark:border-gray-600 flex items-center justify-between">
-                      <p className="text-sm text-gray-900 dark:text-white font-mono flex-1">
+                    <div className="bg-white dark:bg-gray-700 rounded-lg p-3 border border-gray-200 dark:border-gray-600 flex items-center justify-between gap-2">
+                      <p className="text-sm text-gray-900 dark:text-white font-mono flex-1 min-w-0 break-words overflow-hidden">
                         {showPassword ? userData.passwordClassroom : '••••••••'}
                       </p>
-                      <div className="flex items-center gap-1 ml-2">
+                      <div className="flex items-center gap-1 flex-shrink-0">
                         <button
                           type="button"
                           onClick={() => handleCopyToClipboard(userData.passwordClassroom, 'Contraseña de Classroom')}
