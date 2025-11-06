@@ -523,8 +523,8 @@ const GestionMaterias = () => {
                             : materia.estado === 'En curso'
                             ? 'bg-blue text-white'
                             : materia.estado === 'Con atraso'
-                            ? 'bg-yellow text-gray-900'
-                            : 'bg-gray text-white'
+                            ? 'bg-red text-white'
+                            : 'bg-gray-600 text-white'
                         }`}>
                           {materia.estado}
                         </span>
