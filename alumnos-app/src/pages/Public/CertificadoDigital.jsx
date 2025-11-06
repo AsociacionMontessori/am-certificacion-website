@@ -45,7 +45,15 @@ const CertificadoDigital = () => {
 
   const { folio, codigoVerificacion, promedio, alumno } = certificado;
   const esGraduado = alumno.estado === 'Graduado';
-  const urlVerificacion = `${window.location.origin}/verificar/${folio}/${codigoVerificacion}`;
+  
+  // Asegurar que el código esté presente antes de generar la URL
+  if (!codigoVerificacion) {
+    console.error('⚠️ No hay código de verificación disponible');
+  }
+  
+  const urlVerificacion = codigoVerificacion 
+    ? `${window.location.origin}/verificar/${folio}/${codigoVerificacion}`
+    : `${window.location.origin}/verificar/${folio}/PENDIENTE`;
   const fechaEmision = new Date().toLocaleDateString('es-MX', {
     year: 'numeric',
     month: 'long',

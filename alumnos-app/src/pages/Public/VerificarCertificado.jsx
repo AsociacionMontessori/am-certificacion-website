@@ -14,11 +14,22 @@ const VerificarCertificado = () => {
         try {
           // Normalizar el código (mayúsculas y sin espacios)
           const codigoNormalizado = codigo.toUpperCase().trim();
+          console.log('🔍 Iniciando verificación desde componente:', { folio, codigo: codigoNormalizado });
           const resultado = await verificarCertificado(folio, codigoNormalizado);
+          console.log('📊 Resultado de verificación:', resultado);
           setResultado(resultado);
         } catch (error) {
-          console.error('Error al verificar:', error);
-          setResultado({ valido: false, error: error.message });
+          console.error('❌ Error al verificar:', error);
+          console.error('Detalles del error:', {
+            code: error.code,
+            message: error.message,
+            stack: error.stack
+          });
+          setResultado({ 
+            valido: false, 
+            error: error.message || 'Error al verificar el certificado',
+            code: error.code
+          });
         }
       } else {
         setResultado({ valido: false, error: 'Faltan parámetros de verificación' });

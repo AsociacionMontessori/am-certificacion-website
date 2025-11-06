@@ -31,17 +31,13 @@ service cloud.firestore {
       // Permitir lectura pública SOLO para verificación de certificados
       // Esto permite que cualquiera verifique un certificado usando folio y código
       // Solo permite leer documentos que tienen folioCertificado y codigoVerificacion
-      allow read: if request.auth == null &&
-                     resource.data.folioCertificado != null &&
-                     resource.data.codigoVerificacion != null;
-    }
-    
-    // Permitir consultas públicas en la colección alumnos SOLO para verificación
-    // Esto permite buscar por folioCertificado sin autenticación
-    // La seguridad está en que necesitas el folio Y el código para verificar
-    match /alumnos/{document=**} {
-      allow list: if request.auth == null &&
-                     request.query.limit <= 10;
+      allow get: if request.auth == null &&
+                    resource.data.folioCertificado != null &&
+                    resource.data.codigoVerificacion != null;
+      
+      // Permitir consultas (list) públicas para buscar por folioCertificado
+      // Esto es necesario para la función verificarCertificado que usa where()
+      allow list: if request.auth == null;
     }
     
     // Colección: materias
