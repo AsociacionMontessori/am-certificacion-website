@@ -5,6 +5,7 @@ import { signInWithEmailAndPassword } from 'firebase/auth';
 import { db, auth } from '../../config/firebase';
 import { ArrowLeftIcon, CalendarIcon, ChartBarIcon, AcademicCapIcon, PencilIcon, CheckIcon, XMarkIcon, EyeIcon, EyeSlashIcon, ClipboardDocumentIcon, ArrowRightOnRectangleIcon } from '@heroicons/react/24/outline';
 import { formatearFechaLarga, formatearFechaInput } from '../../utils/formatearFecha';
+import { useNotifications } from '../../contexts/NotificationContext';
 
 const AlumnoDetail = () => {
   const { id } = useParams();
@@ -28,14 +29,22 @@ const AlumnoDetail = () => {
   });
   const [showPassword, setShowPassword] = useState(false);
 
+  const { success, error: showError, prompt: showPrompt } = useNotifications();
+
   // Función para copiar al portapapeles
   const handleCopyToClipboard = async (texto, tipo = '') => {
     try {
       await navigator.clipboard.writeText(texto);
-      alert(`${tipo ? tipo + ' ' : ''}copiado al portapapeles`);
+      success(`${tipo ? tipo + ' ' : ''}copiado al portapapeles`);
     } catch (error) {
       console.error('Error al copiar:', error);
-      prompt(`Copia este ${tipo || 'texto'}:`, texto);
+      const userInput = await showPrompt(`Copia este ${tipo || 'texto'}:`, {
+        defaultValue: texto,
+        title: 'Copiar al portapapeles'
+      });
+      if (userInput) {
+        success(`${tipo ? tipo + ' ' : ''}copiado al portapapeles`);
+      }
     }
   };
 
@@ -99,10 +108,10 @@ const AlumnoDetail = () => {
       }
       
       setEditing(false);
-      alert('Datos guardados exitosamente');
+      success('Datos guardados exitosamente');
     } catch (error) {
       console.error('Error al guardar:', error);
-      alert('Error al guardar los datos');
+      showError('Error al guardar los datos');
     }
     setSaving(false);
   };
@@ -132,7 +141,7 @@ const AlumnoDetail = () => {
   // Función para iniciar sesión como este usuario
   const handleSignInAsUser = async () => {
     if (!alumno?.email) {
-      alert('No se puede iniciar sesión: el usuario no tiene email');
+      showError('No se puede iniciar sesión: el usuario no tiene email');
       return;
     }
 
@@ -140,9 +149,13 @@ const AlumnoDetail = () => {
     const password = alumno.passwordTemporal;
 
     if (!password) {
-      const userPassword = prompt(
+      const userPassword = await showPrompt(
         'La contraseña no está disponible en el sistema. Por favor, ingresa la contraseña del usuario:',
-        ''
+        {
+          title: 'Ingresar contraseña',
+          type: 'password',
+          placeholder: 'Contraseña del usuario'
+        }
       );
       if (!userPassword) {
         return;
@@ -154,7 +167,7 @@ const AlumnoDetail = () => {
         navigate('/');
       } catch (error) {
         console.error('Error al iniciar sesión:', error);
-        alert(`Error al iniciar sesión: ${error.message}`);
+        showError(`Error al iniciar sesión: ${error.message}`);
       } finally {
         setSigningIn(false);
       }
@@ -169,16 +182,20 @@ const AlumnoDetail = () => {
     } catch (error) {
       console.error('Error al iniciar sesión:', error);
       // Si la contraseña no funciona, pedirla manualmente
-      const userPassword = prompt(
+      const userPassword = await showPrompt(
         'La contraseña registrada no funcionó. Por favor, ingresa la contraseña del usuario:',
-        ''
+        {
+          title: 'Ingresar contraseña',
+          type: 'password',
+          placeholder: 'Contraseña del usuario'
+        }
       );
       if (userPassword) {
         try {
           await signInWithEmailAndPassword(auth, alumno.email, userPassword);
           navigate('/');
         } catch (retryError) {
-          alert(`Error al iniciar sesión: ${retryError.message}`);
+          showError(`Error al iniciar sesión: ${retryError.message}`);
         }
       }
     } finally {

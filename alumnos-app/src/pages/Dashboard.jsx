@@ -1,4 +1,5 @@
 import { useAuth } from '../contexts/AuthContext';
+import { useNotifications } from '../contexts/NotificationContext';
 import { 
   DocumentTextIcon, 
   CalendarIcon, 
@@ -23,14 +24,22 @@ const Dashboard = () => {
   const { userData } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
 
+  const { success, error: showError, prompt: showPrompt } = useNotifications();
+
   // Función para copiar al portapapeles
   const handleCopyToClipboard = async (texto, tipo = '') => {
     try {
       await navigator.clipboard.writeText(texto);
-      alert(`${tipo ? tipo + ' ' : ''}copiado al portapapeles`);
+      success(`${tipo ? tipo + ' ' : ''}copiado al portapapeles`);
     } catch (error) {
       console.error('Error al copiar:', error);
-      prompt(`Copia este ${tipo || 'texto'}:`, texto);
+      const userInput = await showPrompt(`Copia este ${tipo || 'texto'}:`, {
+        defaultValue: texto,
+        title: 'Copiar al portapapeles'
+      });
+      if (userInput) {
+        success(`${tipo ? tipo + ' ' : ''}copiado al portapapeles`);
+      }
     }
   };
 

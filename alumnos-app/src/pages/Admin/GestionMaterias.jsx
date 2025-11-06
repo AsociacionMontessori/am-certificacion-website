@@ -7,9 +7,11 @@ import { ArrowLeftIcon, PlusIcon, PencilIcon, TrashIcon, CalendarIcon, DocumentD
 import LoadingSpinner from '../../components/LoadingSpinner';
 import LoadingButton from '../../components/LoadingButton';
 import { formatearFechaLarga, formatearFechaInput } from '../../utils/formatearFecha';
+import { useNotifications } from '../../contexts/NotificationContext';
 
 const GestionMaterias = () => {
   const { id } = useParams();
+  const { success, error: showError, confirm } = useNotifications();
   const [alumno, setAlumno] = useState(null);
   const [materias, setMaterias] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -126,7 +128,7 @@ const GestionMaterias = () => {
       });
     } catch (error) {
       console.error('Error al guardar materia:', error);
-      alert('Error al guardar la materia');
+      showError('Error al guardar la materia');
     }
   };
 
@@ -143,13 +145,24 @@ const GestionMaterias = () => {
   };
 
   const handleDelete = async (materiaId) => {
-    if (window.confirm('¿Estás seguro de eliminar esta materia?')) {
+    const confirmed = await confirm(
+      '¿Estás seguro de eliminar esta materia?',
+      {
+        title: 'Confirmar eliminación',
+        type: 'danger',
+        confirmText: 'Sí, eliminar',
+        cancelText: 'Cancelar'
+      }
+    );
+    
+    if (confirmed) {
       try {
         await deleteDoc(doc(db, 'materias', materiaId));
         setMaterias(materias.filter(m => m.id !== materiaId));
+        success('Materia eliminada exitosamente');
       } catch (error) {
         console.error('Error al eliminar materia:', error);
-        alert('Error al eliminar la materia');
+        showError('Error al eliminar la materia');
       }
     }
   };
@@ -177,7 +190,17 @@ const GestionMaterias = () => {
       ? '¿Estás seguro de eliminar esta materia?'
       : `¿Estás seguro de eliminar ${selectedMaterias.length} materias?`;
     
-    if (!window.confirm(confirmMessage)) return;
+    const confirmed = await confirm(
+      confirmMessage,
+      {
+        title: 'Confirmar eliminación',
+        type: 'danger',
+        confirmText: 'Sí, eliminar',
+        cancelText: 'Cancelar'
+      }
+    );
+    
+    if (!confirmed) return;
 
     try {
       const batch = writeBatch(db);
@@ -187,13 +210,14 @@ const GestionMaterias = () => {
       
       await batch.commit();
       
+      const count = selectedMaterias.length;
       setMaterias(materias.filter(m => !selectedMaterias.includes(m.id)));
       setSelectedMaterias([]);
       setIsSelecting(false);
-      alert(`✅ ${selectedMaterias.length} materia(s) eliminada(s) exitosamente`);
+      success(`${count} materia(s) eliminada(s) exitosamente`);
     } catch (error) {
       console.error('Error al eliminar materias:', error);
-      alert('Error al eliminar las materias');
+      showError('Error al eliminar las materias');
     }
   };
 
@@ -355,7 +379,7 @@ const GestionMaterias = () => {
       setShowBulkModal(false);
       setBulkData('');
       setBulkPreview([]);
-      alert(`✅ ${bulkPreview.length} materias agregadas exitosamente`);
+      success(`${bulkPreview.length} materias agregadas exitosamente`);
     } catch (error) {
       console.error('Error al agregar materias por lotes:', error);
       setBulkError('Error al guardar las materias: ' + error.message);

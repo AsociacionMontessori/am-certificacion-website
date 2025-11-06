@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeftIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
 import { regenerarTodosLosCodigos } from '../../utils/regenerarCodigosVerificacion';
+import { useNotifications } from '../../contexts/NotificationContext';
 
 const STORAGE_KEY = 'regenerarCodigos_historial';
 
@@ -23,8 +24,20 @@ const RegenerarCodigos = () => {
     }
   }, []);
 
+  const { confirm } = useNotifications();
+
   const handleRegenerar = async () => {
-    if (!window.confirm('¿Estás seguro de regenerar todos los códigos de verificación? Esto actualizará los códigos de todos los alumnos que tienen folio.')) {
+    const confirmed = await confirm(
+      '¿Estás seguro de regenerar todos los códigos de verificación? Esto actualizará los códigos de todos los alumnos que tienen folio.',
+      {
+        title: 'Confirmar regeneración',
+        type: 'warning',
+        confirmText: 'Sí, regenerar',
+        cancelText: 'Cancelar'
+      }
+    );
+    
+    if (!confirmed) {
       return;
     }
 
@@ -120,8 +133,18 @@ const RegenerarCodigos = () => {
           </button>
           {resultado && (
             <button
-              onClick={() => {
-                if (window.confirm('¿Deseas limpiar el historial guardado?')) {
+              onClick={async () => {
+                const confirmed = await confirm(
+                  '¿Deseas limpiar el historial guardado?',
+                  {
+                    title: 'Limpiar historial',
+                    type: 'warning',
+                    confirmText: 'Sí, limpiar',
+                    cancelText: 'Cancelar'
+                  }
+                );
+                
+                if (confirmed) {
                   localStorage.removeItem(STORAGE_KEY);
                   setResultado(null);
                 }

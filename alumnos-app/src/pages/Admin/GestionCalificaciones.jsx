@@ -6,9 +6,11 @@ import { getMateriasPorNivel } from '../../data/materiasPorNivel';
 import { ArrowLeftIcon, PlusIcon, PencilIcon, TrashIcon, ChartBarIcon, DocumentDuplicateIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import LoadingButton from '../../components/LoadingButton';
+import { useNotifications } from '../../contexts/NotificationContext';
 
 const GestionCalificaciones = () => {
   const { id } = useParams();
+  const { success, error: showError, confirm } = useNotifications();
   const [alumno, setAlumno] = useState(null);
   const [calificaciones, setCalificaciones] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -107,7 +109,7 @@ const GestionCalificaciones = () => {
       });
     } catch (error) {
       console.error('Error al guardar calificación:', error);
-      alert('Error al guardar la calificación');
+      showError('Error al guardar la calificación');
     }
   };
 
@@ -121,13 +123,24 @@ const GestionCalificaciones = () => {
   };
 
   const handleDelete = async (calificacionId) => {
-    if (window.confirm('¿Estás seguro de eliminar esta calificación?')) {
+    const confirmed = await confirm(
+      '¿Estás seguro de eliminar esta calificación?',
+      {
+        title: 'Confirmar eliminación',
+        type: 'danger',
+        confirmText: 'Sí, eliminar',
+        cancelText: 'Cancelar'
+      }
+    );
+    
+    if (confirmed) {
       try {
         await deleteDoc(doc(db, 'calificaciones', calificacionId));
         setCalificaciones(calificaciones.filter(c => c.id !== calificacionId));
+        success('Calificación eliminada exitosamente');
       } catch (error) {
         console.error('Error al eliminar calificación:', error);
-        alert('Error al eliminar la calificación');
+        showError('Error al eliminar la calificación');
       }
     }
   };
@@ -155,7 +168,17 @@ const GestionCalificaciones = () => {
       ? '¿Estás seguro de eliminar esta calificación?'
       : `¿Estás seguro de eliminar ${selectedCalificaciones.length} calificaciones?`;
     
-    if (!window.confirm(confirmMessage)) return;
+    const confirmed = await confirm(
+      confirmMessage,
+      {
+        title: 'Confirmar eliminación',
+        type: 'danger',
+        confirmText: 'Sí, eliminar',
+        cancelText: 'Cancelar'
+      }
+    );
+    
+    if (!confirmed) return;
 
     try {
       const batch = writeBatch(db);
@@ -165,13 +188,14 @@ const GestionCalificaciones = () => {
       
       await batch.commit();
       
+      const count = selectedCalificaciones.length;
       setCalificaciones(calificaciones.filter(c => !selectedCalificaciones.includes(c.id)));
       setSelectedCalificaciones([]);
       setIsSelecting(false);
-      alert(`✅ ${selectedCalificaciones.length} calificación(es) eliminada(s) exitosamente`);
+      success(`${count} calificación(es) eliminada(s) exitosamente`);
     } catch (error) {
       console.error('Error al eliminar calificaciones:', error);
-      alert('Error al eliminar las calificaciones');
+      showError('Error al eliminar las calificaciones');
     }
   };
 
@@ -281,7 +305,7 @@ const GestionCalificaciones = () => {
       setShowBulkModal(false);
       setBulkData('');
       setBulkPreview([]);
-      alert(`✅ ${bulkPreview.length} calificación(es) agregada(s) exitosamente`);
+      success(`${bulkPreview.length} calificación(es) agregada(s) exitosamente`);
     } catch (error) {
       console.error('Error al agregar calificaciones por lotes:', error);
       setBulkError('Error al guardar las calificaciones: ' + error.message);

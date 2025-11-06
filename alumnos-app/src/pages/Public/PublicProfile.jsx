@@ -5,9 +5,11 @@ import { db } from '../../config/firebase';
 import { AcademicCapIcon, UserIcon, CalendarIcon, DocumentTextIcon, PrinterIcon, ClipboardDocumentIcon, LinkIcon } from '@heroicons/react/24/outline';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import { formatearFechaLarga } from '../../utils/formatearFecha';
+import { useNotifications } from '../../contexts/NotificationContext';
 
 const PublicProfile = () => {
   const { id } = useParams();
+  const { success, prompt: showPrompt } = useNotifications();
   const [alumno, setAlumno] = useState(null);
   const [materias, setMaterias] = useState([]);
   const [calificaciones, setCalificaciones] = useState([]);
@@ -115,12 +117,16 @@ const PublicProfile = () => {
   const handleCopyToClipboard = async (texto, tipo = '') => {
     try {
       await navigator.clipboard.writeText(texto);
-      // Mostrar feedback visual (puedes mejorar esto con un toast)
-      alert(`${tipo ? tipo + ' ' : ''}copiado al portapapeles`);
+      success(`${tipo ? tipo + ' ' : ''}copiado al portapapeles`);
     } catch (error) {
       console.error('Error al copiar:', error);
-      // Fallback: usar prompt
-      prompt(`Copia este ${tipo || 'texto'}:`, texto);
+      const userInput = await showPrompt(`Copia este ${tipo || 'texto'}:`, {
+        defaultValue: texto,
+        title: 'Copiar al portapapeles'
+      });
+      if (userInput) {
+        success(`${tipo ? tipo + ' ' : ''}copiado al portapapeles`);
+      }
     }
   };
 

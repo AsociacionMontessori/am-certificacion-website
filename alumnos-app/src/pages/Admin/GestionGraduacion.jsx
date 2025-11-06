@@ -5,9 +5,11 @@ import { db } from '../../config/firebase';
 import { ArrowLeftIcon, AcademicCapIcon, CheckCircleIcon, ClockIcon } from '@heroicons/react/24/outline';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import LoadingButton from '../../components/LoadingButton';
+import { useNotifications } from '../../contexts/NotificationContext';
 
 const GestionGraduacion = () => {
   const { id } = useParams();
+  const { success, error: showError } = useNotifications();
   const [alumno, setAlumno] = useState(null);
   const [infoGraduacion, setInfoGraduacion] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -74,11 +76,14 @@ const GestionGraduacion = () => {
         });
       }
 
-      alert('Información de graduación guardada exitosamente');
-      window.location.reload();
+      success('Información de graduación guardada exitosamente');
+      // Recargar después de un breve delay para mostrar la notificación
+      setTimeout(() => {
+        window.location.reload();
+      }, 1500);
     } catch (error) {
       console.error('Error al guardar información de graduación:', error);
-      alert('Error al guardar la información de graduación');
+      showError('Error al guardar la información de graduación');
     } finally {
       setSaving(false);
     }

@@ -2,6 +2,7 @@ import { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { ThemeProvider } from './contexts/ThemeContext';
+import { NotificationProvider } from './contexts/NotificationContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminRoute from './components/AdminRoute';
 import Layout from './components/Layout';
@@ -77,8 +78,9 @@ const DashboardRedirect = () => {
 function App() {
   return (
     <ThemeProvider>
-      <AuthProvider>
-        <Router>
+      <NotificationProvider>
+        <AuthProvider>
+          <Router>
         <Routes>
           {/* Rutas públicas */}
           <Route 
@@ -307,7 +309,8 @@ function App() {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
         </Router>
-      </AuthProvider>
+        </AuthProvider>
+      </NotificationProvider>
     </ThemeProvider>
   );
 }

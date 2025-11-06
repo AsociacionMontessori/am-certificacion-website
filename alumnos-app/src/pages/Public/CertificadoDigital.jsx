@@ -4,9 +4,11 @@ import { QRCodeSVG } from 'qrcode.react';
 import { obtenerCertificado } from '../../services/certificadoService';
 import { AcademicCapIcon, ShieldCheckIcon, ShareIcon } from '@heroicons/react/24/outline';
 import { formatearFechaLarga } from '../../utils/formatearFecha';
+import { useNotifications } from '../../contexts/NotificationContext';
 
 const CertificadoDigital = () => {
   const { id } = useParams();
+  const { success } = useNotifications();
   const [certificado, setCertificado] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -245,24 +247,30 @@ const CertificadoDigital = () => {
             Imprimir Certificado
           </button>
           <button
-            onClick={() => {
+            onClick={async () => {
               const url = window.location.href;
               if (navigator.share) {
                 navigator.share({
                   title: `${esGraduado ? 'Certificado Digital' : 'Constancia de Estudios'} - ${alumno.nombreCompleto}`,
                   text: `Certificado digital de ${alumno.nombreCompleto}`,
                   url: url
-                }).catch(() => {
+                }).catch(async () => {
                   // Si falla, copiar al portapapeles
-                  navigator.clipboard.writeText(url).then(() => {
-                    alert('URL copiada al portapapeles');
-                  });
+                  try {
+                    await navigator.clipboard.writeText(url);
+                    success('URL copiada al portapapeles');
+                  } catch (error) {
+                    console.error('Error al copiar:', error);
+                  }
                 });
               } else {
                 // Fallback: copiar al portapapeles
-                navigator.clipboard.writeText(url).then(() => {
-                  alert('URL copiada al portapapeles');
-                });
+                try {
+                  await navigator.clipboard.writeText(url);
+                  success('URL copiada al portapapeles');
+                } catch (error) {
+                  console.error('Error al copiar:', error);
+                }
               }
             }}
             className="inline-flex items-center px-6 py-3 bg-green text-gray-900 dark:text-white rounded-lg hover:bg-green/90 transition-colors shadow-lg"

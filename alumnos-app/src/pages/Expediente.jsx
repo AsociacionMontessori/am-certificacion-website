@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { useNotifications } from '../contexts/NotificationContext';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import { DocumentTextIcon, UserIcon, AcademicCapIcon, LinkIcon, ShareIcon, EyeIcon } from '@heroicons/react/24/outline';
@@ -8,6 +9,7 @@ import { formatearFechaLarga } from '../utils/formatearFecha';
 
 const Expediente = () => {
   const { currentUser, userData } = useAuth();
+  const { success } = useNotifications();
   const [expediente, setExpediente] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -194,11 +196,14 @@ const Expediente = () => {
                     Ver
                   </a>
                   <button
-                    onClick={() => {
+                    onClick={async () => {
                       const url = `${window.location.origin}/public/alumno/${currentUser?.uid}`;
-                      navigator.clipboard.writeText(url).then(() => {
-                        alert('URL copiada al portapapeles');
-                      });
+                      try {
+                        await navigator.clipboard.writeText(url);
+                        success('URL copiada al portapapeles');
+                      } catch (error) {
+                        console.error('Error al copiar:', error);
+                      }
                     }}
                     className="inline-flex items-center justify-center px-3 sm:px-4 py-2 bg-green text-gray-900 dark:bg-green/80 dark:text-white rounded-lg hover:bg-green/90 dark:hover:bg-green/70 transition-colors text-sm whitespace-nowrap"
                   >
@@ -232,11 +237,14 @@ const Expediente = () => {
                     Ver
                   </a>
                   <button
-                    onClick={() => {
+                    onClick={async () => {
                       const url = `${window.location.origin}/certificado/${currentUser?.uid}`;
-                      navigator.clipboard.writeText(url).then(() => {
-                        alert('URL copiada al portapapeles');
-                      });
+                      try {
+                        await navigator.clipboard.writeText(url);
+                        success('URL copiada al portapapeles');
+                      } catch (error) {
+                        console.error('Error al copiar:', error);
+                      }
                     }}
                     className="inline-flex items-center justify-center px-3 sm:px-4 py-2 bg-green text-gray-900 dark:bg-green/80 dark:text-white rounded-lg hover:bg-green/90 dark:hover:bg-green/70 transition-colors text-sm whitespace-nowrap"
                   >

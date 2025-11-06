@@ -10,10 +10,12 @@ import {
 import { getMateriasProximas, formatearMateriasParaEmail, formatearMateriasParaEmailTexto } from '../services/notificacionesService';
 import { sendNotificacionMateriasProximas } from '../services/emailService';
 import { useAuth } from '../contexts/AuthContext';
+import { useNotifications } from '../contexts/NotificationContext';
 import LoadingSpinner from './LoadingSpinner';
 
 const AlertasMateriasProximas = () => {
   const { currentUser, userData } = useAuth();
+  const { success, error: showError } = useNotifications();
   const [materiasProximas, setMateriasProximas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [enviandoEmail, setEnviandoEmail] = useState(false);
@@ -50,7 +52,7 @@ const AlertasMateriasProximas = () => {
     const adminEmail = userData?.email || currentUser?.email;
     
     if (!adminEmail) {
-      alert('No se puede enviar el email: no hay email del administrador configurado');
+      showError('No se puede enviar el email: no hay email del administrador configurado');
       return;
     }
 
@@ -60,13 +62,13 @@ const AlertasMateriasProximas = () => {
       if (resultado.success) {
         setEmailEnviado(true);
         localStorage.setItem('lastMateriasEmailDate', new Date().toDateString());
-        alert(resultado.message || 'Email enviado exitosamente');
+        success(resultado.message || 'Email enviado exitosamente');
       } else {
-        alert(resultado.error || 'Error al enviar el email');
+        showError(resultado.error || 'Error al enviar el email');
       }
     } catch (error) {
       console.error('Error al enviar email:', error);
-      alert('Error al enviar el email. Por favor, intenta de nuevo.');
+      showError('Error al enviar el email. Por favor, intenta de nuevo.');
     } finally {
       setEnviandoEmail(false);
     }

@@ -4,8 +4,10 @@ import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { QRCodeSVG } from 'qrcode.react';
 import { ArrowLeftIcon, ArrowDownTrayIcon, PrinterIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
+import { useNotifications } from '../../contexts/NotificationContext';
 
 const GeneradorQR = () => {
+  const { error: showError } = useNotifications();
   const [alumnos, setAlumnos] = useState([]);
   const [alumnoSeleccionado, setAlumnoSeleccionado] = useState(null);
   const [busqueda, setBusqueda] = useState('');
@@ -46,7 +48,7 @@ const GeneradorQR = () => {
     // Buscar el elemento SVG del QR
     const qrElement = document.querySelector('#qr-permanente svg');
     if (!qrElement) {
-      alert('No se pudo encontrar el código QR. Por favor, intenta de nuevo.');
+      showError('No se pudo encontrar el código QR. Por favor, intenta de nuevo.');
       return;
     }
     
@@ -78,7 +80,7 @@ const GeneradorQR = () => {
         // Descargar como PNG
         canvas.toBlob((blob) => {
           if (!blob) {
-            alert('Error al generar la imagen. Por favor, intenta de nuevo.');
+            showError('Error al generar la imagen. Por favor, intenta de nuevo.');
             return;
           }
           
@@ -96,14 +98,14 @@ const GeneradorQR = () => {
       };
       
       img.onerror = () => {
-        alert('Error al cargar la imagen del QR. Por favor, intenta de nuevo.');
+        showError('Error al cargar la imagen del QR. Por favor, intenta de nuevo.');
         URL.revokeObjectURL(svgUrl);
       };
       
       img.src = svgUrl;
     } catch (error) {
       console.error('Error al descargar QR:', error);
-      alert('Error al descargar el código QR. Por favor, intenta de nuevo.');
+      showError('Error al descargar el código QR. Por favor, intenta de nuevo.');
     }
   };
 

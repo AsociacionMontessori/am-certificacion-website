@@ -3,9 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { collection, addDoc } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import { DocumentTextIcon } from '@heroicons/react/24/outline';
+import { useNotifications } from '../contexts/NotificationContext';
 
 const Inscripcion = () => {
   const navigate = useNavigate();
+  const { success, error: showError } = useNotifications();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     nombreCompleto: '',
@@ -52,11 +54,11 @@ const Inscripcion = () => {
 
       await addDoc(collection(db, 'inscripciones'), inscripcionData);
 
-      alert('¡Inscripción enviada exitosamente! Te contactaremos pronto.');
-      navigate('/');
+      success('¡Inscripción enviada exitosamente! Te contactaremos pronto.');
+      setTimeout(() => navigate('/'), 2000);
     } catch (error) {
       console.error('Error al enviar inscripción:', error);
-      alert('Error al enviar la inscripción. Por favor, intenta de nuevo.');
+      showError('Error al enviar la inscripción. Por favor, intenta de nuevo.');
     } finally {
       setLoading(false);
     }
