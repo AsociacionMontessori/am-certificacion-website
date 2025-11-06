@@ -34,6 +34,7 @@ export const crearUsuarioAlumno = async (datosUsuario) => {
     const alumnoData = {
       nombre: nombre || '',
       email: email,
+      matricula: datosAdicionales.matricula || null,
       emailContacto: datosAdicionales.emailContacto || null,
       telefono: datosAdicionales.telefono || null,
       nivel: datosAdicionales.nivel || null,
