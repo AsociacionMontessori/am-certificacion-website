@@ -1,14 +1,12 @@
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { collection, query, where, getDocs, getDoc, doc, updateDoc, deleteDoc, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { getMateriasPorNivel } from '../../data/materiasPorNivel';
 import { ArrowLeftIcon, PlusIcon, PencilIcon, TrashIcon, CalendarIcon } from '@heroicons/react/24/outline';
-import { Link } from 'react-router-dom';
 
 const GestionMaterias = () => {
   const { id } = useParams();
-  const navigate = useNavigate();
   const [alumno, setAlumno] = useState(null);
   const [materias, setMaterias] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -169,11 +167,11 @@ const GestionMaterias = () => {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <Link
-            to="/admin"
+            to={`/admin/alumno/${id}`}
             className="inline-flex items-center text-blue hover:text-blue/80 mb-4"
           >
             <ArrowLeftIcon className="w-5 h-5 mr-2" />
-            Volver al panel
+            Volver al alumno
           </Link>
           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white">
             Gestión de Materias

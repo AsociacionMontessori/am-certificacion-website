@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { collection, query, where, getDocs, getDoc, doc, updateDoc, deleteDoc, addDoc, orderBy, serverTimestamp } from 'firebase/firestore';
+import { collection, query, where, getDocs, getDoc, doc, updateDoc, deleteDoc, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { getMateriasPorNivel } from '../../data/materiasPorNivel';
 import { ArrowLeftIcon, PlusIcon, PencilIcon, TrashIcon, ChartBarIcon } from '@heroicons/react/24/outline';
@@ -14,10 +14,7 @@ const GestionCalificaciones = () => {
   const [calificacionEditando, setCalificacionEditando] = useState(null);
   const [formData, setFormData] = useState({
     materia: '',
-    periodo: '',
-    calificacion: '',
-    profesor: '',
-    observaciones: ''
+    calificacion: ''
   });
 
   useEffect(() => {
@@ -39,11 +36,8 @@ const GestionCalificaciones = () => {
           ...doc.data()
         }));
         
-        // Ordenar en el cliente: primero por período (desc), luego por materia (asc)
+        // Ordenar por materia (asc)
         calificacionesData.sort((a, b) => {
-          if (a.periodo !== b.periodo) {
-            return (b.periodo || '').localeCompare(a.periodo || '');
-          }
           return (a.materia || '').localeCompare(b.materia || '');
         });
         
@@ -65,10 +59,7 @@ const GestionCalificaciones = () => {
       const calificacionData = {
         alumnoId: id,
         materia: formData.materia,
-        periodo: formData.periodo,
         calificacion: parseFloat(formData.calificacion),
-        profesor: formData.profesor || null,
-        observaciones: formData.observaciones || null,
         fechaActualizacion: serverTimestamp()
       };
 
@@ -92,11 +83,8 @@ const GestionCalificaciones = () => {
         ...doc.data()
       }));
       
-      // Ordenar en el cliente
+      // Ordenar por materia (asc)
       calificacionesData.sort((a, b) => {
-        if (a.periodo !== b.periodo) {
-          return (b.periodo || '').localeCompare(a.periodo || '');
-        }
         return (a.materia || '').localeCompare(b.materia || '');
       });
       
@@ -106,10 +94,7 @@ const GestionCalificaciones = () => {
       setCalificacionEditando(null);
       setFormData({
         materia: '',
-        periodo: '',
-        calificacion: '',
-        profesor: '',
-        observaciones: ''
+        calificacion: ''
       });
     } catch (error) {
       console.error('Error al guardar calificación:', error);
@@ -121,10 +106,7 @@ const GestionCalificaciones = () => {
     setCalificacionEditando(calificacion);
     setFormData({
       materia: calificacion.materia,
-      periodo: calificacion.periodo,
-      calificacion: calificacion.calificacion?.toString() || '',
-      profesor: calificacion.profesor || '',
-      observaciones: calificacion.observaciones || ''
+      calificacion: calificacion.calificacion?.toString() || ''
     });
     setShowModal(true);
   };
@@ -149,7 +131,6 @@ const GestionCalificaciones = () => {
   };
 
   const materiasDisponibles = alumno?.nivel ? getMateriasPorNivel(alumno.nivel) : [];
-  const periodos = [...new Set(calificaciones.map(c => c.periodo))].sort().reverse();
 
   if (loading) {
     return (
@@ -182,10 +163,7 @@ const GestionCalificaciones = () => {
             setCalificacionEditando(null);
             setFormData({
               materia: '',
-              periodo: '',
-              calificacion: '',
-              profesor: '',
-              observaciones: ''
+              calificacion: ''
             });
             setShowModal(true);
           }}
@@ -196,76 +174,45 @@ const GestionCalificaciones = () => {
         </button>
       </div>
 
-      {/* Calificaciones por período */}
-      {periodos.length > 0 ? (
-        <div className="space-y-6">
-          {periodos.map((periodo) => {
-            const calificacionesPeriodo = calificaciones.filter(c => c.periodo === periodo);
-            const promedioPeriodo = calificacionesPeriodo.length > 0
-              ? (calificacionesPeriodo.reduce((acc, c) => acc + (c.calificacion || 0), 0) / calificacionesPeriodo.length).toFixed(2)
-              : 0;
-
-            return (
-              <div key={periodo} className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
-                <div className="bg-yellow/10 dark:bg-yellow/20 px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 dark:border-gray-700">
-                  <div className="flex items-center justify-between">
-                    <h2 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white flex items-center">
-                      <ChartBarIcon className="w-5 h-5 sm:w-6 sm:h-6 text-yellow mr-2" />
-                      {periodo}
-                    </h2>
-                    <div className="text-right">
-                      <p className="text-sm text-gray-500 dark:text-gray-400">Promedio</p>
-                      <p className="text-2xl font-bold text-yellow">{promedioPeriodo}</p>
+      {/* Lista de calificaciones */}
+      {calificaciones.length > 0 ? (
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
+          <div className="p-4 sm:p-6">
+            <div className="space-y-3">
+              {calificaciones.map((calificacion) => (
+                <div key={calificacion.id} className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 border border-gray-200 dark:border-gray-600">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between">
+                        <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
+                          {calificacion.materia}
+                        </h3>
+                        <span className={`text-xl sm:text-2xl font-bold ${obtenerColorCalificacion(calificacion.calificacion)}`}>
+                          {calificacion.calificacion || 'N/A'}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => handleEdit(calificacion)}
+                        className="p-2 text-blue hover:bg-blue/10 rounded-lg transition-colors"
+                        aria-label="Editar"
+                      >
+                        <PencilIcon className="w-5 h-5" />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(calificacion.id)}
+                        className="p-2 text-red hover:bg-red/10 rounded-lg transition-colors"
+                        aria-label="Eliminar"
+                      >
+                        <TrashIcon className="w-5 h-5" />
+                      </button>
                     </div>
                   </div>
                 </div>
-                <div className="p-4 sm:p-6">
-                  <div className="space-y-3">
-                    {calificacionesPeriodo.map((calificacion) => (
-                      <div key={calificacion.id} className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 border border-gray-200 dark:border-gray-600">
-                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                          <div className="flex-1">
-                            <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                              {calificacion.materia}
-                            </h3>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-gray-600 dark:text-gray-400">
-                              <div>
-                                <span className={`text-lg font-bold ${obtenerColorCalificacion(calificacion.calificacion)}`}>
-                                  {calificacion.calificacion || 'N/A'}
-                                </span>
-                              </div>
-                              {calificacion.profesor && (
-                                <div>Profesor: {calificacion.profesor}</div>
-                              )}
-                              {calificacion.observaciones && (
-                                <div className="sm:col-span-2">Observaciones: {calificacion.observaciones}</div>
-                              )}
-                            </div>
-                          </div>
-                          <div className="flex gap-2">
-                            <button
-                              onClick={() => handleEdit(calificacion)}
-                              className="p-2 text-blue hover:bg-blue/10 rounded-lg transition-colors"
-                              aria-label="Editar"
-                            >
-                              <PencilIcon className="w-5 h-5" />
-                            </button>
-                            <button
-                              onClick={() => handleDelete(calificacion.id)}
-                              className="p-2 text-red hover:bg-red/10 rounded-lg transition-colors"
-                              aria-label="Eliminar"
-                            >
-                              <TrashIcon className="w-5 h-5" />
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            );
-          })}
+              ))}
+            </div>
+          </div>
         </div>
       ) : (
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-8 sm:p-12 text-center">
@@ -304,57 +251,18 @@ const GestionCalificaciones = () => {
                   </select>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Período *
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={formData.periodo}
-                      onChange={(e) => setFormData({ ...formData, periodo: e.target.value })}
-                      placeholder="Ej: 2024-1, Enero-Junio 2024"
-                      className="w-full px-4 py-2.5 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Calificación *
-                    </label>
-                    <input
-                      type="number"
-                      required
-                      min="0"
-                      max="100"
-                      step="0.1"
-                      value={formData.calificacion}
-                      onChange={(e) => setFormData({ ...formData, calificacion: e.target.value })}
-                      className="w-full px-4 py-2.5 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue"
-                    />
-                  </div>
-                </div>
-
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Profesor
+                    Calificación *
                   </label>
                   <input
-                    type="text"
-                    value={formData.profesor}
-                    onChange={(e) => setFormData({ ...formData, profesor: e.target.value })}
-                    className="w-full px-4 py-2.5 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Observaciones
-                  </label>
-                  <textarea
-                    value={formData.observaciones}
-                    onChange={(e) => setFormData({ ...formData, observaciones: e.target.value })}
-                    rows={3}
+                    type="number"
+                    required
+                    min="0"
+                    max="100"
+                    step="0.1"
+                    value={formData.calificacion}
+                    onChange={(e) => setFormData({ ...formData, calificacion: e.target.value })}
                     className="w-full px-4 py-2.5 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue"
                   />
                 </div>

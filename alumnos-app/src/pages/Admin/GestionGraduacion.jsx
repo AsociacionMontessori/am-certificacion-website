@@ -14,11 +14,7 @@ const GestionGraduacion = () => {
     promedioMinimo: false,
     tesisCompletada: false,
     practicasCompletadas: false,
-    pagoRealizado: false,
-    fechaCeremonia: '',
-    lugarCeremonia: '',
-    horaCeremonia: '',
-    instrucciones: ''
+    pagoRealizado: false
   });
 
   useEffect(() => {
@@ -38,13 +34,7 @@ const GestionGraduacion = () => {
             promedioMinimo: graduacionData.promedioMinimo || false,
             tesisCompletada: graduacionData.tesisCompletada || false,
             practicasCompletadas: graduacionData.practicasCompletadas || false,
-            pagoRealizado: graduacionData.pagoRealizado || false,
-            fechaCeremonia: graduacionData.fechaCeremonia?.toDate 
-              ? graduacionData.fechaCeremonia.toDate().toISOString().split('T')[0]
-              : graduacionData.fechaCeremonia || '',
-            lugarCeremonia: graduacionData.lugarCeremonia || '',
-            horaCeremonia: graduacionData.horaCeremonia || '',
-            instrucciones: graduacionData.instrucciones || ''
+            pagoRealizado: graduacionData.pagoRealizado || false
           });
         }
       } catch (error) {
@@ -68,10 +58,6 @@ const GestionGraduacion = () => {
         tesisCompletada: formData.tesisCompletada,
         practicasCompletadas: formData.practicasCompletadas,
         pagoRealizado: formData.pagoRealizado,
-        fechaCeremonia: formData.fechaCeremonia ? new Date(formData.fechaCeremonia) : null,
-        lugarCeremonia: formData.lugarCeremonia || null,
-        horaCeremonia: formData.horaCeremonia || null,
-        instrucciones: formData.instrucciones || null,
         fechaActualizacion: serverTimestamp()
       };
 
@@ -176,61 +162,6 @@ const GestionGraduacion = () => {
                 </span>
               </label>
             ))}
-          </div>
-        </div>
-
-        {/* Información de Ceremonia */}
-        <div>
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-            Información de Ceremonia
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Fecha de Ceremonia
-              </label>
-              <input
-                type="date"
-                value={formData.fechaCeremonia}
-                onChange={(e) => setFormData({ ...formData, fechaCeremonia: e.target.value })}
-                className="w-full px-4 py-2.5 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Hora de Ceremonia
-              </label>
-              <input
-                type="time"
-                value={formData.horaCeremonia}
-                onChange={(e) => setFormData({ ...formData, horaCeremonia: e.target.value })}
-                className="w-full px-4 py-2.5 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue"
-              />
-            </div>
-            <div className="sm:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Lugar de Ceremonia
-              </label>
-              <input
-                type="text"
-                value={formData.lugarCeremonia}
-                onChange={(e) => setFormData({ ...formData, lugarCeremonia: e.target.value })}
-                placeholder="Ej: Auditorio Principal"
-                className="w-full px-4 py-2.5 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue"
-              />
-            </div>
-            <div className="sm:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Instrucciones Adicionales
-              </label>
-              <textarea
-                value={formData.instrucciones}
-                onChange={(e) => setFormData({ ...formData, instrucciones: e.target.value })}
-                rows={4}
-                placeholder="Instrucciones adicionales para la ceremonia de graduación..."
-                className="w-full px-4 py-2.5 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue"
-              />
-            </div>
           </div>
         </div>
 
