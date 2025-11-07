@@ -11,29 +11,48 @@
  * 6. firebase deploy --only functions
  */
 
-const functions = require('firebase-functions');
+const {onDocumentCreated} = require('firebase-functions/v2/firestore');
+const {onSchedule} = require('firebase-functions/v2/scheduler');
+const {defineSecret} = require('firebase-functions/params');
 const admin = require('firebase-admin');
 const nodemailer = require('nodemailer');
 
 admin.initializeApp();
 
+// Definir secretos de Firebase (más seguro que config)
+// Estos se configuran con: firebase functions:secrets:set EMAIL_USER
+const emailUser = defineSecret('EMAIL_USER');
+const emailPass = defineSecret('EMAIL_PASS');
+
 // Configurar transporter de email
 // Puedes usar Gmail, SendGrid, o cualquier otro servicio SMTP
-const transporter = nodemailer.createTransport({
-  service: 'gmail', // o 'sendgrid', etc.
-  auth: {
-    user: functions.config().email?.user || process.env.EMAIL_USER,
-    pass: functions.config().email?.pass || process.env.EMAIL_PASS
-  }
-});
+const getTransporter = (user, pass) => {
+  return nodemailer.createTransport({
+    service: 'gmail', // o 'sendgrid', etc.
+    auth: {
+      user: user,
+      pass: pass
+    }
+  });
+};
 
 /**
  * Cloud Function que escucha nuevos documentos en 'emails_pendientes'
  * y envía el email correspondiente
  */
-exports.enviarEmailNotificacion = functions.firestore
-  .document('emails_pendientes/{emailId}')
-  .onCreate(async (snap, context) => {
+exports.enviarEmailNotificacion = onDocumentCreated(
+  {
+    document: 'emails_pendientes/{emailId}',
+    region: 'us-central1',
+    secrets: [emailUser, emailPass],
+  },
+  async (event) => {
+    const snap = event.data;
+    if (!snap) {
+      console.log('No data in event');
+      return null;
+    }
+
     const emailData = snap.data();
 
     // Solo procesar si está pendiente
@@ -41,10 +60,14 @@ exports.enviarEmailNotificacion = functions.firestore
       return null;
     }
 
+    const user = emailUser.value();
+    const pass = emailPass.value();
+    const transporter = getTransporter(user, pass);
+
     try {
       // Configurar opciones del email
       const mailOptions = {
-        from: functions.config().email?.user || process.env.EMAIL_USER,
+        from: user,
         to: emailData.to,
         subject: emailData.subject,
         html: emailData.html,
@@ -86,16 +109,21 @@ exports.enviarEmailNotificacion = functions.firestore
 
       throw error;
     }
-  });
+  }
+);
 
 /**
  * Cloud Function programada que verifica materias próximas diariamente
  * y envía notificaciones si es necesario
  */
-exports.verificarMateriasProximas = functions.pubsub
-  .schedule('0 9 * * *') // Ejecutar diariamente a las 9 AM
-  .timeZone('America/Mexico_City')
-  .onRun(async (context) => {
+exports.verificarMateriasProximas = onSchedule(
+  {
+    schedule: '0 9 * * *', // Ejecutar diariamente a las 9 AM
+    timeZone: 'America/Mexico_City',
+    region: 'us-central1',
+    secrets: [emailUser, emailPass],
+  },
+  async (event) => {
     const db = admin.firestore();
     const hoy = new Date();
     hoy.setHours(0, 0, 0, 0);
@@ -192,7 +220,8 @@ exports.verificarMateriasProximas = functions.pubsub
       console.error('Error al verificar materias próximas:', error);
       throw error;
     }
-  });
+  }
+);
 
 // Funciones auxiliares para formatear emails (simplificadas)
 function formatearMateriasParaEmail(materiasProximas) {

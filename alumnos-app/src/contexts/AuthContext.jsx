@@ -55,22 +55,35 @@ export const AuthProvider = ({ children }) => {
               };
               setUserData(userDataWithRole);
             } else {
-              // Si no es directivo, intentar como alumno
-              const alumnoDoc = await getDoc(doc(db, 'alumnos', user.uid));
+              // Si no es directivo, intentar como grupos
+              const gruposDoc = await getDoc(doc(db, 'grupos', user.uid));
               
-              if (alumnoDoc.exists()) {
-                const alumnoData = alumnoDoc.data();
+              if (gruposDoc.exists()) {
+                const gruposData = gruposDoc.data();
                 const userDataWithRole = { 
-                  id: alumnoDoc.id, 
-                  ...alumnoData, 
-                  rol: 'alumno' 
+                  id: gruposDoc.id, 
+                  ...gruposData, 
+                  rol: 'grupos' 
                 };
                 setUserData(userDataWithRole);
               } else {
-                console.warn('⚠️ Usuario no encontrado en admins, directivos ni alumnos:', user.uid);
-                console.warn('⚠️ Verifica que exista un documento en Firestore con ID =', user.uid);
-                // Si no existe en ninguna colección, no establecer userData
-                setUserData(null);
+                // Si no es grupos, intentar como alumno
+                const alumnoDoc = await getDoc(doc(db, 'alumnos', user.uid));
+                
+                if (alumnoDoc.exists()) {
+                  const alumnoData = alumnoDoc.data();
+                  const userDataWithRole = { 
+                    id: alumnoDoc.id, 
+                    ...alumnoData, 
+                    rol: 'alumno' 
+                  };
+                  setUserData(userDataWithRole);
+                } else {
+                  console.warn('⚠️ Usuario no encontrado en admins, directivos, grupos ni alumnos:', user.uid);
+                  console.warn('⚠️ Verifica que exista un documento en Firestore con ID =', user.uid);
+                  // Si no existe en ninguna colección, no establecer userData
+                  setUserData(null);
+                }
               }
             }
           }

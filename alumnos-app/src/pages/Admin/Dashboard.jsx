@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { collection, getDocs, query, orderBy } from 'firebase/firestore';
+import { collection, getDocs, query, orderBy, getDoc, doc } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { 
   UserGroupIcon, 
@@ -14,9 +14,11 @@ import {
 import { Link } from 'react-router-dom';
 import AlertasMateriasProximas from '../../components/AlertasMateriasProximas';
 import useCanEdit from '../../hooks/useCanEdit';
+import { useAuth } from '../../contexts/AuthContext';
 
 const AdminDashboard = () => {
   const canEdit = useCanEdit();
+  const { userData } = useAuth();
   const [alumnos, setAlumnos] = useState([]);
   const [ultimoAlumnoId, setUltimoAlumnoId] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -31,15 +33,32 @@ const AdminDashboard = () => {
   useEffect(() => {
     const loadAlumnos = async () => {
       try {
-        const alumnosQuery = query(
-          collection(db, 'alumnos'),
-          orderBy('nombre', 'asc')
-        );
-        const querySnapshot = await getDocs(alumnosQuery);
-        const alumnosData = querySnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        }));
+        let alumnosData;
+        
+        // Si es usuario de grupos, solo cargar alumnos asignados
+        if (userData?.rol === 'grupos' && userData?.alumnosAsignados?.length > 0) {
+          // Cargar solo los alumnos asignados
+          const alumnosPromises = userData.alumnosAsignados.map(async (alumnoId) => {
+            const alumnoDoc = await getDoc(doc(db, 'alumnos', alumnoId));
+            if (alumnoDoc.exists()) {
+              return { id: alumnoDoc.id, ...alumnoDoc.data() };
+            }
+            return null;
+          });
+          alumnosData = (await Promise.all(alumnosPromises)).filter(a => a !== null);
+        } else {
+          // Admin y directivo cargan todos los alumnos
+          const alumnosQuery = query(
+            collection(db, 'alumnos'),
+            orderBy('nombre', 'asc')
+          );
+          const querySnapshot = await getDocs(alumnosQuery);
+          alumnosData = querySnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+          }));
+        }
+        
         setAlumnos(alumnosData);
 
         // Determinar el último alumno agregado por fechaCreacion
@@ -68,7 +87,7 @@ const AdminDashboard = () => {
     };
 
     loadAlumnos();
-  }, []);
+  }, [userData]);
 
   // Solo resaltar el último alumno agregado
   const esUltimoAlumno = (alumno) => alumno?.id === ultimoAlumnoId;

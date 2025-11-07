@@ -30,6 +30,7 @@ const VerificarCertificado = lazy(() => import('./pages/Public/VerificarCertific
 const RegenerarCodigos = lazy(() => import('./pages/Admin/RegenerarCodigos'));
 const GeneradorQR = lazy(() => import('./pages/Admin/GeneradorQR'));
 const DiagnosticoCodigos = lazy(() => import('./pages/Admin/DiagnosticoCodigos'));
+const GestionGrupos = lazy(() => import('./pages/Admin/GestionGrupos'));
 
 // Componente para redirigir según el rol
 const DashboardRedirect = () => {
@@ -62,8 +63,8 @@ const DashboardRedirect = () => {
     );
   }
   
-  // Si el usuario es admin o directivo, redirigir al panel de administración
-  if (userData.rol === 'admin' || userData.rol === 'directivo') {
+  // Si el usuario es admin, directivo o grupos, redirigir al panel de administración
+  if (userData.rol === 'admin' || userData.rol === 'directivo' || userData.rol === 'grupos') {
     return <Navigate to="/admin" replace />;
   }
   
@@ -240,6 +241,18 @@ function App() {
                 <AdminLayout>
                   <Suspense fallback={<LoadingSpinner fullScreen size="xl" variant="montessori" message="Cargando..." />}>
                     <GestionGraduacion />
+                  </Suspense>
+                </AdminLayout>
+              </AdminRoute>
+            }
+          />
+          <Route
+            path="/admin/gestion-grupos"
+            element={
+              <AdminRoute>
+                <AdminLayout>
+                  <Suspense fallback={<LoadingSpinner fullScreen size="xl" variant="montessori" message="Cargando..." />}>
+                    <GestionGrupos />
                   </Suspense>
                 </AdminLayout>
               </AdminRoute>

@@ -201,3 +201,49 @@ export const crearUsuarioDirectivo = async (datosDirectivo) => {
   }
 };
 
+/**
+ * Crea un nuevo usuario de grupos
+ * Los usuarios de grupos pueden ver solo los alumnos que les asigne el administrador
+ */
+export const crearUsuarioGrupos = async (datosGrupos) => {
+  try {
+    const { email, password, nombre } = datosGrupos;
+
+    // Crear usuario en Authentication
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
+
+    // Actualizar perfil
+    if (nombre) {
+      await updateProfile(user, {
+        displayName: nombre
+      });
+    }
+
+    // Crear documento en Firestore en la colección 'grupos'
+    // alumnosAsignados es un array vacío inicialmente, el admin lo llenará después
+    await setDoc(doc(db, 'grupos', user.uid), {
+      nombre: nombre || '',
+      email: email,
+      rol: 'grupos',
+      alumnosAsignados: [], // Array de IDs de alumnos que puede ver
+      fechaCreacion: serverTimestamp(),
+      activo: true
+    });
+
+    return {
+      success: true,
+      uid: user.uid,
+      email: user.email,
+      message: 'Usuario de grupos creado exitosamente'
+    };
+  } catch (error) {
+    console.error('Error al crear usuario de grupos:', error);
+    return {
+      success: false,
+      error: error.message,
+      code: error.code
+    };
+  }
+};
+

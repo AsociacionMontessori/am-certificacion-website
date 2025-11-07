@@ -14,7 +14,21 @@ service cloud.firestore {
              exists(/databases/$(database)/documents/directivos/$(request.auth.uid));
     }
     
-    // Función helper para verificar si el usuario es admin o directivo (lectura)
+    // Función helper para verificar si el usuario es grupos
+    function isGrupos() {
+      return request.auth != null && 
+             exists(/databases/$(database)/documents/grupos/$(request.auth.uid));
+    }
+    
+    // Función helper para verificar si el usuario puede leer un alumno específico
+    // Admin y directivo pueden leer todos, grupos solo los asignados
+    function canReadAlumno(alumnoId) {
+      return isAdmin() || 
+             isDirectivo() || 
+             (isGrupos() && alumnoId in get(/databases/$(database)/documents/grupos/$(request.auth.uid)).data.alumnosAsignados);
+    }
+    
+    // Función helper para verificar si el usuario es admin o directivo (lectura completa)
     function canReadAdmin() {
       return isAdmin() || isDirectivo();
     }
@@ -52,11 +66,21 @@ service cloud.firestore {
       allow write: if false;
     }
     
+    // Colección: grupos
+    // PERMITE que un usuario autenticado lea su propio documento de grupos
+    match /grupos/{grupoId} {
+      // Cualquier usuario autenticado puede leer SU PROPIO documento
+      // Esto es necesario para que el sistema pueda verificar si es grupos
+      allow read: if request.auth != null && request.auth.uid == grupoId;
+      // Solo admin puede escribir (asignar alumnos)
+      allow write: if isAdmin();
+    }
+    
     // Colección: alumnos
     match /alumnos/{alumnoId} {
       // El alumno puede leer/editar su propio documento
-      // Admin puede leer y escribir, directivo solo puede leer
-      allow read: if isOwnAlumno(alumnoId) || canReadAdmin();
+      // Admin puede leer y escribir, directivo puede leer todos, grupos solo los asignados
+      allow read: if isOwnAlumno(alumnoId) || canReadAdmin() || canReadAlumno(alumnoId);
       allow write: if isOwnAlumno(alumnoId) || isAdmin();
       
       // Permitir lectura pública SOLO para verificación de certificados
@@ -76,10 +100,11 @@ service cloud.firestore {
     // Colección: materias
     match /materias/{materiaId} {
       // Lectura: propio alumno o pública si el alumno tiene certificado válido
-      // Admin y directivo pueden leer todas las materias
+      // Admin y directivo pueden leer todas, grupos solo de alumnos asignados
       allow read: if (request.auth != null && resource.data.alumnoId == request.auth.uid)
                    || (request.auth == null && hasValidCertificate(resource.data.alumnoId))
-                   || canReadAdmin();
+                   || canReadAdmin()
+                   || (isGrupos() && canReadAlumno(resource.data.alumnoId));
       // Escritura solo admin
       allow write: if isAdmin();
     }
@@ -87,10 +112,11 @@ service cloud.firestore {
     // Colección: calificaciones
     match /calificaciones/{calificacionId} {
       // Lectura: propio alumno o pública si el alumno tiene certificado válido
-      // Admin y directivo pueden leer todas las calificaciones
+      // Admin y directivo pueden leer todas, grupos solo de alumnos asignados
       allow read: if (request.auth != null && resource.data.alumnoId == request.auth.uid)
                    || (request.auth == null && hasValidCertificate(resource.data.alumnoId))
-                   || canReadAdmin();
+                   || canReadAdmin()
+                   || (isGrupos() && canReadAlumno(resource.data.alumnoId));
       // Escritura solo admin
       allow write: if isAdmin();
     }
@@ -98,8 +124,8 @@ service cloud.firestore {
     // Colección: graduacion
     match /graduacion/{alumnoId} {
       // El alumno solo puede leer su propia información
-      // Admin y directivo pueden leer todas las graduaciones
-      allow read: if isOwnAlumno(alumnoId) || canReadAdmin();
+      // Admin y directivo pueden leer todas, grupos solo de alumnos asignados
+      allow read: if isOwnAlumno(alumnoId) || canReadAdmin() || canReadAlumno(alumnoId);
       // Solo admin puede escribir
       allow write: if isAdmin();
     }

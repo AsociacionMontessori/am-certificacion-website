@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { crearUsuarioAlumno } from '../../services/adminService';
+import { crearUsuarioAlumno, crearUsuarioAdmin, crearUsuarioDirectivo, crearUsuarioGrupos } from '../../services/adminService';
 import { UserPlusIcon, ArrowLeftIcon } from '@heroicons/react/24/outline';
 import { Link } from 'react-router-dom';
 import useCanEdit from '../../hooks/useCanEdit';
@@ -20,6 +20,7 @@ const CrearUsuario = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const [formData, setFormData] = useState({
+    rol: 'alumno',
     nombreCompleto: '',
     matricula: '',
     emailContacto: '',
@@ -85,33 +86,54 @@ const CrearUsuario = () => {
     }
 
     try {
-      const resultado = await crearUsuarioAlumno({
-        nombre: formData.nombreCompleto,
-        email: formData.email,
-        password: formData.password,
-        matricula: formData.matricula,
-        emailContacto: formData.emailContacto,
-        telefono: formData.telefono,
-        nivel: formData.nivel,
-        fechaIngreso: formData.fechaIngreso || new Date().toISOString().split('T')[0],
-        fechaEgresoEstimada: formData.fechaEgresoEstimada,
-        estado: formData.estado,
-        mailClassroom: formData.mailClassroom,
-        passwordClassroom: formData.passwordClassroom,
-        creadoPor: currentUser?.uid,
-      });
+      let resultado;
+      
+      // Crear usuario según el rol seleccionado
+      if (formData.rol === 'alumno') {
+        resultado = await crearUsuarioAlumno({
+          nombre: formData.nombreCompleto,
+          email: formData.email,
+          password: formData.password,
+          matricula: formData.matricula,
+          emailContacto: formData.emailContacto,
+          telefono: formData.telefono,
+          nivel: formData.nivel,
+          fechaIngreso: formData.fechaIngreso || new Date().toISOString().split('T')[0],
+          fechaEgresoEstimada: formData.fechaEgresoEstimada,
+          estado: formData.estado,
+          mailClassroom: formData.mailClassroom,
+          passwordClassroom: formData.passwordClassroom,
+          creadoPor: currentUser?.uid,
+        });
+      } else if (formData.rol === 'admin') {
+        resultado = await crearUsuarioAdmin({
+          nombre: formData.nombreCompleto,
+          email: formData.email,
+          password: formData.password,
+        });
+      } else if (formData.rol === 'directivo') {
+        resultado = await crearUsuarioDirectivo({
+          nombre: formData.nombreCompleto,
+          email: formData.email,
+          password: formData.password,
+        });
+      } else if (formData.rol === 'grupos') {
+        resultado = await crearUsuarioGrupos({
+          nombre: formData.nombreCompleto,
+          email: formData.email,
+          password: formData.password,
+        });
+      }
 
-      if (resultado.success) {
+      if (resultado?.success) {
         setSuccess(true);
-        // Guardar información del usuario creado para poder iniciar sesión como él después
+        // Guardar información del usuario creado
         if (resultado.uid && resultado.email) {
-          // La contraseña ya está guardada en localStorage por el servicio
-          // Guardar también el UID y email para referencia
           sessionStorage.setItem('lastCreatedUserId', resultado.uid);
           sessionStorage.setItem('lastCreatedUserEmail', resultado.email);
         }
       } else {
-        setError(resultado.error || 'Error al crear el usuario');
+        setError(resultado?.error || 'Error al crear el usuario');
       }
     } catch (error) {
       setError(error.message || 'Error al crear el usuario');
@@ -128,15 +150,22 @@ const CrearUsuario = () => {
           <h2 className="text-2xl font-bold mb-2">¡Usuario creado exitosamente!</h2>
           <p className="mb-4">El alumno ha sido registrado correctamente.</p>
           <p className="mb-4 text-sm opacity-90">
-            Actualmente estás logueado como el nuevo usuario. Puedes ver su perfil o volver al panel de admin.
+            {formData.rol === 'alumno' 
+              ? 'El alumno ha sido registrado correctamente. Actualmente estás logueado como el nuevo usuario.'
+              : formData.rol === 'grupos'
+              ? 'El usuario de grupos ha sido registrado correctamente. Puedes asignarle alumnos desde la gestión de grupos.'
+              : `El ${formData.rol === 'admin' ? 'administrador' : 'directivo'} ha sido registrado correctamente.`
+            }
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link
-              to={`/admin/alumno/${sessionStorage.getItem('lastCreatedUserId')}`}
-              className="inline-block px-6 py-2 bg-white text-green rounded-lg hover:bg-gray-100 transition-colors"
-            >
-              Ver Detalles del Alumno
-            </Link>
+            {formData.rol === 'alumno' && (
+              <Link
+                to={`/admin/alumno/${sessionStorage.getItem('lastCreatedUserId')}`}
+                className="inline-block px-6 py-2 bg-white text-green rounded-lg hover:bg-gray-100 transition-colors"
+              >
+                Ver Detalles del Alumno
+              </Link>
+            )}
             <Link
               to="/admin"
               className="inline-block px-6 py-2 bg-white/20 text-white rounded-lg hover:bg-white/30 transition-colors border border-white/30"
@@ -161,10 +190,10 @@ const CrearUsuario = () => {
 
       <div className="mb-6">
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
-          Crear Nuevo Alumno
+          Crear Nuevo Usuario
         </h1>
         <p className="mt-2 text-gray-600 dark:text-gray-400">
-          Registra un nuevo alumno en el sistema
+          Registra un nuevo usuario en el sistema
         </p>
       </div>
 
@@ -183,6 +212,23 @@ const CrearUsuario = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Tipo de Usuario *
+              </label>
+              <select
+                name="rol"
+                required
+                value={formData.rol}
+                onChange={handleChange}
+                className="w-full px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue transition-all duration-200"
+              >
+                <option value="alumno">Alumno</option>
+                <option value="directivo">Directivo</option>
+                <option value="admin">Administrador</option>
+                <option value="grupos">Grupos</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Nombre completo *
               </label>
               <input
@@ -195,107 +241,111 @@ const CrearUsuario = () => {
                 className="w-full px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue transition-all duration-200"
               />
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Matrícula
-              </label>
-              <input
-                type="text"
-                name="matricula"
-                value={formData.matricula}
-                onChange={handleChange}
-                placeholder="Ej: MAT-2025-001"
-                className="w-full px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue transition-all duration-200"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Email de contacto (y recuperación)
-              </label>
-              <input
-                type="email"
-                name="emailContacto"
-                value={formData.emailContacto}
-                onChange={handleChange}
-                placeholder="contacto@ejemplo.com"
-                className="w-full px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue transition-all duration-200"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Teléfono de contacto *
-              </label>
-              <input
-                type="tel"
-                name="telefono"
-                required
-                value={formData.telefono}
-                onChange={handleChange}
-                placeholder="Ej: 5512345678"
-                className="w-full px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue transition-all duration-200"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Nivel *
-              </label>
-              <select
-                name="nivel"
-                required
-                value={formData.nivel}
-                onChange={handleChange}
-                className="w-full px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue transition-all duration-200"
-              >
-                <option value="">Selecciona un nivel</option>
-                {niveles.map((nivel) => (
-                  <option key={nivel} value={nivel}>
-                    {nivel}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Fecha de ingreso *
-              </label>
-              <input
-                type="date"
-                name="fechaIngreso"
-                required
-                value={formData.fechaIngreso}
-                onChange={handleChange}
-                className="w-full px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue transition-all duration-200"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Fecha estimada de egreso *
-              </label>
-              <input
-                type="date"
-                name="fechaEgresoEstimada"
-                required
-                value={formData.fechaEgresoEstimada}
-                onChange={handleChange}
-                className="w-full px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue transition-all duration-200"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Estado *
-              </label>
-              <select
-                name="estado"
-                required
-                value={formData.estado}
-                onChange={handleChange}
-                className="w-full px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue transition-all duration-200"
-              >
-                <option value="Activo">Activo</option>
-                <option value="Inactivo">Inactivo</option>
-                <option value="Graduado">Graduado</option>
-              </select>
-            </div>
+            {formData.rol === 'alumno' && (
+              <>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Matrícula
+                  </label>
+                  <input
+                    type="text"
+                    name="matricula"
+                    value={formData.matricula}
+                    onChange={handleChange}
+                    placeholder="Ej: MAT-2025-001"
+                    className="w-full px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue transition-all duration-200"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Email de contacto (y recuperación)
+                  </label>
+                  <input
+                    type="email"
+                    name="emailContacto"
+                    value={formData.emailContacto}
+                    onChange={handleChange}
+                    placeholder="contacto@ejemplo.com"
+                    className="w-full px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue transition-all duration-200"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Teléfono de contacto *
+                  </label>
+                  <input
+                    type="tel"
+                    name="telefono"
+                    required={formData.rol === 'alumno'}
+                    value={formData.telefono}
+                    onChange={handleChange}
+                    placeholder="Ej: 5512345678"
+                    className="w-full px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue transition-all duration-200"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Nivel *
+                  </label>
+                  <select
+                    name="nivel"
+                    required={formData.rol === 'alumno'}
+                    value={formData.nivel}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue transition-all duration-200"
+                  >
+                    <option value="">Selecciona un nivel</option>
+                    {niveles.map((nivel) => (
+                      <option key={nivel} value={nivel}>
+                        {nivel}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Fecha de ingreso *
+                  </label>
+                  <input
+                    type="date"
+                    name="fechaIngreso"
+                    required={formData.rol === 'alumno'}
+                    value={formData.fechaIngreso}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue transition-all duration-200"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Fecha estimada de egreso *
+                  </label>
+                  <input
+                    type="date"
+                    name="fechaEgresoEstimada"
+                    required={formData.rol === 'alumno'}
+                    value={formData.fechaEgresoEstimada}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue transition-all duration-200"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Estado *
+                  </label>
+                  <select
+                    name="estado"
+                    required={formData.rol === 'alumno'}
+                    value={formData.estado}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue transition-all duration-200"
+                  >
+                    <option value="Activo">Activo</option>
+                    <option value="Inactivo">Inactivo</option>
+                    <option value="Graduado">Graduado</option>
+                  </select>
+                </div>
+              </>
+            )}
           </div>
         </section>
 
@@ -357,40 +407,42 @@ const CrearUsuario = () => {
           </div>
         </section>
 
-        {/* Credenciales de Google Classroom */}
-        <section>
-          <h2 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white mb-4">
-            Credenciales de Google Classroom
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Mail de Classroom
-              </label>
-              <input
-                type="email"
-                name="mailClassroom"
-                value={formData.mailClassroom}
-                onChange={handleChange}
-                placeholder="ejemplo@classroom.com"
-                className="w-full px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue transition-all duration-200"
-              />
+        {/* Credenciales de Google Classroom - Solo para alumnos */}
+        {formData.rol === 'alumno' && (
+          <section>
+            <h2 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white mb-4">
+              Credenciales de Google Classroom
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Mail de Classroom
+                </label>
+                <input
+                  type="email"
+                  name="mailClassroom"
+                  value={formData.mailClassroom}
+                  onChange={handleChange}
+                  placeholder="ejemplo@classroom.com"
+                  className="w-full px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue transition-all duration-200"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Contraseña de Classroom
+                </label>
+                <input
+                  type="password"
+                  name="passwordClassroom"
+                  value={formData.passwordClassroom}
+                  onChange={handleChange}
+                  placeholder="Contraseña de Classroom"
+                  className="w-full px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue transition-all duration-200"
+                />
+              </div>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Contraseña de Classroom
-              </label>
-              <input
-                type="password"
-                name="passwordClassroom"
-                value={formData.passwordClassroom}
-                onChange={handleChange}
-                placeholder="Contraseña de Classroom"
-                className="w-full px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue transition-all duration-200"
-              />
-            </div>
-          </div>
-        </section>
+          </section>
+        )}
 
         {/* Botones */}
         <div className="flex flex-col sm:flex-row justify-end gap-3 sm:gap-4 pt-4 border-t border-gray-200 dark:border-gray-700">
