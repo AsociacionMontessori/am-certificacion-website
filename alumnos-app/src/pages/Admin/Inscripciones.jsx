@@ -46,9 +46,9 @@ const Inscripciones = () => {
   const getEstadoColor = (estado) => {
     switch (estado) {
       case 'Pendiente':
-        return 'bg-yellow text-white';
+        return 'bg-yellow text-gray-900 dark:text-gray-900';
       case 'Aprobada':
-        return 'bg-green text-gray-900 dark:text-white';
+        return 'bg-green text-gray-900 dark:text-gray-900';
       case 'Rechazada':
         return 'bg-red text-white';
       default:
@@ -198,4 +198,3 @@ const Inscripciones = () => {
 };
 
 export default Inscripciones;
-

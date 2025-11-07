@@ -510,7 +510,28 @@ const GestionMaterias = () => {
           )}
 
           <div className="space-y-4">
-            {materias.map((materia) => (
+            {materias.map((materia) => {
+              const estado = (materia.estado || 'Pendiente').toString().trim();
+              let estadoClass = 'bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-white';
+
+              switch (estado) {
+                case 'Completada':
+                  estadoClass = 'bg-green text-gray-900 dark:bg-green/80 dark:text-gray-900';
+                  break;
+                case 'En curso':
+                  estadoClass = 'bg-blue text-white';
+                  break;
+                case 'Con atraso':
+                  estadoClass = 'bg-red text-white';
+                  break;
+                case 'Pendiente':
+                  estadoClass = 'bg-yellow text-gray-900 dark:bg-yellow/80 dark:text-gray-900';
+                  break;
+                default:
+                  estadoClass = 'bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-white';
+              }
+
+              return (
               <div key={materia.id} className={`bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 border ${isSelecting && selectedMaterias.includes(materia.id) ? 'border-blue ring-2 ring-blue' : 'border-gray-200 dark:border-gray-600'}`}>
                 <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                   <div className="flex items-start gap-3 flex-1">
@@ -543,18 +564,10 @@ const GestionMaterias = () => {
                         <div>Aula: {materia.aula}</div>
                       )}
                     </div>
-                    {materia.estado && (
+                    {estado && (
                       <div className="mt-2">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                          materia.estado === 'Completada' 
-                            ? 'bg-green text-gray-900 dark:bg-green/80 dark:text-white'
-                            : materia.estado === 'En curso'
-                            ? 'bg-blue text-white'
-                            : materia.estado === 'Con atraso'
-                            ? 'bg-red text-white'
-                            : 'bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-white'
-                        }`}>
-                          {materia.estado}
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${estadoClass}`}>
+                          {estado}
                         </span>
                       </div>
                     )}
@@ -580,7 +593,8 @@ const GestionMaterias = () => {
                   )}
                 </div>
               </div>
-            ))}
+            );
+            })}
           </div>
 
           {materias.length === 0 && (
@@ -810,4 +824,3 @@ const GestionMaterias = () => {
 };
 
 export default GestionMaterias;
-

@@ -14,7 +14,12 @@
     "version:patch": "node scripts/version.js patch",
     "version:minor": "node scripts/version.js minor",
     "version:major": "node scripts/version.js major",
-    "version:show": "node scripts/version.js show"
+    "version:show": "node scripts/version.js show",
+    "init:pagos": "node scripts/inicializar-pagos.js",
+    "create:config-general": "node scripts/crear-config-pagos-general.js",
+    "verify:pagos": "node scripts/verificar-config-pagos.js",
+    "migrate:pagos": "node scripts/migrar-pagos-numerados.js",
+    "deploy:rules": "firebase deploy --only firestore:rules,storage:rules"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.9",
@@ -32,6 +37,7 @@
     "@types/react-dom": "^19.1.9",
     "@vitejs/plugin-react": "^5.0.4",
     "autoprefixer": "^10.4.21",
+    "dotenv": "^17.2.3",
     "eslint": "^9.36.0",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.22",

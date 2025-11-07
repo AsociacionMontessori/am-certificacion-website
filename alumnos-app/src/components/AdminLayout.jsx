@@ -6,6 +6,7 @@ import {
   HomeIcon, 
   UserGroupIcon,
   DocumentTextIcon,
+  CurrencyDollarIcon,
   ArrowPathIcon,
   QrCodeIcon,
   WrenchScrewdriverIcon,
@@ -24,6 +25,7 @@ const AdminLayout = ({ children }) => {
     { name: 'Dashboard', href: '/admin', icon: HomeIcon },
     ...(canEdit ? [{ name: 'Crear Usuario', href: '/admin/crear-usuario', icon: UserGroupIcon }] : []),
     { name: 'Inscripciones', href: '/admin/inscripciones', icon: DocumentTextIcon },
+    { name: 'Pagos', href: '/admin/pagos', icon: CurrencyDollarIcon },
     ...(canEdit ? [{ name: 'Gestión Grupos', href: '/admin/gestion-grupos', icon: UserGroupIcon }] : []),
     { name: 'Generador QR', href: '/admin/generador-qr', icon: QrCodeIcon },
   ];

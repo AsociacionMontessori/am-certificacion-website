@@ -261,6 +261,24 @@ html.dark .bg-white .text-gray-400 {
   color: #9ca3af !important;
 }
 
+/* Botones/etiquetas verdes mantienen texto oscuro en modo oscuro */
+html.dark .bg-green,
+html.dark .bg-green[class*="text-"],
+html.dark .bg-green .text-white,
+html.dark .bg-green .text-gray-900,
+html.dark .badge.bg-green {
+  color: #0f172a !important;
+}
+
+/* Botones/etiquetas amarillas mantienen texto oscuro en modo oscuro */
+html.dark .bg-yellow,
+html.dark .bg-yellow[class*="text-"],
+html.dark .bg-yellow .text-white,
+html.dark .bg-yellow .text-gray-900,
+html.dark .badge.bg-yellow {
+  color: #0f172a !important;
+}
+
 /* Asegurar que bg-gray-50, bg-gray-100, bg-gray-200 cambien en modo oscuro cuando no tienen dark: */
 html.dark .bg-gray-50:not([class*="dark:bg-"]) {
   background-color: #111827 !important;

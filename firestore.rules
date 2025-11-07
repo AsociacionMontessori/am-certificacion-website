@@ -150,6 +150,43 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
     
+    // Colección: pagos
+    match /pagos/{pagoId} {
+      // El alumno puede leer sus propios pagos y crear pagos pendientes
+      // Admin y directivo pueden leer todos los pagos, grupos solo de alumnos asignados
+      allow read: if isOwnAlumno(resource.data.alumnoId) 
+                   || canReadAdmin() 
+                   || (isGrupos() && canReadAlumno(resource.data.alumnoId));
+      // El alumno solo puede crear pagos pendientes (no validados)
+      allow create: if request.auth != null && 
+                      request.resource.data.alumnoId == request.auth.uid &&
+                      request.resource.data.estado == 'Pendiente';
+      // El alumno puede actualizar sus pagos pendientes (subir comprobantes, etc.)
+      allow update: if isOwnAlumno(resource.data.alumnoId) && 
+                      resource.data.estado == 'Pendiente';
+      // Solo admin puede validar/rechazar pagos y crear/actualizar pagos validados
+      allow write: if isAdmin();
+    }
+    
+    // Colección: configuracionPagos
+    match /configuracionPagos/{configId} {
+      // Todos los usuarios autenticados pueden leer la configuración
+      allow read: if request.auth != null;
+      // Solo admin puede escribir
+      allow write: if isAdmin();
+    }
+    
+    // Colección: becas
+    match /becas/{becaId} {
+      // El alumno puede leer sus propias becas
+      // Admin y directivo pueden leer todas, grupos solo de alumnos asignados
+      allow read: if isOwnAlumno(resource.data.alumnoId) 
+                   || canReadAdmin() 
+                   || (isGrupos() && canReadAlumno(resource.data.alumnoId));
+      // Solo admin puede crear, actualizar y eliminar becas
+      allow write: if isAdmin();
+    }
+    
     // Denegar acceso a todo lo demás por defecto
     match /{document=**} {
       allow read, write: if false;

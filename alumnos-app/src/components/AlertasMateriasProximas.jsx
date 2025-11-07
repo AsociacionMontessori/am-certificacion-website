@@ -192,7 +192,7 @@ const AlertasMateriasProximas = () => {
           disabled={enviandoEmail || emailEnviado}
           className={`inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
             emailEnviado
-              ? 'bg-green text-gray-900 dark:text-white cursor-not-allowed'
+              ? 'bg-green text-gray-900 dark:text-gray-900 cursor-not-allowed'
               : enviandoEmail
               ? 'bg-gray-400 text-white cursor-not-allowed'
               : 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600'
@@ -238,6 +238,9 @@ const MateriaItem = ({ item, color }) => {
     : color === 'yellow'
     ? 'bg-yellow'
     : 'bg-blue';
+  const textBadgeClass = color === 'yellow'
+    ? 'text-gray-900 dark:text-gray-900'
+    : 'text-white';
 
   return (
     <div className={`bg-white dark:bg-gray-800 rounded-lg p-3 border-l-4 ${borderColorClass} shadow-sm`}>
@@ -247,7 +250,7 @@ const MateriaItem = ({ item, color }) => {
             <h4 className="font-semibold text-gray-900 dark:text-white text-sm sm:text-base truncate">
               {item.materia.nombre}
             </h4>
-            <span className={`badge ${bgBadgeClass} text-white text-xs flex-shrink-0`}>
+            <span className={`badge ${bgBadgeClass} ${textBadgeClass} text-xs flex-shrink-0`}>
               {item.diasRestantes} día{item.diasRestantes !== 1 ? 's' : ''}
             </span>
           </div>
@@ -279,4 +282,3 @@ const MateriaItem = ({ item, color }) => {
 };
 
 export default AlertasMateriasProximas;
-

@@ -32,6 +32,8 @@ const GeneradorQR = lazy(() => import('./pages/Admin/GeneradorQR'));
 const DiagnosticoCodigos = lazy(() => import('./pages/Admin/DiagnosticoCodigos'));
 const GestionGrupos = lazy(() => import('./pages/Admin/GestionGrupos'));
 const GestionNiveles = lazy(() => import('./pages/Admin/GestionNiveles'));
+const GestionPagos = lazy(() => import('./pages/Admin/GestionPagos'));
+const Pagos = lazy(() => import('./pages/Pagos'));
 
 // Componente para redirigir según el rol
 const DashboardRedirect = () => {
@@ -271,6 +273,18 @@ function App() {
               </AdminRoute>
             }
           />
+          <Route
+            path="/admin/pagos"
+            element={
+              <AdminRoute>
+                <AdminLayout>
+                  <Suspense fallback={<LoadingSpinner fullScreen size="xl" variant="montessori" message="Cargando..." />}>
+                    <GestionPagos />
+                  </Suspense>
+                </AdminLayout>
+              </AdminRoute>
+            }
+          />
           
           {/* Rutas protegidas - Alumnos */}
           <Route
@@ -326,6 +340,18 @@ function App() {
                 <Layout>
                   <Suspense fallback={<LoadingSpinner fullScreen size="xl" variant="montessori" message="Cargando..." />}>
                     <Graduacion />
+                  </Suspense>
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/pagos"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <Suspense fallback={<LoadingSpinner fullScreen size="xl" variant="montessori" message="Cargando..." />}>
+                    <Pagos />
                   </Suspense>
                 </Layout>
               </ProtectedRoute>

@@ -242,7 +242,7 @@ const Dashboard = () => {
               href="https://mail.google.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center justify-center w-full px-4 py-2.5 bg-green text-gray-900 dark:text-white rounded-lg hover:bg-green/90 font-medium transition-colors"
+              className="inline-flex items-center justify-center w-full px-4 py-2.5 bg-green text-gray-900 dark:text-gray-900 rounded-lg hover:bg-green/90 font-medium transition-colors"
             >
               Abrir Gmail
             </a>
@@ -266,7 +266,7 @@ const Dashboard = () => {
               href="https://drive.google.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center justify-center w-full px-4 py-2.5 bg-yellow text-white rounded-lg hover:bg-yellow/90 font-medium transition-colors"
+              className="inline-flex items-center justify-center w-full px-4 py-2.5 bg-yellow text-gray-900 dark:text-gray-900 rounded-lg hover:bg-yellow/90 font-medium transition-colors"
             >
               Abrir Google Drive
             </a>
@@ -471,4 +471,3 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
-
