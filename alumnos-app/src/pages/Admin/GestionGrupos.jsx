@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { collection, getDocs, getDoc, doc, updateDoc, query, orderBy } from 'firebase/firestore';
 import { db } from '../../config/firebase';
-import { ArrowLeftIcon, UserGroupIcon, CheckIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import { ArrowLeftIcon, UserGroupIcon, CheckIcon, XMarkIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 import { Link } from 'react-router-dom';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import { useNotifications } from '../../contexts/NotificationContext';
@@ -16,6 +16,24 @@ const GestionGrupos = () => {
   const [usuarioSeleccionado, setUsuarioSeleccionado] = useState(null);
   const [alumnosAsignados, setAlumnosAsignados] = useState([]);
   const [saving, setSaving] = useState(false);
+  const [searchAlumno, setSearchAlumno] = useState('');
+
+  const terminoBusqueda = searchAlumno.trim().toLowerCase();
+
+  const alumnosFiltrados = useMemo(() => {
+    if (!terminoBusqueda) {
+      return alumnos;
+    }
+
+    return alumnos.filter((alumno) => {
+      return (
+        alumno.nombre?.toLowerCase().includes(terminoBusqueda) ||
+        alumno.email?.toLowerCase().includes(terminoBusqueda) ||
+        alumno.matricula?.toLowerCase().includes(terminoBusqueda) ||
+        alumno.nivel?.toLowerCase().includes(terminoBusqueda)
+      );
+    });
+  }, [alumnos, terminoBusqueda]);
 
   useEffect(() => {
     const loadData = async () => {
@@ -210,42 +228,80 @@ const GestionGrupos = () => {
                 )}
               </div>
               
-              <div className="space-y-2 max-h-[500px] overflow-y-auto">
-                {alumnos.length === 0 ? (
+              <div className="space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                  <div className="relative flex-1">
+                    <MagnifyingGlassIcon className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                    <input
+                      type="text"
+                      value={searchAlumno}
+                      onChange={(e) => setSearchAlumno(e.target.value)}
+                      placeholder="Buscar alumno por nombre, email, matrícula o nivel"
+                      className="w-full pl-10 pr-10 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue"
+                    />
+                    {searchAlumno && (
+                      <button
+                        type="button"
+                        onClick={() => setSearchAlumno('')}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+                        aria-label="Limpiar búsqueda"
+                      >
+                        <XMarkIcon className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
+                  <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+                    Mostrando{' '}
+                    <span className="font-medium text-gray-900 dark:text-gray-200">
+                      {alumnosFiltrados.length}
+                    </span>{' '}
+                    de {alumnos.length} alumnos
+                  </p>
+                </div>
+
+                <div className="space-y-2 max-h-[500px] overflow-y-auto pr-1">
+                  {alumnos.length === 0 ? (
                   <p className="text-gray-500 dark:text-gray-400 text-center py-8">
                     No hay alumnos registrados
                   </p>
-                ) : (
-                  alumnos.map((alumno) => {
-                    const isSelected = alumnosAsignados.includes(alumno.id);
-                    return (
-                      <label
-                        key={alumno.id}
-                        className={`flex items-center p-3 rounded-lg border cursor-pointer transition-all ${
-                          isSelected
-                            ? 'border-blue bg-blue/5 dark:bg-blue/20'
-                            : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
-                        } ${!canEdit ? 'cursor-not-allowed opacity-50' : ''}`}
-                      >
-                        <input
-                          type="checkbox"
-                          checked={isSelected}
-                          onChange={() => handleToggleAlumno(alumno.id)}
-                          disabled={!canEdit}
-                          className="w-5 h-5 text-blue border-gray-300 rounded focus:ring-blue disabled:opacity-50 disabled:cursor-not-allowed"
-                        />
-                        <div className="ml-3 flex-1">
-                          <p className="text-sm font-medium text-gray-900 dark:text-white">
-                            {alumno.nombre || 'Sin nombre'}
-                          </p>
-                          <p className="text-xs text-gray-500 dark:text-gray-400">
-                            {alumno.email} {alumno.nivel ? `• ${alumno.nivel}` : ''}
-                          </p>
-                        </div>
-                      </label>
-                    );
-                  })
-                )}
+                  ) : (
+                    alumnosFiltrados.length === 0 ? (
+                      <p className="text-gray-500 dark:text-gray-400 text-center py-8">
+                        No se encontraron alumnos que coincidan con la búsqueda
+                      </p>
+                    ) : (
+                      alumnosFiltrados.map((alumno) => {
+                        const isSelected = alumnosAsignados.includes(alumno.id);
+                        return (
+                          <label
+                            key={alumno.id}
+                            className={`flex items-center p-3 rounded-lg border cursor-pointer transition-all ${
+                              isSelected
+                                ? 'border-blue bg-blue/5 dark:bg-blue/20'
+                                : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+                            } ${!canEdit ? 'cursor-not-allowed opacity-50' : ''}`}
+                          >
+                            <input
+                              type="checkbox"
+                              checked={isSelected}
+                              onChange={() => handleToggleAlumno(alumno.id)}
+                              disabled={!canEdit}
+                              className="w-5 h-5 text-blue border-gray-300 rounded focus:ring-blue disabled:opacity-50 disabled:cursor-not-allowed"
+                            />
+                            <div className="ml-3 flex-1">
+                              <p className="text-sm font-medium text-gray-900 dark:text-white">
+                                {alumno.nombre || 'Sin nombre'}
+                              </p>
+                              <p className="text-xs text-gray-500 dark:text-gray-400">
+                                {alumno.email} {alumno.nivel ? `• ${alumno.nivel}` : ''}
+                              </p>
+                            </div>
+                          </label>
+                        );
+                      })
+                    )
+                  )}
+                </div>
               </div>
             </>
           ) : (
