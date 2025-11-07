@@ -9,12 +9,15 @@ import {
   UserPlusIcon,
   Squares2X2Icon,
   TableCellsIcon,
-  SparklesIcon
+  SparklesIcon,
+  FunnelIcon,
+  ArrowUpDownIcon
 } from '@heroicons/react/24/outline';
 import { Link } from 'react-router-dom';
 import AlertasMateriasProximas from '../../components/AlertasMateriasProximas';
 import useCanEdit from '../../hooks/useCanEdit';
 import { useAuth } from '../../contexts/AuthContext';
+import { obtenerNiveles } from '../../services/nivelesService';
 
 const AdminDashboard = () => {
   const canEdit = useCanEdit();
@@ -23,6 +26,13 @@ const AdminDashboard = () => {
   const [ultimoAlumnoId, setUltimoAlumnoId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [filtroNivel, setFiltroNivel] = useState('');
+  const [filtroFechaInicio, setFiltroFechaInicio] = useState('');
+  const [filtroFechaFin, setFiltroFechaFin] = useState('');
+  const [ordenPor, setOrdenPor] = useState('nombre'); // 'nombre', 'fechaIngreso', 'nivel'
+  const [ordenDireccion, setOrdenDireccion] = useState('asc'); // 'asc', 'desc'
+  const [nivelesDisponibles, setNivelesDisponibles] = useState([]);
+  const [showFilters, setShowFilters] = useState(false);
   const [viewMode, setViewMode] = useState(() => {
     // Por defecto, tarjetas en móvil y tabla en desktop
     // Guardar preferencia en localStorage
@@ -89,26 +99,110 @@ const AdminDashboard = () => {
     loadAlumnos();
   }, [userData]);
 
+  // Cargar niveles disponibles
+  useEffect(() => {
+    const loadNiveles = async () => {
+      try {
+        const resultado = await obtenerNiveles();
+        if (resultado.success) {
+          const nivelesActivos = resultado.niveles
+            .filter(n => n.activo !== false)
+            .map(n => n.nombre);
+          setNivelesDisponibles(nivelesActivos);
+        }
+      } catch (error) {
+        console.error('Error al cargar niveles:', error);
+      }
+    };
+    loadNiveles();
+  }, []);
+
   // Solo resaltar el último alumno agregado
   const esUltimoAlumno = (alumno) => alumno?.id === ultimoAlumnoId;
 
+  // Función para convertir fecha a Date
+  const getDate = (fecha) => {
+    if (!fecha) return null;
+    if (fecha?.toDate) return fecha.toDate();
+    if (fecha?.seconds) return new Date(fecha.seconds * 1000);
+    if (fecha instanceof Date) return fecha;
+    if (typeof fecha === 'string') return new Date(fecha);
+    return null;
+  };
+
   const filteredAlumnos = alumnos
     .filter(alumno => {
+      // Filtro de búsqueda
       const search = searchTerm.toLowerCase();
-      return (
+      const matchSearch = !searchTerm || (
         alumno.nombre?.toLowerCase().includes(search) ||
         alumno.email?.toLowerCase().includes(search) ||
         alumno.matricula?.toLowerCase().includes(search) ||
         alumno.nivel?.toLowerCase().includes(search)
       );
+
+      // Filtro por nivel
+      const matchNivel = !filtroNivel || alumno.nivel === filtroNivel;
+
+      // Filtro por fecha de ingreso
+      let matchFecha = true;
+      if (filtroFechaInicio || filtroFechaFin) {
+        const fechaIngreso = getDate(alumno.fechaIngreso);
+        if (fechaIngreso) {
+          const fechaInicio = filtroFechaInicio ? new Date(filtroFechaInicio) : null;
+          const fechaFin = filtroFechaFin ? new Date(filtroFechaFin + 'T23:59:59') : null;
+          
+          if (fechaInicio && fechaFin) {
+            matchFecha = fechaIngreso >= fechaInicio && fechaIngreso <= fechaFin;
+          } else if (fechaInicio) {
+            matchFecha = fechaIngreso >= fechaInicio;
+          } else if (fechaFin) {
+            matchFecha = fechaIngreso <= fechaFin;
+          }
+        } else {
+          matchFecha = false; // Si no tiene fecha de ingreso y se está filtrando, no mostrar
+        }
+      }
+
+      return matchSearch && matchNivel && matchFecha;
     })
     .sort((a, b) => {
       // El último alumno agregado siempre va primero
       if (a.id === ultimoAlumnoId) return -1;
       if (b.id === ultimoAlumnoId) return 1;
-      // El resto se mantiene en orden alfabético
-      return (a.nombre || '').localeCompare(b.nombre || '');
+
+      let comparison = 0;
+
+      switch (ordenPor) {
+        case 'nombre':
+          comparison = (a.nombre || '').localeCompare(b.nombre || '');
+          break;
+        case 'fechaIngreso':
+          const fechaA = getDate(a.fechaIngreso);
+          const fechaB = getDate(b.fechaIngreso);
+          if (!fechaA && !fechaB) comparison = 0;
+          else if (!fechaA) comparison = 1;
+          else if (!fechaB) comparison = -1;
+          else comparison = fechaA.getTime() - fechaB.getTime();
+          break;
+        case 'nivel':
+          comparison = (a.nivel || '').localeCompare(b.nivel || '');
+          break;
+        default:
+          comparison = (a.nombre || '').localeCompare(b.nombre || '');
+      }
+
+      return ordenDireccion === 'asc' ? comparison : -comparison;
     });
+
+  const limpiarFiltros = () => {
+    setFiltroNivel('');
+    setFiltroFechaInicio('');
+    setFiltroFechaFin('');
+    setSearchTerm('');
+  };
+
+  const tieneFiltrosActivos = filtroNivel || filtroFechaInicio || filtroFechaFin || searchTerm;
 
   const stats = {
     total: alumnos.length,
@@ -179,8 +273,9 @@ const AdminDashboard = () => {
         ))}
       </div>
 
-      {/* Búsqueda y Vista */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 transition-all duration-300 hover:shadow-md hover:border-gray-200 dark:hover:border-gray-600 p-4 sm:p-5">
+      {/* Búsqueda, Filtros y Vista */}
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 transition-all duration-300 hover:shadow-md hover:border-gray-200 dark:hover:border-gray-600 p-4 sm:p-5 space-y-4">
+        {/* Primera fila: Búsqueda y controles */}
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="relative flex-1">
             <MagnifyingGlassIcon className="absolute left-3 sm:left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -192,39 +287,146 @@ const AdminDashboard = () => {
               className="w-full px-4 py-2.5 sm:py-3 pl-10 sm:pl-12 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue transition-all duration-200"
             />
           </div>
-          <div className="flex items-center gap-2 bg-gray-50 dark:bg-gray-700 rounded-lg p-1">
+          <div className="flex items-center gap-2">
             <button
-              onClick={() => {
-                setViewMode('table');
-                localStorage.setItem('adminViewMode', 'table');
-              }}
-              className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                viewMode === 'table'
-                  ? 'bg-white dark:bg-gray-600 text-blue shadow-sm'
-                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+              onClick={() => setShowFilters(!showFilters)}
+              className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                showFilters || tieneFiltrosActivos
+                  ? 'bg-blue text-white'
+                  : 'bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600'
               }`}
-              title="Vista de tabla"
             >
-              <TableCellsIcon className="w-5 h-5" />
-              <span className="hidden sm:inline">Tabla</span>
+              <FunnelIcon className="w-5 h-5" />
+              <span className="hidden sm:inline">Filtros</span>
+              {tieneFiltrosActivos && (
+                <span className="ml-1 px-1.5 py-0.5 text-xs bg-white/20 rounded-full">
+                  {[filtroNivel, filtroFechaInicio, filtroFechaFin, searchTerm].filter(Boolean).length}
+                </span>
+              )}
             </button>
-            <button
-              onClick={() => {
-                setViewMode('cards');
-                localStorage.setItem('adminViewMode', 'cards');
-              }}
-              className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                viewMode === 'cards'
-                  ? 'bg-white dark:bg-gray-600 text-blue shadow-sm'
-                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
-              }`}
-              title="Vista de tarjetas"
-            >
-              <Squares2X2Icon className="w-5 h-5" />
-              <span className="hidden sm:inline">Tarjetas</span>
-            </button>
+            <div className="flex items-center gap-2 bg-gray-50 dark:bg-gray-700 rounded-lg p-1">
+              <button
+                onClick={() => {
+                  setViewMode('table');
+                  localStorage.setItem('adminViewMode', 'table');
+                }}
+                className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                  viewMode === 'table'
+                    ? 'bg-white dark:bg-gray-600 text-blue shadow-sm'
+                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+                }`}
+                title="Vista de tabla"
+              >
+                <TableCellsIcon className="w-5 h-5" />
+                <span className="hidden sm:inline">Tabla</span>
+              </button>
+              <button
+                onClick={() => {
+                  setViewMode('cards');
+                  localStorage.setItem('adminViewMode', 'cards');
+                }}
+                className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                  viewMode === 'cards'
+                    ? 'bg-white dark:bg-gray-600 text-blue shadow-sm'
+                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+                }`}
+                title="Vista de tarjetas"
+              >
+                <Squares2X2Icon className="w-5 h-5" />
+                <span className="hidden sm:inline">Tarjetas</span>
+              </button>
+            </div>
           </div>
         </div>
+
+        {/* Panel de Filtros y Ordenamiento */}
+        {(showFilters || tieneFiltrosActivos) && (
+          <div className="border-t border-gray-200 dark:border-gray-700 pt-4 space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {/* Filtro por Nivel */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Filtrar por Nivel
+                </label>
+                <select
+                  value={filtroNivel}
+                  onChange={(e) => setFiltroNivel(e.target.value)}
+                  className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue"
+                >
+                  <option value="">Todos los niveles</option>
+                  {nivelesDisponibles.map((nivel) => (
+                    <option key={nivel} value={nivel}>
+                      {nivel}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Filtro por Fecha Inicio */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Fecha Ingreso Desde
+                </label>
+                <input
+                  type="date"
+                  value={filtroFechaInicio}
+                  onChange={(e) => setFiltroFechaInicio(e.target.value)}
+                  className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue"
+                />
+              </div>
+
+              {/* Filtro por Fecha Fin */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Fecha Ingreso Hasta
+                </label>
+                <input
+                  type="date"
+                  value={filtroFechaFin}
+                  onChange={(e) => setFiltroFechaFin(e.target.value)}
+                  className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue"
+                />
+              </div>
+
+              {/* Ordenamiento */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Ordenar por
+                </label>
+                <div className="flex gap-2">
+                  <select
+                    value={ordenPor}
+                    onChange={(e) => setOrdenPor(e.target.value)}
+                    className="flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue"
+                  >
+                    <option value="nombre">Nombre</option>
+                    <option value="fechaIngreso">Fecha Ingreso</option>
+                    <option value="nivel">Nivel</option>
+                  </select>
+                  <button
+                    onClick={() => setOrdenDireccion(ordenDireccion === 'asc' ? 'desc' : 'asc')}
+                    className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
+                    title={ordenDireccion === 'asc' ? 'Ascendente' : 'Descendente'}
+                  >
+                    <ArrowUpDownIcon className="w-5 h-5" />
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Botón Limpiar Filtros */}
+            {tieneFiltrosActivos && (
+              <div className="flex justify-end">
+                <button
+                  onClick={limpiarFiltros}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                >
+                  Limpiar Filtros
+                </button>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Lista de Alumnos */}
