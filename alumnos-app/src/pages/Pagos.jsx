@@ -258,6 +258,12 @@ const Pagos = () => {
                 pago.tipo
               );
               const fechaVenc = pago.fechaVencimiento?.toDate?.() || new Date(pago.fechaVencimiento);
+              const becasAplicadasPago = Array.isArray(pago.becasAplicadas) ? pago.becasAplicadas : [];
+              const descuentoRegistrado = pago.descuentoAplicado !== undefined
+                ? Number(pago.descuentoAplicado)
+                : pago.montoOriginal !== undefined
+                  ? Number((pago.montoOriginal - (pago.monto ?? 0)).toFixed(2))
+                  : 0;
               
               return (
                 <div key={pago.id} className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 border border-gray-200 dark:border-gray-600">
@@ -276,9 +282,29 @@ const Pagos = () => {
                       <p className="text-sm text-gray-600 dark:text-gray-400">
                         Vence: {fechaVenc.toLocaleDateString('es-MX')}
                       </p>
-                      <p className="text-lg font-bold text-gray-900 dark:text-white mt-1">
-                        {formatearMoneda(montoTotal)}
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                        Monto actual: <span className="font-semibold text-gray-900 dark:text-white">{formatearMoneda(pago.monto || 0)}</span>
                       </p>
+                      {pago.montoOriginal !== undefined && pago.montoOriginal !== null && pago.montoOriginal !== pago.monto && (
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                          Monto original: {formatearMoneda(pago.montoOriginal)}
+                        </p>
+                      )}
+                      {descuentoRegistrado > 0 && (
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                          Descuento aplicado: -{formatearMoneda(descuentoRegistrado)}
+                          {becasAplicadasPago.length > 0 && (
+                            <span className="block mt-1">
+                              {becasAplicadasPago.map((beca) => beca.nombre || beca.tipo || 'Descuento').join(', ')}
+                            </span>
+                          )}
+                        </p>
+                      )}
+                      {montoTotal !== pago.monto && (
+                        <p className="text-xs text-yellow-700 dark:text-yellow-300 mt-1">
+                          Total con recargo: {formatearMoneda(montoTotal)}
+                        </p>
+                      )}
                     </div>
                     {!pago.comprobanteUrl && (
                       <button
@@ -313,6 +339,12 @@ const Pagos = () => {
               const EstadoIcon = estado.icon;
               const fechaVenc = pago.fechaVencimiento?.toDate?.() || new Date(pago.fechaVencimiento);
               const fechaCreacion = pago.fechaCreacion?.toDate?.() || new Date(pago.fechaCreacion);
+              const becasAplicadasPago = Array.isArray(pago.becasAplicadas) ? pago.becasAplicadas : [];
+              const descuentoRegistrado = pago.descuentoAplicado !== undefined
+                ? Number(pago.descuentoAplicado)
+                : pago.montoOriginal !== undefined
+                  ? Number((pago.montoOriginal - (pago.monto ?? 0)).toFixed(2))
+                  : 0;
               
               return (
                 <div key={pago.id} className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 border border-gray-200 dark:border-gray-600">
@@ -332,6 +364,19 @@ const Pagos = () => {
                       <div className="text-sm text-gray-600 dark:text-gray-400 space-y-1">
                         <p>Vencimiento: {fechaVenc.toLocaleDateString('es-MX')}</p>
                         <p>Monto: {formatearMoneda(pago.monto || 0)}</p>
+                        {pago.montoOriginal !== undefined && pago.montoOriginal !== null && pago.montoOriginal !== pago.monto && (
+                          <p>Monto original: {formatearMoneda(pago.montoOriginal)}</p>
+                        )}
+                        {descuentoRegistrado > 0 && (
+                          <p>
+                            Descuento aplicado: -{formatearMoneda(descuentoRegistrado)}
+                            {becasAplicadasPago.length > 0 && (
+                              <span className="block text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                {becasAplicadasPago.map((beca) => beca.nombre || beca.tipo || 'Descuento').join(', ')}
+                              </span>
+                            )}
+                          </p>
+                        )}
                         {pago.montoPagado && (
                           <p>Pagado: {formatearMoneda(pago.montoPagado)}</p>
                         )}

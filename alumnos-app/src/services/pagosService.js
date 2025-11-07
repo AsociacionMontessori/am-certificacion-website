@@ -12,10 +12,203 @@ import {
   orderBy,
   serverTimestamp,
   Timestamp,
-  limit
+  limit,
+  deleteField
 } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 import { db, storage } from '../config/firebase';
+
+const normalizarFecha = (valor) => {
+  if (!valor) return null;
+  if (valor instanceof Date) return valor;
+  if (typeof valor === 'string') {
+    const fecha = new Date(valor);
+    return Number.isNaN(fecha.getTime()) ? null : fecha;
+  }
+  if (valor?.toDate) return valor.toDate();
+  if (typeof valor?.seconds === 'number') return new Date(valor.seconds * 1000);
+  return null;
+};
+
+const mapearBecaParaPago = (beca) => {
+  if (!beca) return null;
+  return {
+    id: beca.id,
+    nombre: beca.nombre || beca.titulo || beca.motivo || 'Descuento',
+    descripcion: beca.descripcion || beca.motivo || '',
+    tipo: beca.tipo || 'porcentaje',
+    valor: Number(beca.valor) || 0,
+    alcance: beca.alcance || 'global',
+    pagoId: beca.pagoId || null,
+    condiciones: beca.condiciones || null,
+    aplicadoEn: beca.aplicadoEn || new Date().toISOString()
+  };
+};
+
+const aplicaBecaAPago = (pago, beca) => {
+  if (!pago || !beca || beca.activa === false) return false;
+  if (['Validado', 'Rechazado'].includes(pago.estado)) return false;
+
+  const fechaInicio = normalizarFecha(beca.fechaInicio);
+  const fechaFin = normalizarFecha(beca.fechaFin);
+  const fechaPago = normalizarFecha(pago.fechaVencimiento) || new Date();
+
+  if (fechaInicio && fechaPago < fechaInicio) return false;
+  if (fechaFin && fechaPago > fechaFin) return false;
+
+  switch (beca.alcance) {
+    case 'colegiaturas':
+      return pago.tipo === 'Colegiatura';
+    case 'inscripcion':
+      return pago.tipo === 'Inscripción';
+    case 'certificado':
+      return pago.tipo === 'Certificado';
+    case 'pago':
+      return beca.pagoId && (pago.id === beca.pagoId);
+    case 'concepto':
+      return beca.concepto ? (pago.tipo === beca.concepto || pago.descripcion?.toLowerCase().includes(beca.concepto.toLowerCase())) : true;
+    case 'global':
+    default:
+      return true;
+  }
+};
+
+const recalcularMontosConBecas = (montoOriginal, becas = []) => {
+  let montoBase = Number(montoOriginal) || 0;
+  let montoActual = montoBase;
+  const detalles = [];
+
+  becas.forEach((beca) => {
+    if (!beca || typeof beca.valor !== 'number' || beca.valor <= 0) {
+      if (beca) {
+        detalles.push({ ...beca, descuento: 0 });
+      }
+      return;
+    }
+
+    let descuento = 0;
+    const porcentaje = Math.min(100, Math.max(0, Number(beca.valor)));
+
+    if ((beca.tipo || 'porcentaje') === 'porcentaje') {
+      const montoAntes = montoActual;
+      montoActual = montoActual * (1 - porcentaje / 100);
+      descuento = montoAntes - montoActual;
+    } else {
+      descuento = Math.min(montoActual, porcentaje);
+      montoActual = montoActual - descuento;
+    }
+
+    descuento = Number(descuento.toFixed(2));
+    montoActual = Number(Math.max(0, montoActual).toFixed(2));
+
+    detalles.push({
+      ...beca,
+      descuento
+    });
+  });
+
+  const totalDescuento = Number(detalles.reduce((suma, item) => suma + (item.descuento || 0), 0).toFixed(2));
+  const montoFinal = Number(Math.max(0, montoActual).toFixed(2));
+
+  return {
+    montoFinal,
+    totalDescuento,
+    becasDetalladas: detalles
+  };
+};
+
+export const aplicarBecaAPagosAlumno = async (alumnoId, beca) => {
+  if (!alumnoId || !beca) return { aplicados: 0, omitidos: 0 };
+
+  const pagosSnapshot = await getDocs(query(collection(db, 'pagos'), where('alumnoId', '==', alumnoId)));
+  let aplicados = 0;
+  let omitidos = 0;
+
+  await Promise.all(pagosSnapshot.docs.map(async (docSnap) => {
+    const pago = { id: docSnap.id, ...docSnap.data() };
+    if (!aplicaBecaAPago(pago, beca)) {
+      omitidos += 1;
+      return;
+    }
+
+    const montoOriginal = Number(pago.montoOriginal ?? pago.monto ?? 0);
+    const becasActuales = (pago.becasAplicadas || []).filter((item) => item?.id !== beca.id);
+    const becaMapeada = mapearBecaParaPago(beca);
+    const { montoFinal, totalDescuento, becasDetalladas } = recalcularMontosConBecas(montoOriginal, [...becasActuales, becaMapeada]);
+
+    const actualizaciones = {
+      montoOriginal,
+      monto: montoFinal,
+      descuentoAplicado: totalDescuento,
+      becasAplicadas: becasDetalladas
+    };
+
+    if (pago.montoPagado) {
+      const pendiente = Number((montoFinal - pago.montoPagado).toFixed(2));
+      actualizaciones.montoPendiente = pendiente > 0 ? pendiente : deleteField();
+    }
+
+    await updateDoc(doc(db, 'pagos', pago.id), actualizaciones);
+    aplicados += 1;
+  }));
+
+  return { aplicados, omitidos };
+};
+
+export const revertirBecaEnPagos = async (alumnoId, becaId) => {
+  if (!alumnoId || !becaId) return { actualizados: 0, sinCambios: 0 };
+
+  const pagosSnapshot = await getDocs(query(collection(db, 'pagos'), where('alumnoId', '==', alumnoId)));
+  let actualizados = 0;
+  let sinCambios = 0;
+
+  await Promise.all(pagosSnapshot.docs.map(async (docSnap) => {
+    const pago = { id: docSnap.id, ...docSnap.data() };
+    const becasActuales = (pago.becasAplicadas || []);
+    if (!becasActuales.some((item) => item?.id === becaId)) {
+      sinCambios += 1;
+      return;
+    }
+
+    const becasFiltradas = becasActuales.filter((item) => item?.id !== becaId);
+    const montoOriginal = Number(pago.montoOriginal ?? pago.monto ?? 0);
+
+    if (becasFiltradas.length === 0) {
+      const actualizaciones = {
+        monto: montoOriginal,
+        descuentoAplicado: deleteField(),
+        becasAplicadas: deleteField(),
+        montoPendiente: pago.montoPagado ? Number(Math.max(0, (montoOriginal - pago.montoPagado)).toFixed(2)) : deleteField()
+      };
+
+      if (!pago.montoOriginal) {
+        actualizaciones.montoOriginal = deleteField();
+      }
+
+      await updateDoc(doc(db, 'pagos', pago.id), actualizaciones);
+      actualizados += 1;
+      return;
+    }
+
+    const { montoFinal, totalDescuento, becasDetalladas } = recalcularMontosConBecas(montoOriginal, becasFiltradas);
+    const actualizaciones = {
+      montoOriginal,
+      monto: montoFinal,
+      descuentoAplicado: totalDescuento,
+      becasAplicadas: becasDetalladas
+    };
+
+    if (pago.montoPagado) {
+      const pendiente = Number((montoFinal - pago.montoPagado).toFixed(2));
+      actualizaciones.montoPendiente = pendiente > 0 ? pendiente : deleteField();
+    }
+
+    await updateDoc(doc(db, 'pagos', pago.id), actualizaciones);
+    actualizados += 1;
+  }));
+
+  return { actualizados, sinCambios };
+};
 
 /**
  * Obtener todos los pagos de un alumno
@@ -87,11 +280,24 @@ export const obtenerPago = async (pagoId) => {
  */
 export const crearPago = async (pagoData) => {
   try {
+    const montoOriginal = Number(pagoData.montoOriginal ?? pagoData.monto ?? 0);
+    const descuentoAplicado = Number(pagoData.descuentoAplicado || 0);
+    const montoFinal = Number((pagoData.monto ?? (montoOriginal - descuentoAplicado)).toFixed(2));
+    const becasAplicadas = Array.isArray(pagoData.becasAplicadas) ? pagoData.becasAplicadas : [];
+
     const nuevoPago = {
       ...pagoData,
+      montoOriginal,
+      monto: montoFinal,
+      descuentoAplicado,
       fechaCreacion: serverTimestamp(),
       fechaActualizacion: serverTimestamp()
     };
+
+    if (becasAplicadas.length > 0) {
+      nuevoPago.becasAplicadas = becasAplicadas;
+    }
+
     const docRef = await addDoc(collection(db, 'pagos'), nuevoPago);
     return docRef.id;
   } catch (error) {
@@ -362,13 +568,39 @@ export const obtenerBecasAlumno = async (alumnoId) => {
  */
 export const crearBeca = async (becaData) => {
   try {
+    if (!becaData?.alumnoId) {
+      throw new Error('La beca debe estar asociada a un alumno');
+    }
+
+    const baseBeca = {
+      alumnoId: becaData.alumnoId,
+      nombre: becaData.nombre || 'Descuento personalizado',
+      descripcion: becaData.descripcion || '',
+      tipo: becaData.tipo || 'porcentaje',
+      valor: Number(becaData.valor) || 0,
+      alcance: becaData.alcance || 'global',
+      pagoId: becaData.pagoId || null,
+      concepto: becaData.concepto || null,
+      condiciones: becaData.condiciones || null,
+      motivo: becaData.motivo || '',
+      fechaInicio: becaData.fechaInicio || null,
+      fechaFin: becaData.fechaFin || null,
+      aplicaRecargos: becaData.aplicaRecargos !== undefined ? becaData.aplicaRecargos : true
+    };
+
     const nuevaBeca = {
-      ...becaData,
-      activa: true,
+      ...baseBeca,
+      activa: becaData.activa !== false,
       fechaCreacion: serverTimestamp(),
       fechaActualizacion: serverTimestamp()
     };
+
     const docRef = await addDoc(collection(db, 'becas'), nuevaBeca);
+
+    if (nuevaBeca.activa) {
+      await aplicarBecaAPagosAlumno(baseBeca.alumnoId, { id: docRef.id, ...baseBeca, activa: true });
+    }
+
     return docRef.id;
   } catch (error) {
     console.error('Error al crear beca:', error);
@@ -381,10 +613,28 @@ export const crearBeca = async (becaData) => {
  */
 export const actualizarBeca = async (becaId, becaData) => {
   try {
-    await updateDoc(doc(db, 'becas', becaId), {
+    const becaRef = doc(db, 'becas', becaId);
+    const becaAnteriorSnap = await getDoc(becaRef);
+    if (!becaAnteriorSnap.exists()) {
+      throw new Error('La beca indicada no existe');
+    }
+
+    const becaAnterior = { id: becaAnteriorSnap.id, ...becaAnteriorSnap.data() };
+
+    await updateDoc(becaRef, {
       ...becaData,
       fechaActualizacion: serverTimestamp()
     });
+
+    const becaActualizadaSnap = await getDoc(becaRef);
+    const becaActualizada = { id: becaActualizadaSnap.id, ...becaActualizadaSnap.data() };
+
+    // Reaplicar efectos en pagos
+    await revertirBecaEnPagos(becaAnterior.alumnoId, becaId);
+
+    if (becaActualizada.activa !== false) {
+      await aplicarBecaAPagosAlumno(becaActualizada.alumnoId, becaActualizada);
+    }
   } catch (error) {
     console.error('Error al actualizar beca:', error);
     throw error;
@@ -396,11 +646,20 @@ export const actualizarBeca = async (becaId, becaData) => {
  */
 export const eliminarBeca = async (becaId) => {
   try {
-    // Desactivar en lugar de eliminar
-    await updateDoc(doc(db, 'becas', becaId), {
+    const becaRef = doc(db, 'becas', becaId);
+    const becaSnap = await getDoc(becaRef);
+    if (!becaSnap.exists()) {
+      throw new Error('La beca indicada no existe');
+    }
+
+    const beca = { id: becaSnap.id, ...becaSnap.data() };
+
+    await updateDoc(becaRef, {
       activa: false,
       fechaActualizacion: serverTimestamp()
     });
+
+    await revertirBecaEnPagos(beca.alumnoId, becaId);
   } catch (error) {
     console.error('Error al eliminar beca:', error);
     throw error;
@@ -580,42 +839,94 @@ export const generarPagosPorNivel = async (alumno, configuracion) => {
       console.log(`   ⚠️ Ya existe pago de inscripción, omitiendo`);
     }
 
-    // Generar colegiaturas mensuales (si aplica)
+    // Generar o completar colegiaturas mensuales (si aplica)
     if (costoNivel.mensual && costoNivel.meses) {
       const meses = costoNivel.meses;
       const fechasVencimiento = [];
-      
-      // Generar fechas de vencimiento para cada mes
+
       for (let i = 0; i < meses; i++) {
         const fecha = new Date(fechaInicio.getFullYear(), fechaInicio.getMonth() + i, diaVencimiento);
         fechasVencimiento.push(fecha);
       }
 
-      // Verificar si ya existen colegiaturas para evitar duplicados
-      const colegiaturasExistentes = pagosExistentes.filter(p => p.tipo === 'Colegiatura');
+      const colegiaturasExistentes = pagosExistentes
+        .filter(p => p.tipo === 'Colegiatura')
+        .sort((a, b) => {
+          const fechaA = a.fechaVencimiento?.toDate?.() || new Date(a.fechaVencimiento || 0);
+          const fechaB = b.fechaVencimiento?.toDate?.() || new Date(b.fechaVencimiento || 0);
+          return fechaA - fechaB;
+        });
+
       console.log(`   - Colegiaturas existentes: ${colegiaturasExistentes.length}/${meses}`);
-      
+
+      const numerosAsignados = new Set();
+      await Promise.all(colegiaturasExistentes.map(async (pago, idx) => {
+        const numeroEsperado = idx + 1;
+        const updates = {};
+        if (!pago.numeroColegiatura || pago.numeroColegiatura !== numeroEsperado) {
+          updates.numeroColegiatura = numeroEsperado;
+        }
+        if (pago.totalColegiaturas !== meses) {
+          updates.totalColegiaturas = meses;
+        }
+        if (!pago.descripcion?.includes(`Colegiatura ${numeroEsperado}`)) {
+          const fechaTexto = fechasVencimiento[numeroEsperado - 1]?.toLocaleDateString('es-MX', { month: 'long', year: 'numeric' });
+          updates.descripcion = `Colegiatura ${numeroEsperado}/${meses} - ${nivelNombre}${fechaTexto ? ` - ${fechaTexto}` : ''}`;
+        }
+        if (Object.keys(updates).length > 0) {
+          await updateDoc(doc(db, 'pagos', pago.id), updates);
+          console.log(`   ✏️ Actualizando colegiatura ${pago.id} con numeración ${numeroEsperado}/${meses}`);
+        }
+        numerosAsignados.add(numeroEsperado);
+      }));
+
       if (colegiaturasExistentes.length === 0) {
         console.log(`   ✅ Generando ${meses} colegiaturas de $${costoNivel.mensual} cada una`);
-        // Generar todas las colegiaturas
         for (let i = 0; i < fechasVencimiento.length; i++) {
           const numeroColegiatura = i + 1;
           const pagoColegiatura = await crearPago({
             alumnoId: alumno.id,
             tipo: 'Colegiatura',
-            numeroColegiatura: numeroColegiatura,
+            numeroColegiatura,
             totalColegiaturas: meses,
             monto: costoNivel.mensual,
             fechaVencimiento: Timestamp.fromDate(fechasVencimiento[i]),
             estado: 'Pendiente',
             recargoPorcentaje,
-            recargoActivo, // Solo las colegiaturas pueden tener recargo
+            recargoActivo,
             descripcion: `Colegiatura ${numeroColegiatura}/${meses} - ${nivelNombre} - ${fechasVencimiento[i].toLocaleDateString('es-MX', { month: 'long', year: 'numeric' })}`
           });
           pagosGenerados.push(pagoColegiatura);
         }
       } else {
-        console.log(`   ⚠️ Ya existen colegiaturas, omitiendo generación`);
+        const faltantes = [];
+        for (let i = 1; i <= meses; i++) {
+          if (!numerosAsignados.has(i)) {
+            faltantes.push(i);
+          }
+        }
+
+        if (faltantes.length > 0) {
+          console.log(`   ➕ Generando colegiaturas faltantes:`, faltantes);
+          for (const numero of faltantes) {
+            const fechaCorrespondiente = fechasVencimiento[numero - 1] || new Date(fechaInicio.getFullYear(), fechaInicio.getMonth() + numero - 1, diaVencimiento);
+            const pagoColegiatura = await crearPago({
+              alumnoId: alumno.id,
+              tipo: 'Colegiatura',
+              numeroColegiatura: numero,
+              totalColegiaturas: meses,
+              monto: costoNivel.mensual,
+              fechaVencimiento: Timestamp.fromDate(fechaCorrespondiente),
+              estado: 'Pendiente',
+              recargoPorcentaje,
+              recargoActivo,
+              descripcion: `Colegiatura ${numero}/${meses} - ${nivelNombre} - ${fechaCorrespondiente.toLocaleDateString('es-MX', { month: 'long', year: 'numeric' })}`
+            });
+            pagosGenerados.push(pagoColegiatura);
+          }
+        } else {
+          console.log(`   ✅ Colegiaturas completas. No se generaron nuevas.`);
+        }
       }
     }
 
@@ -684,6 +995,17 @@ export const generarPagosPorNivel = async (alumno, configuracion) => {
 
     console.log(`   ✅ Total de pagos generados: ${pagosGenerados.length}`);
     
+    if (pagosGenerados.length > 0) {
+      try {
+        const becasActivas = await obtenerBecasAlumno(alumno.id);
+        for (const beca of becasActivas) {
+          await aplicarBecaAPagosAlumno(alumno.id, beca);
+        }
+      } catch (errorBecas) {
+        console.warn('⚠️ No se pudieron aplicar las becas activas después de generar pagos:', errorBecas);
+      }
+    }
+
     if (pagosGenerados.length === 0) {
       console.warn(`   ⚠️ No se generaron pagos. Razones posibles:`);
       console.warn(`      - Ya existen todos los pagos necesarios`);

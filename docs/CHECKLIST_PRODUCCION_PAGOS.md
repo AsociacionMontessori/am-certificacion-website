@@ -45,6 +45,7 @@
 - ✅ Generar pagos por nivel
 - ✅ Configurar costos por nivel
 - ✅ Gestionar becas
+- ✅ Aplicar y eliminar descuentos personalizados
 - ✅ Ver estadísticas
 
 ### Alumno
@@ -108,11 +109,13 @@
 5. ✅ Validar un pago excedente
 6. ✅ Rechazar un pago
 7. ✅ Subir comprobante
-8. ✅ Eliminar un pago
-9. ✅ Generar pagos por nivel
-10. ✅ Configurar costos
-11. ✅ Filtrar y buscar pagos
-12. ✅ Paginación
+8. ✅ Aplicar un descuento (porcentaje y monto fijo)
+9. ✅ Editar un descuento existente
+10. ✅ Eliminar un descuento y verificar reversión de montos
+11. ✅ Generar pagos por nivel
+12. ✅ Configurar costos
+13. ✅ Filtrar y buscar pagos
+14. ✅ Paginación
 
 #### Como Alumno:
 1. ✅ Ver mis pagos

@@ -119,7 +119,21 @@
 3. Verifica que el monto total incluya el recargo
 4. Verifica que se muestre como "Con Recargo" o "Vencido"
 
-### 10. Probar Responsive (Mobile)
+### 10. Probar Descuentos y Becas
+
+**Como Administrador:**
+1. Ve a `/admin/pagos` y filtra un alumno
+2. Haz clic en el botón **"Descuentos"**
+3. Usa la plantilla **Pago de contado 5%**
+4. Verifica que los pagos pendientes reflejen el monto rebajado y muestren el descuento aplicado
+5. Edita el descuento y cambia el porcentaje
+6. Elimina el descuento y confirma que los montos regresan al valor original
+
+**Como Alumno:**
+1. Ve a `/pagos`
+2. Verifica que cada pago muestre el monto original y el descuento aplicado
+
+### 11. Probar Responsive (Mobile)
 
 **En diferentes dispositivos:**
 1. Abre la aplicación en móvil
@@ -143,6 +157,7 @@
 - [ ] La configuración se muestra correctamente
 - [ ] Los filtros funcionan
 - [ ] La búsqueda funciona
+- [ ] Los descuentos se aplican y se revocan correctamente
 
 ### Subida de Comprobantes
 - [ ] Alumnos pueden subir comprobantes
@@ -160,6 +175,7 @@
 ### Cálculos
 - [ ] Los recargos se calculan correctamente
 - [ ] Los montos adeudados se muestran correctamente
+- [ ] Los descuentos modifican los montos mostrados
 - [ ] Las fechas de vencimiento se muestran correctamente
 - [ ] Los pagos vencidos se identifican correctamente
 

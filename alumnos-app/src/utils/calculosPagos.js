@@ -71,24 +71,6 @@ export const calcularMontoTotal = (monto, fechaVencimiento, recargoPorcentaje = 
 };
 
 /**
- * Aplicar descuento de beca
- */
-export const aplicarBeca = (monto, becas = []) => {
-  if (!becas || becas.length === 0) return monto;
-  
-  let montoConDescuento = monto;
-  becas.forEach(beca => {
-    if (beca.activa && beca.tipo === 'porcentaje') {
-      montoConDescuento = montoConDescuento * (1 - beca.valor / 100);
-    } else if (beca.activa && beca.tipo === 'fijo') {
-      montoConDescuento = montoConDescuento - beca.valor;
-    }
-  });
-  
-  return Math.max(0, montoConDescuento);
-};
-
-/**
  * Calcular saldo pendiente
  */
 export const calcularSaldoPendiente = (pagos) => {
@@ -113,8 +95,9 @@ export const calcularMontoAdeudado = (pagos, becas = []) => {
   );
   
   let total = pagosPendientes.reduce((suma, pago) => {
-    const montoBase = pago.monto || 0;
-    const montoConBeca = aplicarBeca(montoBase, becas);
+    const montoBase = pago.montoOriginal !== undefined ? Number(pago.montoOriginal) : Number(pago.monto || 0);
+    const montoConDescuentosRegistrados = Number((pago.monto ?? montoBase).toFixed(2));
+    const montoConBeca = aplicarBeca(montoConDescuentosRegistrados, becas, { pago });
     // Solo aplicar recargo a colegiaturas
     const montoConRecargo = calcularMontoTotal(
       montoConBeca,
@@ -214,5 +197,66 @@ export const obtenerCostoNivel = (nivel, configuracion) => {
   }
   
   return null;
+};
+
+const normalizarFechaValor = (valor) => {
+  if (!valor) return null;
+  if (valor instanceof Date) return valor;
+  if (typeof valor === 'string') {
+    const fecha = new Date(valor);
+    return Number.isNaN(fecha.getTime()) ? null : fecha;
+  }
+  if (valor?.toDate) return valor.toDate();
+  if (typeof valor?.seconds === 'number') return new Date(valor.seconds * 1000);
+  return null;
+};
+
+const becaAplicaAPago = (beca, pago) => {
+  if (!beca || beca.activa === false) return false;
+  if (!pago) return true;
+  const fechaVencimiento = normalizarFechaValor(pago.fechaVencimiento) || new Date();
+  const inicio = normalizarFechaValor(beca.fechaInicio);
+  const fin = normalizarFechaValor(beca.fechaFin);
+  if (inicio && fechaVencimiento < inicio) return false;
+  if (fin && fechaVencimiento > fin) return false;
+
+  switch (beca.alcance) {
+    case 'colegiaturas':
+      return pago.tipo === 'Colegiatura';
+    case 'inscripcion':
+      return pago.tipo === 'Inscripción';
+    case 'certificado':
+      return pago.tipo === 'Certificado';
+    case 'pago':
+      return beca.pagoId && pago.id === beca.pagoId;
+    case 'global':
+    default:
+      return true;
+  }
+};
+
+export const aplicarBeca = (monto, becas = [], opciones = {}) => {
+  const montoBase = Number(monto) || 0;
+  if (!becas || becas.length === 0) return Number(Math.max(0, montoBase).toFixed(2));
+
+  const pago = opciones?.pago;
+  const becasAplicadasIds = new Set((pago?.becasAplicadas || []).map((item) => item.id));
+  let montoConDescuento = montoBase;
+
+  becas.forEach((beca) => {
+    if (!beca?.activa) return;
+    if (becasAplicadasIds.has(beca.id)) return;
+    if (pago && !becaAplicaAPago(beca, pago)) return;
+
+    if ((beca.tipo || 'porcentaje') === 'porcentaje') {
+      const porcentaje = Math.min(100, Math.max(0, Number(beca.valor) || 0));
+      montoConDescuento = montoConDescuento * (1 - porcentaje / 100);
+    } else {
+      const rebaja = Math.max(0, Number(beca.valor) || 0);
+      montoConDescuento = montoConDescuento - Math.min(rebaja, montoConDescuento);
+    }
+  });
+
+  return Number(Math.max(0, montoConDescuento).toFixed(2));
 };
 

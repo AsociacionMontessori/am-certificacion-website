@@ -82,15 +82,37 @@ const GestionPagos = () => {
   });
   const [archivoComprobante, setArchivoComprobante] = useState(null);
   const [uploadingComprobante, setUploadingComprobante] = useState(false);
-  const [nuevoPago, setNuevoPago] = useState({
-    alumnoId: alumnoIdParam || '',
+  const crearPagoInicial = (alumnoId = '') => ({
+    alumnoId,
     tipo: 'Colegiatura',
     monto: '',
     fechaVencimiento: '',
-    descripcion: ''
+    descripcion: '',
+    numeroColegiatura: '',
+    totalColegiaturas: ''
   });
+  const [nuevoPago, setNuevoPago] = useState(crearPagoInicial(alumnoIdParam || ''));
   const [alumnosLoading, setAlumnosLoading] = useState(true);
   const [generandoPagos, setGenerandoPagos] = useState(false);
+  const crearBecaFormBase = (alumnoId = '') => ({
+    alumnoId,
+    nombre: '',
+    tipo: 'porcentaje',
+    valor: '',
+    alcance: 'colegiaturas',
+    pagoId: '',
+    motivo: '',
+    descripcion: '',
+    fechaInicio: '',
+    fechaFin: '',
+    aplicaRecargos: true
+  });
+  const [becaForm, setBecaForm] = useState(crearBecaFormBase(alumnoIdParam || ''));
+  const [becaEditando, setBecaEditando] = useState(null);
+  const [becasAlumno, setBecasAlumno] = useState([]);
+  const [loadingBecas, setLoadingBecas] = useState(false);
+  const [guardandoBeca, setGuardandoBeca] = useState(false);
+  const [eliminandoBecaId, setEliminandoBecaId] = useState(null);
 
   useEffect(() => {
     const loadData = async () => {
@@ -185,6 +207,246 @@ const GestionPagos = () => {
     loadData();
   }, [showError]);
 
+  const convertirFechaAInput = (valor) => {
+    const fecha = valor?.toDate ? valor.toDate() : valor?.seconds ? new Date(valor.seconds * 1000) : typeof valor === 'string' ? new Date(valor) : valor;
+    if (!fecha || Number.isNaN(fecha?.getTime?.())) return '';
+    return fecha.toISOString().slice(0, 10);
+  };
+
+  const convertirInputATimestamp = (valor) => {
+    if (!valor) return null;
+    const fecha = new Date(`${valor}T00:00:00`);
+    if (Number.isNaN(fecha.getTime())) return null;
+    return Timestamp.fromDate(fecha);
+  };
+
+  const recargarPagos = async () => {
+    const pagosActualizados = await obtenerTodosLosPagos();
+    setPagos(pagosActualizados);
+  };
+
+  const cargarBecasAlumno = async (alumnoId) => {
+    if (!alumnoId) return;
+    setLoadingBecas(true);
+    try {
+      const becasData = await obtenerBecasAlumno(alumnoId);
+      setBecasAlumno(becasData);
+    } catch (error) {
+      console.error('Error al cargar becas:', error);
+      showError('No se pudieron cargar los descuentos del alumno');
+    } finally {
+      setLoadingBecas(false);
+    }
+  };
+
+  const plantillasDescuentos = [
+    {
+      id: 'contado5',
+      label: 'Pago de contado 5%',
+      data: {
+        nombre: 'Descuento pago de contado',
+        tipo: 'porcentaje',
+        valor: 5,
+        alcance: 'colegiaturas',
+        motivo: 'Pago completo en una sola exhibición',
+        descripcion: 'Aplica un 5% de descuento sobre todas las colegiaturas pendientes.',
+        aplicaRecargos: false
+      }
+    },
+    {
+      id: 'ajuste500',
+      label: 'Ajuste puntual $500',
+      data: {
+        nombre: 'Ajuste puntual',
+        tipo: 'fijo',
+        valor: 500,
+        alcance: 'pago',
+        motivo: 'Ajuste administrativo puntual',
+        descripcion: 'Descuento directo de $500 aplicado a un pago específico.',
+        aplicaRecargos: true
+      }
+    }
+  ];
+
+  const handleAbrirDescuentos = (alumnoId, pagoId = '') => {
+    if (!alumnoId) {
+      showError('Selecciona un alumno para gestionar descuentos');
+      return;
+    }
+    setBecaEditando(null);
+    setBecaForm({
+      ...crearBecaFormBase(alumnoId),
+      alcance: pagoId ? 'pago' : 'colegiaturas',
+      pagoId: pagoId || ''
+    });
+    setShowModalBeca(true);
+    cargarBecasAlumno(alumnoId);
+  };
+
+  const aplicarPlantillaBeca = (plantilla) => {
+    if (!becaForm.alumnoId) {
+      showError('Primero selecciona un alumno');
+      return;
+    }
+    const pagoSugerido = plantilla.data.alcance === 'pago'
+      ? (pagos.find((pago) => pago.alumnoId === becaForm.alumnoId)?.id || '')
+      : '';
+    setBecaForm((prev) => ({
+      ...prev,
+      nombre: plantilla.data.nombre || prev.nombre,
+      tipo: plantilla.data.tipo || prev.tipo,
+      valor: plantilla.data.valor?.toString() || prev.valor,
+      alcance: plantilla.data.alcance || prev.alcance,
+      motivo: plantilla.data.motivo || prev.motivo,
+      descripcion: plantilla.data.descripcion || prev.descripcion,
+      aplicaRecargos: plantilla.data.aplicaRecargos !== undefined ? plantilla.data.aplicaRecargos : prev.aplicaRecargos,
+      pagoId: plantilla.data.alcance === 'pago' ? (pagoSugerido || prev.pagoId) : ''
+    }));
+  };
+
+  const handleEditarBeca = (beca) => {
+    setBecaEditando(beca);
+    setBecaForm({
+      alumnoId: beca.alumnoId,
+      nombre: beca.nombre || '',
+      tipo: beca.tipo || 'porcentaje',
+      valor: beca.valor !== undefined ? beca.valor.toString() : '',
+      alcance: beca.alcance || 'global',
+      pagoId: beca.pagoId || '',
+      motivo: beca.motivo || '',
+      descripcion: beca.descripcion || '',
+      fechaInicio: convertirFechaAInput(beca.fechaInicio),
+      fechaFin: convertirFechaAInput(beca.fechaFin),
+      aplicaRecargos: beca.aplicaRecargos !== undefined ? beca.aplicaRecargos : true
+    });
+  };
+
+  const handleCancelarEdicionBeca = () => {
+    setBecaEditando(null);
+    setBecaForm((prev) => crearBecaFormBase(prev.alumnoId));
+  };
+
+  const handleGuardarBeca = async () => {
+    if (!becaForm.alumnoId) {
+      showError('Selecciona un alumno para aplicar el descuento');
+      return;
+    }
+    if (!becaForm.valor || Number(becaForm.valor) <= 0) {
+      showError('El valor del descuento debe ser mayor que cero');
+      return;
+    }
+    if (becaForm.alcance === 'pago' && !becaForm.pagoId) {
+      showError('Selecciona el pago al que deseas aplicar el descuento');
+      return;
+    }
+
+    setGuardandoBeca(true);
+    try {
+      const payload = {
+        alumnoId: becaForm.alumnoId,
+        nombre: becaForm.nombre?.trim() || 'Descuento personalizado',
+        tipo: becaForm.tipo,
+        valor: Number(becaForm.valor),
+        alcance: becaForm.alcance,
+        pagoId: becaForm.alcance === 'pago' ? becaForm.pagoId || null : null,
+        motivo: becaForm.motivo,
+        descripcion: becaForm.descripcion,
+        fechaInicio: convertirInputATimestamp(becaForm.fechaInicio),
+        fechaFin: convertirInputATimestamp(becaForm.fechaFin),
+        aplicaRecargos: becaForm.aplicaRecargos
+      };
+
+      if (becaEditando) {
+        await actualizarBeca(becaEditando.id, payload);
+        success('Descuento actualizado correctamente');
+      } else {
+        await crearBeca(payload);
+        success('Descuento creado y aplicado correctamente');
+      }
+
+      await cargarBecasAlumno(becaForm.alumnoId);
+      await recargarPagos();
+      if (!becaEditando) {
+        setBecaForm(crearBecaFormBase(becaForm.alumnoId));
+      }
+      setBecaEditando(null);
+    } catch (error) {
+      console.error('Error al guardar beca:', error);
+      showError('No se pudo guardar el descuento');
+    } finally {
+      setGuardandoBeca(false);
+    }
+  };
+
+  const handleDesactivarBeca = async (beca) => {
+    const confirmado = await confirm(
+      '¿Eliminar descuento?',
+      `Esta acción revertirá el descuento "${beca.nombre || beca.tipo}" en los pagos del alumno. ¿Deseas continuar?`
+    );
+    if (!confirmado) return;
+
+    setEliminandoBecaId(beca.id);
+    try {
+      await eliminarBeca(beca.id);
+      success('Descuento eliminado y montos actualizados');
+      await cargarBecasAlumno(beca.alumnoId);
+      await recargarPagos();
+    } catch (error) {
+      console.error('Error al eliminar beca:', error);
+      showError('No se pudo eliminar el descuento');
+    } finally {
+      setEliminandoBecaId(null);
+    }
+  };
+
+  const obtenerCostosNivelAlumno = useCallback((alumnoId) => {
+    if (!alumnoId || !configuracion?.costos) return null;
+    const alumnoSeleccionado = alumnos[alumnoId];
+    if (!alumnoSeleccionado?.nivel) return null;
+    const nivelAlumno = alumnoSeleccionado.nivel.toLowerCase();
+
+    let coincidencia = null;
+    for (const [key, valor] of Object.entries(configuracion.costos)) {
+      const keyLower = key.toLowerCase();
+      if (keyLower === nivelAlumno) {
+        coincidencia = valor;
+        break;
+      }
+      if (nivelAlumno.includes(keyLower) || keyLower.includes(nivelAlumno.split(' ')[0] || '')) {
+        coincidencia = valor;
+      }
+    }
+    return coincidencia;
+  }, [alumnos, configuracion]);
+
+  const sugerirSiguienteColegiatura = useCallback((alumnoId) => {
+    const costos = obtenerCostosNivelAlumno(alumnoId);
+    const totalEsperado = Number(costos?.meses || costos?.pagos || 0) || '';
+
+    const colegiaturasAlumno = pagos
+      .filter((pago) => pago.alumnoId === alumnoId && pago.tipo === 'Colegiatura');
+
+    const numerosAsignados = new Set(
+      colegiaturasAlumno
+        .map((pago) => Number(pago.numeroColegiatura))
+        .filter((numero) => Number.isFinite(numero) && numero > 0)
+    );
+
+    let numeroSugerido = 1;
+    while (numerosAsignados.has(numeroSugerido)) {
+      numeroSugerido += 1;
+    }
+
+    if (totalEsperado && numeroSugerido > totalEsperado) {
+      numeroSugerido = '';
+    }
+
+    return {
+      numero: numeroSugerido ? numeroSugerido.toString() : '',
+      total: totalEsperado ? totalEsperado.toString() : ''
+    };
+  }, [obtenerCostosNivelAlumno, pagos]);
+
   // Memoizar filtrado y ordenamiento para evitar recálculos innecesarios
   const filteredPagos = useMemo(() => {
     return pagos
@@ -207,6 +469,11 @@ const GestionPagos = () => {
       });
   }, [pagos, filtroEstado, filtroAlumno, filtroTipo, debouncedSearchTerm, ordenFecha, alumnos]);
 
+  const pagosDelAlumno = useMemo(() => {
+    if (!becaForm.alumnoId) return [];
+    return pagos.filter((pago) => pago.alumnoId === becaForm.alumnoId);
+  }, [pagos, becaForm.alumnoId]);
+
   // Paginación
   const totalPaginas = Math.ceil(filteredPagos.length / itemsPorPagina);
   const pagosPaginados = useMemo(() => {
@@ -219,6 +486,27 @@ const GestionPagos = () => {
   useEffect(() => {
     setPaginaActual(1);
   }, [filtroEstado, filtroAlumno, filtroTipo, debouncedSearchTerm, ordenFecha]);
+
+  useEffect(() => {
+    if (nuevoPago.tipo !== 'Colegiatura') {
+      if (nuevoPago.numeroColegiatura || nuevoPago.totalColegiaturas) {
+        setNuevoPago((prev) => ({ ...prev, numeroColegiatura: '', totalColegiaturas: '' }));
+      }
+      return;
+    }
+    if (!nuevoPago.alumnoId) return;
+    const sugerencias = sugerirSiguienteColegiatura(nuevoPago.alumnoId);
+    setNuevoPago((prev) => {
+      const updates = {};
+      if (!prev.numeroColegiatura && sugerencias.numero) {
+        updates.numeroColegiatura = sugerencias.numero;
+      }
+      if (!prev.totalColegiaturas && sugerencias.total) {
+        updates.totalColegiaturas = sugerencias.total;
+      }
+      return Object.keys(updates).length ? { ...prev, ...updates } : prev;
+    });
+  }, [nuevoPago.tipo, nuevoPago.alumnoId, sugerirSiguienteColegiatura]);
 
   const handleValidarPago = async () => {
     if (!selectedPago) return;
@@ -355,31 +643,72 @@ const GestionPagos = () => {
         return;
       }
       fechaVenc.setHours(23, 59, 59, 999);
+
+      const esColegiatura = nuevoPago.tipo === 'Colegiatura';
+      let numeroColegiatura = null;
+      let totalColegiaturas = null;
+
+      if (esColegiatura) {
+        numeroColegiatura = Number(nuevoPago.numeroColegiatura);
+        if (!Number.isFinite(numeroColegiatura) || numeroColegiatura < 1) {
+          showError('Ingresa un número de colegiatura válido (mayor o igual a 1)');
+          return;
+        }
+
+        totalColegiaturas = nuevoPago.totalColegiaturas
+          ? Number(nuevoPago.totalColegiaturas)
+          : null;
+
+        if (totalColegiaturas && (!Number.isFinite(totalColegiaturas) || totalColegiaturas < numeroColegiatura)) {
+          showError('El total de colegiaturas no puede ser menor al número asignado');
+          return;
+        }
+
+        const pagosAlumno = pagos.filter((pago) => pago.alumnoId === nuevoPago.alumnoId && pago.tipo === 'Colegiatura');
+        if (pagosAlumno.some((pago) => Number(pago.numeroColegiatura) === numeroColegiatura)) {
+          showError(`Ya existe una colegiatura con el número ${numeroColegiatura}.`);
+          return;
+        }
+
+        if (!totalColegiaturas) {
+          const costos = obtenerCostosNivelAlumno(nuevoPago.alumnoId);
+          totalColegiaturas = Number(costos?.meses || costos?.pagos || '') || null;
+        }
+      }
       
-      await crearPago({
+      let descripcion = nuevoPago.descripcion?.trim() || '';
+      if (esColegiatura) {
+        const totalTexto = totalColegiaturas ? `${numeroColegiatura}/${totalColegiaturas}` : `${numeroColegiatura}`;
+        if (!descripcion) {
+          descripcion = `Colegiatura ${totalTexto}`;
+        }
+      }
+
+      const payload = {
         alumnoId: nuevoPago.alumnoId,
         tipo: nuevoPago.tipo,
-        monto: monto,
+        monto,
+        montoOriginal: monto,
         fechaVencimiento: Timestamp.fromDate(fechaVenc),
         estado: 'Pendiente',
-        descripcion: nuevoPago.descripcion || '',
-        recargoPorcentaje: configuracion?.recargoPorcentaje || 10,
-        recargoActivo: nuevoPago.tipo === 'Colegiatura' ? (configuracion?.recargoActivo !== false) : false
-      });
+        descripcion,
+        recargoPorcentaje: esColegiatura ? (configuracion?.recargoPorcentaje || 10) : 0,
+        recargoActivo: esColegiatura ? (configuracion?.recargoActivo !== false) : false
+      };
+
+      if (esColegiatura) {
+        payload.numeroColegiatura = numeroColegiatura;
+        if (totalColegiaturas) {
+          payload.totalColegiaturas = totalColegiaturas;
+        }
+      }
+
+      await crearPago(payload);
 
       success('Pago creado exitosamente');
       setShowModalCrearPago(false);
-      setNuevoPago({
-        alumnoId: '',
-        tipo: 'Colegiatura',
-        monto: '',
-        fechaVencimiento: '',
-        descripcion: ''
-      });
-
-      // Recargar pagos
-      const pagosData = await obtenerTodosLosPagos();
-      setPagos(pagosData);
+      setNuevoPago(crearPagoInicial(''));
+      await recargarPagos();
     } catch (error) {
       console.error('Error al crear pago:', error);
       showError('Error al crear el pago');
@@ -589,13 +918,8 @@ const GestionPagos = () => {
           <div className="flex flex-wrap gap-2">
             <button
               onClick={() => {
-                setNuevoPago({
-                  alumnoId: alumnoIdParam || '',
-                  tipo: 'Colegiatura',
-                  monto: '',
-                  fechaVencimiento: '',
-                  descripcion: ''
-                });
+                const alumnoSeleccionado = filtroAlumno || alumnoIdParam || '';
+                setNuevoPago(crearPagoInicial(alumnoSeleccionado));
                 setShowModalCrearPago(true);
               }}
               className="inline-flex items-center px-4 py-2 bg-blue text-white rounded-lg hover:bg-blue/90 transition-colors"
@@ -609,6 +933,15 @@ const GestionPagos = () => {
             >
               <Cog6ToothIcon className="w-5 h-5 mr-2" />
               Configuración
+            </button>
+            <button
+              onClick={() => handleAbrirDescuentos(filtroAlumno || alumnoIdParam || '')}
+              disabled={!filtroAlumno && !alumnoIdParam}
+              className="inline-flex items-center px-4 py-2 bg-yellow text-gray-900 dark:text-gray-900 rounded-lg hover:bg-yellow/90 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+              title={!filtroAlumno && !alumnoIdParam ? 'Selecciona un alumno para gestionar descuentos' : 'Gestionar descuentos y becas del alumno'}
+            >
+              <CurrencyDollarIcon className="w-5 h-5 mr-2" />
+              Descuentos
             </button>
           </div>
         )}
@@ -776,6 +1109,12 @@ const GestionPagos = () => {
               // Verificar si el alumno tiene pagos (para mostrar botón de generar)
               const pagosDelAlumno = pagos.filter(p => p.alumnoId === pago.alumnoId);
               const alumnoTienePagos = pagosDelAlumno.length > 0;
+              const becasAplicadasPago = Array.isArray(pago.becasAplicadas) ? pago.becasAplicadas : [];
+              const descuentoRegistrado = pago.descuentoAplicado !== undefined
+                ? Number(pago.descuentoAplicado)
+                : pago.montoOriginal !== undefined
+                  ? Number((pago.montoOriginal - (pago.monto ?? 0)).toFixed(2))
+                  : 0;
 
               return (
                 <div key={pago.id} className="p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
@@ -810,6 +1149,21 @@ const GestionPagos = () => {
                             </span>
                           )}
                         </p>
+                        {pago.montoOriginal !== undefined && pago.montoOriginal !== null && pago.montoOriginal !== pago.monto && (
+                          <p>
+                            <span className="font-medium">Monto original:</span> {formatearMoneda(pago.montoOriginal)}
+                          </p>
+                        )}
+                        {descuentoRegistrado > 0 && (
+                          <p>
+                            <span className="font-medium">Descuento aplicado:</span> -{formatearMoneda(descuentoRegistrado)}
+                            {becasAplicadasPago.length > 0 && (
+                              <span className="block text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                {becasAplicadasPago.map((beca) => beca.nombre || beca.tipo || 'Descuento').join(', ')}
+                              </span>
+                            )}
+                          </p>
+                        )}
                         {pago.montoPagado && (
                           <p>
                             <span className="font-medium">Pagado:</span> {formatearMoneda(pago.montoPagado)}
@@ -1425,6 +1779,330 @@ const GestionPagos = () => {
         </div>
       )}
 
+      {/* Modal Descuentos / Becas */}
+      {showModalBeca && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-5xl p-6">
+            <div className="flex items-start justify-between gap-4 mb-4">
+              <div>
+                <h3 className="text-2xl font-semibold text-gray-900 dark:text-white">
+                  Descuentos y becas del alumno
+                </h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                  Gestiona descuentos adicionales para pagos específicos o para todas las colegiaturas. Los cambios se reflejan inmediatamente en los montos pendientes.
+                </p>
+              </div>
+              <button
+                onClick={() => {
+                  setShowModalBeca(false);
+                  handleCancelarEdicionBeca();
+                }}
+                className="px-3 py-1.5 text-sm rounded-lg border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              >
+                Cerrar
+              </button>
+            </div>
+
+            <div className="mb-4 p-4 bg-blue/10 border border-blue/20 rounded-lg text-sm text-gray-700 dark:text-gray-200">
+              <p>
+                <span className="font-medium">Alumno:</span>{' '}
+                {alumnos[becaForm.alumnoId]?.nombre || alumnos[becaForm.alumnoId]?.email || 'Selecciona un alumno'}
+              </p>
+              {alumnos[becaForm.alumnoId]?.nivel && (
+                <p className="mt-1">
+                  <span className="font-medium">Nivel:</span> {alumnos[becaForm.alumnoId]?.nivel}
+                </p>
+              )}
+            </div>
+
+            {loadingBecas ? (
+              <LoadingSpinner
+                message="Cargando descuentos del alumno..."
+                className="h-40"
+              />
+            ) : (
+              <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                <div className="space-y-5">
+                  <div className="bg-gray-50 dark:bg-gray-900/40 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                    <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                      Atajos rápidos
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {plantillasDescuentos.map((plantilla) => (
+                        <button
+                          key={plantilla.id}
+                          onClick={() => aplicarPlantillaBeca(plantilla)}
+                          className="px-3 py-1.5 text-xs font-medium rounded-full border border-yellow/40 bg-yellow/20 text-yellow-900 hover:bg-yellow/30 transition-colors"
+                        >
+                          {plantilla.label}
+                        </button>
+                      ))}
+                    </div>
+                    <p className="mt-3 text-xs text-gray-500 dark:text-gray-400">
+                      Estos atajos precargan valores comunes (por ejemplo, 5% por pago de contado). Ajusta los datos según sea necesario antes de guardar.
+                    </p>
+                  </div>
+
+                  <div className="bg-white dark:bg-gray-900/40 border border-gray-200 dark:border-gray-700 rounded-lg p-5 space-y-4">
+                    <h4 className="text-lg font-semibold text-gray-900 dark:text-white">
+                      {becaEditando ? 'Editar descuento' : 'Nuevo descuento'}
+                    </h4>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="md:col-span-2">
+                        <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                          Nombre del descuento
+                        </label>
+                        <input
+                          type="text"
+                          value={becaForm.nombre}
+                          onChange={(e) => setBecaForm({ ...becaForm, nombre: e.target.value })}
+                          placeholder="Ej. Descuento por pago de contado"
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                          Tipo de descuento
+                        </label>
+                        <select
+                          value={becaForm.tipo}
+                          onChange={(e) => setBecaForm({ ...becaForm, tipo: e.target.value })}
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                        >
+                          <option value="porcentaje">Porcentaje (%)</option>
+                          <option value="fijo">Monto fijo ($)</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                          Valor del descuento
+                        </label>
+                        <input
+                          type="number"
+                          min="0"
+                          step="0.01"
+                          value={becaForm.valor}
+                          onChange={(e) => setBecaForm({ ...becaForm, valor: e.target.value })}
+                          placeholder={becaForm.tipo === 'porcentaje' ? 'Ej. 5' : 'Ej. 500'}
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                          Alcance
+                        </label>
+                        <select
+                          value={becaForm.alcance}
+                          onChange={(e) => setBecaForm({ ...becaForm, alcance: e.target.value, pagoId: e.target.value === 'pago' ? becaForm.pagoId : '' })}
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                        >
+                          <option value="colegiaturas">Todas las colegiaturas</option>
+                          <option value="global">Todos los pagos</option>
+                          <option value="pago">Pago específico</option>
+                          <option value="inscripcion">Inscripción</option>
+                          <option value="certificado">Certificado</option>
+                        </select>
+                      </div>
+
+                      {becaForm.alcance === 'pago' && (
+                        <div className="md:col-span-2">
+                          <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                            Selecciona el pago
+                          </label>
+                          <select
+                            value={becaForm.pagoId}
+                            onChange={(e) => setBecaForm({ ...becaForm, pagoId: e.target.value })}
+                            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                          >
+                            <option value="">Seleccionar...</option>
+                            {pagosDelAlumno.map((pago) => (
+                              <option key={pago.id} value={pago.id}>
+                                {`${pago.tipo}${pago.numeroColegiatura ? ` ${pago.numeroColegiatura}/${pago.totalColegiaturas || ''}` : ''} · ${formatearMoneda(pago.monto)} · ${pago.descripcion || ''}`}
+                              </option>
+                            ))}
+                          </select>
+                          {pagosDelAlumno.length === 0 && (
+                            <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                              No se encontraron pagos para este alumno. Genera pagos primero para aplicar un descuento específico.
+                            </p>
+                          )}
+                        </div>
+                      )}
+
+                      <div>
+                        <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                          Vigencia desde
+                        </label>
+                        <input
+                          type="date"
+                          value={becaForm.fechaInicio}
+                          onChange={(e) => setBecaForm({ ...becaForm, fechaInicio: e.target.value })}
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                          Vigencia hasta
+                        </label>
+                        <input
+                          type="date"
+                          value={becaForm.fechaFin}
+                          onChange={(e) => setBecaForm({ ...becaForm, fechaFin: e.target.value })}
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                        />
+                      </div>
+
+                      <div className="md:col-span-2 flex items-center gap-2">
+                        <input
+                          id="descuento-aplica-recargos"
+                          type="checkbox"
+                          checked={becaForm.aplicaRecargos}
+                          onChange={(e) => setBecaForm({ ...becaForm, aplicaRecargos: e.target.checked })}
+                          className="h-4 w-4 text-blue border-gray-300 rounded"
+                        />
+                        <label htmlFor="descuento-aplica-recargos" className="text-xs text-gray-600 dark:text-gray-400">
+                          Mantener recargos en pagos con descuento (recomendado desactivar para descuentos por pronto pago)
+                        </label>
+                      </div>
+
+                      <div className="md:col-span-2">
+                        <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                          Motivo
+                        </label>
+                        <input
+                          type="text"
+                          value={becaForm.motivo}
+                          onChange={(e) => setBecaForm({ ...becaForm, motivo: e.target.value })}
+                          placeholder="Ej. Pago completo anticipado"
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                        />
+                      </div>
+
+                      <div className="md:col-span-2">
+                        <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                          Descripción detallada (opcional)
+                        </label>
+                        <textarea
+                          value={becaForm.descripcion}
+                          onChange={(e) => setBecaForm({ ...becaForm, descripcion: e.target.value })}
+                          rows={3}
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                          placeholder="Anota condiciones o acuerdos específicos del descuento"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="flex gap-3 pt-2">
+                      {becaEditando && (
+                        <button
+                          onClick={handleCancelarEdicionBeca}
+                          className="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                        >
+                          Cancelar edición
+                        </button>
+                      )}
+                      <button
+                        onClick={handleGuardarBeca}
+                        disabled={guardandoBeca}
+                        className="px-4 py-2 bg-blue text-white rounded-lg hover:bg-blue/90 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                      >
+                        {guardandoBeca ? 'Guardando...' : becaEditando ? 'Actualizar descuento' : 'Guardar descuento'}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h4 className="text-lg font-semibold text-gray-900 dark:text-white">
+                      Descuentos activos ({becasAlumno.length})
+                    </h4>
+                    <button
+                      onClick={() => becaForm.alumnoId && cargarBecasAlumno(becaForm.alumnoId)}
+                      className="text-xs px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                    >
+                      Actualizar lista
+                    </button>
+                  </div>
+
+                  <div className="space-y-3 max-h-[420px] overflow-y-auto pr-1">
+                    {becasAlumno.length === 0 ? (
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        No hay descuentos activos para este alumno.
+                      </p>
+                    ) : (
+                      becasAlumno.map((beca) => {
+                        const vigenciaInicio = convertirFechaAInput(beca.fechaInicio);
+                        const vigenciaFin = convertirFechaAInput(beca.fechaFin);
+                        const alcanceLabel = {
+                          global: 'Todos los pagos',
+                          colegiaturas: 'Colegiaturas',
+                          pago: 'Pago específico',
+                          inscripcion: 'Inscripción',
+                          certificado: 'Certificado'
+                        }[beca.alcance || 'global'] || 'Personalizado';
+                        return (
+                          <div key={beca.id} className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-white dark:bg-gray-900/40">
+                            <div className="flex items-start justify-between gap-3">
+                              <div>
+                                <p className="font-semibold text-gray-900 dark:text-white">
+                                  {beca.nombre || 'Descuento'}
+                                </p>
+                                <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                                  {beca.tipo === 'porcentaje'
+                                    ? `${beca.valor}%`
+                                    : formatearMoneda(beca.valor)}{' '}
+                                  · {alcanceLabel}
+                                </p>
+                                {beca.motivo && (
+                                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                    Motivo: {beca.motivo}
+                                  </p>
+                                )}
+                                {beca.descripcion && (
+                                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                    {beca.descripcion}
+                                  </p>
+                                )}
+                                {(vigenciaInicio || vigenciaFin) && (
+                                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                    Vigencia: {vigenciaInicio ? vigenciaInicio : 'sin inicio definido'}{vigenciaFin ? ` a ${vigenciaFin}` : ''}
+                                  </p>
+                                )}
+                              </div>
+                              <div className="flex flex-col gap-2">
+                                <button
+                                  onClick={() => handleEditarBeca(beca)}
+                                  className="px-3 py-1.5 text-xs rounded-lg border border-blue text-blue hover:bg-blue/10 transition-colors"
+                                >
+                                  Editar
+                                </button>
+                                <button
+                                  onClick={() => handleDesactivarBeca(beca)}
+                                  disabled={eliminandoBecaId === beca.id}
+                                  className="px-3 py-1.5 text-xs rounded-lg border border-red text-red hover:bg-red/10 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                                >
+                                  {eliminandoBecaId === beca.id ? 'Eliminando...' : 'Eliminar'}
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Modal Crear Pago */}
       {showModalCrearPago && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
@@ -1439,7 +2117,7 @@ const GestionPagos = () => {
                 </label>
                 <select
                   value={nuevoPago.alumnoId}
-                  onChange={(e) => setNuevoPago({ ...nuevoPago, alumnoId: e.target.value })}
+                  onChange={(e) => setNuevoPago({ ...nuevoPago, alumnoId: e.target.value, numeroColegiatura: '', totalColegiaturas: '' })}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   required
                 >
@@ -1477,7 +2155,15 @@ const GestionPagos = () => {
                 </label>
                 <select
                   value={nuevoPago.tipo}
-                  onChange={(e) => setNuevoPago({ ...nuevoPago, tipo: e.target.value })}
+                  onChange={(e) => {
+                    const nuevoTipo = e.target.value;
+                    setNuevoPago((prev) => ({
+                      ...prev,
+                      tipo: nuevoTipo,
+                      numeroColegiatura: nuevoTipo === 'Colegiatura' ? '' : '',
+                      totalColegiaturas: nuevoTipo === 'Colegiatura' ? '' : ''
+                    }));
+                  }}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 >
                   <option value="Colegiatura">Colegiatura</option>
@@ -1528,13 +2214,7 @@ const GestionPagos = () => {
                 <button
                   onClick={() => {
                     setShowModalCrearPago(false);
-                    setNuevoPago({
-                      alumnoId: '',
-                      tipo: 'Colegiatura',
-                      monto: '',
-                      fechaVencimiento: '',
-                      descripcion: ''
-                    });
+                    setNuevoPago(crearPagoInicial(''));
                   }}
                   className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                 >
@@ -1547,6 +2227,42 @@ const GestionPagos = () => {
                   Crear Pago
                 </button>
               </div>
+              {nuevoPago.tipo === 'Colegiatura' && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Número de colegiatura *
+                    </label>
+                    <input
+                      type="number"
+                      min="1"
+                      value={nuevoPago.numeroColegiatura}
+                      onChange={(e) => setNuevoPago({ ...nuevoPago, numeroColegiatura: e.target.value })}
+                      placeholder="Ej. 1"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    />
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                      Se sugiere el siguiente número faltante según los pagos del alumno.
+                    </p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Total de colegiaturas
+                    </label>
+                    <input
+                      type="number"
+                      min="1"
+                      value={nuevoPago.totalColegiaturas}
+                      onChange={(e) => setNuevoPago({ ...nuevoPago, totalColegiaturas: e.target.value })}
+                      placeholder="Ej. 16"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    />
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                      Si se deja vacío, se usará el total configurado para el nivel del alumno.
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
