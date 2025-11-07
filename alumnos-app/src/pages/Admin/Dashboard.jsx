@@ -244,6 +244,9 @@ const AdminDashboard = () => {
                   Email
                 </th>
                 <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  Teléfono
+                </th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                   Nivel
                 </th>
                 <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">
@@ -275,6 +278,9 @@ const AdminDashboard = () => {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                     {alumno.email || 'N/A'}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                    {alumno.telefono || 'N/A'}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                     {alumno.nivel || 'N/A'}
@@ -355,6 +361,12 @@ const AdminDashboard = () => {
                   <div className="flex items-center text-sm">
                     <span className="text-gray-500 dark:text-gray-400 mr-2 font-medium">Matrícula:</span>
                     <span className="text-gray-900 dark:text-white">{alumno.matricula}</span>
+                  </div>
+                )}
+                {alumno.telefono && (
+                  <div className="flex items-center text-sm">
+                    <span className="text-gray-500 dark:text-gray-400 mr-2 font-medium">Teléfono:</span>
+                    <span className="text-gray-900 dark:text-white">{alumno.telefono}</span>
                   </div>
                 )}
                 {alumno.nivel && (
