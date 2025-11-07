@@ -11,7 +11,7 @@ import {
   TableCellsIcon,
   SparklesIcon,
   FunnelIcon,
-  ArrowUpDownIcon
+  ArrowsUpDownIcon
 } from '@heroicons/react/24/outline';
 import { Link } from 'react-router-dom';
 import AlertasMateriasProximas from '../../components/AlertasMateriasProximas';
@@ -408,7 +408,7 @@ const AdminDashboard = () => {
                     className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
                     title={ordenDireccion === 'asc' ? 'Ascendente' : 'Descendente'}
                   >
-                    <ArrowUpDownIcon className="w-5 h-5" />
+                    <ArrowsUpDownIcon className="w-5 h-5" />
                   </button>
                 </div>
               </div>
