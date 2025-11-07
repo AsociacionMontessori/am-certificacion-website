@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { QRCodeSVG } from 'qrcode.react';
 import { obtenerCertificado } from '../../services/certificadoService';
 import { AcademicCapIcon, ShieldCheckIcon, ShareIcon } from '@heroicons/react/24/outline';
@@ -8,9 +8,12 @@ import { useNotifications } from '../../contexts/NotificationContext';
 
 const CertificadoDigital = () => {
   const { id } = useParams();
+  const [searchParams] = useSearchParams();
   const { success } = useNotifications();
   const [certificado, setCertificado] = useState(null);
   const [loading, setLoading] = useState(true);
+  const tipoDocumento = searchParams.get('tipo');
+  const forzarConstancia = tipoDocumento === 'constancia';
 
   useEffect(() => {
     const loadCertificado = async () => {
@@ -58,29 +61,39 @@ const CertificadoDigital = () => {
     );
   }
 
-  const { folio, codigoVerificacion, promedio, alumno } = certificado;
-  const esGraduado = alumno.estado === 'Graduado';
-  
+  const { folio, codigoVerificacion, promedio, alumno, graduacion } = certificado;
+  const mostrarCertificado = !forzarConstancia && graduacion?.completa;
+  const nivelCertificado = graduacion?.nivel || alumno.nivelGraduacion || alumno.nivel;
+  const nivelActual = alumno.nivelActual || alumno.nivel;
+  const programaCertificado = graduacion?.programa || alumno.programa;
+  const programaActual = alumno.programaActual || alumno.programa;
+
   // Asegurar que el código esté presente antes de generar la URL
   if (!codigoVerificacion) {
     console.error('⚠️ No hay código de verificación disponible');
   }
-  
+
   const urlVerificacion = codigoVerificacion 
     ? `${window.location.origin}/verificar/${folio}/${codigoVerificacion}`
     : `${window.location.origin}/verificar/${folio}/PENDIENTE`;
-  const fechaEmision = formatearFechaLarga(new Date());
+  const fechaIngresoCertificado = formatearFechaLarga(graduacion?.fechaIngresoNivel || alumno.fechaIngreso);
+  const fechaEgresoCertificado = formatearFechaLarga(graduacion?.fechaEgresoNivel || alumno.fechaEgreso);
+  const fechaIngresoActual = formatearFechaLarga(alumno.fechaIngresoActual || alumno.fechaIngreso);
+  const fechaEgresoEstimadaActual = formatearFechaLarga(alumno.fechaEgresoEstimadaActual);
+  const fechaEmision = formatearFechaLarga(mostrarCertificado ? (graduacion?.fechaGraduacion || new Date()) : new Date());
   const lugarEmision = 'Ciudad de México, México';
-
-  const fechaIngreso = formatearFechaLarga(alumno.fechaIngreso);
-  const fechaEgreso = formatearFechaLarga(alumno.fechaEgreso || alumno.fechaEgresoEstimada);
+  const basePath = `/certificado/${id}`;
+  const constanciaUrl = `${basePath}?tipo=constancia`;
+  const certificadoUrl = basePath;
+  const descripcionProgramaCertificado = programaCertificado || (esNivelGuia ? `Guía Montessori` : 'Formación Montessori');
+  const descripcionProgramaConstancia = programaActual || (esNivelGuia ? `Guía Montessori` : nivelActual || 'Certificación Montessori');
 
   const nivelesGuia = new Set([
     'Nido & Comunidad infantil',
     'Casa de Niños',
     'Taller'
   ]);
-  const esNivelGuia = nivelesGuia.has(alumno.nivel);
+  const esNivelGuia = nivelesGuia.has(mostrarCertificado ? nivelCertificado : nivelActual);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8 px-4 sm:px-6 lg:px-8">
@@ -94,14 +107,44 @@ const CertificadoDigital = () => {
             </div>
             <div className="relative z-10">
               <h1 className="text-4xl font-bold text-white mb-4">
-                {esGraduado ? 'CERTIFICADO DIGITAL' : 'CONSTANCIA DE ESTUDIOS'}
+                {mostrarCertificado ? 'CERTIFICADO DIGITAL' : 'CONSTANCIA DE ESTUDIOS'}
               </h1>
               <p className="text-white/90 text-lg">Asociación Montessori de México A.C.</p>
-              {!esGraduado && (
+              {!mostrarCertificado && (
                 <p className="text-white/80 text-sm mt-2">Certificado Digital Verificable</p>
               )}
             </div>
           </div>
+
+          {graduacion?.completa && (
+            <div className="bg-blue/10 border-b border-blue/30 px-6 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 text-sm text-blue/90">
+              <div>
+                {mostrarCertificado ? (
+                  <span>¿Necesitas constancia del nivel actual del alumno?</span>
+                ) : (
+                  <span>¿Necesitas consultar el certificado de graduación?</span>
+                )}
+              </div>
+              <div className="flex gap-2">
+                {!mostrarCertificado && (
+                  <a
+                    href={certificadoUrl}
+                    className="inline-flex items-center px-3 py-1.5 bg-blue text-white rounded-lg text-xs sm:text-sm hover:bg-blue/90 transition-colors"
+                  >
+                    Ver certificado
+                  </a>
+                )}
+                {mostrarCertificado && (
+                  <a
+                    href={constanciaUrl}
+                    className="inline-flex items-center px-3 py-1.5 bg-blue text-white rounded-lg text-xs sm:text-sm hover:bg-blue/90 transition-colors"
+                  >
+                    Ver constancia actual
+                  </a>
+                )}
+              </div>
+            </div>
+          )}
 
           {/* Contenido del certificado */}
           <div className="px-8 py-12 space-y-8">
@@ -116,14 +159,14 @@ const CertificadoDigital = () => {
                 No. 163 de la Ciudad de México, Lic. Francisco Xavier Arredondo Galván;
               </p>
 
-              {esGraduado ? (
+              {mostrarCertificado ? (
                 <>
                   <p className="text-lg font-semibold text-center my-6">
                     <strong>CERTIFICAN</strong> que <strong>{alumno.nombreCompleto}</strong> ha 
                     cumplido satisfactoriamente con los requisitos académicos y prácticos del 
-                    programa de formación {esNivelGuia ? 'de Guía Montessori ' : ''}en el nivel <strong>{alumno.nivel}</strong>, 
-                    con fecha de ingreso <strong>{fechaIngreso}</strong> y fecha de egreso{' '}
-                    <strong>{fechaEgreso}</strong>.
+                    programa de formación <strong>{descripcionProgramaCertificado}</strong> en el nivel <strong>{nivelCertificado}</strong>, 
+                    con fecha de ingreso <strong>{fechaIngresoCertificado || 'Sin registro'}</strong> y fecha de egreso{' '}
+                    <strong>{fechaEgresoCertificado || 'Sin registro'}</strong>.
                   </p>
                   {promedio && (
                     <p className="text-center text-lg">
@@ -135,9 +178,9 @@ const CertificadoDigital = () => {
                 <>
                   <p className="text-lg font-semibold text-center my-6">
                     <strong>CONSTAN</strong> que <strong>{alumno.nombreCompleto}</strong> se encuentra 
-                    inscrito en el programa de formación {esNivelGuia ? 'de Guía Montessori ' : ''}en el nivel{' '}
-                    <strong>{alumno.nivel}</strong>, con fecha de ingreso{' '}
-                    <strong>{fechaIngreso}</strong>.
+                    inscrito en el programa de formación <strong>{descripcionProgramaConstancia}</strong> en el nivel{' '}
+                    <strong>{nivelActual}</strong>, con fecha de ingreso{' '}
+                    <strong>{fechaIngresoActual || 'Sin registro'}</strong>.
                   </p>
                   <div className="bg-yellow/10 border-l-4 border-yellow p-4 my-6 rounded-r">
                     <p className="text-sm text-gray-700 leading-relaxed">
@@ -147,6 +190,11 @@ const CertificadoDigital = () => {
                       únicamente una vez completados satisfactoriamente todos los requisitos académicos y prácticos del programa.
                     </p>
                   </div>
+                  {fechaEgresoEstimadaActual && (
+                    <p className="text-sm text-gray-700 dark:text-gray-300 mt-4 text-center">
+                      Fecha estimada de egreso del nivel actual: <strong>{fechaEgresoEstimadaActual}</strong>
+                    </p>
+                  )}
                 </>
               )}
 
@@ -251,7 +299,7 @@ const CertificadoDigital = () => {
               const url = window.location.href;
               if (navigator.share) {
                 navigator.share({
-                  title: `${esGraduado ? 'Certificado Digital' : 'Constancia de Estudios'} - ${alumno.nombreCompleto}`,
+                  title: `${mostrarCertificado ? 'Certificado Digital' : 'Constancia de Estudios'} - ${alumno.nombreCompleto}`,
                   text: `Certificado digital de ${alumno.nombreCompleto}`,
                   url: url
                 }).catch(async () => {

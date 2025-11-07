@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { verificarCertificado } from '../../services/certificadoService';
+import { formatearFechaLarga } from '../../utils/formatearFecha';
 import { ShieldCheckIcon, XCircleIcon } from '@heroicons/react/24/outline';
 
 const VerificarCertificado = () => {
@@ -82,6 +83,20 @@ const VerificarCertificado = () => {
                     <dt className="text-sm font-medium text-gray-500">Nivel</dt>
                     <dd className="text-lg text-gray-900 mt-1">{resultado.alumno.nivel}</dd>
                   </div>
+                  {resultado.alumno.fechaGraduacion && (
+                    <div>
+                      <dt className="text-sm font-medium text-gray-500">Fecha de graduación</dt>
+                      <dd className="text-sm text-gray-900 mt-1">
+                        {formatearFechaLarga(resultado.alumno.fechaGraduacion)}
+                      </dd>
+                    </div>
+                  )}
+                  {resultado.alumno.nivelActual && resultado.alumno.nivelActual !== resultado.alumno.nivel && (
+                    <div>
+                      <dt className="text-sm font-medium text-gray-500">Nivel actual</dt>
+                      <dd className="text-sm text-gray-900 mt-1">{resultado.alumno.nivelActual}</dd>
+                    </div>
+                  )}
                   <div>
                     <dt className="text-sm font-medium text-gray-500">Estado</dt>
                     <dd className="mt-1">

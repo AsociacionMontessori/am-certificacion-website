@@ -409,26 +409,26 @@ const Dashboard = () => {
                 </div>
               </div>
               {/* Certificado Digital */}
-              <div className="bg-white dark:bg-gray-700 rounded-lg p-3 border border-gray-200 dark:border-gray-600">
+              <div className="bg-white dark:bg-gray-700 rounded-lg p-3 border border-gray-200 dark:border-gray-600 space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex-1 min-w-0">
                     <label className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1 block">
-                      Certificado Digital
+                      Constancia (nivel actual)
                     </label>
                     <p className="text-xs text-gray-900 dark:text-white font-mono truncate">
-                      {`${window.location.origin}/certificado/${userData?.id || ''}`}
+                      {`${window.location.origin}/certificado/${userData?.id || ''}?tipo=constancia`}
                     </p>
                   </div>
                   <div className="flex items-center gap-1 ml-2">
                     <button
-                      onClick={() => handleCopyToClipboard(`${window.location.origin}/certificado/${userData?.id || ''}`, 'Enlace de certificado')}
+                      onClick={() => handleCopyToClipboard(`${window.location.origin}/certificado/${userData?.id || ''}?tipo=constancia`, 'Enlace de constancia')}
                       className="p-1.5 text-gray-600 dark:text-gray-400 hover:text-green dark:hover:text-green transition-colors"
                       title="Copiar enlace"
                     >
                       <ClipboardDocumentIcon className="w-5 h-5" />
                     </button>
                     <a
-                      href={`/certificado/${userData?.id || ''}`}
+                      href={`/certificado/${userData?.id || ''}?tipo=constancia`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="p-1.5 text-gray-600 dark:text-gray-400 hover:text-green dark:hover:text-green transition-colors"
@@ -438,6 +438,37 @@ const Dashboard = () => {
                     </a>
                   </div>
                 </div>
+
+                {userData?.fechaGraduacion && (
+                  <div className="flex items-center justify-between border-t border-gray-200 dark:border-gray-600 pt-3">
+                    <div className="flex-1 min-w-0">
+                      <label className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1 block">
+                        Certificado de graduación
+                      </label>
+                      <p className="text-xs text-gray-900 dark:text-white font-mono truncate">
+                        {`${window.location.origin}/certificado/${userData?.id || ''}`}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-1 ml-2">
+                      <button
+                        onClick={() => handleCopyToClipboard(`${window.location.origin}/certificado/${userData?.id || ''}`, 'Enlace de certificado')}
+                        className="p-1.5 text-gray-600 dark:text-gray-400 hover:text-green dark:hover:text-green transition-colors"
+                        title="Copiar enlace"
+                      >
+                        <ClipboardDocumentIcon className="w-5 h-5" />
+                      </button>
+                      <a
+                        href={`/certificado/${userData?.id || ''}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="p-1.5 text-gray-600 dark:text-gray-400 hover:text-green dark:hover:text-green transition-colors"
+                        title="Abrir en nueva pestaña"
+                      >
+                        <ArrowTopRightOnSquareIcon className="w-5 h-5" />
+                      </a>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>

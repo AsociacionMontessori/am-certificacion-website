@@ -86,6 +86,11 @@ const GestionGraduacion = () => {
         const estadoPrevio = infoGraduacion?.estadoPrevio || alumno?.estado || 'Activo';
         graduacionData.estadoPrevio = estadoPrevio;
         graduacionData.fechaGraduacion = timestamp;
+        graduacionData.nivelGraduacion = alumno?.nivel || null;
+        graduacionData.programaGraduacion = alumno?.programa || null;
+        graduacionData.cohorteGraduacion = alumno?.cohorte || null;
+        graduacionData.fechaIngresoNivel = alumno?.fechaIngreso || null;
+        graduacionData.fechaEgresoNivel = alumno?.fechaEgresoEstimada || alumno?.fechaEgreso || null;
 
         const alumnoUpdate = {
           estado: 'Graduado'
@@ -96,6 +101,11 @@ const GestionGraduacion = () => {
         await updateDoc(alumnoRef, alumnoUpdate);
       } else {
         graduacionData.fechaGraduacion = null;
+        graduacionData.nivelGraduacion = null;
+        graduacionData.programaGraduacion = null;
+        graduacionData.cohorteGraduacion = null;
+        graduacionData.fechaIngresoNivel = null;
+        graduacionData.fechaEgresoNivel = null;
 
         if (alumno?.estado === 'Graduado') {
           const estadoPrevio = infoGraduacion?.estadoPrevio || 'Activo';

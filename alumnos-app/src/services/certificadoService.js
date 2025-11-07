@@ -74,6 +74,23 @@ export const calcularPromedioFinal = async (alumnoId) => {
   }
 };
 
+const ensureDate = (value) => {
+  if (!value) {
+    return null;
+  }
+  if (value instanceof Date) {
+    return value;
+  }
+  if (typeof value?.toDate === 'function') {
+    return value.toDate();
+  }
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) {
+    return null;
+  }
+  return parsed;
+};
+
 /**
  * Obtiene o genera el certificado del alumno
  */
@@ -86,7 +103,7 @@ export const obtenerCertificado = async (alumnoId) => {
     }
 
     const alumnoData = alumnoDoc.data();
-    
+
     // Si ya tiene folio, usar ese
     let folio = alumnoData.folioCertificado;
     let codigoVerificacion = alumnoData.codigoVerificacion;
@@ -138,6 +155,20 @@ export const obtenerCertificado = async (alumnoId) => {
       }
     }
 
+    const graduacionDoc = await getDoc(doc(db, 'graduacion', alumnoId));
+    const graduacionDataRaw = graduacionDoc.exists() ? graduacionDoc.data() : null;
+    const graduacionCompleta = Boolean(graduacionDataRaw?.progresoCompleto);
+    const nivelGraduacion = graduacionDataRaw?.nivelGraduacion || alumnoData.nivel || null;
+    const programaGraduacion = graduacionDataRaw?.programaGraduacion || alumnoData.programa || null;
+    const fechaGraduacion = ensureDate(graduacionDataRaw?.fechaGraduacion);
+    const fechaIngresoNivelGraduacion = ensureDate(graduacionDataRaw?.fechaIngresoNivel);
+    const fechaEgresoNivelGraduacion = ensureDate(graduacionDataRaw?.fechaEgresoNivel);
+    const fechaIngresoActual = ensureDate(alumnoData.fechaIngreso);
+    const fechaEgresoActual = ensureDate(alumnoData.fechaEgresoEstimada || alumnoData.fechaEgreso);
+    const nivelActual = alumnoData.nivel || null;
+    const estadoActual = alumnoData.estado || 'Activo';
+    const estadoParaDocumento = graduacionCompleta ? 'Graduado' : estadoActual;
+
     // Calcular promedio
     const promedio = await calcularPromedioFinal(alumnoId);
 
@@ -145,13 +176,29 @@ export const obtenerCertificado = async (alumnoId) => {
       folio,
       codigoVerificacion,
       promedio,
+      graduacion: {
+        completa: graduacionCompleta,
+        nivel: nivelGraduacion,
+        programa: programaGraduacion,
+        fechaGraduacion,
+        fechaIngresoNivel: fechaIngresoNivelGraduacion || fechaIngresoActual,
+        fechaEgresoNivel: fechaEgresoNivelGraduacion || fechaEgresoActual
+      },
       alumno: {
         id: alumnoDoc.id,
         nombreCompleto: alumnoData.nombre,
-        nivel: alumnoData.nivel,
-        fechaIngreso: alumnoData.fechaIngreso,
-        fechaEgreso: alumnoData.fechaEgresoEstimada || alumnoData.fechaEgreso,
-        estado: alumnoData.estado
+        nivel: graduacionCompleta ? nivelGraduacion : nivelActual,
+        nivelActual,
+        nivelGraduacion,
+        programa: graduacionCompleta ? programaGraduacion : alumnoData.programa || null,
+        programaActual: alumnoData.programa || null,
+        fechaIngreso: graduacionCompleta ? (fechaIngresoNivelGraduacion || fechaIngresoActual) : fechaIngresoActual,
+        fechaEgreso: graduacionCompleta ? (fechaEgresoNivelGraduacion || fechaEgresoActual) : fechaEgresoActual,
+        fechaIngresoActual,
+        fechaEgresoEstimadaActual: fechaEgresoActual,
+        estado: estadoParaDocumento,
+        estadoActual,
+        fechaGraduacion
       }
     };
   } catch (error) {
@@ -201,15 +248,27 @@ export const verificarCertificado = async (folio, codigoVerificacion) => {
       console.error('❌ Los códigos no coinciden en verificación');
       return { valido: false, error: 'El código de verificación no coincide con el folio proporcionado' };
     }
+    const graduacionDoc = await getDoc(doc(db, 'graduacion', alumnoDoc.id));
+    const graduacionDataRaw = graduacionDoc.exists() ? graduacionDoc.data() : null;
+    const graduacionCompleta = Boolean(graduacionDataRaw?.progresoCompleto);
+    const nivelGraduacion = graduacionDataRaw?.nivelGraduacion || alumnoData.nivel || null;
+
     return {
       valido: true,
       alumno: {
         id: alumnoDoc.id,
         nombre: alumnoData.nombre,
-        nivel: alumnoData.nivel,
-        fechaIngreso: alumnoData.fechaIngreso,
-        fechaEgreso: alumnoData.fechaEgresoEstimada || alumnoData.fechaEgreso,
-        estado: alumnoData.estado
+        nivel: graduacionCompleta ? nivelGraduacion : alumnoData.nivel,
+        nivelActual: alumnoData.nivel,
+        nivelGraduacion,
+        fechaIngreso: graduacionCompleta
+          ? ensureDate(graduacionDataRaw?.fechaIngresoNivel) || ensureDate(alumnoData.fechaIngreso)
+          : ensureDate(alumnoData.fechaIngreso),
+        fechaEgreso: graduacionCompleta
+          ? ensureDate(graduacionDataRaw?.fechaEgresoNivel) || ensureDate(alumnoData.fechaEgresoEstimada || alumnoData.fechaEgreso)
+          : ensureDate(alumnoData.fechaEgresoEstimada || alumnoData.fechaEgreso),
+        estado: graduacionCompleta ? 'Graduado' : alumnoData.estado || 'Activo',
+        fechaGraduacion: ensureDate(graduacionDataRaw?.fechaGraduacion)
       }
     };
   } catch (error) {

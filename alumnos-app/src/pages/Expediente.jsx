@@ -42,6 +42,11 @@ const Expediente = () => {
     );
   }
 
+  const alumnoId = currentUser?.uid;
+  const baseCertUrl = alumnoId ? `${window.location.origin}/certificado/${alumnoId}` : '';
+  const constanciaUrl = alumnoId ? `${baseCertUrl}?tipo=constancia` : '';
+  const tieneCertificado = Boolean(expediente?.fechaGraduacion);
+
   return (
     <div className="px-4 py-6 sm:px-0">
       <div className="mb-6">
@@ -215,44 +220,86 @@ const Expediente = () => {
             </div>
 
             {/* Certificado Digital */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Certificado digital / Constancia de estudios
-              </label>
-              <div className="flex flex-col sm:flex-row gap-2">
-                <input
-                  type="text"
-                  readOnly
-                  value={`${window.location.origin}/certificado/${currentUser?.uid}`}
-                  className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm min-w-0"
-                />
-                <div className="flex gap-2 sm:flex-shrink-0">
-                  <a
-                    href={`/certificado/${currentUser?.uid}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center px-3 sm:px-4 py-2 bg-green text-gray-900 dark:bg-green/80 dark:text-gray-900 rounded-lg hover:bg-green/90 dark:hover:bg-green/70 transition-colors text-sm whitespace-nowrap"
-                  >
-                    <EyeIcon className="w-4 h-4 mr-1" />
-                    Ver
-                  </a>
-                  <button
-                    onClick={async () => {
-                      const url = `${window.location.origin}/certificado/${currentUser?.uid}`;
-                      try {
-                        await navigator.clipboard.writeText(url);
-                        success('URL copiada al portapapeles');
-                      } catch (error) {
-                        console.error('Error al copiar:', error);
-                      }
-                    }}
-                    className="inline-flex items-center justify-center px-3 sm:px-4 py-2 bg-green text-gray-900 dark:bg-green/80 dark:text-gray-900 rounded-lg hover:bg-green/90 dark:hover:bg-green/70 transition-colors text-sm whitespace-nowrap"
-                  >
-                    <ShareIcon className="w-4 h-4 mr-1" />
-                    Compartir
-                  </button>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Constancia de estudios (nivel actual)
+                </label>
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <input
+                    type="text"
+                    readOnly
+                    value={constanciaUrl}
+                    className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm min-w-0"
+                  />
+                  <div className="flex gap-2 sm:flex-shrink-0">
+                    <a
+                      href={constanciaUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center justify-center px-3 sm:px-4 py-2 bg-green text-gray-900 dark:bg-green/80 dark:text-gray-900 rounded-lg hover:bg-green/90 dark:hover:bg-green/70 transition-colors text-sm whitespace-nowrap"
+                    >
+                      <EyeIcon className="w-4 h-4 mr-1" />
+                      Ver constancia
+                    </a>
+                    <button
+                      onClick={async () => {
+                        try {
+                          await navigator.clipboard.writeText(constanciaUrl);
+                          success('URL copiada al portapapeles');
+                        } catch (error) {
+                          console.error('Error al copiar:', error);
+                        }
+                      }}
+                      className="inline-flex items-center justify-center px-3 sm:px-4 py-2 bg-green text-gray-900 dark:bg-green/80 dark:text-gray-900 rounded-lg hover:bg-green/90 dark:hover:bg-green/70 transition-colors text-sm whitespace-nowrap"
+                    >
+                      <ShareIcon className="w-4 h-4 mr-1" />
+                      Compartir
+                    </button>
+                  </div>
                 </div>
               </div>
+
+              {tieneCertificado && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Certificado digital de graduación
+                  </label>
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <input
+                      type="text"
+                      readOnly
+                      value={baseCertUrl}
+                      className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm min-w-0"
+                    />
+                    <div className="flex gap-2 sm:flex-shrink-0">
+                      <a
+                        href={baseCertUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center justify-center px-3 sm:px-4 py-2 bg-green text-gray-900 dark:bg-green/80 dark:text-gray-900 rounded-lg hover:bg-green/90 dark:hover:bg-green/70 transition-colors text-sm whitespace-nowrap"
+                      >
+                        <EyeIcon className="w-4 h-4 mr-1" />
+                        Ver certificado
+                      </a>
+                      <button
+                        onClick={async () => {
+                          try {
+                            await navigator.clipboard.writeText(baseCertUrl);
+                            success('URL copiada al portapapeles');
+                          } catch (error) {
+                            console.error('Error al copiar:', error);
+                          }
+                        }}
+                        className="inline-flex items-center justify-center px-3 sm:px-4 py-2 bg-green text-gray-900 dark:bg-green/80 dark:text-gray-900 rounded-lg hover:bg-green/90 dark:hover:bg-green/70 transition-colors text-sm whitespace-nowrap"
+                      >
+                        <ShareIcon className="w-4 h-4 mr-1" />
+                        Compartir
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
