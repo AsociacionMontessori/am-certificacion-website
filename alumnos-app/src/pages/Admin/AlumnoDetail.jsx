@@ -8,6 +8,7 @@ import { formatearFechaLarga, formatearFechaInput } from '../../utils/formatearF
 import { useNotifications } from '../../contexts/NotificationContext';
 import useCanEdit from '../../hooks/useCanEdit';
 import { getNivelActivo, getHistorialNiveles, actualizarHistorialNiveles } from '../../utils/alumnos';
+import { obtenerNiveles } from '../../services/nivelesService';
 
 const AlumnoDetail = () => {
   const { id } = useParams();
@@ -33,6 +34,7 @@ const AlumnoDetail = () => {
     passwordClassroom: ''
   });
   const [nivelesHistorial, setNivelesHistorial] = useState([]);
+  const [nivelesDisponibles, setNivelesDisponibles] = useState([]);
   const [showPassword, setShowPassword] = useState(false);
 
   const { success, error: showError, prompt: showPrompt } = useNotifications();
@@ -110,6 +112,36 @@ const AlumnoDetail = () => {
 
     loadAlumno();
   }, [id]);
+
+  useEffect(() => {
+    const cargarNiveles = async () => {
+      try {
+        const resultado = await obtenerNiveles();
+        if (resultado.success) {
+          const nivelesActivos = resultado.niveles
+            .filter((nivel) => nivel.activo !== false && nivel?.nombre)
+            .map((nivel) => nivel.nombre);
+          setNivelesDisponibles(nivelesActivos);
+          return;
+        }
+      } catch (error) {
+        console.error('Error al cargar niveles:', error);
+      }
+      setNivelesDisponibles([
+        'Propedéutico',
+        'Nido & Comunidad infantil',
+        'Comunidad Infantil (0-3 años)',
+        'Casa de Niños',
+        'Casa de Niños (3-6 años)',
+        'Taller',
+        'Taller 1 (6-9 años)',
+        'Taller 2 (9-12 años)',
+        'Neuroeducación'
+      ]);
+    };
+
+    cargarNiveles();
+  }, []);
 
   const handleSave = async () => {
     setSaving(true);
@@ -465,10 +497,11 @@ const AlumnoDetail = () => {
                   className="mt-1 w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
                 >
                   <option value="">Seleccionar nivel</option>
-                  <option value="Casa de Niños (3-6 años)">Casa de Niños (3-6 años)</option>
-                  <option value="Taller 1 (6-9 años)">Taller 1 (6-9 años)</option>
-                  <option value="Taller 2 (9-12 años)">Taller 2 (9-12 años)</option>
-                  <option value="Comunidad Infantil (0-3 años)">Comunidad Infantil (0-3 años)</option>
+                  {[...new Set([...(nivelesDisponibles || []), formData.nivel].filter(Boolean))].map((nivel) => (
+                    <option key={nivel} value={nivel}>
+                      {nivel}
+                    </option>
+                  ))}
                 </select>
               ) : (
                 <dd className="text-sm text-gray-900 dark:text-white mt-1">{formData.nivel || 'N/A'}</dd>
