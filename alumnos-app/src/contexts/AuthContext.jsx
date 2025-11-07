@@ -53,8 +53,10 @@ export const AuthProvider = ({ children }) => {
                 ...directivoData, 
                 rol: 'directivo' 
               };
+              console.log('✅ Usuario directivo detectado:', userDataWithRole);
               setUserData(userDataWithRole);
             } else {
+              console.warn('⚠️ Usuario no encontrado en directivos. UID:', user.uid);
               // Si no es directivo, intentar como grupos
               const gruposDoc = await getDoc(doc(db, 'grupos', user.uid));
               
@@ -79,8 +81,14 @@ export const AuthProvider = ({ children }) => {
                   };
                   setUserData(userDataWithRole);
                 } else {
-                  console.warn('⚠️ Usuario no encontrado en admins, directivos, grupos ni alumnos:', user.uid);
-                  console.warn('⚠️ Verifica que exista un documento en Firestore con ID =', user.uid);
+                  console.warn('⚠️ Usuario no encontrado en admins, directivos, grupos ni alumnos');
+                  console.warn('⚠️ UID del usuario:', user.uid);
+                  console.warn('⚠️ Email del usuario:', user.email);
+                  console.warn('⚠️ Verifica que exista un documento en Firestore:');
+                  console.warn('   - Colección "directivos" con ID =', user.uid);
+                  console.warn('   - O colección "admins" con ID =', user.uid);
+                  console.warn('   - O colección "grupos" con ID =', user.uid);
+                  console.warn('   - O colección "alumnos" con ID =', user.uid);
                   // Si no existe en ninguna colección, no establecer userData
                   setUserData(null);
                 }
