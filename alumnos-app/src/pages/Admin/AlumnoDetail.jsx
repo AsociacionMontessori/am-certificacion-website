@@ -7,6 +7,7 @@ import { ArrowLeftIcon, CalendarIcon, ChartBarIcon, AcademicCapIcon, CurrencyDol
 import { formatearFechaLarga, formatearFechaInput } from '../../utils/formatearFecha';
 import { useNotifications } from '../../contexts/NotificationContext';
 import useCanEdit from '../../hooks/useCanEdit';
+import { getNivelActivo, getHistorialNiveles, actualizarHistorialNiveles } from '../../utils/alumnos';
 
 const AlumnoDetail = () => {
   const { id } = useParams();
@@ -23,15 +24,57 @@ const AlumnoDetail = () => {
     emailContacto: '',
     telefono: '',
     nivel: '',
+    programa: '',
+    cohorte: '',
     fechaIngreso: '',
     fechaEgresoEstimada: '',
     estado: 'Activo',
     mailClassroom: '',
     passwordClassroom: ''
   });
+  const [nivelesHistorial, setNivelesHistorial] = useState([]);
   const [showPassword, setShowPassword] = useState(false);
 
   const { success, error: showError, prompt: showPrompt } = useNotifications();
+
+  const convertirFecha = (valor) => {
+    if (!valor) {
+      return null;
+    }
+    if (valor instanceof Date) {
+      return valor;
+    }
+    if (typeof valor?.toDate === 'function') {
+      return valor.toDate();
+    }
+    const parsed = new Date(valor);
+    return Number.isNaN(parsed.getTime()) ? null : parsed;
+  };
+
+  const prepararFormulario = (datos) => {
+    if (!datos) {
+      return;
+    }
+    const fechaIngreso = formatearFechaInput(datos.fechaIngreso);
+    const fechaEgresoEstimada = formatearFechaInput(datos.fechaEgresoEstimada);
+    const nivelActivoActual = getNivelActivo(datos);
+
+    setFormData({
+      matricula: datos.matricula || '',
+      email: datos.email || '',
+      emailContacto: datos.emailContacto || '',
+      telefono: datos.telefono || '',
+      nivel: nivelActivoActual?.nombre || '',
+      programa: datos.programa || '',
+      cohorte: datos.cohorte || '',
+      fechaIngreso: fechaIngreso,
+      fechaEgresoEstimada: fechaEgresoEstimada,
+      estado: datos.estado || 'Activo',
+      mailClassroom: datos.mailClassroom || '',
+      passwordClassroom: datos.passwordClassroom || ''
+    });
+    setNivelesHistorial(getHistorialNiveles(datos));
+  };
 
   // Función para copiar al portapapeles
   const handleCopyToClipboard = async (texto, tipo = '') => {
@@ -57,23 +100,7 @@ const AlumnoDetail = () => {
         if (alumnoDoc.exists()) {
           const data = { id: alumnoDoc.id, ...alumnoDoc.data() };
           setAlumno(data);
-          
-          // Formatear fechas para inputs
-          const fechaIngreso = formatearFechaInput(data.fechaIngreso);
-          const fechaEgresoEstimada = formatearFechaInput(data.fechaEgresoEstimada);
-          
-          setFormData({
-            matricula: data.matricula || '',
-            email: data.email || '',
-            emailContacto: data.emailContacto || '',
-            telefono: data.telefono || '',
-            nivel: data.nivel || '',
-            fechaIngreso: fechaIngreso,
-            fechaEgresoEstimada: fechaEgresoEstimada,
-            estado: data.estado || 'Activo',
-            mailClassroom: data.mailClassroom || '',
-            passwordClassroom: data.passwordClassroom || ''
-          });
+          prepararFormulario(data);
         }
       } catch (error) {
         console.error('Error al cargar alumno:', error);
@@ -87,12 +114,46 @@ const AlumnoDetail = () => {
   const handleSave = async () => {
     setSaving(true);
     try {
+      const nombreNivelNuevo = formData.nivel?.trim() || '';
+      const programaNormalizado = formData.programa?.trim() || '';
+      const cohorteNormalizado = formData.cohorte?.trim() || '';
+      const nivelActivoAnterior = getNivelActivo(alumno);
+      const nombreNivelAnterior = nivelActivoAnterior?.nombre || alumno?.nivel || '';
+
+      let fechaFinAnterior = null;
+      if (nombreNivelAnterior && nombreNivelAnterior !== nombreNivelNuevo) {
+        const fechaFinInput = await showPrompt(
+          '¿Cuál fue la fecha de finalización del nivel anterior?',
+          {
+            title: 'Finalización de nivel previo',
+            type: 'date'
+          }
+        );
+        if (fechaFinInput) {
+          const parsedFechaFin = new Date(fechaFinInput);
+          if (!Number.isNaN(parsedFechaFin.getTime())) {
+            fechaFinAnterior = parsedFechaFin;
+          }
+        }
+      }
+
+      const { historialActualizado, nivelActualId } = actualizarHistorialNiveles({
+        alumno,
+        nuevoNivelNombre: nombreNivelNuevo,
+        fechaInicioNuevo: formData.fechaIngreso ? new Date(formData.fechaIngreso) : undefined,
+        fechaFinAnterior
+      });
+
       const updateData = {
         matricula: formData.matricula || null,
         email: formData.email,
         emailContacto: formData.emailContacto || null,
         telefono: formData.telefono || null,
-        nivel: formData.nivel || null,
+        nivel: nombreNivelNuevo || null,
+        programa: programaNormalizado || null,
+        cohorte: cohorteNormalizado || null,
+        nivelActualId: nivelActualId || null,
+        niveles: historialActualizado,
         fechaIngreso: formData.fechaIngreso ? new Date(formData.fechaIngreso) : null,
         fechaEgresoEstimada: formData.fechaEgresoEstimada ? new Date(formData.fechaEgresoEstimada) : null,
         estado: formData.estado,
@@ -107,6 +168,7 @@ const AlumnoDetail = () => {
       if (alumnoDoc.exists()) {
         const data = { id: alumnoDoc.id, ...alumnoDoc.data() };
         setAlumno(data);
+        prepararFormulario(data);
       }
       
       setEditing(false);
@@ -119,23 +181,8 @@ const AlumnoDetail = () => {
   };
 
   const handleCancel = () => {
-    // Restaurar valores originales
     if (alumno) {
-      const fechaIngreso = formatearFechaInput(alumno.fechaIngreso);
-      const fechaEgresoEstimada = formatearFechaInput(alumno.fechaEgresoEstimada);
-      
-      setFormData({
-        matricula: alumno.matricula || '',
-        email: alumno.email || '',
-        emailContacto: alumno.emailContacto || '',
-        telefono: alumno.telefono || '',
-        nivel: alumno.nivel || '',
-        fechaIngreso: fechaIngreso,
-        fechaEgresoEstimada: fechaEgresoEstimada,
-        estado: alumno.estado || 'Activo',
-        mailClassroom: alumno.mailClassroom || '',
-        passwordClassroom: alumno.passwordClassroom || ''
-      });
+      prepararFormulario(alumno);
     }
     setEditing(false);
   };
@@ -204,6 +251,12 @@ const AlumnoDetail = () => {
       setSigningIn(false);
     }
   };
+
+  const historialOrdenado = [...nivelesHistorial].sort((a, b) => {
+    const fechaA = convertirFecha(a?.fechaInicio)?.getTime() || 0;
+    const fechaB = convertirFecha(b?.fechaInicio)?.getTime() || 0;
+    return fechaB - fechaA;
+  });
 
   if (loading) {
     return (
@@ -376,6 +429,34 @@ const AlumnoDetail = () => {
           </h2>
           <dl className="space-y-3">
             <div>
+              <dt className="text-sm font-medium text-gray-500">Programa</dt>
+              {editing && canEdit ? (
+                <input
+                  type="text"
+                  value={formData.programa}
+                  onChange={(e) => setFormData({ ...formData, programa: e.target.value })}
+                  className="mt-1 w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
+                  placeholder="Ej: Diplomado Montessori"
+                />
+              ) : (
+                <dd className="text-sm text-gray-900 dark:text-white mt-1">{alumno.programa || 'N/A'}</dd>
+              )}
+            </div>
+            <div>
+              <dt className="text-sm font-medium text-gray-500">Cohorte</dt>
+              {editing && canEdit ? (
+                <input
+                  type="text"
+                  value={formData.cohorte}
+                  onChange={(e) => setFormData({ ...formData, cohorte: e.target.value })}
+                  className="mt-1 w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
+                  placeholder="Ej: Generación 2025"
+                />
+              ) : (
+                <dd className="text-sm text-gray-900 dark:text-white mt-1">{alumno.cohorte || 'N/A'}</dd>
+              )}
+            </div>
+            <div>
               <dt className="text-sm font-medium text-gray-500">Nivel</dt>
               {editing && canEdit ? (
                 <select
@@ -390,8 +471,82 @@ const AlumnoDetail = () => {
                   <option value="Comunidad Infantil (0-3 años)">Comunidad Infantil (0-3 años)</option>
                 </select>
               ) : (
-                <dd className="text-sm text-gray-900 dark:text-white mt-1">{alumno.nivel || 'N/A'}</dd>
+                <dd className="text-sm text-gray-900 dark:text-white mt-1">{formData.nivel || 'N/A'}</dd>
               )}
+            </div>
+            <div>
+              <dt className="text-sm font-medium text-gray-500">Historial de niveles</dt>
+              <dd className="mt-2">
+                {historialOrdenado.length > 0 ? (
+                  <div className="flex flex-col gap-3">
+                    {historialOrdenado.map((nivelItem, index) => {
+                      const fechaInicioNivel = convertirFecha(nivelItem?.fechaInicio);
+                      const fechaFinNivel = convertirFecha(nivelItem?.fechaFin);
+                      const keyBase = `${nivelItem?.nombre || 'nivel'}-${fechaInicioNivel?.getTime() || index}`;
+                      const key = nivelItem?.id || keyBase;
+                      const estadoActivo = nivelItem?.estado === 'activo';
+
+                      return (
+                        <div
+                          key={key}
+                          className="rounded-lg border border-gray-200 dark:border-gray-700 p-4 bg-gray-50 dark:bg-gray-900/40"
+                        >
+                          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
+                            <div>
+                              <p className="text-base font-semibold text-gray-900 dark:text-white">
+                                {nivelItem?.nombre || 'Nivel sin nombre'}
+                              </p>
+                              <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                                {estadoActivo ? 'En progreso' : 'Finalizado'}
+                              </p>
+                            </div>
+                            <span
+                              className={`inline-flex items-center self-start rounded-full px-2.5 py-1 text-xs font-medium ${
+                                estadoActivo
+                                  ? 'bg-blue/10 text-blue'
+                                  : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300'
+                              }`}
+                            >
+                              {estadoActivo ? 'Activo' : 'Completado'}
+                            </span>
+                          </div>
+                          <div className="mt-3 grid grid-cols-1 gap-2 text-sm text-gray-600 dark:text-gray-300 sm:grid-cols-2">
+                            <p>
+                              <span className="font-medium text-gray-700 dark:text-gray-200">Inicio:</span>{' '}
+                              {fechaInicioNivel ? formatearFechaLarga(fechaInicioNivel) : 'Sin registro'}
+                            </p>
+                            <p>
+                              <span className="font-medium text-gray-700 dark:text-gray-200">Fin:</span>{' '}
+                              {fechaFinNivel ? formatearFechaLarga(fechaFinNivel) : 'En curso'}
+                            </p>
+                            {nivelItem?.certificadoUrl && (
+                              <p className="sm:col-span-2">
+                                <span className="font-medium text-gray-700 dark:text-gray-200">Certificado:</span>{' '}
+                                <a
+                                  href={nivelItem.certificadoUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-blue hover:text-blue/80 underline break-words"
+                                >
+                                  Ver constancia
+                                </a>
+                              </p>
+                            )}
+                            {nivelItem?.observaciones && (
+                              <p className="sm:col-span-2">
+                                <span className="font-medium text-gray-700 dark:text-gray-200">Notas:</span>{' '}
+                                {nivelItem.observaciones}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <p className="text-sm text-gray-500 dark:text-gray-400">No hay historial registrado.</p>
+                )}
+              </dd>
             </div>
             <div>
               <dt className="text-sm font-medium text-gray-500">Fecha de ingreso</dt>

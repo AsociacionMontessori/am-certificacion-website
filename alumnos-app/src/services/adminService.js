@@ -12,6 +12,7 @@ import {
 } from 'firebase/firestore';
 import { auth, db } from '../config/firebase';
 import { getMateriasPorNivel } from '../data/materiasPorNivel';
+import { buildNivelEntry } from '../utils/alumnos';
 
 /**
  * Crea un nuevo usuario en Firebase Authentication y su documento en Firestore
@@ -38,6 +39,13 @@ export const crearUsuarioAlumno = async (datosUsuario) => {
       });
     }
 
+    const fechaIngresoFirestore = datosAdicionales.fechaIngreso
+      ? new Date(datosAdicionales.fechaIngreso)
+      : serverTimestamp();
+    const fechaIngresoNivel = datosAdicionales.fechaIngreso
+      ? new Date(datosAdicionales.fechaIngreso)
+      : new Date();
+
     // 3. Crear documento en Firestore en la colección 'alumnos'
     const alumnoData = {
       nombre: nombre || '',
@@ -46,7 +54,9 @@ export const crearUsuarioAlumno = async (datosUsuario) => {
       emailContacto: datosAdicionales.emailContacto || null,
       telefono: datosAdicionales.telefono || null,
       nivel: datosAdicionales.nivel || null,
-      fechaIngreso: datosAdicionales.fechaIngreso ? new Date(datosAdicionales.fechaIngreso) : serverTimestamp(),
+      nivelActualId: null,
+      niveles: [],
+      fechaIngreso: fechaIngresoFirestore,
       fechaEgresoEstimada: datosAdicionales.fechaEgresoEstimada ? new Date(datosAdicionales.fechaEgresoEstimada) : null,
       estado: datosAdicionales.estado || 'Activo',
       mailClassroom: datosAdicionales.mailClassroom || null,
@@ -56,6 +66,16 @@ export const crearUsuarioAlumno = async (datosUsuario) => {
       fechaCreacion: serverTimestamp(),
       creadoPor: datosAdicionales.creadoPor || null,
     };
+
+    if (datosAdicionales.nivel) {
+      const nivelInicial = buildNivelEntry({
+        nombre: datosAdicionales.nivel,
+        estado: 'activo',
+        fechaInicio: fechaIngresoNivel
+      });
+      alumnoData.nivelActualId = nivelInicial.id;
+      alumnoData.niveles = [nivelInicial];
+    }
 
     await setDoc(doc(db, 'alumnos', user.uid), alumnoData);
 

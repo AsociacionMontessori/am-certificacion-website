@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, getDoc, setDoc, serverTimestamp, updateDoc } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { ArrowLeftIcon, AcademicCapIcon, CheckCircleIcon, ClockIcon } from '@heroicons/react/24/outline';
 import LoadingSpinner from '../../components/LoadingSpinner';
@@ -59,6 +59,18 @@ const GestionGraduacion = () => {
     e.preventDefault();
     setSaving(true);
     try {
+      const requisitosCompletos = [
+        formData.materiasCompletadas,
+        formData.promedioMinimo,
+        formData.tesisCompletada,
+        formData.practicasCompletadas,
+        formData.pagoRealizado
+      ].every(Boolean);
+
+      const timestamp = serverTimestamp();
+      const graduacionRef = doc(db, 'graduacion', id);
+      const alumnoRef = doc(db, 'alumnos', id);
+
       const graduacionData = {
         alumnoId: id,
         materiasCompletadas: formData.materiasCompletadas,
@@ -66,23 +78,66 @@ const GestionGraduacion = () => {
         tesisCompletada: formData.tesisCompletada,
         practicasCompletadas: formData.practicasCompletadas,
         pagoRealizado: formData.pagoRealizado,
-        fechaActualizacion: serverTimestamp()
+        progresoCompleto: requisitosCompletos,
+        fechaActualizacion: timestamp
       };
 
-      if (infoGraduacion) {
-        await setDoc(doc(db, 'graduacion', id), graduacionData, { merge: true });
+      if (requisitosCompletos) {
+        const estadoPrevio = infoGraduacion?.estadoPrevio || alumno?.estado || 'Activo';
+        graduacionData.estadoPrevio = estadoPrevio;
+        graduacionData.fechaGraduacion = timestamp;
+
+        const alumnoUpdate = {
+          estado: 'Graduado'
+        };
+        if (!alumno?.fechaGraduacion) {
+          alumnoUpdate.fechaGraduacion = timestamp;
+        }
+        await updateDoc(alumnoRef, alumnoUpdate);
       } else {
-        await setDoc(doc(db, 'graduacion', id), {
+        graduacionData.fechaGraduacion = null;
+
+        if (alumno?.estado === 'Graduado') {
+          const estadoPrevio = infoGraduacion?.estadoPrevio || 'Activo';
+          graduacionData.estadoPrevio = estadoPrevio;
+          await updateDoc(alumnoRef, {
+            estado: estadoPrevio,
+            fechaGraduacion: null
+          });
+        }
+      }
+
+      if (infoGraduacion) {
+        await setDoc(graduacionRef, graduacionData, { merge: true });
+      } else {
+        await setDoc(graduacionRef, {
           ...graduacionData,
-          fechaCreacion: serverTimestamp()
+          fechaCreacion: timestamp
         });
       }
 
+      const [graduacionDocActualizado, alumnoDocActualizado] = await Promise.all([
+        getDoc(graduacionRef),
+        getDoc(alumnoRef)
+      ]);
+
+      if (graduacionDocActualizado.exists()) {
+        const graduacionActualizada = { id: graduacionDocActualizado.id, ...graduacionDocActualizado.data() };
+        setInfoGraduacion(graduacionActualizada);
+        setFormData({
+          materiasCompletadas: graduacionActualizada.materiasCompletadas || false,
+          promedioMinimo: graduacionActualizada.promedioMinimo || false,
+          tesisCompletada: graduacionActualizada.tesisCompletada || false,
+          practicasCompletadas: graduacionActualizada.practicasCompletadas || false,
+          pagoRealizado: graduacionActualizada.pagoRealizado || false
+        });
+      }
+
+      if (alumnoDocActualizado.exists()) {
+        setAlumno({ id: alumnoDocActualizado.id, ...alumnoDocActualizado.data() });
+      }
+
       success('Información de graduación guardada exitosamente');
-      // Recargar después de un breve delay para mostrar la notificación
-      setTimeout(() => {
-        window.location.reload();
-      }, 1500);
     } catch (error) {
       console.error('Error al guardar información de graduación:', error);
       showError('Error al guardar la información de graduación');

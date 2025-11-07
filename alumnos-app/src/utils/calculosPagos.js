@@ -42,9 +42,6 @@ export const aplicaRecargo = (fechaVencimiento, diaVencimiento = 10, recargoActi
     ? fechaVencimiento 
     : fechaVencimiento?.toDate?.() || new Date(fechaVencimiento);
   
-  // Obtener el día del mes del vencimiento
-  const diaVenc = vencimiento.getDate();
-  
   // Crear fecha límite (día 10 del mes de vencimiento)
   const fechaLimite = new Date(vencimiento.getFullYear(), vencimiento.getMonth(), diaVencimiento);
   

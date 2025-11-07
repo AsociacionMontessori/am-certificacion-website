@@ -236,7 +236,7 @@ const GestionMaterias = () => {
     }
     
     // Formato DD/MM/YYYY o DD-MM-YYYY
-    const formatoDMY = /^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/;
+    const formatoDMY = /^(\d{1,2})[-/](\d{1,2})[-/](\d{4})$/;
     const matchDMY = fechaStrTrimmed.match(formatoDMY);
     if (matchDMY) {
       const [, dia, mes, año] = matchDMY;
@@ -244,7 +244,7 @@ const GestionMaterias = () => {
     }
     
     // Formato MM/DD/YYYY o MM-DD-YYYY
-    const formatoMDY = /^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/;
+    const formatoMDY = /^(\d{1,2})[-/](\d{1,2})[-/](\d{4})$/;
     const matchMDY = fechaStrTrimmed.match(formatoMDY);
     if (matchMDY) {
       const [, mes, dia, año] = matchMDY;

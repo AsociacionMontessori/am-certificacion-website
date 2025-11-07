@@ -181,7 +181,7 @@ const AdminDashboard = () => {
         case 'nombre':
           comparison = (a.nombre || '').localeCompare(b.nombre || '');
           break;
-        case 'fechaIngreso':
+        case 'fechaIngreso': {
           const fechaA = getDate(a.fechaIngreso);
           const fechaB = getDate(b.fechaIngreso);
           if (!fechaA && !fechaB) comparison = 0;
@@ -189,6 +189,7 @@ const AdminDashboard = () => {
           else if (!fechaB) comparison = -1;
           else comparison = fechaA.getTime() - fechaB.getTime();
           break;
+        }
         case 'nivel':
           comparison = (a.nivel || '').localeCompare(b.nivel || '');
           break;

@@ -110,6 +110,7 @@ exports.enviarEmailNotificacion = onDocumentCreated(
       throw error;
     }
   }
+
 );
 
 /**
@@ -123,7 +124,7 @@ exports.verificarMateriasProximas = onSchedule(
     region: 'us-central1',
     secrets: [emailUser, emailPass],
   },
-  async (event) => {
+  async () => {
     const db = admin.firestore();
     const hoy = new Date();
     hoy.setHours(0, 0, 0, 0);

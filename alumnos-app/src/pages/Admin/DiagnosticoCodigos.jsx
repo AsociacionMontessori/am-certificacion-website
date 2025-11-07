@@ -6,7 +6,6 @@ import { generarCodigoVerificacion } from '../../services/certificadoService';
 import { ArrowLeftIcon, ExclamationTriangleIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
 
 const DiagnosticoCodigos = () => {
-  const [alumnos, setAlumnos] = useState([]); // usado para resumen
   const [loading, setLoading] = useState(true);
   const [diagnostico, setDiagnostico] = useState([]);
 
@@ -42,7 +41,6 @@ const DiagnosticoCodigos = () => {
           }
         }
 
-        setAlumnos(alumnosData);
         setDiagnostico(diagnosticos);
       } catch (error) {
         console.error('Error al cargar diagnóstico:', error);

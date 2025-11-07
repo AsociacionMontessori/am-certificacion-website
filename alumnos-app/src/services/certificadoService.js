@@ -21,7 +21,13 @@ const hashString = (str) => {
 export const generarFolio = (alumnoId) => {
   const timestamp = Date.now();
   const random = Math.random().toString(36).substring(2, 8).toUpperCase();
-  return `CERT-${timestamp.toString(36).toUpperCase().substring(0, 6)}-${random}`;
+  const idSegment = (alumnoId || 'ALM')
+    .toString()
+    .toUpperCase()
+    .replace(/[^A-Z0-9]/g, '')
+    .slice(-4)
+    .padStart(4, '0');
+  return `CERT-${timestamp.toString(36).toUpperCase().substring(0, 6)}-${random}-${idSegment}`;
 };
 
 /**
@@ -84,14 +90,11 @@ export const obtenerCertificado = async (alumnoId) => {
     // Si ya tiene folio, usar ese
     let folio = alumnoData.folioCertificado;
     let codigoVerificacion = alumnoData.codigoVerificacion;
-    let necesitaGuardar = false;
-    
     // Si no tiene folio, generar uno nuevo
     if (!folio) {
       folio = generarFolio(alumnoId);
       // Generar código para el nuevo folio
       codigoVerificacion = generarCodigoVerificacion(alumnoId, folio);
-      necesitaGuardar = true;
     } else {
       // Si tiene folio, validar que el código sea correcto (determinístico)
       const codigoEsperado = generarCodigoVerificacion(alumnoId, folio);
@@ -100,7 +103,6 @@ export const obtenerCertificado = async (alumnoId) => {
       // Si el código no existe o no coincide con el determinístico, regenerarlo
       if (!codigoVerificacion || codigoActual !== codigoEsperado) {
         codigoVerificacion = codigoEsperado;
-        necesitaGuardar = true;
       }
     }
     

@@ -24,7 +24,7 @@ const Dashboard = () => {
   const { userData } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
 
-  const { success, error: showError, prompt: showPrompt } = useNotifications();
+  const { success, prompt: showPrompt } = useNotifications();
 
   // Función para copiar al portapapeles
   const handleCopyToClipboard = async (texto, tipo = '') => {

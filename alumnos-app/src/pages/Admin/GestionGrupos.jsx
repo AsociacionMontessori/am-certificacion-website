@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import { useNotifications } from '../../contexts/NotificationContext';
 import useCanEdit from '../../hooks/useCanEdit';
+import { getNivelActivo } from '../../utils/alumnos';
 
 const GestionGrupos = () => {
   const canEdit = useCanEdit();
@@ -18,6 +19,14 @@ const GestionGrupos = () => {
   const [saving, setSaving] = useState(false);
   const [searchAlumno, setSearchAlumno] = useState('');
 
+  const obtenerNombreNivelAlumno = (alumnoData) => {
+    if (!alumnoData) {
+      return '';
+    }
+    const nivelActivo = getNivelActivo(alumnoData);
+    return nivelActivo?.nombre || alumnoData.nivel || '';
+  };
+
   const terminoBusqueda = searchAlumno.trim().toLowerCase();
 
   const alumnosFiltrados = useMemo(() => {
@@ -26,11 +35,12 @@ const GestionGrupos = () => {
     }
 
     return alumnos.filter((alumno) => {
+      const nivelNombre = obtenerNombreNivelAlumno(alumno).toLowerCase();
       return (
         alumno.nombre?.toLowerCase().includes(terminoBusqueda) ||
         alumno.email?.toLowerCase().includes(terminoBusqueda) ||
         alumno.matricula?.toLowerCase().includes(terminoBusqueda) ||
-        alumno.nivel?.toLowerCase().includes(terminoBusqueda)
+        nivelNombre.includes(terminoBusqueda)
       );
     });
   }, [alumnos, terminoBusqueda]);
@@ -272,6 +282,7 @@ const GestionGrupos = () => {
                     ) : (
                       alumnosFiltrados.map((alumno) => {
                         const isSelected = alumnosAsignados.includes(alumno.id);
+                        const nivelAlumno = obtenerNombreNivelAlumno(alumno);
                         return (
                           <label
                             key={alumno.id}
@@ -293,7 +304,7 @@ const GestionGrupos = () => {
                                 {alumno.nombre || 'Sin nombre'}
                               </p>
                               <p className="text-xs text-gray-500 dark:text-gray-400">
-                                {alumno.email} {alumno.nivel ? `• ${alumno.nivel}` : ''}
+                                {alumno.email} {nivelAlumno ? `• ${nivelAlumno}` : ''}
                               </p>
                             </div>
                           </label>

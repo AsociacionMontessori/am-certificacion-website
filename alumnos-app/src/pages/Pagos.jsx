@@ -11,7 +11,6 @@ import {
 } from '../services/pagosService';
 import {
   calcularMontoAdeudado,
-  calcularSaldoPendiente,
   formatearMoneda,
   obtenerProximosPagos,
   obtenerPagosVencidos,
@@ -143,11 +142,9 @@ const Pagos = () => {
 
   const pagosPendientes = pagos.filter(p => p.estado === 'Pendiente' || p.estado === 'Vencido');
   const pagosValidados = pagos.filter(p => p.estado === 'Validado');
-  const pagosRechazados = pagos.filter(p => p.estado === 'Rechazado');
   const proximosPagos = obtenerProximosPagos(pagos, 5);
   const pagosVencidos = obtenerPagosVencidos(pagos);
   const montoAdeudado = calcularMontoAdeudado(pagos, becas);
-  const saldoPendiente = calcularSaldoPendiente(pagos);
 
   const obtenerEstadoPago = (pago) => {
     if (pago.estado === 'Validado') return { texto: 'Validado', color: 'text-green', bg: 'bg-green/10', icon: CheckCircleIcon };
@@ -338,7 +335,6 @@ const Pagos = () => {
               const estado = obtenerEstadoPago(pago);
               const EstadoIcon = estado.icon;
               const fechaVenc = pago.fechaVencimiento?.toDate?.() || new Date(pago.fechaVencimiento);
-              const fechaCreacion = pago.fechaCreacion?.toDate?.() || new Date(pago.fechaCreacion);
               const becasAplicadasPago = Array.isArray(pago.becasAplicadas) ? pago.becasAplicadas : [];
               const descuentoRegistrado = pago.descuentoAplicado !== undefined
                 ? Number(pago.descuentoAplicado)

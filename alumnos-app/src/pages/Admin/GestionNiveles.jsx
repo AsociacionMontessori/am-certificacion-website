@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { ArrowLeftIcon, PlusIcon, PencilIcon, TrashIcon, XMarkIcon, CheckIcon } from '@heroicons/react/24/outline';
 import { Link } from 'react-router-dom';
 import LoadingSpinner from '../../components/LoadingSpinner';
@@ -20,11 +20,7 @@ const GestionNiveles = () => {
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(null);
 
-  useEffect(() => {
-    loadNiveles();
-  }, []);
-
-  const loadNiveles = async () => {
+  const loadNiveles = useCallback(async () => {
     setLoading(true);
     try {
       const resultado = await obtenerNiveles();
@@ -39,7 +35,11 @@ const GestionNiveles = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [showError]);
+
+  useEffect(() => {
+    loadNiveles();
+  }, [loadNiveles]);
 
   const handleOpenModal = (nivel = null) => {
     if (!canEdit) return;

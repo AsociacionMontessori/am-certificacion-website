@@ -70,7 +70,7 @@ const PublicProfile = () => {
             return (a.materia || '').localeCompare(b.materia || '');
           });
           setCalificaciones(califsData);
-        } catch (e) {
+        } catch {
           // si no hay colección o permisos, simplemente no mostrar
         }
       } catch (error) {

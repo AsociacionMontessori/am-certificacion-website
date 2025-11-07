@@ -7,7 +7,7 @@ import {
   XMarkIcon,
   ClockIcon
 } from '@heroicons/react/24/outline';
-import { getMateriasProximas, formatearMateriasParaEmail, formatearMateriasParaEmailTexto } from '../services/notificacionesService';
+import { getMateriasProximas } from '../services/notificacionesService';
 import { sendNotificacionMateriasProximas } from '../services/emailService';
 import { useAuth } from '../contexts/AuthContext';
 import { useNotifications } from '../contexts/NotificationContext';

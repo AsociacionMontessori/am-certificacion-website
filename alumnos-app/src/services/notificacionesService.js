@@ -1,8 +1,7 @@
-import { 
-  collection, 
-  getDocs, 
-  query, 
-  where,
+import {
+  collection,
+  getDocs,
+  query,
   getDoc,
   doc
 } from 'firebase/firestore';

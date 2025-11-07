@@ -52,6 +52,7 @@ const updateChangelog = (newVersion, type) => {
   try {
     changelog = readFileSync(changelogPath, 'utf8');
   } catch (e) {
+    console.warn('⚠️  CHANGELOG.md no encontrado, se creará uno nuevo.', e?.message);
     // Si no existe, crear uno nuevo
     changelog = `# Changelog
 

@@ -1,6 +1,6 @@
 // Versión de la aplicación
-export const VERSION = '0.0.4';
+export const VERSION = '0.1.0';
 export const VERSION_INFO = {
-  version: '0.0.4',
+  version: '0.1.0',
   buildDate: new Date().toISOString()
 };

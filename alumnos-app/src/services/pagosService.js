@@ -17,6 +17,7 @@ import {
 } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 import { db, storage } from '../config/firebase';
+import { getNivelActivo } from '../utils/alumnos';
 
 const normalizarFecha = (valor) => {
   if (!valor) return null;
@@ -449,6 +450,7 @@ export const obtenerConfiguracionPagos = async () => {
       const configQuery = query(collection(db, 'configuracionPagos'), orderBy('fechaCreacion', 'desc'), limit(1));
       querySnapshot = await getDocs(configQuery);
     } catch (orderError) {
+      console.warn('orderBy fechaCreacion no disponible, usando fallback:', orderError?.message);
       // Si falla por falta de índice, obtener todos y tomar el primero
       const configQuery = query(collection(db, 'configuracionPagos'), limit(1));
       querySnapshot = await getDocs(configQuery);
@@ -740,12 +742,14 @@ export const obtenerTodosLosPagos = async (filtros = {}) => {
  */
 export const generarPagosPorNivel = async (alumno, configuracion) => {
   try {
-    if (!alumno.nivel || !configuracion?.costos) {
+    const nivelActivo = getNivelActivo(alumno);
+    const nivelNombre = nivelActivo?.nombre || alumno?.nivel || '';
+
+    if (!nivelNombre || !configuracion?.costos) {
       throw new Error('El alumno debe tener un nivel asignado y debe existir configuración de costos');
     }
 
     // Buscar el costo correspondiente al nivel del alumno
-    const nivelNombre = alumno.nivel;
     const costos = configuracion.costos;
     
     // Buscar coincidencia exacta o parcial del nivel
@@ -804,7 +808,6 @@ export const generarPagosPorNivel = async (alumno, configuracion) => {
 
     // Verificar si el alumno ya tiene pagos generados
     const pagosExistentes = await obtenerPagosAlumno(alumno.id);
-    const tienePagos = pagosExistentes.length > 0;
     
     console.log(`🔍 Generando pagos para ${alumno.nombre || alumno.email}`);
     console.log(`   - Nivel: ${nivelNombre}`);
@@ -1036,7 +1039,8 @@ export const generarPagosParaTodosLosAlumnos = async (configuracion) => {
     try {
       const alumnosQuery = query(collection(db, 'alumnos'), orderBy('nombre', 'asc'));
       alumnosSnapshot = await getDocs(alumnosQuery);
-    } catch (error) {
+    } catch (errorOrdenAlumnos) {
+      console.warn('orderBy nombre no disponible, obteniendo alumnos sin ordenar:', errorOrdenAlumnos?.message);
       // Si falla por índice, obtener sin ordenar
       alumnosSnapshot = await getDocs(collection(db, 'alumnos'));
     }

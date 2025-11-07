@@ -1,9 +1,8 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { collection, query, getDocs, getDoc, doc, updateDoc, addDoc, serverTimestamp, Timestamp, orderBy } from 'firebase/firestore';
+import { collection, query, getDocs, getDoc, doc, updateDoc, serverTimestamp, Timestamp, orderBy } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { useNotifications } from '../../contexts/NotificationContext';
-import { useAuth } from '../../contexts/AuthContext';
 import useCanEdit from '../../hooks/useCanEdit';
 import { useDebouncedValue } from '../../hooks/useDebouncedValue';
 import {
@@ -41,11 +40,21 @@ import {
   PencilIcon,
   TrashIcon,
   MagnifyingGlassIcon,
-  ArrowLeftIcon
+  ArrowLeftIcon,
+  ArrowPathIcon,
+  BanknotesIcon,
+  ChevronDownIcon,
+  ChevronUpIcon,
+  DocumentDuplicateIcon,
+  FunnelIcon,
+  PlusCircleIcon,
+  ShieldCheckIcon,
+  Squares2X2Icon,
+  XMarkIcon
 } from '@heroicons/react/24/outline';
+import { getNivelActivo } from '../../utils/alumnos';
 
 const GestionPagos = () => {
-  const { userData } = useAuth();
   const canEdit = useCanEdit();
   const { success, error: showError, confirm } = useNotifications();
   const [searchParams] = useSearchParams();
@@ -113,6 +122,17 @@ const GestionPagos = () => {
   const [loadingBecas, setLoadingBecas] = useState(false);
   const [guardandoBeca, setGuardandoBeca] = useState(false);
   const [eliminandoBecaId, setEliminandoBecaId] = useState(null);
+
+  const obtenerNombreNivelAlumno = (alumnoData) => {
+    if (!alumnoData) {
+      return '';
+    }
+    const nivelActivo = getNivelActivo(alumnoData);
+    return nivelActivo?.nombre || alumnoData.nivel || '';
+  };
+
+  const alumnoSeleccionadoBeca = becaForm.alumnoId ? alumnos[becaForm.alumnoId] : null;
+  const nivelAlumnoSeleccionadoBeca = obtenerNombreNivelAlumno(alumnoSeleccionadoBeca);
 
   useEffect(() => {
     const loadData = async () => {
@@ -402,8 +422,9 @@ const GestionPagos = () => {
   const obtenerCostosNivelAlumno = useCallback((alumnoId) => {
     if (!alumnoId || !configuracion?.costos) return null;
     const alumnoSeleccionado = alumnos[alumnoId];
-    if (!alumnoSeleccionado?.nivel) return null;
-    const nivelAlumno = alumnoSeleccionado.nivel.toLowerCase();
+    const nivelAlumnoNombre = obtenerNombreNivelAlumno(alumnoSeleccionado);
+    if (!nivelAlumnoNombre) return null;
+    const nivelAlumno = nivelAlumnoNombre.toLowerCase();
 
     let coincidencia = null;
     for (const [key, valor] of Object.entries(configuracion.costos)) {
@@ -506,7 +527,7 @@ const GestionPagos = () => {
       }
       return Object.keys(updates).length ? { ...prev, ...updates } : prev;
     });
-  }, [nuevoPago.tipo, nuevoPago.alumnoId, sugerirSiguienteColegiatura]);
+  }, [nuevoPago.tipo, nuevoPago.alumnoId, nuevoPago.numeroColegiatura, nuevoPago.totalColegiaturas, sugerirSiguienteColegiatura]);
 
   const handleValidarPago = async () => {
     if (!selectedPago) return;
@@ -795,15 +816,16 @@ const GestionPagos = () => {
       return;
     }
 
-    if (!alumno.nivel) {
+    const nivelAlumnoNombre = obtenerNombreNivelAlumno(alumno);
+    if (!nivelAlumnoNombre) {
       showError('El alumno no tiene nivel asignado');
       return;
     }
 
-    setGenerandoPagos(true);
     try {
+      setGenerandoPagos(true);
       console.log('🔄 Iniciando generación de pagos para:', alumno.nombre || alumno.email);
-      console.log('   - Nivel del alumno:', alumno.nivel);
+      console.log('   - Nivel del alumno:', nivelAlumnoNombre);
       console.log('   - Configuración disponible:', !!configuracion);
       console.log('   - Costos disponibles:', configuracion?.costos ? Object.keys(configuracion.costos) : 'No hay costos');
       
@@ -1047,11 +1069,15 @@ const GestionPagos = () => {
             ) : Object.keys(alumnos).length > 0 ? (
               Object.values(alumnos)
                 .sort((a, b) => (a.nombre || a.email || '').localeCompare(b.nombre || b.email || ''))
-                .map((alumno) => (
-                  <option key={alumno.id} value={alumno.id}>
-                    {alumno.nombre || alumno.email || 'Sin nombre'}
-                  </option>
-                ))
+                .map((alumno) => {
+                  const nivelNombre = obtenerNombreNivelAlumno(alumno);
+                  return (
+                    <option key={alumno.id} value={alumno.id}>
+                      {alumno.nombre || alumno.email || 'Sin nombre'}
+                      {nivelNombre ? ` (${nivelNombre})` : ''}
+                    </option>
+                  );
+                })
             ) : (
               <option value="" disabled>No hay alumnos disponibles</option>
             )}
@@ -1081,8 +1107,8 @@ const GestionPagos = () => {
                   <button
                     onClick={() => handleGenerarPagosAlumno(filtroAlumno)}
                     className="inline-flex items-center px-4 py-2 bg-yellow text-gray-900 dark:text-gray-900 rounded-lg hover:bg-yellow/90 transition-colors"
-                    disabled={generandoPagos || !alumnos[filtroAlumno].nivel}
-                    title={!alumnos[filtroAlumno].nivel ? 'El alumno no tiene nivel asignado' : 'Generar pagos para este alumno'}
+                    disabled={generandoPagos || !obtenerNombreNivelAlumno(alumnos[filtroAlumno])}
+                    title={!obtenerNombreNivelAlumno(alumnos[filtroAlumno]) ? 'El alumno no tiene nivel asignado' : 'Generar pagos para este alumno'}
                   >
                     <PlusIcon className="w-5 h-5 mr-2" />
                     {generandoPagos ? 'Generando...' : 'Generar Pagos para este Alumno'}
@@ -1095,6 +1121,7 @@ const GestionPagos = () => {
               const estado = obtenerEstadoPago(pago);
               const EstadoIcon = estado.icon;
               const alumno = alumnos[pago.alumnoId];
+              const nivelActualAlumno = obtenerNombreNivelAlumno(alumno);
               const fechaVenc = pago.fechaVencimiento?.toDate?.() || new Date(pago.fechaVencimiento);
               // Solo calcular recargo para colegiaturas
               const montoTotal = calcularMontoTotal(
@@ -1107,8 +1134,6 @@ const GestionPagos = () => {
               );
 
               // Verificar si el alumno tiene pagos (para mostrar botón de generar)
-              const pagosDelAlumno = pagos.filter(p => p.alumnoId === pago.alumnoId);
-              const alumnoTienePagos = pagosDelAlumno.length > 0;
               const becasAplicadasPago = Array.isArray(pago.becasAplicadas) ? pago.becasAplicadas : [];
               const descuentoRegistrado = pago.descuentoAplicado !== undefined
                 ? Number(pago.descuentoAplicado)
@@ -1220,8 +1245,8 @@ const GestionPagos = () => {
                             <button
                               onClick={() => handleGenerarPagosAlumno(pago.alumnoId)}
                               className="inline-flex items-center px-3 py-2 bg-yellow text-gray-900 dark:text-gray-900 rounded-lg hover:bg-yellow/90 transition-colors text-sm"
-                              disabled={generandoPagos || !alumno.nivel}
-                              title={!alumno.nivel ? 'El alumno no tiene nivel asignado' : 'Generar pagos para este alumno'}
+                              disabled={generandoPagos || !nivelActualAlumno}
+                              title={!nivelActualAlumno ? 'El alumno no tiene nivel asignado' : 'Generar pagos para este alumno'}
                             >
                               <PlusIcon className="w-4 h-4 mr-1" />
                               Generar Pagos
@@ -1355,8 +1380,6 @@ const GestionPagos = () => {
           recargoCalculado = (montoBase * recargoPorcentaje) / 100;
           montoTotalConRecargo = montoBase + recargoCalculado;
         }
-        
-        const montoSugerido = montoPagado ? parseFloat(montoPagado) : montoTotalConRecargo;
         
         return (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
@@ -1808,9 +1831,9 @@ const GestionPagos = () => {
                 <span className="font-medium">Alumno:</span>{' '}
                 {alumnos[becaForm.alumnoId]?.nombre || alumnos[becaForm.alumnoId]?.email || 'Selecciona un alumno'}
               </p>
-              {alumnos[becaForm.alumnoId]?.nivel && (
+              {nivelAlumnoSeleccionadoBeca && (
                 <p className="mt-1">
-                  <span className="font-medium">Nivel:</span> {alumnos[becaForm.alumnoId]?.nivel}
+                  <span className="font-medium">Nivel:</span> {nivelAlumnoSeleccionadoBeca}
                 </p>
               )}
             </div>
@@ -2133,12 +2156,15 @@ const GestionPagos = () => {
                         const nombreB = (b.nombre || b.email || '').toLowerCase();
                         return nombreA.localeCompare(nombreB);
                       })
-                      .map((alumno) => (
-                        <option key={alumno.id} value={alumno.id}>
-                          {alumno.nombre || alumno.email || 'Sin nombre'} 
-                          {alumno.nivel ? ` (${alumno.nivel})` : ''}
-                        </option>
-                      ))
+                      .map((alumno) => {
+                        const nivelNombre = obtenerNombreNivelAlumno(alumno);
+                        return (
+                          <option key={alumno.id} value={alumno.id}>
+                            {alumno.nombre || alumno.email || 'Sin nombre'}
+                            {nivelNombre ? ` (${nivelNombre})` : ''}
+                          </option>
+                        );
+                      })
                   ) : (
                     <option value="" disabled>No hay alumnos disponibles</option>
                   )}

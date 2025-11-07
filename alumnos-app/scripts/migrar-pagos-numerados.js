@@ -55,7 +55,7 @@ async function migrarPagos() {
       pagosSnapshot = await getDocs(q);
     } catch (error) {
       // Si falla (por falta de índice), obtener sin ordenar
-      console.warn('⚠️  No se pudo ordenar por fechaVencimiento, obteniendo sin ordenar...');
+      console.warn('⚠️  No se pudo ordenar por fechaVencimiento, obteniendo sin ordenar...', error?.message);
       pagosSnapshot = await getDocs(collection(db, 'pagos'));
     }
 
