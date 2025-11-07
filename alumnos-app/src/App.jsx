@@ -31,6 +31,7 @@ const RegenerarCodigos = lazy(() => import('./pages/Admin/RegenerarCodigos'));
 const GeneradorQR = lazy(() => import('./pages/Admin/GeneradorQR'));
 const DiagnosticoCodigos = lazy(() => import('./pages/Admin/DiagnosticoCodigos'));
 const GestionGrupos = lazy(() => import('./pages/Admin/GestionGrupos'));
+const GestionNiveles = lazy(() => import('./pages/Admin/GestionNiveles'));
 
 // Componente para redirigir según el rol
 const DashboardRedirect = () => {
@@ -253,6 +254,18 @@ function App() {
                 <AdminLayout>
                   <Suspense fallback={<LoadingSpinner fullScreen size="xl" variant="montessori" message="Cargando..." />}>
                     <GestionGrupos />
+                  </Suspense>
+                </AdminLayout>
+              </AdminRoute>
+            }
+          />
+          <Route
+            path="/admin/gestion-niveles"
+            element={
+              <AdminRoute>
+                <AdminLayout>
+                  <Suspense fallback={<LoadingSpinner fullScreen size="xl" variant="montessori" message="Cargando..." />}>
+                    <GestionNiveles />
                   </Suspense>
                 </AdminLayout>
               </AdminRoute>

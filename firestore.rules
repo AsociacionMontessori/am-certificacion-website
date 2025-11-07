@@ -142,6 +142,14 @@ service cloud.firestore {
       // Los usuarios solo pueden leer sus propias inscripciones
     }
     
+    // Colección: niveles
+    match /niveles/{nivelId} {
+      // Todos los usuarios autenticados pueden leer los niveles
+      allow read: if request.auth != null;
+      // Solo admin puede crear, actualizar y eliminar niveles
+      allow write: if isAdmin();
+    }
+    
     // Denegar acceso a todo lo demás por defecto
     match /{document=**} {
       allow read, write: if false;

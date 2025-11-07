@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { crearUsuarioAlumno, crearUsuarioAdmin, crearUsuarioDirectivo, crearUsuarioGrupos } from '../../services/adminService';
-import { UserPlusIcon, ArrowLeftIcon } from '@heroicons/react/24/outline';
-import { Link } from 'react-router-dom';
+import { UserPlusIcon, ArrowLeftIcon, Cog6ToothIcon } from '@heroicons/react/24/outline';
 import useCanEdit from '../../hooks/useCanEdit';
+import { obtenerNiveles } from '../../services/nivelesService';
 
 const CrearUsuario = () => {
   const navigate = useNavigate();
@@ -19,6 +19,8 @@ const CrearUsuario = () => {
   }, [canEdit, navigate]);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+  const [niveles, setNiveles] = useState([]);
+  const [loadingNiveles, setLoadingNiveles] = useState(true);
   const [formData, setFormData] = useState({
     rol: 'alumno',
     nombreCompleto: '',
@@ -36,13 +38,45 @@ const CrearUsuario = () => {
     passwordClassroom: '',
   });
 
-  const niveles = [
-    'Propedéutico',
-    'Nido & Comunidad infantil',
-    'Casa de Niños',
-    'Taller',
-    'Neuroeducación'
-  ];
+  // Cargar niveles desde Firestore
+  useEffect(() => {
+    const loadNiveles = async () => {
+      setLoadingNiveles(true);
+      try {
+        const resultado = await obtenerNiveles();
+        if (resultado.success) {
+          // Filtrar solo niveles activos y obtener solo el nombre
+          const nivelesActivos = resultado.niveles
+            .filter(n => n.activo !== false)
+            .map(n => n.nombre);
+          setNiveles(nivelesActivos);
+        } else {
+          // Si hay error o no hay niveles, usar los valores por defecto
+          setNiveles([
+            'Propedéutico',
+            'Nido & Comunidad infantil',
+            'Casa de Niños',
+            'Taller',
+            'Neuroeducación'
+          ]);
+        }
+      } catch (error) {
+        console.error('Error al cargar niveles:', error);
+        // En caso de error, usar valores por defecto
+        setNiveles([
+          'Propedéutico',
+          'Nido & Comunidad infantil',
+          'Casa de Niños',
+          'Taller',
+          'Neuroeducación'
+        ]);
+      } finally {
+        setLoadingNiveles(false);
+      }
+    };
+
+    loadNiveles();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -284,17 +318,31 @@ const CrearUsuario = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Nivel *
-                  </label>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                      Nivel *
+                    </label>
+                    {canEdit && (
+                      <Link
+                        to="/admin/gestion-niveles"
+                        className="inline-flex items-center text-xs text-blue hover:text-blue/80 transition-colors"
+                      >
+                        <Cog6ToothIcon className="w-4 h-4 mr-1" />
+                        Gestionar niveles
+                      </Link>
+                    )}
+                  </div>
                   <select
                     name="nivel"
                     required={formData.rol === 'alumno'}
                     value={formData.nivel}
                     onChange={handleChange}
-                    className="w-full px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue transition-all duration-200"
+                    disabled={loadingNiveles}
+                    className="w-full px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    <option value="">Selecciona un nivel</option>
+                    <option value="">
+                      {loadingNiveles ? 'Cargando niveles...' : 'Selecciona un nivel'}
+                    </option>
                     {niveles.map((nivel) => (
                       <option key={nivel} value={nivel}>
                         {nivel}
