@@ -176,6 +176,11 @@ const AlumnoDetail = () => {
         fechaFinAnterior
       });
 
+      let estadoActualizado = formData.estado;
+      if (estadoActualizado === 'Graduado' && nombreNivelNuevo) {
+        estadoActualizado = 'Activo';
+      }
+
       const updateData = {
         matricula: formData.matricula || null,
         email: formData.email,
@@ -188,7 +193,7 @@ const AlumnoDetail = () => {
         niveles: historialActualizado,
         fechaIngreso: formData.fechaIngreso ? new Date(formData.fechaIngreso) : null,
         fechaEgresoEstimada: formData.fechaEgresoEstimada ? new Date(formData.fechaEgresoEstimada) : null,
-        estado: formData.estado,
+        estado: estadoActualizado,
         mailClassroom: formData.mailClassroom || null,
         passwordClassroom: formData.passwordClassroom || null
       };
