@@ -55,11 +55,7 @@ const DashboardRedirect = () => {
   
   // Si no hay userData, puede ser que el documento no existe
   if (!userData) {
-    console.warn('⚠️ DashboardRedirect - No hay userData');
-    console.warn('⚠️ UID del usuario:', currentUser?.uid);
-    console.warn('⚠️ Email del usuario:', currentUser?.email);
-    console.warn('⚠️ Verifica que exista un documento en Firestore con ID =', currentUser?.uid);
-    console.warn('⚠️ Mostrando dashboard de alumno por defecto');
+    console.warn('⚠️ DashboardRedirect - No hay userData, mostrando dashboard de alumno por defecto');
     return (
       <Suspense fallback={<LoadingSpinner fullScreen size="xl" variant="montessori" message="Cargando..." />}>
         <Dashboard />
@@ -67,16 +63,10 @@ const DashboardRedirect = () => {
     );
   }
   
-  console.log('📊 DashboardRedirect - userData:', userData);
-  console.log('📊 DashboardRedirect - rol:', userData.rol);
-  
   // Si el usuario es admin, directivo o grupos, redirigir al panel de administración
   if (userData.rol === 'admin' || userData.rol === 'directivo' || userData.rol === 'grupos') {
-    console.log('✅ Redirigiendo a /admin para rol:', userData.rol);
     return <Navigate to="/admin" replace />;
   }
-  
-  console.log('ℹ️ Mostrando dashboard de alumno para rol:', userData.rol);
   
   // Si no es admin, mostrar dashboard de alumno
   return (
