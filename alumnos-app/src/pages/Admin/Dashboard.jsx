@@ -18,6 +18,7 @@ import AlertasMateriasProximas from '../../components/AlertasMateriasProximas';
 import useCanEdit from '../../hooks/useCanEdit';
 import { useAuth } from '../../contexts/AuthContext';
 import { obtenerNiveles } from '../../services/nivelesService';
+import { getEstadoBadgeClasses } from '../../utils/estadoBadgeClasses';
 
 const AdminDashboard = () => {
   const canEdit = useCanEdit();
@@ -511,13 +512,7 @@ const AdminDashboard = () => {
                     {alumno.nivel || 'N/A'}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`badge ${
-                      alumno.estado === 'Activo' 
-                        ? 'bg-green text-gray-900 dark:bg-green/80 dark:text-gray-900'
-                        : alumno.estado === 'Graduado'
-                        ? 'bg-yellow text-gray-900 dark:bg-yellow/80 dark:text-gray-900'
-                        : 'bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-white'
-                    }`}>
+                    <span className={`badge ${getEstadoBadgeClasses(alumno.estado)}`}>
                       {alumno.estado || 'N/A'}
                     </span>
                   </td>
@@ -571,13 +566,7 @@ const AdminDashboard = () => {
                   </h3>
                   <p className="text-sm text-gray-500 dark:text-gray-400 truncate">{alumno.email || 'N/A'}</p>
                 </div>
-                <span className={`badge ml-2 flex-shrink-0 ${
-                  alumno.estado === 'Activo' 
-                    ? 'bg-green text-gray-900 dark:bg-green/80 dark:text-gray-900'
-                    : alumno.estado === 'Graduado'
-                    ? 'bg-yellow text-gray-900 dark:bg-yellow/80 dark:text-gray-900'
-                    : 'bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-white'
-                }`}>
+                <span className={`badge ml-2 flex-shrink-0 ${getEstadoBadgeClasses(alumno.estado)}`}>
                   {alumno.estado || 'N/A'}
                 </span>
               </div>

@@ -6,6 +6,7 @@ import { db } from '../config/firebase';
 import { DocumentTextIcon, UserIcon, AcademicCapIcon, LinkIcon, ShareIcon, EyeIcon } from '@heroicons/react/24/outline';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { formatearFechaLarga } from '../utils/formatearFecha';
+import { getEstadoBadgeClasses } from '../utils/estadoBadgeClasses';
 
 const Expediente = () => {
   const { currentUser, userData } = useAuth();
@@ -154,11 +155,7 @@ const Expediente = () => {
               <div>
                 <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Estado</dt>
                 <dd className="text-sm text-gray-900 dark:text-white mt-1">
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                    expediente.estado === 'Activo' 
-                      ? 'bg-green text-gray-900 dark:bg-green/80 dark:text-gray-900' 
-                      : 'bg-gray-700 text-white'
-                  }`}>
+                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${getEstadoBadgeClasses(expediente.estado)}`}>
                     {expediente.estado}
                   </span>
                 </dd>

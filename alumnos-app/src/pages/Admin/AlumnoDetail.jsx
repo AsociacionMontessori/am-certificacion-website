@@ -9,6 +9,7 @@ import { useNotifications } from '../../contexts/NotificationContext';
 import useCanEdit from '../../hooks/useCanEdit';
 import { getNivelActivo, getHistorialNiveles, actualizarHistorialNiveles } from '../../utils/alumnos';
 import { obtenerNiveles } from '../../services/nivelesService';
+import { getEstadoBadgeClasses } from '../../utils/estadoBadgeClasses';
 
 const AlumnoDetail = () => {
   const { id } = useParams();
@@ -658,13 +659,7 @@ const AlumnoDetail = () => {
                 </select>
               ) : (
                 <dd className="mt-1">
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                    alumno.estado === 'Activo' 
-                      ? 'bg-green text-gray-900 dark:text-gray-900'
-                      : alumno.estado === 'Graduado'
-                      ? 'bg-yellow text-gray-900 dark:text-gray-900'
-                      : 'bg-gray-700 text-white'
-                  }`}>
+                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${getEstadoBadgeClasses(alumno.estado)}`}>
                     {alumno.estado || 'N/A'}
                   </span>
                 </dd>

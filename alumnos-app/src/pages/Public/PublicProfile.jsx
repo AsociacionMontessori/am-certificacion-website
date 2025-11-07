@@ -6,6 +6,7 @@ import { AcademicCapIcon, UserIcon, CalendarIcon, DocumentTextIcon, PrinterIcon,
 import LoadingSpinner from '../../components/LoadingSpinner';
 import { formatearFechaLarga } from '../../utils/formatearFecha';
 import { getNivelActivo } from '../../utils/alumnos';
+import { getEstadoBadgeClasses } from '../../utils/estadoBadgeClasses';
 import { useNotifications } from '../../contexts/NotificationContext';
 
 const PublicProfile = () => {
@@ -771,13 +772,7 @@ const PublicProfile = () => {
                     <div>
                       <dt className="text-sm font-medium text-gray-500">Estado</dt>
                       <dd className="mt-1">
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          alumno.estado === 'Activo' 
-                          ? 'bg-green text-gray-900 dark:bg-green/80 dark:text-gray-900'
-                            : alumno.estado === 'Graduado'
-                            ? 'bg-yellow text-gray-900 dark:bg-yellow/80 dark:text-gray-900'
-                            : 'bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-white'
-                        }`}>
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getEstadoBadgeClasses(alumno.estado)}`}>
                           {alumno.estado}
                         </span>
                       </dd>
