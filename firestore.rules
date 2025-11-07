@@ -59,21 +59,23 @@ service cloud.firestore {
     // Colección: directivos
     // PERMITE que un usuario autenticado lea su propio documento de directivo
     match /directivos/{directivoId} {
-      // Cualquier usuario autenticado puede leer SU PROPIO documento
-      // Esto es necesario para que el sistema pueda verificar si es directivo
-      allow read: if request.auth != null && request.auth.uid == directivoId;
-      // Solo desde Admin SDK o consola
-      allow write: if false;
+      // Lectura: su propio documento o por administradores
+      allow read: if (request.auth != null && request.auth.uid == directivoId) || isAdmin();
+      // Creación: el propio directivo (cuando se registra) o un administrador
+      allow create: if request.auth != null && (request.auth.uid == directivoId || isAdmin());
+      // Actualización y eliminación solo por administradores
+      allow update, delete: if isAdmin();
     }
     
     // Colección: grupos
     // PERMITE que un usuario autenticado lea su propio documento de grupos
     match /grupos/{grupoId} {
-      // Cualquier usuario autenticado puede leer SU PROPIO documento
-      // Esto es necesario para que el sistema pueda verificar si es grupos
-      allow read: if request.auth != null && request.auth.uid == grupoId;
-      // Solo admin puede escribir (asignar alumnos)
-      allow write: if isAdmin();
+      // Lectura: su propio documento o por administradores (para gestión)
+      allow read: if (request.auth != null && request.auth.uid == grupoId) || isAdmin();
+      // Creación: el propio usuario de grupos (cuando se registra) o un administrador
+      allow create: if request.auth != null && (request.auth.uid == grupoId || isAdmin());
+      // Actualización y eliminación solo por administradores (para asignar alumnos, etc.)
+      allow update, delete: if isAdmin();
     }
     
     // Colección: alumnos
