@@ -53,10 +53,8 @@ export const AuthProvider = ({ children }) => {
                 ...directivoData, 
                 rol: 'directivo' 
               };
-              console.log('✅ Usuario directivo detectado:', userDataWithRole);
               setUserData(userDataWithRole);
             } else {
-              console.warn('⚠️ Usuario no encontrado en directivos. UID:', user.uid);
               // Si no es directivo, intentar como grupos
               const gruposDoc = await getDoc(doc(db, 'grupos', user.uid));
               
