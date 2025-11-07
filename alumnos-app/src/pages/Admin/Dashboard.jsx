@@ -27,6 +27,7 @@ const AdminDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [filtroNivel, setFiltroNivel] = useState('');
+  const [filtroEstado, setFiltroEstado] = useState('');
   const [filtroFechaInicio, setFiltroFechaInicio] = useState('');
   const [filtroFechaFin, setFiltroFechaFin] = useState('');
   const [ordenPor, setOrdenPor] = useState('nombre'); // 'nombre', 'fechaIngreso', 'nivel'
@@ -144,6 +145,9 @@ const AdminDashboard = () => {
       // Filtro por nivel
       const matchNivel = !filtroNivel || alumno.nivel === filtroNivel;
 
+      // Filtro por estado
+      const matchEstado = !filtroEstado || alumno.estado === filtroEstado;
+
       // Filtro por fecha de ingreso
       let matchFecha = true;
       if (filtroFechaInicio || filtroFechaFin) {
@@ -164,7 +168,7 @@ const AdminDashboard = () => {
         }
       }
 
-      return matchSearch && matchNivel && matchFecha;
+      return matchSearch && matchNivel && matchEstado && matchFecha;
     })
     .sort((a, b) => {
       // El último alumno agregado siempre va primero
@@ -197,12 +201,13 @@ const AdminDashboard = () => {
 
   const limpiarFiltros = () => {
     setFiltroNivel('');
+    setFiltroEstado('');
     setFiltroFechaInicio('');
     setFiltroFechaFin('');
     setSearchTerm('');
   };
 
-  const tieneFiltrosActivos = filtroNivel || filtroFechaInicio || filtroFechaFin || searchTerm;
+  const tieneFiltrosActivos = filtroNivel || filtroEstado || filtroFechaInicio || filtroFechaFin || searchTerm;
 
   const stats = {
     total: alumnos.length,
@@ -300,7 +305,7 @@ const AdminDashboard = () => {
               <span className="hidden sm:inline">Filtros</span>
               {tieneFiltrosActivos && (
                 <span className="ml-1 px-1.5 py-0.5 text-xs bg-white/20 rounded-full">
-                  {[filtroNivel, filtroFechaInicio, filtroFechaFin, searchTerm].filter(Boolean).length}
+                  {[filtroNivel, filtroEstado, filtroFechaInicio, filtroFechaFin, searchTerm].filter(Boolean).length}
                 </span>
               )}
             </button>
@@ -342,7 +347,7 @@ const AdminDashboard = () => {
         {/* Panel de Filtros y Ordenamiento */}
         {(showFilters || tieneFiltrosActivos) && (
           <div className="border-t border-gray-200 dark:border-gray-700 pt-4 space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
               {/* Filtro por Nivel */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -359,6 +364,23 @@ const AdminDashboard = () => {
                       {nivel}
                     </option>
                   ))}
+                </select>
+              </div>
+
+              {/* Filtro por Estado */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Filtrar por Estado
+                </label>
+                <select
+                  value={filtroEstado}
+                  onChange={(e) => setFiltroEstado(e.target.value)}
+                  className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue"
+                >
+                  <option value="">Todos los estados</option>
+                  <option value="Activo">Activo</option>
+                  <option value="Inactivo">Inactivo</option>
+                  <option value="Graduado">Graduado</option>
                 </select>
               </div>
 
