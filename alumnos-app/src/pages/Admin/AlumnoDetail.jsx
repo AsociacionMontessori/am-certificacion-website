@@ -266,7 +266,7 @@ const AlumnoDetail = () => {
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
               Información Personal
             </h2>
-            {canEdit && !editing ? (
+            {canEdit && !editing && (
               <button
                 onClick={() => setEditing(true)}
                 className="p-2 text-blue hover:bg-blue/10 rounded-lg transition-colors"
@@ -274,7 +274,8 @@ const AlumnoDetail = () => {
               >
                 <PencilIcon className="w-5 h-5" />
               </button>
-            ) : canEdit && editing ? (
+            )}
+            {canEdit && editing && (
               <div className="flex gap-2">
                 <button
                   onClick={handleSave}
