@@ -239,7 +239,7 @@ html.dark thead.bg-gray-50 {
 }
 
 /* Textos dentro de elementos con bg-white en modo oscuro */
-html.dark .bg-white .text-gray-900,
+html.dark .bg-white .text-gray-900:not([class*="bg-green"]):not([class*="bg-yellow"]),
 html.dark .bg-white h1,
 html.dark .bg-white h2,
 html.dark .bg-white h3,
