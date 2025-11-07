@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { db, auth } from '../../config/firebase';
 import { ArrowLeftIcon, CalendarIcon, ChartBarIcon, AcademicCapIcon, CurrencyDollarIcon, PencilIcon, CheckIcon, XMarkIcon, EyeIcon, EyeSlashIcon, ClipboardDocumentIcon, ArrowRightOnRectangleIcon } from '@heroicons/react/24/outline';
@@ -36,8 +36,13 @@ const AlumnoDetail = () => {
   const [nivelesHistorial, setNivelesHistorial] = useState([]);
   const [nivelesDisponibles, setNivelesDisponibles] = useState([]);
   const [showPassword, setShowPassword] = useState(false);
-
+  const [notasPrivadas, setNotasPrivadas] = useState('');
+  const [notasOriginales, setNotasOriginales] = useState('');
+  const [guardandoNotas, setGuardandoNotas] = useState(false);
+ 
   const { success, error: showError, prompt: showPrompt } = useNotifications();
+
+  const notasHanCambiado = notasPrivadas !== notasOriginales;
 
   const convertirFecha = (valor) => {
     if (!valor) {
@@ -76,6 +81,8 @@ const AlumnoDetail = () => {
       passwordClassroom: datos.passwordClassroom || ''
     });
     setNivelesHistorial(getHistorialNiveles(datos));
+    setNotasPrivadas(datos.notasPrivadas || '');
+    setNotasOriginales(datos.notasPrivadas || '');
   };
 
   // Función para copiar al portapapeles
@@ -222,6 +229,27 @@ const AlumnoDetail = () => {
       prepararFormulario(alumno);
     }
     setEditing(false);
+  };
+
+  const handleGuardarNotas = async () => {
+    if (!canEdit) {
+      return;
+    }
+    const notasLimpias = notasPrivadas.trim();
+    setGuardandoNotas(true);
+    try {
+      await updateDoc(doc(db, 'alumnos', alumno?.id || id), {
+        notasPrivadas: notasLimpias ? notasLimpias : null,
+        fechaActualizacionNotasPrivadas: serverTimestamp()
+      });
+      setNotasOriginales(notasLimpias);
+      success('Notas privadas guardadas');
+    } catch (error) {
+      console.error('Error al guardar notas privadas:', error);
+      showError('Error al guardar las notas privadas');
+    } finally {
+      setGuardandoNotas(false);
+    }
   };
 
   // Función para iniciar sesión como este usuario
@@ -718,6 +746,50 @@ const AlumnoDetail = () => {
             </div>
           </dl>
         </div>
+
+        {canEdit && (
+          <div className="lg:col-span-2 bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+              <div>
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                  Notas privadas
+                </h2>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  Solo visibles para administradores
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={handleGuardarNotas}
+                  disabled={!notasHanCambiado || guardandoNotas}
+                  className="px-4 py-2 bg-blue text-white rounded-lg hover:bg-blue/90 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {guardandoNotas ? 'Guardando…' : 'Guardar notas'}
+                </button>
+                {notasHanCambiado && !guardandoNotas && (
+                  <button
+                    type="button"
+                    onClick={() => setNotasPrivadas(notasOriginales)}
+                    className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+                  >
+                    Deshacer
+                  </button>
+                )}
+              </div>
+            </div>
+            <textarea
+              value={notasPrivadas}
+              onChange={(e) => setNotasPrivadas(e.target.value)}
+              placeholder="Escribe notas internas sobre este alumno..."
+              rows={6}
+              className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue"
+            />
+            <p className="mt-2 text-xs text-gray-500 dark:text-gray-500">
+              Estas notas no son visibles para el alumno ni en la vista pública.
+            </p>
+          </div>
+        )}
 
         {/* Gestión Académica */}
         <div className="lg:col-span-2 bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">

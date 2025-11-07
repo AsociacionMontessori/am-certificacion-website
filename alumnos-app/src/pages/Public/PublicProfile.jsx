@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { AcademicCapIcon, UserIcon, CalendarIcon, DocumentTextIcon, PrinterIcon, ClipboardDocumentIcon, LinkIcon } from '@heroicons/react/24/outline';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import { formatearFechaLarga } from '../../utils/formatearFecha';
+import { getNivelActivo } from '../../utils/alumnos';
 import { useNotifications } from '../../contexts/NotificationContext';
 
 const PublicProfile = () => {
@@ -14,6 +15,77 @@ const PublicProfile = () => {
   const [materias, setMaterias] = useState([]);
   const [calificaciones, setCalificaciones] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const nivelActivo = useMemo(() => (alumno ? getNivelActivo(alumno) : null), [alumno]);
+
+  const esRegistroDelNivel = (registro, nivel) => {
+    if (!registro) {
+      return false;
+    }
+    if (!nivel) {
+      return !registro.nivelId && !registro.nivelNombre && !registro.nivel;
+    }
+    if (nivel.id && registro.nivelId) {
+      return registro.nivelId === nivel.id;
+    }
+    const nombreRegistro = registro.nivelNombre || registro.nivel || '';
+    return !!nombreRegistro && nivel.nombre === nombreRegistro;
+  };
+
+  const materiasNivelActual = useMemo(() => {
+    if (!materias.length) {
+      return [];
+    }
+    if (!nivelActivo) {
+      return materias.filter((materia) => !materia.nivelId && !materia.nivelNombre);
+    }
+    return materias.filter((materia) => esRegistroDelNivel(materia, nivelActivo));
+  }, [materias, nivelActivo]);
+
+  const materiasHistorial = useMemo(() => {
+    if (!materias.length) {
+      return [];
+    }
+    if (!nivelActivo) {
+      return materias.filter((materia) => materia.nivelId || materia.nivelNombre);
+    }
+    return materias.filter((materia) => !esRegistroDelNivel(materia, nivelActivo));
+  }, [materias, nivelActivo]);
+
+  const agruparPorNivel = (lista) => {
+    return lista.reduce((acumulado, item) => {
+      const nombre = item.nivelNombre || item.nivel || 'Sin nivel asignado';
+      if (!acumulado[nombre]) {
+        acumulado[nombre] = [];
+      }
+      acumulado[nombre].push(item);
+      return acumulado;
+    }, {});
+  };
+
+  const materiasHistorialAgrupadas = useMemo(() => agruparPorNivel(materiasHistorial), [materiasHistorial]);
+
+  const calificacionesNivelActual = useMemo(() => {
+    if (!calificaciones.length) {
+      return [];
+    }
+    if (!nivelActivo) {
+      return calificaciones.filter((calificacion) => !calificacion.nivelId && !calificacion.nivelNombre);
+    }
+    return calificaciones.filter((calificacion) => esRegistroDelNivel(calificacion, nivelActivo));
+  }, [calificaciones, nivelActivo]);
+
+  const calificacionesHistorial = useMemo(() => {
+    if (!calificaciones.length) {
+      return [];
+    }
+    if (!nivelActivo) {
+      return calificaciones.filter((calificacion) => calificacion.nivelId || calificacion.nivelNombre);
+    }
+    return calificaciones.filter((calificacion) => !esRegistroDelNivel(calificacion, nivelActivo));
+  }, [calificaciones, nivelActivo]);
+
+  const calificacionesHistorialAgrupadas = useMemo(() => agruparPorNivel(calificacionesHistorial), [calificacionesHistorial]);
 
   useEffect(() => {
     const loadAlumno = async () => {
@@ -37,6 +109,8 @@ const PublicProfile = () => {
             codigoVerificacion: data.codigoVerificacion,
             ciudad: data.ciudad,
             fechaEmisionCertificado: data.fechaEmisionCertificado,
+            niveles: data.niveles || [],
+            nivelActualId: data.nivelActualId || null,
             // Solo incluir campos que el alumno haya marcado como públicos
             mostrarEmail: data.mostrarEmail && data.email,
             mostrarTelefono: data.mostrarTelefono && data.telefono,
@@ -86,7 +160,7 @@ const PublicProfile = () => {
 
   // Preparar materias para la tabla
   const tablaMaterias = () => {
-    return materias
+    return materiasNivelActual
       .map(materia => ({
         id: materia.id || `materia-${materia.nombre}`,
         nombre: materia.nombre,
@@ -429,11 +503,11 @@ const PublicProfile = () => {
                     </p>
                   )}
                   
-                  {materias.length > 0 && (
-                    <div className="text-justify mt-4">
-                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3">
-                        <p className="font-semibold mb-2 sm:mb-0">
-                          Materias:
+                  {materiasNivelActual.length > 0 ? (
+                    <div className="bg-white dark:bg-gray-800 rounded-lg p-6 sm:p-8 shadow-sm border border-gray-200 dark:border-gray-700">
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+                        <p className="font-semibold text-gray-900 dark:text-white">
+                          Materias registradas
                         </p>
                         <div className="flex gap-2 no-print">
                           <button
@@ -441,7 +515,7 @@ const PublicProfile = () => {
                             className="inline-flex items-center px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
                           >
                             <PrinterIcon className="w-4 h-4 mr-1.5" />
-                            Imprimir
+                            Imprimir listado
                           </button>
                           <button
                             onClick={() => handleCopyToClipboard(window.location.href, 'Enlace de constancia')}
@@ -501,6 +575,39 @@ const PublicProfile = () => {
                           </tbody>
                         </table>
                       </div>
+                    </div>
+                  ) : (
+                    <p className="text-sm text-gray-600 dark:text-gray-300 mt-4">
+                      No hay materias registradas en el nivel actual.
+                    </p>
+                  )}
+
+                  {Object.keys(materiasHistorialAgrupadas).length > 0 && (
+                    <div className="mt-6 space-y-3">
+                      <h3 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white">
+                        Materias de niveles anteriores
+                      </h3>
+                      {Object.entries(materiasHistorialAgrupadas).map(([nivelNombre, materiasLista]) => (
+                        <div key={nivelNombre} className="border border-gray-200 dark:border-gray-700 rounded-lg">
+                          <div className="px-4 py-2 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+                            <p className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">
+                              {nivelNombre}
+                            </p>
+                          </div>
+                          <ul className="divide-y divide-gray-200 dark:divide-gray-700 text-xs sm:text-sm">
+                            {materiasLista.map((materia) => (
+                              <li key={materia.id} className="px-4 py-2 flex items-center justify-between">
+                                <span className="text-gray-900 dark:text-white font-medium">
+                                  {materia.nombre}
+                                </span>
+                                <span className="text-gray-500 dark:text-gray-400">
+                                  {materia.estado || 'Pendiente'}
+                                </span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      ))}
                     </div>
                   )}
                   
@@ -578,7 +685,7 @@ const PublicProfile = () => {
             </div>
 
             {/* Calificaciones (público) */}
-            {calificaciones.length > 0 && (
+            {(calificacionesNivelActual.length > 0 || calificacionesHistorial.length > 0) && (
               <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8">
                 <div className="flex items-center mb-4">
                   <DocumentTextIcon className="w-6 h-6 text-yellow mr-2" />
@@ -586,21 +693,57 @@ const PublicProfile = () => {
                     Calificaciones
                   </h2>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {calificaciones.map((c) => (
-                    <div key={c.id} className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 border border-gray-200 dark:border-gray-600">
-                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm text-gray-500 dark:text-gray-400 truncate">{c.periodo || 'Período'}</p>
-                          <h3 className="text-base font-semibold text-gray-900 dark:text-white truncate">{c.materia || 'Materia'}</h3>
-                        </div>
-                        <div className="sm:ml-4 flex-shrink-0">
-                          <span className="text-xl font-bold text-gray-900 dark:text-white">{c.calificacion ?? 'N/A'}</span>
+                {calificacionesNivelActual.length > 0 ? (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {calificacionesNivelActual.map((c) => (
+                      <div key={c.id} className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 border border-gray-200 dark:border-gray-600">
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm text-gray-500 dark:text-gray-400 truncate">{c.periodo || 'Período'}</p>
+                            <h3 className="text-base font-semibold text-gray-900 dark:text-white truncate">{c.materia || 'Materia'}</h3>
+                          </div>
+                          <div className="sm:ml-4 flex-shrink-0">
+                            <span className="text-xl font-bold text-gray-900 dark:text-white">{c.calificacion ?? 'N/A'}</span>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-sm text-gray-600 dark:text-gray-300">No hay calificaciones registradas en el nivel actual.</p>
+                )}
+
+                {Object.keys(calificacionesHistorialAgrupadas).length > 0 && (
+                  <div className="mt-6 space-y-3">
+                    <h3 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white">
+                      Calificaciones de niveles anteriores
+                    </h3>
+                    {Object.entries(calificacionesHistorialAgrupadas).map(([nivelNombre, califLista]) => (
+                      <div key={nivelNombre} className="border border-gray-200 dark:border-gray-700 rounded-lg">
+                        <div className="px-4 py-2 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+                          <p className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">
+                            {nivelNombre}
+                          </p>
+                        </div>
+                        <ul className="divide-y divide-gray-200 dark:divide-gray-700 text-xs sm:text-sm">
+                          {califLista.map((c) => (
+                            <li key={c.id} className="px-4 py-2 flex items-center justify-between gap-3">
+                              <div className="flex-1 min-w-0">
+                                <p className="text-gray-900 dark:text-white font-medium truncate">{c.materia || 'Materia'}</p>
+                                {c.periodo && (
+                                  <p className="text-gray-500 dark:text-gray-400 text-xs truncate">{c.periodo}</p>
+                                )}
+                              </div>
+                              <span className="text-sm font-semibold text-gray-700 dark:text-gray-200">
+                                {c.calificacion ?? 'N/A'}
+                              </span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
 

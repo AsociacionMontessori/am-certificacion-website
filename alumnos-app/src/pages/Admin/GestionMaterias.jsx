@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { collection, query, where, getDocs, getDoc, doc, updateDoc, deleteDoc, addDoc, serverTimestamp, writeBatch } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { getMateriasPorNivel } from '../../data/materiasPorNivel';
+import { getHistorialNiveles, getNivelActivo } from '../../utils/alumnos';
 import { ArrowLeftIcon, PlusIcon, PencilIcon, TrashIcon, CalendarIcon, DocumentDuplicateIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import LoadingButton from '../../components/LoadingButton';
@@ -31,8 +32,106 @@ const GestionMaterias = () => {
     fechaInicio: '',
     fechaFin: '',
     aula: '',
-    estado: 'Pendiente'
+    estado: 'Pendiente',
+    nivelId: '',
+    nivelNombre: ''
   });
+  const [nivelesHistorial, setNivelesHistorial] = useState([]);
+  const [nivelActivo, setNivelActivo] = useState(null);
+  const [nivelFiltro, setNivelFiltro] = useState('todos');
+  const [bulkNivelId, setBulkNivelId] = useState(null);
+
+  const normalizarMaterias = (lista, historialLista, nivelActivoRef, alumnoRef) => {
+    return lista.map((materia) => {
+      const nivelIdDocumento = materia.nivelId || materia.nivelActualId || null;
+      const nivelNombreDocumento = materia.nivelNombre || materia.nivel || null;
+      const historialNivel = historialLista.find((nivel) => nivel.id === nivelIdDocumento) ||
+        historialLista.find((nivel) => nivel.nombre === nivelNombreDocumento);
+      const idFinal = historialNivel?.id || nivelIdDocumento || nivelActivoRef?.id || null;
+      const nombreFinal = historialNivel?.nombre || nivelNombreDocumento || nivelActivoRef?.nombre || alumnoRef?.nivel || '';
+      return {
+        ...materia,
+        nivelId: idFinal,
+        nivelNombre: nombreFinal
+      };
+    });
+  };
+
+  const nivelesOpciones = useMemo(() => {
+    const lista = [];
+    const historialOrdenado = [...nivelesHistorial];
+    historialOrdenado.sort((a, b) => {
+      const fechaA = a.fechaInicio ? new Date(a.fechaInicio) : null;
+      const fechaB = b.fechaInicio ? new Date(b.fechaInicio) : null;
+      if (fechaA && fechaB) {
+        return fechaB - fechaA;
+      }
+      if (fechaA) return -1;
+      if (fechaB) return 1;
+      return 0;
+    });
+    historialOrdenado.forEach((nivel) => {
+      if (!nivel?.nombre) {
+        return;
+      }
+      if (!lista.find((item) => item.id === nivel.id && item.nombre === nivel.nombre)) {
+        lista.push({
+          id: nivel.id,
+          nombre: nivel.nombre,
+          estado: nivel.estado || 'completado'
+        });
+      }
+    });
+    if (!lista.length && (nivelActivo?.nombre || alumno?.nivel)) {
+      lista.push({
+        id: nivelActivo?.id || null,
+        nombre: nivelActivo?.nombre || alumno?.nivel,
+        estado: 'activo'
+      });
+    }
+    return lista;
+  }, [nivelesHistorial, nivelActivo, alumno]);
+
+  const hayMateriasSinNivel = useMemo(() => materias.some((materia) => !materia.nivelId), [materias]);
+
+  const materiasFiltradas = useMemo(() => {
+    if (nivelFiltro === 'todos') {
+      return materias;
+    }
+    if (nivelFiltro === 'sinNivel') {
+      return materias.filter((materia) => !materia.nivelId);
+    }
+    return materias.filter((materia) => materia.nivelId === nivelFiltro);
+  }, [materias, nivelFiltro]);
+
+  const nivelActualNombre = nivelActivo?.nombre || alumno?.nivel || 'Sin nivel activo';
+  const nivelFiltroEtiqueta = useMemo(() => {
+    if (nivelFiltro === 'todos') {
+      return 'Todos los niveles';
+    }
+    if (nivelFiltro === 'sinNivel') {
+      return 'Sin nivel asignado';
+    }
+    const encontrado = nivelesOpciones.find((nivel) => nivel.id === nivelFiltro);
+    return encontrado?.nombre || 'Nivel actual';
+  }, [nivelFiltro, nivelesOpciones]);
+
+  const obtenerClaseFiltro = (valor) =>
+    valor === nivelFiltro
+      ? 'px-3 py-1.5 text-sm font-semibold rounded-full bg-blue text-white shadow-sm'
+      : 'px-3 py-1.5 text-sm font-medium rounded-full bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors';
+
+  const nivelBulkSeleccionado = useMemo(() => {
+    if (!bulkNivelId) {
+      return nivelActivo || null;
+    }
+    return (
+      nivelesOpciones.find((nivel) => nivel.id === bulkNivelId) ||
+      nivelesHistorial.find((nivel) => nivel.id === bulkNivelId) ||
+      nivelActivo ||
+      null
+    );
+  }, [bulkNivelId, nivelesOpciones, nivelesHistorial, nivelActivo]);
 
   useEffect(() => {
     const loadData = async () => {
@@ -42,7 +141,13 @@ const GestionMaterias = () => {
         if (alumnoDoc.exists()) {
           const alumnoData = { id: alumnoDoc.id, ...alumnoDoc.data() };
           setAlumno(alumnoData);
-          
+          const historial = getHistorialNiveles(alumnoData);
+          setNivelesHistorial(historial);
+          const nivelActivoActual = getNivelActivo(alumnoData);
+          setNivelActivo(nivelActivoActual);
+          setNivelFiltro(nivelActivoActual?.id || 'todos');
+          setBulkNivelId(nivelActivoActual?.id || null);
+
           // Cargar materias del alumno
           const materiasQuery = query(
             collection(db, 'materias'),
@@ -62,7 +167,8 @@ const GestionMaterias = () => {
             if (!fechaB) return -1;
             return fechaA - fechaB;
           });
-          setMaterias(materiasData);
+          const materiasNormalizadas = normalizarMaterias(materiasData, historial, nivelActivoActual, alumnoData);
+          setMaterias(materiasNormalizadas);
         }
       } catch (error) {
         console.error('Error al cargar datos:', error);
@@ -78,10 +184,18 @@ const GestionMaterias = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      const nivelSeleccionado = nivelesOpciones.find((nivel) => nivel.id === formData.nivelId) ||
+        nivelesHistorial.find((nivel) => nivel.id === formData.nivelId) ||
+        (formData.nivelNombre ? { id: formData.nivelId || null, nombre: formData.nivelNombre } : nivelActivo);
+      const nivelNombreFinal = nivelSeleccionado?.nombre || formData.nivelNombre || nivelActivo?.nombre || alumno?.nivel || '';
+      const nivelIdFinal = nivelSeleccionado?.id || formData.nivelId || nivelActivo?.id || null;
+
       const materiaData = {
         alumnoId: id,
         nombre: formData.nombre,
-        nivel: alumno?.nivel || '',
+        nivel: nivelNombreFinal,
+        nivelId: nivelIdFinal,
+        nivelNombre: nivelNombreFinal,
         fechaInicio: formData.fechaInicio ? new Date(formData.fechaInicio) : null,
         fechaFin: formData.fechaFin ? new Date(formData.fechaFin) : null,
         aula: formData.aula || null,
@@ -117,7 +231,8 @@ const GestionMaterias = () => {
         if (!fechaB) return -1;
         return fechaA - fechaB;
       });
-      setMaterias(materiasData);
+      const materiasNormalizadas = normalizarMaterias(materiasData, nivelesHistorial, nivelActivo, alumno);
+      setMaterias(materiasNormalizadas);
 
       setShowModal(false);
       setMateriaEditando(null);
@@ -126,7 +241,9 @@ const GestionMaterias = () => {
         fechaInicio: '',
         fechaFin: '',
         aula: '',
-        estado: 'Pendiente'
+        estado: 'Pendiente',
+        nivelId: nivelActivo?.id || '',
+        nivelNombre: nivelActivo?.nombre || ''
       });
     } catch (error) {
       console.error('Error al guardar materia:', error);
@@ -141,7 +258,9 @@ const GestionMaterias = () => {
       fechaInicio: formatearFechaInput(materia.fechaInicio),
       fechaFin: formatearFechaInput(materia.fechaFin),
       aula: materia.aula || '',
-      estado: materia.estado || 'Pendiente'
+      estado: materia.estado || 'Pendiente',
+      nivelId: materia.nivelId || materia.nivelActualId || '',
+      nivelNombre: materia.nivelNombre || materia.nivel || ''
     });
     setShowModal(true);
   };
@@ -178,10 +297,10 @@ const GestionMaterias = () => {
   };
 
   const handleSelectAll = () => {
-    if (selectedMaterias.length === materias.length) {
+    if (selectedMaterias.length === materiasFiltradas.length) {
       setSelectedMaterias([]);
     } else {
-      setSelectedMaterias(materias.map(m => m.id));
+      setSelectedMaterias(materiasFiltradas.map(m => m.id));
     }
   };
 
@@ -339,13 +458,17 @@ const GestionMaterias = () => {
     try {
       const batch = writeBatch(db);
       const materiasRef = collection(db, 'materias');
+      const nivelBulkNombre = nivelBulkSeleccionado?.nombre || alumno?.nivel || '';
+      const nivelBulkId = nivelBulkSeleccionado?.id || null;
 
       bulkPreview.forEach((materia) => {
         const nuevaMateriaRef = doc(materiasRef);
         batch.set(nuevaMateriaRef, {
           alumnoId: id,
           nombre: materia.nombre,
-          nivel: alumno?.nivel || '',
+          nivel: nivelBulkNombre,
+          nivelId: nivelBulkId,
+          nivelNombre: nivelBulkNombre,
           fechaInicio: materia.fechaInicio ? new Date(materia.fechaInicio) : null,
           fechaFin: materia.fechaFin ? new Date(materia.fechaFin) : null,
           aula: materia.aula || null,
@@ -377,7 +500,8 @@ const GestionMaterias = () => {
         return fechaA - fechaB;
       });
       
-      setMaterias(materiasData);
+      const materiasNormalizadas = normalizarMaterias(materiasData, nivelesHistorial, nivelActivo, alumno);
+      setMaterias(materiasNormalizadas);
       setShowBulkModal(false);
       setBulkData('');
       setBulkPreview([]);
@@ -390,7 +514,13 @@ const GestionMaterias = () => {
     }
   };
 
-  const materiasDisponibles = alumno?.nivel ? getMateriasPorNivel(alumno.nivel) : [];
+  const materiasDisponibles = useMemo(() => {
+    const referencia = formData.nivelNombre || nivelActivo?.nombre || alumno?.nivel || '';
+    if (!referencia) {
+      return [];
+    }
+    return getMateriasPorNivel(referencia);
+  }, [formData.nivelNombre, nivelActivo, alumno]);
 
   if (loading) {
     return (
@@ -418,7 +548,10 @@ const GestionMaterias = () => {
             Gestión de Materias
           </h1>
           <p className="mt-1 sm:mt-2 text-sm sm:text-base text-gray-600 dark:text-gray-400">
-            {alumno?.nombre} - {alumno?.nivel}
+            {alumno?.nombre} · Nivel actual: {nivelActualNombre}
+          </p>
+          <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-500">
+            Mostrando: {nivelFiltroEtiqueta}
           </p>
         </div>
         {canEdit && (
@@ -426,12 +559,17 @@ const GestionMaterias = () => {
             <button
               onClick={() => {
                 setMateriaEditando(null);
+                const nivelDefault = nivelActivo?.id
+                  ? { id: nivelActivo.id, nombre: nivelActivo.nombre }
+                  : (nivelesOpciones[0] || { id: '', nombre: '' });
                 setFormData({
                   nombre: '',
                   fechaInicio: '',
                   fechaFin: '',
                   aula: '',
-                  estado: 'Pendiente'
+                  estado: 'Pendiente',
+                  nivelId: nivelDefault.id || '',
+                  nivelNombre: nivelDefault.nombre || ''
                 });
                 setShowModal(true);
               }}
@@ -446,6 +584,7 @@ const GestionMaterias = () => {
                 setBulkData('');
                 setBulkPreview([]);
                 setBulkError('');
+                setBulkNivelId(nivelActivo?.id || '');
               }}
               className="inline-flex items-center justify-center px-4 py-2.5 sm:px-6 sm:py-3 text-sm sm:text-base font-semibold text-gray-900 bg-green rounded-lg shadow-sm hover:bg-green/90 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-green focus:ring-offset-2 transition-all duration-200"
             >
@@ -459,6 +598,38 @@ const GestionMaterias = () => {
       {/* Lista de materias */}
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
         <div className="p-4 sm:p-6">
+          <div className="mb-4 flex flex-wrap gap-2">
+            <button
+              onClick={() => setNivelFiltro('todos')}
+              className={obtenerClaseFiltro('todos')}
+              type="button"
+            >
+              Todos
+            </button>
+            {nivelesOpciones
+              .filter((nivel) => nivel.id)
+              .map((nivel) => (
+                <button
+                  key={nivel.id}
+                  onClick={() => setNivelFiltro(nivel.id)}
+                  className={obtenerClaseFiltro(nivel.id)}
+                  type="button"
+                  title={nivel.estado === 'activo' ? 'Nivel activo' : 'Nivel histórico'}
+                >
+                  {nivel.estado === 'activo' ? 'Activo: ' : ''}{nivel.nombre}
+                </button>
+              ))}
+            {hayMateriasSinNivel && (
+              <button
+                onClick={() => setNivelFiltro('sinNivel')}
+                className={obtenerClaseFiltro('sinNivel')}
+                type="button"
+              >
+                Sin nivel
+              </button>
+            )}
+          </div>
+
           {/* Barra de acciones de selección múltiple */}
           {isSelecting && (
             <div className="mb-4 p-3 bg-blue/10 dark:bg-blue/20 rounded-lg border border-blue/20 flex items-center justify-between">
@@ -467,10 +638,10 @@ const GestionMaterias = () => {
                   onClick={handleSelectAll}
                   className="text-sm font-medium text-blue hover:text-blue/80"
                 >
-                  {selectedMaterias.length === materias.length ? 'Deseleccionar todas' : 'Seleccionar todas'}
+                  {selectedMaterias.length === materiasFiltradas.length ? 'Deseleccionar todas' : 'Seleccionar todas'}
                 </button>
                 <span className="text-sm text-gray-600 dark:text-gray-400">
-                  {selectedMaterias.length} de {materias.length} seleccionadas
+                  {selectedMaterias.length} de {materiasFiltradas.length} seleccionadas
                 </span>
               </div>
               <div className="flex items-center gap-2">
@@ -498,7 +669,7 @@ const GestionMaterias = () => {
           )}
 
           {/* Botón para activar selección múltiple */}
-          {!isSelecting && materias.length > 0 && (
+          {!isSelecting && materiasFiltradas.length > 0 && (
             <div className="mb-4">
               <button
                 onClick={() => setIsSelecting(true)}
@@ -510,7 +681,7 @@ const GestionMaterias = () => {
           )}
 
           <div className="space-y-4">
-            {materias.map((materia) => {
+            {materiasFiltradas.map((materia) => {
               const estado = (materia.estado || 'Pendiente').toString().trim();
               let estadoClass = 'bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-white';
 
@@ -544,9 +715,14 @@ const GestionMaterias = () => {
                       />
                     )}
                     <div className="flex-1">
-                    <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                      {materia.nombre}
-                    </h3>
+                      <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                        {materia.nombre}
+                      </h3>
+                      <div className="mb-2">
+                        <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-800">
+                          {materia.nivelNombre || 'Sin nivel asignado'}
+                        </span>
+                      </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-gray-600 dark:text-gray-400">
                       {materia.fechaInicio && (
                         <div className="flex items-center">
@@ -597,13 +773,21 @@ const GestionMaterias = () => {
             })}
           </div>
 
-          {materias.length === 0 && (
+          {materias.length === 0 ? (
             <div className="text-center py-12">
               <CalendarIcon className="w-16 h-16 text-gray-400 mx-auto mb-4" />
               <p className="text-gray-600 dark:text-gray-400">
                 No hay materias registradas para este alumno.
               </p>
             </div>
+          ) : (
+            materiasFiltradas.length === 0 && (
+              <div className="text-center py-10">
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  No hay materias en el nivel seleccionado.
+                </p>
+              </div>
+            )
           )}
         </div>
       </div>
@@ -633,6 +817,44 @@ const GestionMaterias = () => {
                         {materia}
                       </option>
                     ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Nivel asociado
+                  </label>
+                  <select
+                    value={formData.nivelId || ''}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      if (!value) {
+                        setFormData({
+                          ...formData,
+                          nivelId: '',
+                          nivelNombre: nivelActivo?.nombre || ''
+                        });
+                        return;
+                      }
+                      const seleccionado = nivelesOpciones.find((nivel) => nivel.id === value);
+                      setFormData({
+                        ...formData,
+                        nivelId: seleccionado?.id || '',
+                        nivelNombre: seleccionado?.nombre || ''
+                      });
+                    }}
+                    className="w-full px-4 py-2.5 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue"
+                  >
+                    <option value="">
+                      {nivelActivo?.nombre ? `Nivel actual: ${nivelActivo.nombre}` : 'Sin nivel específico'}
+                    </option>
+                    {nivelesOpciones
+                      .filter((nivel) => nivel.id)
+                      .map((nivel) => (
+                        <option key={nivel.id} value={nivel.id}>
+                          {nivel.estado === 'activo' ? 'Activo: ' : 'Histórico: '}
+                          {nivel.nombre}
+                        </option>
+                      ))}
                   </select>
                 </div>
 
@@ -738,6 +960,34 @@ const GestionMaterias = () => {
                 <p className="text-xs text-gray-500 dark:text-gray-500 mt-2">
                   Formatos de fecha aceptados: DD/MM/YYYY, MM/DD/YYYY, YYYY-MM-DD
                 </p>
+              </div>
+
+              <div className="mb-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Asignar al nivel
+                  </label>
+                  <select
+                    value={bulkNivelId || ''}
+                    onChange={(e) => setBulkNivelId(e.target.value)}
+                    className="w-full px-4 py-2.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue"
+                  >
+                    <option value="">
+                      {nivelActivo?.nombre ? `Nivel actual: ${nivelActivo.nombre}` : 'Sin nivel específico'}
+                    </option>
+                    {nivelesOpciones
+                      .filter((nivel) => nivel.id)
+                      .map((nivel) => (
+                        <option key={nivel.id} value={nivel.id}>
+                          {nivel.estado === 'activo' ? 'Activo: ' : 'Histórico: '}
+                          {nivel.nombre}
+                        </option>
+                      ))}
+                  </select>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                    Se asignarán al nivel: <strong>{nivelBulkSeleccionado?.nombre || 'Sin nivel específico'}</strong>
+                  </p>
+                </div>
               </div>
 
               <div className="mb-4">
