@@ -130,6 +130,8 @@ const GestionCalificaciones = () => {
     );
   }, [bulkNivelId, nivelesOpciones, nivelesHistorial, nivelActivo]);
 
+  const normalizarTexto = (valor) => (valor || '').toString().trim().toLowerCase();
+
   const formatearValorCalificacion = (valor) => {
     const numero = Number(valor);
     if (Number.isNaN(numero)) {
@@ -153,6 +155,114 @@ const GestionCalificaciones = () => {
     if (numero >= 80) return 'text-blue';
     if (numero >= 70) return 'text-yellow';
     return 'text-red';
+  };
+
+  const obtenerFechaFinMateria = (materia) => {
+    if (!materia?.fechaFin) {
+      return null;
+    }
+    if (typeof materia.fechaFin.toDate === 'function') {
+      return materia.fechaFin.toDate();
+    }
+    if (materia.fechaFin instanceof Date) {
+      return materia.fechaFin;
+    }
+    const fecha = new Date(materia.fechaFin);
+    return Number.isNaN(fecha.getTime()) ? null : fecha;
+  };
+
+  const determinarEstadoMateria = (materia, calificacionValor) => {
+    const numero = Number(calificacionValor);
+    if (Number.isNaN(numero)) {
+      return null;
+    }
+    const fechaFin = obtenerFechaFinMateria(materia);
+    const haPasadoFechaFin = fechaFin ? fechaFin.getTime() < Date.now() : false;
+
+    if (haPasadoFechaFin && numero < 10) {
+      return 'Con atraso';
+    }
+    if (numero === 0) {
+      return 'Pendiente';
+    }
+    if (numero === 1) {
+      return 'En curso';
+    }
+    if (numero >= 10) {
+      return 'Completada';
+    }
+    return 'En curso';
+  };
+
+  const actualizarEstadoMateriaPorCalificacion = async ({ materiaNombre, calificacionValor, nivelId, nivelNombre }) => {
+    if (!materiaNombre) {
+      return;
+    }
+
+    try {
+      const materiasRef = collection(db, 'materias');
+      const materiasQuery = query(materiasRef, where('alumnoId', '==', id));
+      const materiasSnapshot = await getDocs(materiasQuery);
+
+      if (materiasSnapshot.empty) {
+        return;
+      }
+
+      const nombreNormalizado = normalizarTexto(materiaNombre);
+      const nivelIdObjetivo = nivelId || null;
+      const nivelNombreNormalizado = normalizarTexto(nivelNombre);
+
+      const materiasRelacionadas = materiasSnapshot.docs
+        .map((materiaDoc) => ({ id: materiaDoc.id, ...materiaDoc.data() }))
+        .filter((materia) => {
+          const coincideNombre = normalizarTexto(materia.nombre) === nombreNormalizado;
+          if (!coincideNombre) {
+            return false;
+          }
+
+          const materiaNivelId = materia.nivelId || materia.nivelActualId || null;
+          if (nivelIdObjetivo && materiaNivelId) {
+            return materiaNivelId === nivelIdObjetivo;
+          }
+          if (nivelIdObjetivo && !materiaNivelId) {
+            return false;
+          }
+
+          const materiaNivelNombre = normalizarTexto(materia.nivelNombre || materia.nivel);
+          if (nivelNombreNormalizado && materiaNivelNombre) {
+            return materiaNivelNombre === nivelNombreNormalizado;
+          }
+
+          if (nivelNombreNormalizado && !materiaNivelNombre) {
+            return false;
+          }
+
+          return true;
+        });
+
+      if (!materiasRelacionadas.length) {
+        return;
+      }
+
+      await Promise.all(
+        materiasRelacionadas.map(async (materia) => {
+          const nuevoEstado = determinarEstadoMateria(materia, calificacionValor);
+          if (!nuevoEstado || nuevoEstado === materia.estado) {
+            return;
+          }
+          try {
+            await updateDoc(doc(db, 'materias', materia.id), {
+              estado: nuevoEstado,
+              fechaActualizacion: serverTimestamp()
+            });
+          } catch (updateError) {
+            console.error('Error al actualizar estado de materia:', updateError);
+          }
+        })
+      );
+    } catch (error) {
+      console.error('Error al sincronizar estado de materia con calificación:', error);
+    }
   };
 
   useEffect(() => {
@@ -233,6 +343,13 @@ const GestionCalificaciones = () => {
           fechaCreacion: serverTimestamp()
         });
       }
+
+      await actualizarEstadoMateriaPorCalificacion({
+        materiaNombre: calificacionData.materia,
+        calificacionValor: calificacionData.calificacion,
+        nivelId: nivelIdFinal,
+        nivelNombre: nivelNombreFinal
+      });
 
       // Recargar calificaciones
       const calificacionesQuery = query(
@@ -446,6 +563,17 @@ const GestionCalificaciones = () => {
       });
 
       await batch.commit();
+
+      await Promise.all(
+        bulkPreview.map((calificacion) =>
+          actualizarEstadoMateriaPorCalificacion({
+            materiaNombre: calificacion.materia,
+            calificacionValor: calificacion.calificacion,
+            nivelId: nivelBulkId,
+            nivelNombre: nivelBulkNombre
+          })
+        )
+      );
 
       // Recargar calificaciones
       const calificacionesQuery = query(
