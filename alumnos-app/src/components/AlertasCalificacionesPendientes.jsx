@@ -9,9 +9,11 @@ const AlertasCalificacionesPendientes = () => {
   const { userData } = useAuth();
   const [pendientes, setPendientes] = useState([]);
   const [loading, setLoading] = useState(true);
+  const rolesPermitidos = ['admin', 'directivo', 'catedratico'];
+  const tieneAcceso = userData?.rol ? rolesPermitidos.includes(userData.rol) : false;
 
   useEffect(() => {
-    if (!userData || userData.rol !== 'admin') {
+    if (!tieneAcceso) {
       setLoading(false);
       return;
     }
@@ -41,7 +43,7 @@ const AlertasCalificacionesPendientes = () => {
       activo = false;
       clearInterval(interval);
     };
-  }, [userData]);
+  }, [tieneAcceso]);
 
   if (loading) {
     return (
@@ -51,7 +53,7 @@ const AlertasCalificacionesPendientes = () => {
     );
   }
 
-  if (!userData || userData.rol !== 'admin' || pendientes.length === 0) {
+  if (!tieneAcceso || pendientes.length === 0) {
     return null;
   }
 

@@ -13,6 +13,12 @@ service cloud.firestore {
       return request.auth != null && 
              exists(/databases/$(database)/documents/directivos/$(request.auth.uid));
     }
+
+    // Función helper para verificar si el usuario es catedrático
+    function isCatedratico() {
+      return request.auth != null &&
+             exists(/databases/$(database)/documents/catedraticos/$(request.auth.uid));
+    }
     
     // Función helper para verificar si el usuario es grupos
     function isGrupos() {
@@ -25,12 +31,13 @@ service cloud.firestore {
     function canReadAlumno(alumnoId) {
       return isAdmin() || 
              isDirectivo() || 
+             isCatedratico() ||
              (isGrupos() && alumnoId in get(/databases/$(database)/documents/grupos/$(request.auth.uid)).data.alumnosAsignados);
     }
     
-    // Función helper para verificar si el usuario es admin o directivo (lectura completa)
+    // Función helper para verificar si el usuario es admin, directivo o catedrático (lectura completa)
     function canReadAdmin() {
-      return isAdmin() || isDirectivo();
+      return isAdmin() || isDirectivo() || isCatedratico();
     }
     
     // Función helper para verificar si es el propio alumno
@@ -51,7 +58,9 @@ service cloud.firestore {
     match /admins/{adminId} {
       // Cualquier usuario autenticado puede leer SU PROPIO documento
       // Esto es necesario para que el sistema pueda verificar si es admin
-      allow read: if request.auth != null && request.auth.uid == adminId;
+      allow get: if request.auth != null && (request.auth.uid == adminId || isAdmin());
+      // Permitir listar todos los administradores únicamente a otros administradores
+      allow list: if isAdmin();
       // Solo desde Admin SDK o consola
       allow write: if false;
     }
@@ -63,6 +72,17 @@ service cloud.firestore {
       allow read: if (request.auth != null && request.auth.uid == directivoId) || isAdmin();
       // Creación: el propio directivo (cuando se registra) o un administrador
       allow create: if request.auth != null && (request.auth.uid == directivoId || isAdmin());
+      // Actualización y eliminación solo por administradores
+      allow update, delete: if isAdmin();
+    }
+
+    // Colección: catedraticos
+    // Permite que un usuario autenticado lea su propio documento de catedrático
+    match /catedraticos/{catedraticoId} {
+      // Lectura: su propio documento o por administradores
+      allow read: if (request.auth != null && request.auth.uid == catedraticoId) || isAdmin();
+      // Creación: el propio catedrático (cuando se registra) o un administrador
+      allow create: if request.auth != null && (request.auth.uid == catedraticoId || isAdmin());
       // Actualización y eliminación solo por administradores
       allow update, delete: if isAdmin();
     }
