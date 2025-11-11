@@ -6,6 +6,7 @@ import { db } from '../../config/firebase';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import { useNotifications } from '../../contexts/NotificationContext';
 import useCanEdit from '../../hooks/useCanEdit';
+import { useAuth } from '../../contexts/AuthContext';
 
 const rolesConfiguracion = [
   {
@@ -55,20 +56,27 @@ const UsuariosAdministrativos = () => {
   const [usuarios, setUsuarios] = useState({ admins: [], directivos: [], catedraticos: [] });
   const [loading, setLoading] = useState(true);
   const [busqueda, setBusqueda] = useState('');
+  const [error, setError] = useState('');
   const { success, prompt: showPrompt } = useNotifications();
   const navigate = useNavigate();
   const canEdit = useCanEdit();
+  const { loading: authLoading, userData } = useAuth();
 
   useEffect(() => {
-    if (!canEdit) {
+    if (!authLoading && (!canEdit || userData?.rol !== 'admin')) {
       navigate('/admin');
     }
-  }, [canEdit, navigate]);
+  }, [authLoading, canEdit, userData, navigate]);
 
   useEffect(() => {
+    if (authLoading || !canEdit || userData?.rol !== 'admin') {
+      return;
+    }
+
     let activo = true;
     const cargarUsuarios = async () => {
       setLoading(true);
+      setError('');
       try {
         const resultados = {};
 
@@ -94,6 +102,10 @@ const UsuariosAdministrativos = () => {
         }
       } catch (error) {
         console.error('Error al cargar usuarios administrativos:', error);
+        if (activo) {
+          setError('No fue posible cargar los usuarios administrativos. Verifica los permisos de lectura de Firestore.');
+          setUsuarios({ admins: [], directivos: [], catedraticos: [] });
+        }
       } finally {
         if (activo) {
           setLoading(false);
@@ -106,7 +118,7 @@ const UsuariosAdministrativos = () => {
     return () => {
       activo = false;
     };
-  }, []);
+  }, [authLoading, canEdit, userData]);
 
   const handleCopyToClipboard = async (texto, tipo = '') => {
     if (!texto) {
@@ -148,7 +160,7 @@ const UsuariosAdministrativos = () => {
     });
   };
 
-  if (!canEdit) {
+  if (!canEdit || userData?.rol !== 'admin') {
     return null;
   }
 
@@ -156,6 +168,27 @@ const UsuariosAdministrativos = () => {
     return (
       <div className="flex items-center justify-center h-64">
         <LoadingSpinner size="lg" variant="montessori" message="Cargando usuarios..." />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="space-y-6 sm:space-y-8 animate-fade-in">
+        <div className="flex items-center justify-between">
+          <div>
+            <Link to="/admin" className="inline-flex items-center text-blue hover:text-blue/80 text-sm mb-3">
+              <ArrowLeftIcon className="w-4 h-4 mr-1" />
+              Volver al panel
+            </Link>
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
+              Usuarios Administrativos
+            </h1>
+            <p className="mt-2 text-sm text-red font-semibold">
+              {error}
+            </p>
+          </div>
+        </div>
       </div>
     );
   }
