@@ -34,6 +34,7 @@ const GestionGrupos = lazy(() => import('./pages/Admin/GestionGrupos'));
 const GestionNiveles = lazy(() => import('./pages/Admin/GestionNiveles'));
 const GestionPagos = lazy(() => import('./pages/Admin/GestionPagos'));
 const Pagos = lazy(() => import('./pages/Pagos'));
+const UsuariosAdministrativos = lazy(() => import('./pages/Admin/UsuariosAdministrativos'));
 
 // Componente para redirigir según el rol
 const DashboardRedirect = () => {
@@ -208,6 +209,18 @@ function App() {
                 <AdminLayout>
                   <Suspense fallback={<LoadingSpinner fullScreen size="xl" variant="montessori" message="Cargando..." />}>
                     <DiagnosticoCodigos />
+                  </Suspense>
+                </AdminLayout>
+              </AdminRoute>
+            }
+          />
+          <Route
+            path="/admin/usuarios-administrativos"
+            element={
+              <AdminRoute allowedRoles={['admin']}>
+                <AdminLayout>
+                  <Suspense fallback={<LoadingSpinner fullScreen size="xl" variant="montessori" message="Cargando..." />}>
+                    <UsuariosAdministrativos />
                   </Suspense>
                 </AdminLayout>
               </AdminRoute>

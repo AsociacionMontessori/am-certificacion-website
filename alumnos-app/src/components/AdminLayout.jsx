@@ -12,7 +12,8 @@ import {
   WrenchScrewdriverIcon,
   ArrowRightOnRectangleIcon,
   SunIcon,
-  MoonIcon
+  MoonIcon,
+  IdentificationIcon
 } from '@heroicons/react/24/outline';
 
 const AdminLayout = ({ children }) => {
@@ -31,6 +32,7 @@ const AdminLayout = ({ children }) => {
   ];
 
   const herramientasAvanzadas = canEdit ? [
+    { name: 'Usuarios Administrativos', href: '/admin/usuarios-administrativos', icon: IdentificationIcon },
     { name: 'Regenerar Códigos', href: '/admin/regenerar-codigos', icon: ArrowPathIcon },
     { name: 'Diagnóstico', href: '/admin/diagnostico-codigos', icon: DocumentTextIcon },
   ] : [];
