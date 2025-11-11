@@ -15,6 +15,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { Link } from 'react-router-dom';
 import AlertasMateriasProximas from '../../components/AlertasMateriasProximas';
+import AlertasCalificacionesPendientes from '../../components/AlertasCalificacionesPendientes';
 import useCanEdit from '../../hooks/useCanEdit';
 import { useAuth } from '../../contexts/AuthContext';
 import { obtenerNiveles } from '../../services/nivelesService';
@@ -228,7 +229,8 @@ const AdminDashboard = () => {
 
   return (
     <div className="space-y-6 sm:space-y-8 animate-fade-in">
-      {/* Alertas de Materias Próximas */}
+      {/* Alertas de Materias Pendientes y Próximas */}
+      <AlertasCalificacionesPendientes />
       <AlertasMateriasProximas />
 
       {/* Header */}

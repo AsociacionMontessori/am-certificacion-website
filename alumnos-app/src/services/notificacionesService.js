@@ -7,6 +7,8 @@ import {
 } from 'firebase/firestore';
 import { db } from '../config/firebase';
 
+const normalizarTexto = (valor) => (valor || '').toString().trim().toLowerCase();
+
 /**
  * Obtiene todas las materias que inician en 7 días o menos
  * @returns {Promise<Array>} Array de materias próximas con información del alumno
@@ -77,6 +79,110 @@ export const getMateriasProximas = async () => {
     return materiasProximas;
   } catch (error) {
     console.error('Error al obtener materias próximas:', error);
+    return [];
+  }
+};
+
+export const getMateriasPendientesCalificar = async () => {
+  try {
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0);
+
+    const materiasSnapshot = await getDocs(collection(db, 'materias'));
+    const calificacionesSnapshot = await getDocs(collection(db, 'calificaciones'));
+
+    const calificacionesMap = new Map();
+    calificacionesSnapshot.forEach((docSnap) => {
+      const data = docSnap.data();
+      const clave = `${data.alumnoId || ''}__${normalizarTexto(data.materia)}`;
+      if (!calificacionesMap.has(clave)) {
+        calificacionesMap.set(clave, []);
+      }
+      calificacionesMap.get(clave).push({ ...data, id: docSnap.id });
+    });
+
+    const alumnosCache = new Map();
+    const pendientes = [];
+
+    const obtenerAlumno = async (alumnoId) => {
+      if (!alumnoId) {
+        return null;
+      }
+      if (alumnosCache.has(alumnoId)) {
+        return alumnosCache.get(alumnoId);
+      }
+      try {
+        const alumnoDoc = await getDoc(doc(db, 'alumnos', alumnoId));
+        if (alumnoDoc.exists()) {
+          const alumnoData = { id: alumnoDoc.id, ...alumnoDoc.data() };
+          alumnosCache.set(alumnoId, alumnoData);
+          return alumnoData;
+        }
+      } catch (error) {
+        console.warn('Error al obtener datos del alumno:', error);
+      }
+      alumnosCache.set(alumnoId, null);
+      return null;
+    };
+
+    for (const materiaDoc of materiasSnapshot.docs) {
+      const materiaData = { id: materiaDoc.id, ...materiaDoc.data() };
+
+      let fechaFin = null;
+      if (materiaData.fechaFin) {
+        if (typeof materiaData.fechaFin.toDate === 'function') {
+          fechaFin = materiaData.fechaFin.toDate();
+        } else if (materiaData.fechaFin instanceof Date) {
+          fechaFin = materiaData.fechaFin;
+        } else if (materiaData.fechaFin.seconds) {
+          fechaFin = new Date(materiaData.fechaFin.seconds * 1000);
+        } else {
+          const parsed = new Date(materiaData.fechaFin);
+          if (!Number.isNaN(parsed.getTime())) {
+            fechaFin = parsed;
+          }
+        }
+      }
+
+      if (!fechaFin || fechaFin >= hoy) {
+        continue;
+      }
+
+      const claveCalificacion = `${materiaData.alumnoId || ''}__${normalizarTexto(materiaData.nombre)}`;
+      const calificacionesAsociadas = calificacionesMap.get(claveCalificacion) || [];
+      const calificacionNumerica = calificacionesAsociadas.reduce((max, item) => {
+        const numero = Number(item.calificacion);
+        if (Number.isNaN(numero)) {
+          return max;
+        }
+        return Math.max(max, numero);
+      }, Number.NEGATIVE_INFINITY);
+
+      const tieneCalificacion = calificacionesAsociadas.length > 0;
+      const calificacionMenorDiez = !tieneCalificacion || calificacionNumerica < 10;
+      const estadoCompletado = materiaData.estado === 'Completada';
+
+      if (!calificacionMenorDiez || estadoCompletado) {
+        continue;
+      }
+
+      const alumnoData = await obtenerAlumno(materiaData.alumnoId);
+      const diasAtraso = Math.max(1, Math.ceil((hoy - fechaFin) / (1000 * 60 * 60 * 24)));
+
+      pendientes.push({
+        materia: materiaData,
+        alumno: alumnoData,
+        diasAtraso,
+        calificacion: tieneCalificacion && Number.isFinite(calificacionNumerica) ? calificacionNumerica : null,
+        fechaFin
+      });
+    }
+
+    pendientes.sort((a, b) => b.diasAtraso - a.diasAtraso);
+
+    return pendientes;
+  } catch (error) {
+    console.error('Error al obtener materias pendientes de calificar:', error);
     return [];
   }
 };
