@@ -418,7 +418,21 @@ const AlumnoDetail = () => {
           <dl className="space-y-3">
             <div>
               <dt className="text-sm font-medium text-gray-500">Nombre completo</dt>
-              <dd className="text-sm text-gray-900 dark:text-white mt-1">{alumno.nombre}</dd>
+              <dd className="text-sm text-gray-900 dark:text-white mt-1">
+                <div className="flex items-center gap-2">
+                  <span className="truncate">{alumno.nombre}</span>
+                  {!!alumno?.nombre && (
+                    <button
+                      type="button"
+                      onClick={() => handleCopyToClipboard(alumno.nombre, 'Nombre')}
+                      className="p-1.5 rounded-md bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                      title="Copiar nombre"
+                    >
+                      <ClipboardDocumentIcon className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
+              </dd>
             </div>
             <div>
               <dt className="text-sm font-medium text-gray-500">Matrícula</dt>
@@ -446,7 +460,21 @@ const AlumnoDetail = () => {
                   required
                 />
               ) : (
-                <dd className="text-sm text-gray-900 dark:text-white mt-1">{alumno.email}</dd>
+                <dd className="text-sm text-gray-900 dark:text-white mt-1">
+                  <div className="flex items-center gap-2">
+                    <span className="truncate">{alumno.email}</span>
+                    {!!alumno?.email && (
+                      <button
+                        type="button"
+                        onClick={() => handleCopyToClipboard(alumno.email, 'Email')}
+                        className="p-1.5 rounded-md bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                        title="Copiar email"
+                      >
+                        <ClipboardDocumentIcon className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
+                </dd>
               )}
             </div>
             <div>
