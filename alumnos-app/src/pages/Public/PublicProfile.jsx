@@ -9,6 +9,20 @@ import { getNivelActivo } from '../../utils/alumnos';
 import { getEstadoBadgeClasses } from '../../utils/estadoBadgeClasses';
 import { useNotifications } from '../../contexts/NotificationContext';
 
+const formatearCalificacionPublica = (valor) => {
+  const numero = Number(valor);
+  if (Number.isNaN(numero)) {
+    return 'N/A';
+  }
+  if (numero === 0) {
+    return 'Por cursar';
+  }
+  if (numero === 1) {
+    return 'Cursando';
+  }
+  return numero;
+};
+
 const PublicProfile = () => {
   const { id } = useParams();
   const { success, prompt: showPrompt } = useNotifications();
@@ -736,7 +750,9 @@ const PublicProfile = () => {
                             <h3 className="text-base font-semibold text-gray-900 dark:text-white truncate">{c.materia || 'Materia'}</h3>
                           </div>
                           <div className="sm:ml-4 flex-shrink-0">
-                            <span className="text-xl font-bold text-gray-900 dark:text-white">{c.calificacion ?? 'N/A'}</span>
+                            <span className="text-xl font-bold text-gray-900 dark:text-white">
+                              {formatearCalificacionPublica(c.calificacion)}
+                            </span>
                           </div>
                         </div>
                       </div>
@@ -768,7 +784,7 @@ const PublicProfile = () => {
                                 )}
                               </div>
                               <span className="text-sm font-semibold text-gray-700 dark:text-gray-200">
-                                {c.calificacion ?? 'N/A'}
+                                {formatearCalificacionPublica(c.calificacion)}
                               </span>
                             </li>
                           ))}

@@ -130,6 +130,31 @@ const GestionCalificaciones = () => {
     );
   }, [bulkNivelId, nivelesOpciones, nivelesHistorial, nivelActivo]);
 
+  const formatearValorCalificacion = (valor) => {
+    const numero = Number(valor);
+    if (Number.isNaN(numero)) {
+      return 'N/A';
+    }
+    if (numero === 0) {
+      return 'Por cursar';
+    }
+    if (numero === 1) {
+      return 'Cursando';
+    }
+    return numero;
+  };
+
+  const obtenerColorCalificacion = (calificacion) => {
+    const numero = Number(calificacion);
+    if (Number.isNaN(numero)) return 'text-gray-500';
+    if (numero === 0) return 'text-gray-500';
+    if (numero === 1) return 'text-blue';
+    if (numero >= 90) return 'text-green';
+    if (numero >= 80) return 'text-blue';
+    if (numero >= 70) return 'text-yellow';
+    return 'text-red';
+  };
+
   useEffect(() => {
     const loadData = async () => {
       try {
@@ -451,13 +476,6 @@ const GestionCalificaciones = () => {
     }
   };
 
-  const obtenerColorCalificacion = (calificacion) => {
-    if (calificacion >= 90) return 'text-green';
-    if (calificacion >= 80) return 'text-blue';
-    if (calificacion >= 70) return 'text-yellow';
-    return 'text-red';
-  };
-
   const materiasDisponibles = useMemo(() => {
     const referencia = formData.nivelNombre || nivelActivo?.nombre || alumno?.nivel || '';
     if (!referencia) {
@@ -649,7 +667,7 @@ const GestionCalificaciones = () => {
                               {calificacion.materia}
                             </h3>
                             <span className={`text-xl sm:text-2xl font-bold ${obtenerColorCalificacion(calificacion.calificacion)}`}>
-                              {calificacion.calificacion || 'N/A'}
+                              {formatearValorCalificacion(calificacion.calificacion)}
                             </span>
                           </div>
                           <div className="mt-1">
@@ -889,7 +907,7 @@ const GestionCalificaciones = () => {
                           <tr key={index}>
                             <td className="px-3 py-2 text-gray-900 dark:text-white">{calificacion.materia}</td>
                             <td className={`px-3 py-2 font-bold ${obtenerColorCalificacion(calificacion.calificacion)}`}>
-                              {calificacion.calificacion}
+                              {formatearValorCalificacion(calificacion.calificacion)}
                             </td>
                           </tr>
                         ))}
