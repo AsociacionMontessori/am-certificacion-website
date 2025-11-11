@@ -59,7 +59,7 @@ const AdminDashboard = () => {
           });
           alumnosData = (await Promise.all(alumnosPromises)).filter(a => a !== null);
         } else {
-          // Admin y directivo cargan todos los alumnos
+          // Admin, directivo y catedrático cargan todos los alumnos
           const alumnosQuery = query(
             collection(db, 'alumnos'),
             orderBy('nombre', 'asc')

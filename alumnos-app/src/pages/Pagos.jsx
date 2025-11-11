@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Navigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useNotifications } from '../contexts/NotificationContext';
 import { 
@@ -28,7 +29,7 @@ import {
 } from '@heroicons/react/24/outline';
 
 const Pagos = () => {
-  const { currentUser } = useAuth();
+  const { currentUser, userData } = useAuth();
   const { success, error: showError } = useNotifications();
   const [pagos, setPagos] = useState([]);
   const [becas, setBecas] = useState([]);
@@ -38,6 +39,7 @@ const Pagos = () => {
   const [selectedPago, setSelectedPago] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [archivoComprobante, setArchivoComprobante] = useState(null);
+  const debeRedirigir = userData?.rol && userData.rol !== 'alumno';
 
   useEffect(() => {
     const loadData = async () => {
@@ -156,6 +158,10 @@ const Pagos = () => {
     }
     return { texto: 'Pendiente', color: 'text-blue', bg: 'bg-blue/10', icon: ClockIcon };
   };
+
+  if (debeRedirigir) {
+    return <Navigate to="/admin" replace />;
+  }
 
   if (loading) {
     return (

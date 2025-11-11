@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { crearUsuarioAlumno, crearUsuarioAdmin, crearUsuarioDirectivo, crearUsuarioGrupos } from '../../services/adminService';
+import { crearUsuarioAlumno, crearUsuarioAdmin, crearUsuarioDirectivo, crearUsuarioGrupos, crearUsuarioCatedratico } from '../../services/adminService';
 import { UserPlusIcon, ArrowLeftIcon, Cog6ToothIcon } from '@heroicons/react/24/outline';
 import useCanEdit from '../../hooks/useCanEdit';
 import { obtenerNiveles } from '../../services/nivelesService';
@@ -151,6 +151,12 @@ const CrearUsuario = () => {
           email: formData.email,
           password: formData.password,
         });
+      } else if (formData.rol === 'catedratico') {
+        resultado = await crearUsuarioCatedratico({
+          nombre: formData.nombreCompleto,
+          email: formData.email,
+          password: formData.password,
+        });
       } else if (formData.rol === 'grupos') {
         resultado = await crearUsuarioGrupos({
           nombre: formData.nombreCompleto,
@@ -188,7 +194,7 @@ const CrearUsuario = () => {
               ? 'El alumno ha sido registrado correctamente. Actualmente estás logueado como el nuevo usuario.'
               : formData.rol === 'grupos'
               ? 'El usuario de grupos ha sido registrado correctamente. Puedes asignarle alumnos desde la gestión de grupos.'
-              : `El ${formData.rol === 'admin' ? 'administrador' : 'directivo'} ha sido registrado correctamente.`
+              : `El ${formData.rol === 'admin' ? 'administrador' : formData.rol === 'directivo' ? 'directivo' : 'catedrático'} ha sido registrado correctamente.`
             }
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
@@ -257,6 +263,7 @@ const CrearUsuario = () => {
               >
                 <option value="alumno">Alumno</option>
                 <option value="directivo">Directivo</option>
+                <option value="catedratico">Catedrático</option>
                 <option value="admin">Administrador</option>
                 <option value="grupos">Grupos</option>
               </select>

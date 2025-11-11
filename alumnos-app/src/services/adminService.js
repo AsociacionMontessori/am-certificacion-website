@@ -222,6 +222,46 @@ export const crearUsuarioDirectivo = async (datosDirectivo) => {
 };
 
 /**
+ * Crea un nuevo catedrático (solo lectura sin acceso a pagos)
+ */
+export const crearUsuarioCatedratico = async (datosCatedratico) => {
+  try {
+    const { email, password, nombre } = datosCatedratico;
+
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
+
+    if (nombre) {
+      await updateProfile(user, {
+        displayName: nombre
+      });
+    }
+
+    await setDoc(doc(db, 'catedraticos', user.uid), {
+      nombre: nombre || '',
+      email,
+      rol: 'catedratico',
+      fechaCreacion: serverTimestamp(),
+      activo: true
+    });
+
+    return {
+      success: true,
+      uid: user.uid,
+      email: user.email,
+      message: 'Catedrático creado exitosamente'
+    };
+  } catch (error) {
+    console.error('Error al crear catedrático:', error);
+    return {
+      success: false,
+      error: error.message,
+      code: error.code
+    };
+  }
+};
+
+/**
  * Crea un nuevo usuario de grupos
  * Los usuarios de grupos pueden ver solo los alumnos que les asigne el administrador
  */

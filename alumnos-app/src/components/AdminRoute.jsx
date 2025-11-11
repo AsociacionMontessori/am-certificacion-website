@@ -2,8 +2,10 @@ import { Navigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import LoadingSpinner from './LoadingSpinner';
 
-const AdminRoute = ({ children }) => {
+const AdminRoute = ({ children, allowedRoles }) => {
   const { currentUser, userData, loading } = useAuth();
+
+  const rolesPermitidos = allowedRoles || ['admin', 'directivo', 'grupos', 'catedratico'];
 
   if (loading) {
     return (
@@ -20,8 +22,7 @@ const AdminRoute = ({ children }) => {
     return <Navigate to="/login" replace />;
   }
 
-  // Permitir acceso a admin, directivo y grupos
-  if (userData?.rol !== 'admin' && userData?.rol !== 'directivo' && userData?.rol !== 'grupos') {
+  if (!rolesPermitidos.includes(userData?.rol)) {
     return <Navigate to="/" replace />;
   }
 

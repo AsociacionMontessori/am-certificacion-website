@@ -67,7 +67,7 @@ const DashboardRedirect = () => {
   }
   
   // Si el usuario es admin, directivo o grupos, redirigir al panel de administración
-  if (userData.rol === 'admin' || userData.rol === 'directivo' || userData.rol === 'grupos') {
+  if (userData.rol === 'admin' || userData.rol === 'directivo' || userData.rol === 'grupos' || userData.rol === 'catedratico') {
     return <Navigate to="/admin" replace />;
   }
   
@@ -276,7 +276,7 @@ function App() {
           <Route
             path="/admin/pagos"
             element={
-              <AdminRoute>
+              <AdminRoute allowedRoles={['admin', 'directivo', 'grupos']}>
                 <AdminLayout>
                   <Suspense fallback={<LoadingSpinner fullScreen size="xl" variant="montessori" message="Cargando..." />}>
                     <GestionPagos />

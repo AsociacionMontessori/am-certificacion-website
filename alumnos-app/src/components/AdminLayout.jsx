@@ -25,7 +25,7 @@ const AdminLayout = ({ children }) => {
     { name: 'Dashboard', href: '/admin', icon: HomeIcon },
     ...(canEdit ? [{ name: 'Crear Usuario', href: '/admin/crear-usuario', icon: UserGroupIcon }] : []),
     { name: 'Inscripciones', href: '/admin/inscripciones', icon: DocumentTextIcon },
-    { name: 'Pagos', href: '/admin/pagos', icon: CurrencyDollarIcon },
+    ...(userData?.rol !== 'catedratico' ? [{ name: 'Pagos', href: '/admin/pagos', icon: CurrencyDollarIcon }] : []),
     ...(canEdit ? [{ name: 'Gestión Grupos', href: '/admin/gestion-grupos', icon: UserGroupIcon }] : []),
     { name: 'Generador QR', href: '/admin/generador-qr', icon: QrCodeIcon },
   ];
@@ -126,7 +126,15 @@ const AdminLayout = ({ children }) => {
                     {userData.nombre || userData.email}
                   </p>
                   <p className="text-xs text-gray-500 dark:text-gray-400">
-                    {userData.rol === 'admin' ? 'Administrador' : userData.rol === 'directivo' ? 'Directivo' : userData.rol === 'grupos' ? 'Grupos' : 'Usuario'}
+                    {userData.rol === 'admin'
+                      ? 'Administrador'
+                      : userData.rol === 'directivo'
+                        ? 'Directivo'
+                        : userData.rol === 'catedratico'
+                          ? 'Catedrático'
+                          : userData.rol === 'grupos'
+                            ? 'Grupos'
+                            : 'Usuario'}
                   </p>
                 </div>
               )}

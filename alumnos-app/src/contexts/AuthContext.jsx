@@ -55,34 +55,47 @@ export const AuthProvider = ({ children }) => {
               };
               setUserData(userDataWithRole);
             } else {
-              // Si no es directivo, intentar como grupos
-              const gruposDoc = await getDoc(doc(db, 'grupos', user.uid));
-              
-              if (gruposDoc.exists()) {
-                const gruposData = gruposDoc.data();
-                const userDataWithRole = { 
-                  id: gruposDoc.id, 
-                  ...gruposData, 
-                  rol: 'grupos' 
+              // Si no es directivo, intentar como catedrático
+              const catedraticoDoc = await getDoc(doc(db, 'catedraticos', user.uid));
+
+              if (catedraticoDoc.exists()) {
+                const catedraticoData = catedraticoDoc.data();
+                const userDataWithRole = {
+                  id: catedraticoDoc.id,
+                  ...catedraticoData,
+                  rol: 'catedratico'
                 };
                 setUserData(userDataWithRole);
               } else {
-                // Si no es grupos, intentar como alumno
-                const alumnoDoc = await getDoc(doc(db, 'alumnos', user.uid));
+                // Si no es directivo, intentar como grupos
+                const gruposDoc = await getDoc(doc(db, 'grupos', user.uid));
                 
-                if (alumnoDoc.exists()) {
-                  const alumnoData = alumnoDoc.data();
+                if (gruposDoc.exists()) {
+                  const gruposData = gruposDoc.data();
                   const userDataWithRole = { 
-                    id: alumnoDoc.id, 
-                    ...alumnoData, 
-                    rol: 'alumno' 
+                    id: gruposDoc.id, 
+                    ...gruposData, 
+                    rol: 'grupos' 
                   };
                   setUserData(userDataWithRole);
                 } else {
-                  console.warn('⚠️ Usuario no encontrado en admins, directivos, grupos ni alumnos:', user.uid);
-                  console.warn('⚠️ Verifica que exista un documento en Firestore con ID =', user.uid);
-                  // Si no existe en ninguna colección, no establecer userData
-                  setUserData(null);
+                  // Si no es grupos, intentar como alumno
+                  const alumnoDoc = await getDoc(doc(db, 'alumnos', user.uid));
+                  
+                  if (alumnoDoc.exists()) {
+                    const alumnoData = alumnoDoc.data();
+                    const userDataWithRole = { 
+                      id: alumnoDoc.id, 
+                      ...alumnoData, 
+                      rol: 'alumno' 
+                    };
+                    setUserData(userDataWithRole);
+                  } else {
+                    console.warn('⚠️ Usuario no encontrado en admins, directivos, catedráticos, grupos ni alumnos:', user.uid);
+                    console.warn('⚠️ Verifica que exista un documento en Firestore con ID =', user.uid);
+                    // Si no existe en ninguna colección, no establecer userData
+                    setUserData(null);
+                  }
                 }
               }
             }
