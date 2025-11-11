@@ -611,6 +611,38 @@ const PublicProfile = () => {
                       ))}
                     </div>
                   )}
+
+                  {alumno.fechaGraduacion && (
+                    <div className="mt-6 p-4 bg-blue/5 dark:bg-blue/10 border border-blue/20 rounded-lg space-y-3">
+                      <div className="flex items-center justify-between flex-wrap gap-2">
+                        <div>
+                          <p className="text-sm font-semibold text-blue dark:text-blue/80">
+                            Certificado digital de graduación disponible
+                          </p>
+                          <p className="text-xs text-gray-600 dark:text-gray-300">
+                            Este documento corresponde al nivel ya concluido y mantiene el mismo folio y código de verificación.
+                          </p>
+                        </div>
+                        <div className="flex gap-2">
+                          <a
+                            href={`/certificado/${alumno.id}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center px-3 py-1.5 text-xs sm:text-sm font-medium text-white bg-blue rounded-lg hover:bg-blue/90 transition-colors"
+                          >
+                            Ver certificado
+                          </a>
+                          <button
+                            onClick={() => handleCopyToClipboard(`${window.location.origin}/certificado/${alumno.id}`, 'Enlace de certificado')}
+                            className="inline-flex items-center px-3 py-1.5 text-xs sm:text-sm font-medium text-blue bg-blue/10 rounded-lg hover:bg-blue/20 transition-colors"
+                            title="Copiar enlace"
+                          >
+                            Copiar enlace
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                   
                   <p className="text-justify mt-4">
                     Esta constancia se expide a solicitud del interesado(a) para los fines que estime convenientes.
