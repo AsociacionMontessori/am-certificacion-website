@@ -1,6 +1,7 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
+import { useIsIOS } from '../hooks/useIsIOS';
 import useCanEdit from '../hooks/useCanEdit';
 import { 
   HomeIcon, 
@@ -21,6 +22,7 @@ const AdminLayout = ({ children }) => {
   const { theme, toggleTheme } = useTheme();
   const location = useLocation();
   const canEdit = useCanEdit();
+  const isIOS = useIsIOS();
 
   const navigation = [
     { name: 'Dashboard', href: '/admin', icon: HomeIcon },
@@ -42,7 +44,7 @@ const AdminLayout = ({ children }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-16 md:pb-0">
+    <div className={`min-h-screen bg-gray-50 dark:bg-gray-900 ${isIOS ? 'pt-20 md:pt-0' : 'pb-16 md:pb-0'}`}>
       {/* Navbar Superior - Desktop */}
       <nav className="hidden md:block shadow-sm border-b border-gray-100 dark:border-gray-700 sticky top-0 z-50 backdrop-blur-sm bg-white/95 dark:bg-gray-800/95">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -205,15 +207,20 @@ const AdminLayout = ({ children }) => {
       </nav>
 
       {/* Main content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 pb-16 md:pb-8 animate-fade-in">
+      <main className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 ${isIOS ? 'md:pb-8' : 'pb-16 md:pb-8'} animate-fade-in`}>
         {children}
       </main>
 
       {/* Bottom Navigation - Mobile (Glassmorphism Style) */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50">
-        <div className="backdrop-blur-lg bg-blue/60 dark:bg-blue/40 border-t border-blue/30 shadow-lg shadow-[0_-8px_32px_rgba(0,151,178,0.3)] dark:shadow-[0_-8px_32px_rgba(0,151,178,0.2)]" style={{ backgroundColor: theme === 'dark' ? 'rgba(0, 151, 178, 0.4)' : 'rgba(0, 151, 178, 0.6)' }}>
-          {/* Efecto de brillo sutil en el borde superior */}
-          <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/50 to-transparent"></div>
+      {/* En iOS se posiciona en la parte superior para evitar conflicto con la barra de Safari */}
+      <nav className={`md:hidden ${isIOS ? 'sticky top-16 z-40' : 'fixed bottom-0 left-0 right-0 z-50'}`}>
+        <div className={`backdrop-blur-lg bg-blue/60 dark:bg-blue/40 shadow-lg ${
+          isIOS 
+            ? 'border-b border-blue/30 shadow-[0_8px_32px_rgba(0,151,178,0.3)] dark:shadow-[0_8px_32px_rgba(0,151,178,0.2)]' 
+            : 'border-t border-blue/30 shadow-[0_-8px_32px_rgba(0,151,178,0.3)] dark:shadow-[0_-8px_32px_rgba(0,151,178,0.2)]'
+        }`} style={{ backgroundColor: theme === 'dark' ? 'rgba(0, 151, 178, 0.4)' : 'rgba(0, 151, 178, 0.6)' }}>
+          {/* Efecto de brillo sutil en el borde */}
+          <div className={`absolute ${isIOS ? 'bottom-0' : 'top-0'} left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/50 to-transparent`}></div>
           <div className="px-2 py-1.5">
             <div className="flex justify-around items-center">
               {navigation.map((item) => {
