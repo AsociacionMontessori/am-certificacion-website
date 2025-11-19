@@ -117,7 +117,7 @@ const CertificadoDigital = () => {
             </div>
           </div>
 
-          {graduacion?.completa && (
+          {graduacion?.completa && alumno?.tieneMultiplesNiveles && (
             <div className="bg-blue/10 border-b border-blue/30 px-6 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 text-sm text-blue/90">
               <div>
                 {mostrarCertificado ? (

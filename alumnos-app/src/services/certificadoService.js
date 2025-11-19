@@ -172,6 +172,38 @@ export const obtenerCertificado = async (alumnoId) => {
     // Calcular promedio
     const promedio = await calcularPromedioFinal(alumnoId);
 
+    // Obtener historial de niveles del alumno
+    const historialNiveles = Array.isArray(alumnoData.niveles) ? alumnoData.niveles : [];
+    
+    // Determinar si el alumno tiene múltiples niveles
+    // Caso 1: Tiene más de un nivel en el historial
+    const tieneMultiplesNivelesHistorial = historialNiveles.length > 1;
+    
+    // Caso 2: Tiene un nivel completado en el historial y un nivel actual diferente
+    const nivelCompletado = historialNiveles.find(n => n.estado === 'completado');
+    const tieneNivelCompletadoYActual = nivelCompletado && 
+      alumnoData.nivelActualId && 
+      nivelCompletado.id !== alumnoData.nivelActualId &&
+      alumnoData.nivel &&
+      nivelCompletado.nombre !== alumnoData.nivel;
+    
+    // Caso 3: Está graduado y el nivel de graduación es diferente al nivel actual
+    const tieneNivelGraduacionDiferente = graduacionCompleta && 
+      nivelGraduacion && 
+      nivelActual && 
+      nivelGraduacion !== nivelActual;
+    
+    // Caso 4: Tiene un nivel completado en historial y un nivel activo actual (sin nivelActualId)
+    const tieneNivelCompletadoYActivoSinId = nivelCompletado && 
+      !alumnoData.nivelActualId && 
+      alumnoData.nivel && 
+      nivelCompletado.nombre !== alumnoData.nivel;
+    
+    const tieneMultiplesNiveles = tieneMultiplesNivelesHistorial || 
+      tieneNivelCompletadoYActual || 
+      tieneNivelGraduacionDiferente || 
+      tieneNivelCompletadoYActivoSinId;
+
     return {
       folio,
       codigoVerificacion,
@@ -198,7 +230,9 @@ export const obtenerCertificado = async (alumnoId) => {
         fechaEgresoEstimadaActual: fechaEgresoActual,
         estado: estadoParaDocumento,
         estadoActual,
-        fechaGraduacion
+        fechaGraduacion,
+        tieneMultiplesNiveles,
+        historialNiveles
       }
     };
   } catch (error) {
