@@ -81,6 +81,9 @@ const CertificadoDigital = () => {
     console.error('⚠️ No hay código de verificación disponible');
   }
 
+  // Generar URL de verificación (React Router maneja automáticamente la codificación)
+  // Nota: No usar encodeURIComponent aquí porque React Router ya maneja los parámetros
+  // Safari iOS puede tener problemas con parámetros, por eso normalizamos al recibirlos
   const urlVerificacion = codigoVerificacion 
     ? `${window.location.origin}/verificar/${folio}/${codigoVerificacion}`
     : `${window.location.origin}/verificar/${folio}/PENDIENTE`;
