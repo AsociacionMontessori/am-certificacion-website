@@ -1,6 +1,7 @@
 import { doc, getDoc, updateDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import { collection, query, where, getDocs } from 'firebase/firestore';
+import { getAuth } from 'firebase/auth';
 
 /**
  * Genera un hash simple compatible con navegador
@@ -123,14 +124,18 @@ export const obtenerCertificado = async (alumnoId) => {
       }
     }
     
-    // SIEMPRE guardar el código de verificación (asegurar que esté en la BD)
-    // Verificar si necesita guardar
+    // Solo intentar guardar si hay cambios y el usuario está autenticado
+    // Para usuarios no autenticados, simplemente usar los valores existentes o generados
     const necesitaGuardarFolio = !alumnoData.folioCertificado;
     const codigoActual = alumnoData.codigoVerificacion?.trim().toUpperCase();
     const codigoEsperado = codigoVerificacion.trim().toUpperCase();
     const necesitaGuardarCodigo = !alumnoData.codigoVerificacion || codigoActual !== codigoEsperado;
     
-    if (necesitaGuardarFolio || necesitaGuardarCodigo) {
+    // Verificar si hay usuario autenticado
+    const auth = getAuth();
+    const usuarioAutenticado = auth.currentUser != null;
+    
+    if ((necesitaGuardarFolio || necesitaGuardarCodigo) && usuarioAutenticado) {
       const updateData = {};
       if (necesitaGuardarFolio) {
         updateData.folioCertificado = folio;
@@ -141,18 +146,17 @@ export const obtenerCertificado = async (alumnoId) => {
         updateData.fechaActualizacionCodigo = serverTimestamp();
       }
       
-      // Guardar en Firestore
+      // Guardar en Firestore solo si el usuario está autenticado
       try {
         await updateDoc(doc(db, 'alumnos', alumnoId), updateData);
       } catch (error) {
-        console.error('❌ Error al guardar código de verificación:', error);
-        // Intentar con setDoc como fallback
-        try {
-          await setDoc(doc(db, 'alumnos', alumnoId), updateData, { merge: true });
-        } catch (setDocError) {
-          console.error('❌ Error al guardar con setDoc:', setDocError);
-        }
+        console.warn('⚠️ No se pudo guardar código de verificación (usuario no autenticado o sin permisos):', error);
+        // No es crítico si no se puede guardar para usuarios no autenticados
+        // Los valores generados se usarán para mostrar el certificado
       }
+    } else if (necesitaGuardarFolio || necesitaGuardarCodigo) {
+      // Si necesita guardar pero no hay usuario autenticado, solo loguear
+      console.warn('⚠️ Certificado necesita actualización pero el usuario no está autenticado. Usando valores generados.');
     }
 
     const graduacionDoc = await getDoc(doc(db, 'graduacion', alumnoId));

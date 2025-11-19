@@ -102,15 +102,16 @@ service cloud.firestore {
     match /alumnos/{alumnoId} {
       // El alumno puede leer/editar su propio documento
       // Admin puede leer y escribir, directivo puede leer todos, grupos solo los asignados
-      allow read: if isOwnAlumno(alumnoId) || canReadAdmin() || canReadAlumno(alumnoId);
-      allow write: if isOwnAlumno(alumnoId) || isAdmin();
+      // También permitir acceso público si tiene certificado válido (folio + código)
+      allow read: if isOwnAlumno(alumnoId) 
+                   || canReadAdmin() 
+                   || canReadAlumno(alumnoId)
+                   || (request.auth == null && 
+                       resource.data.folioCertificado != null && 
+                       resource.data.codigoVerificacion != null &&
+                       resource.data.estado != 'Inactivo');
       
-      // Permitir lectura pública SOLO para verificación de certificados
-      // Esto permite que cualquiera verifique un certificado usando folio y código
-      // Solo permite leer documentos que tienen folioCertificado y codigoVerificacion
-      allow get: if request.auth == null &&
-                    resource.data.folioCertificado != null &&
-                    resource.data.codigoVerificacion != null;
+      allow write: if isOwnAlumno(alumnoId) || isAdmin();
       
       // Permitir consultas (list) para verificación de certificados
       // Esto es necesario para la función verificarCertificado que usa where()
@@ -147,7 +148,11 @@ service cloud.firestore {
     match /graduacion/{alumnoId} {
       // El alumno solo puede leer su propia información
       // Admin y directivo pueden leer todas, grupos solo de alumnos asignados
-      allow read: if isOwnAlumno(alumnoId) || canReadAdmin() || canReadAlumno(alumnoId);
+      // También permitir acceso público si el alumno tiene certificado válido
+      allow read: if isOwnAlumno(alumnoId) 
+                   || canReadAdmin() 
+                   || canReadAlumno(alumnoId)
+                   || (request.auth == null && hasValidCertificate(alumnoId));
       // Solo admin puede escribir
       allow write: if isAdmin();
     }
