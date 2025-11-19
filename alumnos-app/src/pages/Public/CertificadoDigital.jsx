@@ -68,6 +68,14 @@ const CertificadoDigital = () => {
   const programaCertificado = graduacion?.programa || alumno.programa;
   const programaActual = alumno.programaActual || alumno.programa;
 
+  // Definir niveles de guía antes de usarlos
+  const nivelesGuia = new Set([
+    'Nido & Comunidad infantil',
+    'Casa de Niños',
+    'Taller'
+  ]);
+  const esNivelGuia = nivelesGuia.has(mostrarCertificado ? nivelCertificado : nivelActual);
+
   // Asegurar que el código esté presente antes de generar la URL
   if (!codigoVerificacion) {
     console.error('⚠️ No hay código de verificación disponible');
@@ -87,13 +95,6 @@ const CertificadoDigital = () => {
   const certificadoUrl = basePath;
   const descripcionProgramaCertificado = programaCertificado || (esNivelGuia ? `Guía Montessori` : 'Formación Montessori');
   const descripcionProgramaConstancia = programaActual || (esNivelGuia ? `Guía Montessori` : nivelActual || 'Certificación Montessori');
-
-  const nivelesGuia = new Set([
-    'Nido & Comunidad infantil',
-    'Casa de Niños',
-    'Taller'
-  ]);
-  const esNivelGuia = nivelesGuia.has(mostrarCertificado ? nivelCertificado : nivelActual);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8 px-4 sm:px-6 lg:px-8">
