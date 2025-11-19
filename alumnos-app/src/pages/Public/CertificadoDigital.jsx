@@ -17,18 +17,44 @@ const CertificadoDigital = () => {
 
   useEffect(() => {
     const loadCertificado = async () => {
+      // Log para debugging en Safari iOS
+      if (typeof window !== 'undefined') {
+        console.log('🔍 CertificadoDigital - Cargando certificado:', { 
+          id,
+          userAgent: navigator.userAgent,
+          url: window.location.href,
+          pathname: window.location.pathname
+        });
+      }
+
+      if (!id) {
+        console.error('❌ CertificadoDigital - No se proporcionó ID');
+        setLoading(false);
+        return;
+      }
+
       try {
         const data = await obtenerCertificado(id);
+        
+        if (!data) {
+          console.error('❌ CertificadoDigital - No se encontró certificado para ID:', id);
+        } else {
+          console.log('✅ CertificadoDigital - Certificado cargado exitosamente');
+        }
+        
         setCertificado(data);
       } catch (error) {
-        console.error('Error al cargar certificado:', error);
+        console.error('❌ CertificadoDigital - Error al cargar certificado:', error);
+        console.error('Detalles del error:', {
+          message: error.message,
+          code: error.code,
+          stack: error.stack
+        });
       }
       setLoading(false);
     };
 
-    if (id) {
-      loadCertificado();
-    }
+    loadCertificado();
   }, [id]);
 
   if (loading) {
