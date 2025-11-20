@@ -580,10 +580,10 @@ const PublicProfile = () => {
                                   </span>
                                 </td>
                                 <td className="px-2 sm:px-4 py-2 text-gray-700 dark:text-gray-300">
-                                  {item.fechaInicio ? formatearFechaLarga(item.fechaInicio) : '-'}
+                                  {item.fechaInicio ? formatearFechaLarga(item.fechaInicio) : 'Sin fecha'}
                                 </td>
                                 <td className="px-2 sm:px-4 py-2 text-gray-700 dark:text-gray-300">
-                                  {item.fechaFin ? formatearFechaLarga(item.fechaFin) : '-'}
+                                  {item.fechaFin ? formatearFechaLarga(item.fechaFin) : 'Sin fecha'}
                                 </td>
                               </tr>
                             ))}

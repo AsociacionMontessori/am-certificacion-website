@@ -724,18 +724,14 @@ const GestionMaterias = () => {
                         </span>
                       </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-gray-600 dark:text-gray-400">
-                      {materia.fechaInicio && (
-                        <div className="flex items-center">
-                          <CalendarIcon className="w-4 h-4 mr-2" />
-                          <span>Inicio: {formatearFechaLarga(materia.fechaInicio)}</span>
-                        </div>
-                      )}
-                      {materia.fechaFin && (
-                        <div className="flex items-center">
-                          <CalendarIcon className="w-4 h-4 mr-2" />
-                          <span>Fin: {formatearFechaLarga(materia.fechaFin)}</span>
-                        </div>
-                      )}
+                      <div className="flex items-center">
+                        <CalendarIcon className="w-4 h-4 mr-2 flex-shrink-0" />
+                        <span>Inicio: {materia.fechaInicio ? formatearFechaLarga(materia.fechaInicio) : 'Sin fecha'}</span>
+                      </div>
+                      <div className="flex items-center">
+                        <CalendarIcon className="w-4 h-4 mr-2 flex-shrink-0" />
+                        <span>Fin: {materia.fechaFin ? formatearFechaLarga(materia.fechaFin) : 'Sin fecha'}</span>
+                      </div>
                       {materia.aula && (
                         <div>Aula: {materia.aula}</div>
                       )}

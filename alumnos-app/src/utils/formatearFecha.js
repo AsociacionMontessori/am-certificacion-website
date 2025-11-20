@@ -1,9 +1,26 @@
 /**
+ * Verifica si una fecha es una fecha "por defecto" o "sin fecha" (1900-01-01)
+ * @param {Date} fechaObj - Objeto Date a verificar
+ * @returns {boolean} true si es fecha por defecto
+ */
+const esFechaPorDefecto = (fechaObj) => {
+  if (!fechaObj || isNaN(fechaObj.getTime())) {
+    return false;
+  }
+  // Verificar si es 1900-01-01 (fecha por defecto que representa "sin fecha")
+  const año = fechaObj.getFullYear();
+  const mes = fechaObj.getMonth() + 1; // getMonth() retorna 0-11
+  const dia = fechaObj.getDate();
+  return año === 1900 && mes === 1 && dia === 1;
+};
+
+/**
  * Formatea una fecha a formato largo en español
  * Ejemplo: "12 de diciembre de 2025"
+ * Si la fecha es 1900-01-01, muestra "Fecha abierta"
  * 
  * @param {Date|Timestamp|string|number} fecha - Fecha a formatear
- * @returns {string} Fecha formateada en formato largo
+ * @returns {string} Fecha formateada en formato largo o "Fecha abierta" si es fecha por defecto
  */
 export const formatearFechaLarga = (fecha) => {
   if (!fecha) return 'N/A';
@@ -31,6 +48,11 @@ export const formatearFechaLarga = (fecha) => {
   // Validar que la fecha sea válida
   if (!fechaObj || isNaN(fechaObj.getTime())) {
     return fecha?.toString() || 'N/A';
+  }
+  
+  // Si es la fecha por defecto (1900-01-01), mostrar "Fecha abierta"
+  if (esFechaPorDefecto(fechaObj)) {
+    return 'Fecha abierta';
   }
   
   // Formatear en español
