@@ -190,14 +190,33 @@ const GestionMaterias = () => {
       const nivelNombreFinal = nivelSeleccionado?.nombre || formData.nivelNombre || nivelActivo?.nombre || alumno?.nivel || '';
       const nivelIdFinal = nivelSeleccionado?.id || formData.nivelId || nivelActivo?.id || null;
 
+      // Para "Diplomado en Neuroeducación", las fechas son opcionales
+      const esDiplomadoNeuroeducacion = nivelNombreFinal === 'Diplomado en Neuroeducación';
+      let fechaInicioFinal = null;
+      let fechaFinFinal = null;
+
+      if (esDiplomadoNeuroeducacion) {
+        // Si es Diplomado en Neuroeducación y no hay fecha, usar null (no requerido)
+        fechaInicioFinal = formData.fechaInicio ? new Date(formData.fechaInicio) : null;
+        fechaFinFinal = formData.fechaFin ? new Date(formData.fechaFin) : null;
+      } else {
+        // Para otros niveles, validar que haya fecha de inicio
+        if (!formData.fechaInicio) {
+          showError('La fecha de inicio es requerida para este nivel');
+          return;
+        }
+        fechaInicioFinal = new Date(formData.fechaInicio);
+        fechaFinFinal = formData.fechaFin ? new Date(formData.fechaFin) : null;
+      }
+
       const materiaData = {
         alumnoId: id,
         nombre: formData.nombre,
         nivel: nivelNombreFinal,
         nivelId: nivelIdFinal,
         nivelNombre: nivelNombreFinal,
-        fechaInicio: formData.fechaInicio ? new Date(formData.fechaInicio) : null,
-        fechaFin: formData.fechaFin ? new Date(formData.fechaFin) : null,
+        fechaInicio: fechaInicioFinal,
+        fechaFin: fechaFinFinal,
         aula: formData.aula || null,
         estado: formData.estado,
         fechaActualizacion: serverTimestamp()
@@ -514,13 +533,24 @@ const GestionMaterias = () => {
     }
   };
 
+  const nivelNombreActual = useMemo(() => {
+    if (formData.nivelNombre) {
+      return formData.nivelNombre;
+    }
+    if (formData.nivelId) {
+      const nivelEncontrado = nivelesOpciones.find((nivel) => nivel.id === formData.nivelId) ||
+        nivelesHistorial.find((nivel) => nivel.id === formData.nivelId);
+      return nivelEncontrado?.nombre || nivelActivo?.nombre || alumno?.nivel || '';
+    }
+    return nivelActivo?.nombre || alumno?.nivel || '';
+  }, [formData.nivelId, formData.nivelNombre, nivelesOpciones, nivelesHistorial, nivelActivo, alumno]);
+
   const materiasDisponibles = useMemo(() => {
-    const referencia = formData.nivelNombre || nivelActivo?.nombre || alumno?.nivel || '';
-    if (!referencia) {
+    if (!nivelNombreActual) {
       return [];
     }
-    return getMateriasPorNivel(referencia);
-  }, [formData.nivelNombre, nivelActivo, alumno]);
+    return getMateriasPorNivel(nivelNombreActual);
+  }, [nivelNombreActual]);
 
   if (loading) {
     return (
@@ -857,19 +887,24 @@ const GestionMaterias = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Fecha de inicio *
+                      Fecha de inicio {nivelNombreActual !== 'Diplomado en Neuroeducación' ? '*' : '(opcional)'}
                     </label>
                     <input
                       type="date"
-                      required
+                      required={nivelNombreActual !== 'Diplomado en Neuroeducación'}
                       value={formData.fechaInicio}
                       onChange={(e) => setFormData({ ...formData, fechaInicio: e.target.value })}
                       className="w-full px-4 py-2.5 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue"
                     />
+                    {nivelNombreActual === 'Diplomado en Neuroeducación' && (
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                        Las materias de este diplomado no requieren fechas específicas
+                      </p>
+                    )}
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Fecha de fin
+                      Fecha de fin {nivelNombreActual === 'Diplomado en Neuroeducación' ? '(opcional)' : ''}
                     </label>
                     <input
                       type="date"

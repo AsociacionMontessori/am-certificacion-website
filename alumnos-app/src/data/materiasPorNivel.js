@@ -45,20 +45,40 @@ export const materiasPorNivel = {
   // Neuroeducación (solo toma Neuroeducación del tronco común)
   'Neuroeducación': [
     'Neuroeducación'
+  ],
+  
+  // Diplomado en Neuroeducación
+  'Diplomado en Neuroeducación': [
+    'Principios básicos de neurociencia',
+    'Introducción a la Neuroeducación',
+    'Relación entre neurociencia y educación',
+    'Memoria y aprendizaje',
+    'Atención y concentración',
+    'Funciones ejecutivas',
+    'Estrategias pedagógicas basadas en la neurociencia',
+    'Neuroeducación y dificultades de aprendizaje',
+    'Emociones y aprendizaje',
+    'Evaluaciones neurocognitivas',
+    'Neurofeedback y biofeedback en la educación',
+    'Investigación en Neuroeducación',
+    'Estudios de caso en neuroeducación',
+    'Desarrollo de programas de neuroeducación',
+    'Talleres y actividades prácticas',
+    'Presentación del proyecto final'
   ]
 };
 
 /**
  * Obtiene todas las materias para un nivel específico
- * Incluye las materias del tronco común (excepto si el nivel es Neuroeducación)
+ * Incluye las materias del tronco común (excepto si el nivel es Neuroeducación o Diplomado en Neuroeducación)
  */
 export const getMateriasPorNivel = (nivel) => {
   if (!nivel) return [];
   
   const materias = [];
   
-  // Si no es Neuroeducación, agregar materias del tronco común
-  if (nivel !== 'Neuroeducación') {
+  // Si no es Neuroeducación ni Diplomado en Neuroeducación, agregar materias del tronco común
+  if (nivel !== 'Neuroeducación' && nivel !== 'Diplomado en Neuroeducación') {
     materias.push(...materiasPorNivel['Propedéutico']);
   }
   
