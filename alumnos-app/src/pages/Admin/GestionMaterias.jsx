@@ -403,6 +403,9 @@ const GestionMaterias = () => {
     const lineas = texto.split('\n').filter(linea => linea.trim() !== '');
     const materiasParseadas = [];
     
+    // Verificar si el nivel seleccionado es "Diplomado en Neuroeducación"
+    const esDiplomadoNeuroeducacion = nivelBulkSeleccionado?.nombre === 'Diplomado en Neuroeducación';
+    
     lineas.forEach((linea, index) => {
       const columnas = linea.split('\t').map(col => col.trim());
       
@@ -415,7 +418,7 @@ const GestionMaterias = () => {
         return; // Saltar encabezado
       }
       
-      // Esperamos: Materia | Fecha Inicio | Fecha Fin | Aula | Estado
+      // Esperamos: Materia | Fecha Inicio (opcional) | Fecha Fin (opcional) | Aula (opcional) | Estado
       const materia = {
         nombre: columnas[0] || '',
         fechaInicio: parsearFecha(columnas[1]),
@@ -430,8 +433,9 @@ const GestionMaterias = () => {
         return;
       }
       
-      if (!materia.fechaInicio) {
-        setBulkError(`Error en línea ${index + 1}: Fecha de inicio inválida: "${columnas[1]}"`);
+      // Solo validar fecha de inicio si NO es Diplomado en Neuroeducación
+      if (!esDiplomadoNeuroeducacion && !materia.fechaInicio) {
+        setBulkError(`Error en línea ${index + 1}: Fecha de inicio inválida: "${columnas[1] || 'vacía'}". Deje en blanco para Diplomado en Neuroeducación.`);
         return;
       }
       
@@ -464,6 +468,18 @@ const GestionMaterias = () => {
       setBulkError('');
     }
   };
+
+  // Re-parsear datos cuando cambie el nivel seleccionado (solo si hay datos)
+  useEffect(() => {
+    if (bulkData.trim() && showBulkModal) {
+      // Usar setTimeout para evitar problemas con el estado asíncrono
+      const timeoutId = setTimeout(() => {
+        parsearBulkData(bulkData);
+      }, 100);
+      return () => clearTimeout(timeoutId);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [bulkNivelId]);
 
   const handleBulkSubmit = async () => {
     if (bulkPreview.length === 0) {
@@ -983,14 +999,22 @@ const GestionMaterias = () => {
                   <strong>Instrucciones:</strong>
                 </p>
                 <ol className="text-sm text-gray-600 dark:text-gray-400 list-decimal list-inside space-y-1">
-                  <li>En Excel, selecciona las columnas: <strong>Materia | Fecha Inicio | Fecha Fin | Aula | Estado</strong></li>
+                  <li>En Excel, selecciona las columnas: <strong>Materia | Fecha Inicio {nivelBulkSeleccionado?.nombre === 'Diplomado en Neuroeducación' ? '(opcional)' : ''} | Fecha Fin {nivelBulkSeleccionado?.nombre === 'Diplomado en Neuroeducación' ? '(opcional)' : ''} | Aula | Estado</strong></li>
                   <li>Copia las celdas (Ctrl+C o Cmd+C)</li>
                   <li>Pega aquí abajo (Ctrl+V o Cmd+V)</li>
                   <li>Revisa la vista previa y guarda</li>
                 </ol>
-                <p className="text-xs text-gray-500 dark:text-gray-500 mt-2">
-                  Formatos de fecha aceptados: DD/MM/YYYY, MM/DD/YYYY, YYYY-MM-DD
-                </p>
+                {nivelBulkSeleccionado?.nombre === 'Diplomado en Neuroeducación' ? (
+                  <div className="mt-2 p-2 bg-green/10 dark:bg-green/20 rounded border border-green/20">
+                    <p className="text-xs font-medium text-green-700 dark:text-green-300">
+                      💡 <strong>Diplomado en Neuroeducación:</strong> Las fechas son opcionales. Puedes dejar las columnas de fechas vacías o con guiones (-) para materias sin fechas específicas (ritmo del estudiante).
+                    </p>
+                  </div>
+                ) : (
+                  <p className="text-xs text-gray-500 dark:text-gray-500 mt-2">
+                    Formatos de fecha aceptados: DD/MM/YYYY, MM/DD/YYYY, YYYY-MM-DD
+                  </p>
+                )}
               </div>
 
               <div className="mb-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -1000,7 +1024,9 @@ const GestionMaterias = () => {
                   </label>
                   <select
                     value={bulkNivelId || ''}
-                    onChange={(e) => setBulkNivelId(e.target.value)}
+                    onChange={(e) => {
+                      setBulkNivelId(e.target.value);
+                    }}
                     className="w-full px-4 py-2.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue"
                   >
                     <option value="">
@@ -1029,7 +1055,9 @@ const GestionMaterias = () => {
                   value={bulkData}
                   onChange={handleBulkChange}
                   onPaste={handleBulkPaste}
-                  placeholder="Materia	01/01/2024	30/06/2024	Aula 1	En curso"
+                  placeholder={nivelBulkSeleccionado?.nombre === 'Diplomado en Neuroeducación' 
+                    ? "Materia\t-\t-\tAula 1\tEn curso\nO simplemente: Materia\t\t\t\tEn curso"
+                    : "Materia	01/01/2024	30/06/2024	Aula 1	En curso"}
                   rows={8}
                   className="w-full px-4 py-2.5 text-sm font-mono border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue"
                 />
@@ -1061,8 +1089,8 @@ const GestionMaterias = () => {
                         {bulkPreview.map((materia, index) => (
                           <tr key={index}>
                             <td className="px-3 py-2 text-gray-900 dark:text-white">{materia.nombre}</td>
-                            <td className="px-3 py-2 text-gray-600 dark:text-gray-400">{materia.fechaInicio || '-'}</td>
-                            <td className="px-3 py-2 text-gray-600 dark:text-gray-400">{materia.fechaFin || '-'}</td>
+                            <td className="px-3 py-2 text-gray-600 dark:text-gray-400">{materia.fechaInicio || (nivelBulkSeleccionado?.nombre === 'Diplomado en Neuroeducación' ? 'Sin fecha' : '-')}</td>
+                            <td className="px-3 py-2 text-gray-600 dark:text-gray-400">{materia.fechaFin || (nivelBulkSeleccionado?.nombre === 'Diplomado en Neuroeducación' ? 'Sin fecha' : '-')}</td>
                             <td className="px-3 py-2 text-gray-600 dark:text-gray-400">{materia.aula || '-'}</td>
                             <td className="px-3 py-2 text-gray-600 dark:text-gray-400">{materia.estado}</td>
                           </tr>
