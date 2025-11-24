@@ -1835,6 +1835,13 @@ const GestionPagos = () => {
       )}
 
       {/* Modal Descuentos / Becas */}
+      {showModalBeca && (() => {
+        console.log('🎭 MODAL DE DESCUENTOS RENDERIZÁNDOSE');
+        console.log('📋 showModalBeca:', showModalBeca);
+        console.log('📋 becaForm:', JSON.stringify(becaForm, null, 2));
+        console.log('📋 becaForm.alumnoId:', becaForm.alumnoId);
+        return null;
+      })()}
       {showModalBeca && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-5xl p-6">
@@ -2078,19 +2085,12 @@ const GestionPagos = () => {
                       Descuentos activos ({becasAlumno.length})
                     </h4>
                     <div className="flex gap-2">
-                      {(() => {
-                        console.log('🎨 Renderizando botón "Aplicar descuentos"', {
-                          alumnoId: becaForm.alumnoId,
-                          recalculando: recalculandoDescuentos,
-                          disabled: recalculandoDescuentos || !becaForm.alumnoId
-                        });
-                        return null;
-                      })()}
                       <button
-                        onClick={(e) => {
+                        type="button"
+                        onClick={async (e) => {
                           e.preventDefault();
                           e.stopPropagation();
-                          console.log('🔘 Botón "Aplicar descuentos" clickeado');
+                          console.log('🔘🔘🔘 BOTÓN CLICKEADO - Aplicar descuentos');
                           console.log('📋 becaForm completo:', JSON.stringify(becaForm, null, 2));
                           console.log('📋 becaForm.alumnoId:', becaForm.alumnoId);
                           console.log('📋 recalculandoDescuentos:', recalculandoDescuentos);
@@ -2101,8 +2101,7 @@ const GestionPagos = () => {
                             return;
                           }
                           
-                          (async () => {
-                            setRecalculandoDescuentos(true);
+                          setRecalculandoDescuentos(true);
                           try {
                             console.log('🔄 Iniciando recalculación de descuentos para alumno:', becaForm.alumnoId);
                             const resultado = await recalcularPagosConBecasActivas(becaForm.alumnoId);
@@ -2133,7 +2132,6 @@ const GestionPagos = () => {
                             setRecalculandoDescuentos(false);
                             console.log('🏁 Proceso de recalculación finalizado');
                           }
-                          })();
                         }}
                         disabled={recalculandoDescuentos || !becaForm.alumnoId}
                         className="text-xs px-3 py-1.5 bg-blue text-white rounded-lg hover:bg-blue/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
