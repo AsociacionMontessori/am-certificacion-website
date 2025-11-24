@@ -79,8 +79,11 @@ const recalcularMontosConBecas = (montoOriginal, becas = []) => {
   let montoActual = montoBase;
   const detalles = [];
 
-  becas.forEach((beca) => {
+  console.log(`      💰 Cálculo inicial: montoBase=${montoBase}, becas=${becas.length}`);
+
+  becas.forEach((beca, index) => {
     if (!beca || typeof beca.valor !== 'number' || beca.valor <= 0) {
+      console.warn(`      ⚠️ Beca ${index} inválida:`, beca);
       if (beca) {
         detalles.push({ ...beca, descuento: 0 });
       }
@@ -89,14 +92,16 @@ const recalcularMontosConBecas = (montoOriginal, becas = []) => {
 
     let descuento = 0;
     const porcentaje = Math.min(100, Math.max(0, Number(beca.valor)));
+    const montoAntes = montoActual;
 
     if ((beca.tipo || 'porcentaje') === 'porcentaje') {
-      const montoAntes = montoActual;
       montoActual = montoActual * (1 - porcentaje / 100);
       descuento = montoAntes - montoActual;
+      console.log(`      📉 Beca ${index} (${porcentaje}%): ${montoAntes} → ${montoActual}, descuento=${descuento.toFixed(2)}`);
     } else {
       descuento = Math.min(montoActual, porcentaje);
       montoActual = montoActual - descuento;
+      console.log(`      📉 Beca ${index} (fijo $${porcentaje}): ${montoAntes} → ${montoActual}, descuento=${descuento.toFixed(2)}`);
     }
 
     descuento = Number(descuento.toFixed(2));
@@ -110,6 +115,8 @@ const recalcularMontosConBecas = (montoOriginal, becas = []) => {
 
   const totalDescuento = Number(detalles.reduce((suma, item) => suma + (item.descuento || 0), 0).toFixed(2));
   const montoFinal = Number(Math.max(0, montoActual).toFixed(2));
+
+  console.log(`      ✅ Resultado final: montoFinal=${montoFinal}, totalDescuento=${totalDescuento}`);
 
   return {
     montoFinal,
@@ -289,7 +296,15 @@ export const recalcularPagosConBecasActivas = async (alumnoId) => {
       }
 
       // Filtrar becas que aplican a este pago
-      const becasAplicables = becasActivas.filter(beca => aplicaBecaAPago(pago, beca));
+      const becasAplicables = becasActivas.filter(beca => {
+        const aplica = aplicaBecaAPago(pago, beca);
+        if (!aplica) {
+          console.log(`   ❌ Beca "${beca.nombre || beca.id}" NO aplica a pago ${pago.id} (${pago.tipo})`);
+        } else {
+          console.log(`   ✅ Beca "${beca.nombre || beca.id}" SÍ aplica a pago ${pago.id} (${pago.tipo})`);
+        }
+        return aplica;
+      });
       console.log(`   💰 Pago ${pago.id} (${pago.tipo}): ${becasAplicables.length} becas aplicables de ${becasActivas.length} totales`);
       
       if (becasAplicables.length === 0) {
@@ -310,7 +325,9 @@ export const recalcularPagosConBecasActivas = async (alumnoId) => {
           actualizaciones.montoPendiente = pendiente > 0 ? pendiente : deleteField();
         }
 
+        console.log(`   💾 Revirtiendo descuentos en pago ${pago.id}`);
         await updateDoc(doc(db, 'pagos', pago.id), actualizaciones);
+        console.log(`   ✅ Pago ${pago.id} revertido exitosamente`);
         actualizados += 1;
         return;
       }
@@ -318,32 +335,54 @@ export const recalcularPagosConBecasActivas = async (alumnoId) => {
       // Obtener monto original
       let montoOriginal = Number(pago.montoOriginal ?? pago.monto ?? 0);
       
+      console.log(`   🔍 Pago ${pago.id} - Estado inicial:`, {
+        monto: pago.monto,
+        montoOriginal: pago.montoOriginal,
+        descuentoAplicado: pago.descuentoAplicado,
+        becasAplicadas: pago.becasAplicadas?.length || 0
+      });
+      
       // Si el pago tiene descuentos aplicados pero no tiene montoOriginal guardado,
       // intentar calcularlo desde el monto actual y los descuentos
       if (!pago.montoOriginal || pago.montoOriginal === pago.monto) {
         // Si no hay montoOriginal o es igual al monto actual, puede que:
         // 1. El pago nunca tuvo descuentos (montoOriginal = monto actual)
         // 2. El pago tiene descuentos pero no se guardó el original
+        
+        // Si hay descuento aplicado, el monto original debería ser mayor
         if (pago.descuentoAplicado && pago.descuentoAplicado > 0) {
-          // Si hay descuento aplicado, el monto original debería ser mayor
           const descuentoAplicado = Number(pago.descuentoAplicado);
           montoOriginal = Number((Number(pago.monto) + descuentoAplicado).toFixed(2));
-        } else if (pago.becasAplicadas && pago.becasAplicadas.length > 0) {
-          // Si hay becas aplicadas pero no descuento registrado, intentar calcular el original
-          // Esto puede pasar si el descuento se calculó incorrectamente
-          // Por seguridad, usar el monto actual como original si no hay descuento registrado
+          console.log(`   🔧 Calculado montoOriginal desde descuento: ${montoOriginal}`);
+        } else {
+          // Si no hay descuento aplicado, el monto actual ES el original
+          // Esto es correcto para pagos que nunca tuvieron descuentos
           montoOriginal = Number(pago.monto);
+          console.log(`   ✅ Usando monto actual como original: ${montoOriginal}`);
         }
-        // Si no hay descuentos ni becas aplicadas, el monto actual es el original
+      } else {
+        console.log(`   ✅ Usando montoOriginal guardado: ${montoOriginal}`);
       }
 
       // Mapear becas aplicables
-      const becasMapeadas = becasAplicables.map(beca => mapearBecaParaPago(beca));
+      const becasMapeadas = becasAplicables.map(beca => {
+        const mapeada = mapearBecaParaPago(beca);
+        console.log(`   🎫 Beca mapeada:`, {
+          id: mapeada.id,
+          nombre: mapeada.nombre,
+          tipo: mapeada.tipo,
+          valor: mapeada.valor,
+          alcance: mapeada.alcance
+        });
+        return mapeada;
+      });
       
+      console.log(`   🧮 Recalculando montos con ${becasMapeadas.length} becas...`);
       // Recalcular montos con todas las becas aplicables
       const { montoFinal, totalDescuento, becasDetalladas } = recalcularMontosConBecas(montoOriginal, becasMapeadas);
       
       console.log(`   📊 Pago ${pago.id}: Original=${montoOriginal}, Final=${montoFinal}, Descuento=${totalDescuento}`);
+      console.log(`   📋 Becas detalladas:`, becasDetalladas.map(b => `${b.nombre}: ${b.descuento}`).join(', '));
 
       const actualizaciones = {
         montoOriginal,
@@ -367,10 +406,13 @@ export const recalcularPagosConBecasActivas = async (alumnoId) => {
         actualizaciones.montoPendiente = pendiente > 0 ? pendiente : deleteField();
       }
 
+      console.log(`   💾 Actualizando pago ${pago.id} con:`, actualizaciones);
       await updateDoc(doc(db, 'pagos', pago.id), actualizaciones);
+      console.log(`   ✅ Pago ${pago.id} actualizado exitosamente`);
       actualizados += 1;
     }));
 
+    console.log(`✅ Recalculación completada: ${actualizados} pagos actualizados, ${omitidos} omitidos`);
     return { actualizados, omitidos };
   } catch (error) {
     console.error('Error al recalcular pagos con becas activas:', error);

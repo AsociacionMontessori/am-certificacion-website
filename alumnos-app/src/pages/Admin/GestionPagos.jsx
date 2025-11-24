@@ -2077,13 +2077,21 @@ const GestionPagos = () => {
                           if (!becaForm.alumnoId) return;
                           setRecalculandoDescuentos(true);
                           try {
+                            console.log('🔄 Iniciando recalculación de descuentos...');
                             const resultado = await recalcularPagosConBecasActivas(becaForm.alumnoId);
-                            success(`Descuentos recalculados: ${resultado.actualizados} pagos actualizados`);
+                            console.log('✅ Recalculación completada:', resultado);
+                            success(`Descuentos recalculados: ${resultado.actualizados} pagos actualizados, ${resultado.omitidos} omitidos`);
+                            
+                            // Esperar un momento para que Firestore procese las actualizaciones
+                            await new Promise(resolve => setTimeout(resolve, 500));
+                            
                             await cargarBecasAlumno(becaForm.alumnoId);
+                            console.log('🔄 Recargando pagos...');
                             await recargarPagos();
+                            console.log('✅ Pagos recargados');
                           } catch (error) {
-                            console.error('Error al recalcular descuentos:', error);
-                            showError('Error al recalcular los descuentos');
+                            console.error('❌ Error al recalcular descuentos:', error);
+                            showError(`Error al recalcular los descuentos: ${error.message}`);
                           } finally {
                             setRecalculandoDescuentos(false);
                           }
