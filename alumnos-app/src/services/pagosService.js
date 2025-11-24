@@ -1209,11 +1209,15 @@ export const generarPagosPorNivel = async (alumno, configuracion) => {
     // Aplicar descuentos activos a todos los pagos del alumno (incluyendo los recién generados)
     if (pagosGenerados.length > 0 || pagosExistentes.length > 0) {
       try {
-        console.log(`   🔄 Aplicando descuentos activos a los pagos...`);
+        console.log(`   🔄 Aplicando descuentos activos a los pagos del alumno ${alumno.id}...`);
         const resultado = await recalcularPagosConBecasActivas(alumno.id);
         console.log(`   ✅ Descuentos aplicados: ${resultado.actualizados} pagos actualizados, ${resultado.omitidos} omitidos`);
+        if (resultado.actualizados === 0) {
+          console.warn(`   ⚠️ No se actualizó ningún pago. Verifica que haya becas activas y pagos pendientes.`);
+        }
       } catch (errorBecas) {
-        console.warn('⚠️ No se pudieron aplicar las becas activas después de generar pagos:', errorBecas);
+        console.error('❌ Error al aplicar las becas activas después de generar pagos:', errorBecas);
+        console.error('❌ Stack trace:', errorBecas.stack);
       }
     }
 
