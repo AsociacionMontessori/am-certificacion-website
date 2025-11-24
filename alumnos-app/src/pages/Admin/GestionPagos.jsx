@@ -216,7 +216,6 @@ const GestionPagos = () => {
           }
         }
         
-        console.log(`✅ Cargados ${Object.keys(alumnosMap).length} alumnos`);
         setAlumnos(alumnosMap);
         setAlumnosLoading(false);
         
@@ -298,20 +297,16 @@ const GestionPagos = () => {
   ];
 
   const handleAbrirDescuentos = (alumnoId, pagoId = '') => {
-    console.log('🔓 Abriendo modal de descuentos para alumno:', alumnoId);
     if (!alumnoId) {
-      console.warn('⚠️ No se proporcionó alumnoId');
       showError('Selecciona un alumno para gestionar descuentos');
       return;
     }
     setBecaEditando(null);
-    const nuevoForm = {
+    setBecaForm({
       ...crearBecaFormBase(alumnoId),
       alcance: pagoId ? 'pago' : 'colegiaturas',
       pagoId: pagoId || ''
-    };
-    console.log('📝 Configurando becaForm:', nuevoForm);
-    setBecaForm(nuevoForm);
+    });
     setShowModalBeca(true);
     cargarBecasAlumno(alumnoId);
   };
@@ -729,8 +724,6 @@ const GestionPagos = () => {
         recargoPorcentaje: esColegiatura ? (configuracion?.recargoPorcentaje || 10) : 0,
         recargoActivo: esColegiatura ? (configuracion?.recargoActivo !== false) : false
       };
-      
-      console.log('📝 Creando pago con payload:', { ...payload, fechaVencimiento: 'Timestamp' });
 
       if (esColegiatura) {
         payload.numeroColegiatura = numeroColegiatura;
@@ -848,11 +841,6 @@ const GestionPagos = () => {
 
     try {
       setGenerandoPagos(true);
-      console.log('🔄 Iniciando generación de pagos para:', alumno.nombre || alumno.email);
-      console.log('   - Nivel del alumno:', nivelAlumnoNombre);
-      console.log('   - Configuración disponible:', !!configuracion);
-      console.log('   - Costos disponibles:', configuracion?.costos ? Object.keys(configuracion.costos) : 'No hay costos');
-      
       const resultado = await generarPagosPorNivel(alumno, configuracion);
       
       if (resultado.pagosGenerados > 0) {
@@ -1835,13 +1823,6 @@ const GestionPagos = () => {
       )}
 
       {/* Modal Descuentos / Becas */}
-      {showModalBeca && (() => {
-        console.log('🎭 MODAL DE DESCUENTOS RENDERIZÁNDOSE');
-        console.log('📋 showModalBeca:', showModalBeca);
-        console.log('📋 becaForm:', JSON.stringify(becaForm, null, 2));
-        console.log('📋 becaForm.alumnoId:', becaForm.alumnoId);
-        return null;
-      })()}
       {showModalBeca && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-5xl p-6">
@@ -2090,47 +2071,32 @@ const GestionPagos = () => {
                         onClick={async (e) => {
                           e.preventDefault();
                           e.stopPropagation();
-                          console.log('🔘🔘🔘 BOTÓN CLICKEADO - Aplicar descuentos');
-                          console.log('📋 becaForm completo:', JSON.stringify(becaForm, null, 2));
-                          console.log('📋 becaForm.alumnoId:', becaForm.alumnoId);
-                          console.log('📋 recalculandoDescuentos:', recalculandoDescuentos);
                           
                           if (!becaForm.alumnoId) {
-                            console.warn('⚠️ No hay alumnoId seleccionado');
                             showError('Selecciona un alumno primero');
                             return;
                           }
                           
                           setRecalculandoDescuentos(true);
                           try {
-                            console.log('🔄 Iniciando recalculación de descuentos para alumno:', becaForm.alumnoId);
                             const resultado = await recalcularPagosConBecasActivas(becaForm.alumnoId);
-                            console.log('✅ Recalculación completada:', resultado);
                             
                             if (resultado.actualizados === 0 && resultado.omitidos === 0) {
-                              console.warn('⚠️ No se actualizó ningún pago');
                               showError('No se encontraron pagos para actualizar');
                             } else {
                               success(`Descuentos recalculados: ${resultado.actualizados} pagos actualizados, ${resultado.omitidos} omitidos`);
                             }
                             
                             // Esperar un momento para que Firestore procese las actualizaciones
-                            console.log('⏳ Esperando 500ms para que Firestore procese...');
                             await new Promise(resolve => setTimeout(resolve, 500));
                             
-                            console.log('🔄 Recargando becas...');
                             await cargarBecasAlumno(becaForm.alumnoId);
-                            
-                            console.log('🔄 Recargando pagos...');
                             await recargarPagos();
-                            console.log('✅ Pagos recargados');
                           } catch (error) {
-                            console.error('❌ Error al recalcular descuentos:', error);
-                            console.error('❌ Stack trace:', error.stack);
+                            console.error('Error al recalcular descuentos:', error);
                             showError(`Error al recalcular los descuentos: ${error.message || 'Error desconocido'}`);
                           } finally {
                             setRecalculandoDescuentos(false);
-                            console.log('🏁 Proceso de recalculación finalizado');
                           }
                         }}
                         disabled={recalculandoDescuentos || !becaForm.alumnoId}

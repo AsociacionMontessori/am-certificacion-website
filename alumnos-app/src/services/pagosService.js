@@ -47,69 +47,31 @@ const mapearBecaParaPago = (beca) => {
 };
 
 const aplicaBecaAPago = (pago, beca) => {
-  console.log(`      🔍 Verificando si beca "${beca.nombre || beca.id}" aplica a pago ${pago.id}:`);
-  console.log(`         - beca.activa: ${beca.activa}`);
-  console.log(`         - pago.estado: ${pago.estado}`);
-  console.log(`         - beca.alcance: ${beca.alcance}`);
-  console.log(`         - pago.tipo: ${pago.tipo}`);
-  
-  if (!pago || !beca || beca.activa === false) {
-    console.log(`         ❌ Rechazado: pago o beca inválidos o beca inactiva`);
-    return false;
-  }
-  if (['Validado', 'Rechazado'].includes(pago.estado)) {
-    console.log(`         ❌ Rechazado: pago ya validado o rechazado`);
-    return false;
-  }
+  if (!pago || !beca || beca.activa === false) return false;
+  if (['Validado', 'Rechazado'].includes(pago.estado)) return false;
 
   const fechaInicio = normalizarFecha(beca.fechaInicio);
   const fechaFin = normalizarFecha(beca.fechaFin);
   const fechaPago = normalizarFecha(pago.fechaVencimiento) || new Date();
-  
-  console.log(`         - fechaInicio: ${fechaInicio ? fechaInicio.toISOString() : 'null'}`);
-  console.log(`         - fechaFin: ${fechaFin ? fechaFin.toISOString() : 'null'}`);
-  console.log(`         - fechaPago: ${fechaPago.toISOString()}`);
 
-  if (fechaInicio && fechaPago < fechaInicio) {
-    console.log(`         ❌ Rechazado: fecha de pago antes de fecha de inicio`);
-    return false;
-  }
-  if (fechaFin && fechaPago > fechaFin) {
-    console.log(`         ❌ Rechazado: fecha de pago después de fecha de fin`);
-    return false;
-  }
+  if (fechaInicio && fechaPago < fechaInicio) return false;
+  if (fechaFin && fechaPago > fechaFin) return false;
 
-  let resultado = false;
   switch (beca.alcance) {
     case 'colegiaturas':
-      resultado = pago.tipo === 'Colegiatura';
-      console.log(`         - Alcance 'colegiaturas': ${resultado ? '✅' : '❌'} (pago.tipo=${pago.tipo})`);
-      break;
+      return pago.tipo === 'Colegiatura';
     case 'inscripcion':
-      resultado = pago.tipo === 'Inscripción';
-      console.log(`         - Alcance 'inscripcion': ${resultado ? '✅' : '❌'} (pago.tipo=${pago.tipo})`);
-      break;
+      return pago.tipo === 'Inscripción';
     case 'certificado':
-      resultado = pago.tipo === 'Certificado';
-      console.log(`         - Alcance 'certificado': ${resultado ? '✅' : '❌'} (pago.tipo=${pago.tipo})`);
-      break;
+      return pago.tipo === 'Certificado';
     case 'pago':
-      resultado = beca.pagoId && (pago.id === beca.pagoId);
-      console.log(`         - Alcance 'pago': ${resultado ? '✅' : '❌'} (beca.pagoId=${beca.pagoId}, pago.id=${pago.id})`);
-      break;
+      return beca.pagoId && (pago.id === beca.pagoId);
     case 'concepto':
-      resultado = beca.concepto ? (pago.tipo === beca.concepto || pago.descripcion?.toLowerCase().includes(beca.concepto.toLowerCase())) : true;
-      console.log(`         - Alcance 'concepto': ${resultado ? '✅' : '❌'} (beca.concepto=${beca.concepto})`);
-      break;
+      return beca.concepto ? (pago.tipo === beca.concepto || pago.descripcion?.toLowerCase().includes(beca.concepto.toLowerCase())) : true;
     case 'global':
     default:
-      resultado = true;
-      console.log(`         - Alcance 'global' o default: ✅`);
-      break;
+      return true;
   }
-  
-  console.log(`         🎯 RESULTADO FINAL: ${resultado ? '✅ APLICA' : '❌ NO APLICA'}`);
-  return resultado;
 };
 
 const recalcularMontosConBecas = (montoOriginal, becas = []) => {
@@ -117,11 +79,8 @@ const recalcularMontosConBecas = (montoOriginal, becas = []) => {
   let montoActual = montoBase;
   const detalles = [];
 
-  console.log(`      💰 Cálculo inicial: montoBase=${montoBase}, becas=${becas.length}`);
-
-  becas.forEach((beca, index) => {
+  becas.forEach((beca) => {
     if (!beca || typeof beca.valor !== 'number' || beca.valor <= 0) {
-      console.warn(`      ⚠️ Beca ${index} inválida:`, beca);
       if (beca) {
         detalles.push({ ...beca, descuento: 0 });
       }
@@ -130,16 +89,14 @@ const recalcularMontosConBecas = (montoOriginal, becas = []) => {
 
     let descuento = 0;
     const porcentaje = Math.min(100, Math.max(0, Number(beca.valor)));
-    const montoAntes = montoActual;
 
     if ((beca.tipo || 'porcentaje') === 'porcentaje') {
+      const montoAntes = montoActual;
       montoActual = montoActual * (1 - porcentaje / 100);
       descuento = montoAntes - montoActual;
-      console.log(`      📉 Beca ${index} (${porcentaje}%): ${montoAntes} → ${montoActual}, descuento=${descuento.toFixed(2)}`);
     } else {
       descuento = Math.min(montoActual, porcentaje);
       montoActual = montoActual - descuento;
-      console.log(`      📉 Beca ${index} (fijo $${porcentaje}): ${montoAntes} → ${montoActual}, descuento=${descuento.toFixed(2)}`);
     }
 
     descuento = Number(descuento.toFixed(2));
@@ -153,8 +110,6 @@ const recalcularMontosConBecas = (montoOriginal, becas = []) => {
 
   const totalDescuento = Number(detalles.reduce((suma, item) => suma + (item.descuento || 0), 0).toFixed(2));
   const montoFinal = Number(Math.max(0, montoActual).toFixed(2));
-
-  console.log(`      ✅ Resultado final: montoFinal=${montoFinal}, totalDescuento=${totalDescuento}`);
 
   return {
     montoFinal,
@@ -276,13 +231,10 @@ export const recalcularPagosConBecasActivas = async (alumnoId) => {
   if (!alumnoId) return { actualizados: 0, omitidos: 0 };
 
   try {
-    console.log(`🔄 Recalculando descuentos para alumno: ${alumnoId}`);
     // Obtener todas las becas activas del alumno
     const becasActivas = await obtenerBecasAlumno(alumnoId);
-    console.log(`   📋 Becas activas encontradas: ${becasActivas.length}`);
     
     if (becasActivas.length === 0) {
-      console.log(`   ⚠️ No hay becas activas, revirtiendo descuentos...`);
       // Si no hay becas activas, revertir todos los descuentos
       const pagosSnapshot = await getDocs(query(collection(db, 'pagos'), where('alumnoId', '==', alumnoId)));
       let actualizados = 0;
@@ -334,21 +286,7 @@ export const recalcularPagosConBecasActivas = async (alumnoId) => {
       }
 
       // Filtrar becas que aplican a este pago
-      console.log(`   🔍 Analizando becas para pago ${pago.id} (${pago.tipo}):`);
-      const becasAplicables = becasActivas.filter(beca => {
-        console.log(`   📋 Verificando beca:`, {
-          id: beca.id,
-          nombre: beca.nombre,
-          activa: beca.activa,
-          alcance: beca.alcance,
-          fechaInicio: beca.fechaInicio,
-          fechaFin: beca.fechaFin,
-          pagoId: beca.pagoId
-        });
-        const aplica = aplicaBecaAPago(pago, beca);
-        return aplica;
-      });
-      console.log(`   💰 Pago ${pago.id} (${pago.tipo}): ${becasAplicables.length} becas aplicables de ${becasActivas.length} totales`);
+      const becasAplicables = becasActivas.filter(beca => aplicaBecaAPago(pago, beca));
       
       if (becasAplicables.length === 0) {
         // Si no hay becas aplicables, revertir descuentos
@@ -368,9 +306,7 @@ export const recalcularPagosConBecasActivas = async (alumnoId) => {
           actualizaciones.montoPendiente = pendiente > 0 ? pendiente : deleteField();
         }
 
-        console.log(`   💾 Revirtiendo descuentos en pago ${pago.id}`);
         await updateDoc(doc(db, 'pagos', pago.id), actualizaciones);
-        console.log(`   ✅ Pago ${pago.id} revertido exitosamente`);
         actualizados += 1;
         return;
       }
@@ -378,54 +314,24 @@ export const recalcularPagosConBecasActivas = async (alumnoId) => {
       // Obtener monto original
       let montoOriginal = Number(pago.montoOriginal ?? pago.monto ?? 0);
       
-      console.log(`   🔍 Pago ${pago.id} - Estado inicial:`, {
-        monto: pago.monto,
-        montoOriginal: pago.montoOriginal,
-        descuentoAplicado: pago.descuentoAplicado,
-        becasAplicadas: pago.becasAplicadas?.length || 0
-      });
-      
       // Si el pago tiene descuentos aplicados pero no tiene montoOriginal guardado,
       // intentar calcularlo desde el monto actual y los descuentos
       if (!pago.montoOriginal || pago.montoOriginal === pago.monto) {
-        // Si no hay montoOriginal o es igual al monto actual, puede que:
-        // 1. El pago nunca tuvo descuentos (montoOriginal = monto actual)
-        // 2. El pago tiene descuentos pero no se guardó el original
-        
         // Si hay descuento aplicado, el monto original debería ser mayor
         if (pago.descuentoAplicado && pago.descuentoAplicado > 0) {
           const descuentoAplicado = Number(pago.descuentoAplicado);
           montoOriginal = Number((Number(pago.monto) + descuentoAplicado).toFixed(2));
-          console.log(`   🔧 Calculado montoOriginal desde descuento: ${montoOriginal}`);
         } else {
           // Si no hay descuento aplicado, el monto actual ES el original
-          // Esto es correcto para pagos que nunca tuvieron descuentos
           montoOriginal = Number(pago.monto);
-          console.log(`   ✅ Usando monto actual como original: ${montoOriginal}`);
         }
-      } else {
-        console.log(`   ✅ Usando montoOriginal guardado: ${montoOriginal}`);
       }
 
       // Mapear becas aplicables
-      const becasMapeadas = becasAplicables.map(beca => {
-        const mapeada = mapearBecaParaPago(beca);
-        console.log(`   🎫 Beca mapeada:`, {
-          id: mapeada.id,
-          nombre: mapeada.nombre,
-          tipo: mapeada.tipo,
-          valor: mapeada.valor,
-          alcance: mapeada.alcance
-        });
-        return mapeada;
-      });
+      const becasMapeadas = becasAplicables.map(beca => mapearBecaParaPago(beca));
       
-      console.log(`   🧮 Recalculando montos con ${becasMapeadas.length} becas...`);
       // Recalcular montos con todas las becas aplicables
       const { montoFinal, totalDescuento, becasDetalladas } = recalcularMontosConBecas(montoOriginal, becasMapeadas);
-      
-      console.log(`   📊 Pago ${pago.id}: Original=${montoOriginal}, Final=${montoFinal}, Descuento=${totalDescuento}`);
-      console.log(`   📋 Becas detalladas:`, becasDetalladas.map(b => `${b.nombre}: ${b.descuento}`).join(', '));
 
       const actualizaciones = {
         montoOriginal,
@@ -449,13 +355,10 @@ export const recalcularPagosConBecasActivas = async (alumnoId) => {
         actualizaciones.montoPendiente = pendiente > 0 ? pendiente : deleteField();
       }
 
-      console.log(`   💾 Actualizando pago ${pago.id} con:`, actualizaciones);
       await updateDoc(doc(db, 'pagos', pago.id), actualizaciones);
-      console.log(`   ✅ Pago ${pago.id} actualizado exitosamente`);
       actualizados += 1;
     }));
 
-    console.log(`✅ Recalculación completada: ${actualizados} pagos actualizados, ${omitidos} omitidos`);
     return { actualizados, omitidos };
   } catch (error) {
     console.error('Error al recalcular pagos con becas activas:', error);
@@ -1005,13 +908,10 @@ export const generarPagosPorNivel = async (alumno, configuracion) => {
     
     // Buscar coincidencia exacta o parcial del nivel
     let costoNivel = null;
-    console.log(`🔍 Buscando configuración para nivel: "${nivelNombre}"`);
-    console.log(`   - Niveles disponibles en configuración:`, Object.keys(costos));
     
     // Primero intentar coincidencia exacta
     if (costos[nivelNombre]) {
       costoNivel = { nombre: nivelNombre, ...costos[nivelNombre] };
-      console.log(`   ✅ Coincidencia exacta encontrada`);
     } else {
       // Buscar coincidencia parcial (el nivel contiene palabras clave del nombre)
       for (const [key, valor] of Object.entries(costos)) {
@@ -1031,19 +931,16 @@ export const generarPagosPorNivel = async (alumno, configuracion) => {
         
         if (tieneCoincidencia || nivelLower.includes(keyLower) || keyLower.includes(nivelLower)) {
           costoNivel = { nombre: key, ...valor };
-          console.log(`   ✅ Coincidencia parcial encontrada: "${key}"`);
           break;
         }
       }
     }
 
     if (!costoNivel) {
-      console.error(`   ❌ No se encontró configuración de costos para el nivel: ${nivelNombre}`);
-      console.error(`   - Niveles disponibles:`, Object.keys(costos));
+      console.error(`No se encontró configuración de costos para el nivel: ${nivelNombre}`);
+      console.error(`Niveles disponibles:`, Object.keys(costos));
       throw new Error(`No se encontró configuración de costos para el nivel: "${nivelNombre}". Niveles disponibles: ${Object.keys(costos).join(', ')}`);
     }
-    
-    console.log(`   ✅ Configuración seleccionada:`, costoNivel);
 
     // Obtener fecha de ingreso del alumno
     let fechaInicio = alumno.fechaIngreso;
@@ -1059,11 +956,6 @@ export const generarPagosPorNivel = async (alumno, configuracion) => {
 
     // Verificar si el alumno ya tiene pagos generados
     const pagosExistentes = await obtenerPagosAlumno(alumno.id);
-    
-    console.log(`🔍 Generando pagos para ${alumno.nombre || alumno.email}`);
-    console.log(`   - Nivel: ${nivelNombre}`);
-    console.log(`   - Pagos existentes: ${pagosExistentes.length}`);
-    console.log(`   - Configuración encontrada:`, costoNivel);
 
     const pagosGenerados = [];
     const diaVencimiento = configuracion.diaVencimiento || 10;
@@ -1074,7 +966,6 @@ export const generarPagosPorNivel = async (alumno, configuracion) => {
     // Verificar si ya existe una inscripción
     const tieneInscripcion = pagosExistentes.some(p => p.tipo === 'Inscripción');
     if (costoNivel.inscripcion && !tieneInscripcion) {
-      console.log(`   ✅ Generando pago de inscripción: $${costoNivel.inscripcion}`);
       const fechaInscripcion = new Date(fechaInicio);
       fechaInscripcion.setDate(diaVencimiento);
       
@@ -1089,8 +980,6 @@ export const generarPagosPorNivel = async (alumno, configuracion) => {
         descripcion: `Inscripción - ${nivelNombre}`
       });
       pagosGenerados.push(pagoInscripcion);
-    } else if (costoNivel.inscripcion && tieneInscripcion) {
-      console.log(`   ⚠️ Ya existe pago de inscripción, omitiendo`);
     }
 
     // Generar o completar colegiaturas mensuales (si aplica)
@@ -1111,8 +1000,6 @@ export const generarPagosPorNivel = async (alumno, configuracion) => {
           return fechaA - fechaB;
         });
 
-      console.log(`   - Colegiaturas existentes: ${colegiaturasExistentes.length}/${meses}`);
-
       const numerosAsignados = new Set();
       await Promise.all(colegiaturasExistentes.map(async (pago, idx) => {
         const numeroEsperado = idx + 1;
@@ -1129,13 +1016,11 @@ export const generarPagosPorNivel = async (alumno, configuracion) => {
         }
         if (Object.keys(updates).length > 0) {
           await updateDoc(doc(db, 'pagos', pago.id), updates);
-          console.log(`   ✏️ Actualizando colegiatura ${pago.id} con numeración ${numeroEsperado}/${meses}`);
         }
         numerosAsignados.add(numeroEsperado);
       }));
 
       if (colegiaturasExistentes.length === 0) {
-        console.log(`   ✅ Generando ${meses} colegiaturas de $${costoNivel.mensual} cada una`);
         for (let i = 0; i < fechasVencimiento.length; i++) {
           const numeroColegiatura = i + 1;
           const pagoColegiatura = await crearPago({
@@ -1161,7 +1046,6 @@ export const generarPagosPorNivel = async (alumno, configuracion) => {
         }
 
         if (faltantes.length > 0) {
-          console.log(`   ➕ Generando colegiaturas faltantes:`, faltantes);
           for (const numero of faltantes) {
             const fechaCorrespondiente = fechasVencimiento[numero - 1] || new Date(fechaInicio.getFullYear(), fechaInicio.getMonth() + numero - 1, diaVencimiento);
             const pagoColegiatura = await crearPago({
@@ -1178,8 +1062,6 @@ export const generarPagosPorNivel = async (alumno, configuracion) => {
             });
             pagosGenerados.push(pagoColegiatura);
           }
-        } else {
-          console.log(`   ✅ Colegiaturas completas. No se generaron nuevas.`);
         }
       }
     }
@@ -1223,7 +1105,6 @@ export const generarPagosPorNivel = async (alumno, configuracion) => {
     // Verificar si ya existe un certificado
     const tieneCertificado = pagosExistentes.some(p => p.tipo === 'Certificado');
     if (costoNivel.certificado && typeof costoNivel.certificado === 'number' && !tieneCertificado) {
-      console.log(`   ✅ Generando pago de certificado: $${costoNivel.certificado}`);
       const fechaCertificado = new Date(fechaInicio);
       if (costoNivel.meses) {
         fechaCertificado.setMonth(fechaInicio.getMonth() + costoNivel.meses);
@@ -1243,32 +1124,15 @@ export const generarPagosPorNivel = async (alumno, configuracion) => {
         descripcion: `Certificado - ${nivelNombre}`
       });
       pagosGenerados.push(pagoCertificado);
-    } else if (costoNivel.certificado && tieneCertificado) {
-      console.log(`   ⚠️ Ya existe pago de certificado, omitiendo`);
     }
-
-    console.log(`   ✅ Total de pagos generados: ${pagosGenerados.length}`);
     
     // Aplicar descuentos activos a todos los pagos del alumno (incluyendo los recién generados)
     if (pagosGenerados.length > 0 || pagosExistentes.length > 0) {
       try {
-        console.log(`   🔄 Aplicando descuentos activos a los pagos del alumno ${alumno.id}...`);
-        const resultado = await recalcularPagosConBecasActivas(alumno.id);
-        console.log(`   ✅ Descuentos aplicados: ${resultado.actualizados} pagos actualizados, ${resultado.omitidos} omitidos`);
-        if (resultado.actualizados === 0) {
-          console.warn(`   ⚠️ No se actualizó ningún pago. Verifica que haya becas activas y pagos pendientes.`);
-        }
+        await recalcularPagosConBecasActivas(alumno.id);
       } catch (errorBecas) {
-        console.error('❌ Error al aplicar las becas activas después de generar pagos:', errorBecas);
-        console.error('❌ Stack trace:', errorBecas.stack);
+        console.error('Error al aplicar las becas activas después de generar pagos:', errorBecas);
       }
-    }
-
-    if (pagosGenerados.length === 0) {
-      console.warn(`   ⚠️ No se generaron pagos. Razones posibles:`);
-      console.warn(`      - Ya existen todos los pagos necesarios`);
-      console.warn(`      - La configuración de costos no coincide con el nivel`);
-      console.warn(`      - El nivel del alumno no tiene costos configurados`);
     }
 
     return {
