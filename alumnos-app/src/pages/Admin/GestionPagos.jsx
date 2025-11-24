@@ -87,7 +87,14 @@ const GestionPagos = () => {
   const [fechaPago, setFechaPago] = useState('');
   const [pagoEditado, setPagoEditado] = useState({
     monto: '',
-    fechaVencimiento: ''
+    fechaVencimiento: '',
+    montoPagado: '',
+    fechaPago: '',
+    recargoPorcentaje: '',
+    recargoActivo: true,
+    observaciones: '',
+    estado: 'Pendiente',
+    descripcion: ''
   });
   const [archivoComprobante, setArchivoComprobante] = useState(null);
   const [uploadingComprobante, setUploadingComprobante] = useState(false);
@@ -1280,14 +1287,22 @@ const GestionPagos = () => {
                             onClick={() => {
                               setSelectedPago(pago);
                               const fechaVenc = pago.fechaVencimiento?.toDate?.() || new Date(pago.fechaVencimiento);
+                              const fechaPagoReal = pago.fechaPago?.toDate?.() || (pago.fechaPago ? new Date(pago.fechaPago) : null);
                               setPagoEditado({
                                 monto: pago.monto || '',
-                                fechaVencimiento: fechaVenc.toISOString().split('T')[0] // Formato YYYY-MM-DD
+                                fechaVencimiento: fechaVenc.toISOString().split('T')[0],
+                                montoPagado: pago.montoPagado || '',
+                                fechaPago: fechaPagoReal ? fechaPagoReal.toISOString().split('T')[0] : '',
+                                recargoPorcentaje: pago.recargoPorcentaje !== undefined ? pago.recargoPorcentaje : (configuracion?.recargoPorcentaje || 10),
+                                recargoActivo: pago.recargoActivo !== undefined ? pago.recargoActivo : (configuracion?.recargoActivo && pago.tipo === 'Colegiatura'),
+                                observaciones: pago.observaciones || '',
+                                estado: pago.estado || 'Pendiente',
+                                descripcion: pago.descripcion || ''
                               });
                               setShowModalEditarPago(true);
                             }}
                             className="inline-flex items-center px-3 py-2 bg-purple/10 text-purple rounded-lg hover:bg-purple/20 dark:hover:bg-purple/30 transition-colors text-sm border border-purple/20"
-                            title="Editar monto y fecha de vencimiento"
+                            title="Editar pago completo"
                           >
                             <PencilIcon className="w-4 h-4 mr-1" />
                             Editar
@@ -2371,65 +2386,232 @@ const GestionPagos = () => {
 
       {/* Modal Editar Pago */}
       {showModalEditarPago && selectedPago && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-md w-full p-6">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-2xl w-full p-6 my-8 max-h-[90vh] overflow-y-auto">
             <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
               Editar Pago
             </h3>
             <div className="space-y-4">
+              {/* Información básica */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Tipo de Pago
+                  </label>
+                  <input
+                    type="text"
+                    value={selectedPago.tipo || ''}
+                    disabled
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 cursor-not-allowed"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Estado *
+                  </label>
+                  <select
+                    value={pagoEditado.estado}
+                    onChange={(e) => setPagoEditado({ ...pagoEditado, estado: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  >
+                    <option value="Pendiente">Pendiente</option>
+                    <option value="Validado">Validado</option>
+                    <option value="Rechazado">Rechazado</option>
+                    <option value="Vencido">Vencido</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Monto y fecha de vencimiento */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Monto *
+                  </label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    value={pagoEditado.monto}
+                    onChange={(e) => setPagoEditado({ ...pagoEditado, monto: e.target.value })}
+                    placeholder="0.00"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  />
+                  {selectedPago.montoOriginal !== undefined && selectedPago.montoOriginal !== null && (
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                      Monto original: {formatearMoneda(selectedPago.montoOriginal)}
+                    </p>
+                  )}
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Fecha de Vencimiento *
+                  </label>
+                  <input
+                    type="date"
+                    value={pagoEditado.fechaVencimiento}
+                    onChange={(e) => setPagoEditado({ ...pagoEditado, fechaVencimiento: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  />
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    Original: {(selectedPago.fechaVencimiento?.toDate?.() || new Date(selectedPago.fechaVencimiento)).toLocaleDateString('es-MX')}
+                  </p>
+                </div>
+              </div>
+
+              {/* Monto pagado y fecha de pago */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Monto Pagado
+                  </label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    value={pagoEditado.montoPagado}
+                    onChange={(e) => setPagoEditado({ ...pagoEditado, montoPagado: e.target.value })}
+                    placeholder="0.00"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  />
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    Dejar vacío si no se ha pagado
+                  </p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Fecha de Pago
+                  </label>
+                  <input
+                    type="date"
+                    value={pagoEditado.fechaPago}
+                    onChange={(e) => setPagoEditado({ ...pagoEditado, fechaPago: e.target.value })}
+                    max={new Date().toISOString().split('T')[0]}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  />
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    Fecha en que se realizó el pago
+                  </p>
+                </div>
+              </div>
+
+              {/* Recargo */}
+              {selectedPago.tipo === 'Colegiatura' && (
+                <div className="bg-yellow/10 border border-yellow/20 rounded-lg p-4 space-y-3">
+                  <h4 className="text-sm font-semibold text-gray-900 dark:text-white">
+                    Configuración de Recargo
+                  </h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Porcentaje de Recargo
+                      </label>
+                      <input
+                        type="number"
+                        step="0.1"
+                        min="0"
+                        max="100"
+                        value={pagoEditado.recargoPorcentaje}
+                        onChange={(e) => setPagoEditado({ ...pagoEditado, recargoPorcentaje: parseFloat(e.target.value) || 0 })}
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                      />
+                    </div>
+                    <div className="flex items-end">
+                      <label className="flex items-center space-x-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={pagoEditado.recargoActivo}
+                          onChange={(e) => setPagoEditado({ ...pagoEditado, recargoActivo: e.target.checked })}
+                          className="w-4 h-4 text-blue border-gray-300 rounded focus:ring-blue"
+                        />
+                        <span className="text-sm text-gray-700 dark:text-gray-300">
+                          Recargo activo
+                        </span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Descripción */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Tipo de Pago
+                  Descripción
                 </label>
                 <input
                   type="text"
-                  value={selectedPago.tipo || ''}
-                  disabled
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 cursor-not-allowed"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Monto *
-                </label>
-                <input
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  value={pagoEditado.monto}
-                  onChange={(e) => setPagoEditado({ ...pagoEditado, monto: e.target.value })}
-                  placeholder="0.00"
+                  value={pagoEditado.descripcion}
+                  onChange={(e) => setPagoEditado({ ...pagoEditado, descripcion: e.target.value })}
+                  placeholder="Descripción del pago"
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 />
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                  Monto original: {formatearMoneda(selectedPago.monto || 0)}
-                </p>
               </div>
+
+              {/* Observaciones */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Fecha de Vencimiento *
+                  Observaciones
                 </label>
-                <input
-                  type="date"
-                  value={pagoEditado.fechaVencimiento}
-                  onChange={(e) => setPagoEditado({ ...pagoEditado, fechaVencimiento: e.target.value })}
+                <textarea
+                  value={pagoEditado.observaciones}
+                  onChange={(e) => setPagoEditado({ ...pagoEditado, observaciones: e.target.value })}
+                  rows={3}
+                  placeholder="Notas adicionales sobre este pago..."
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 />
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                  Fecha original: {(selectedPago.fechaVencimiento?.toDate?.() || new Date(selectedPago.fechaVencimiento)).toLocaleDateString('es-MX')}
-                </p>
               </div>
+
+              {/* Comprobante */}
+              {selectedPago.comprobanteUrl && (
+                <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3 border border-gray-200 dark:border-gray-600">
+                  <p className="text-sm text-gray-700 dark:text-gray-300 mb-2">
+                    <span className="font-medium">Comprobante:</span>
+                  </p>
+                  <a
+                    href={selectedPago.comprobanteUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-blue hover:underline inline-flex items-center gap-1"
+                  >
+                    <DocumentArrowUpIcon className="w-4 h-4" />
+                    Ver comprobante actual
+                  </a>
+                  <button
+                    onClick={() => {
+                      setShowModalEditarPago(false);
+                      setSelectedPago(selectedPago);
+                      setArchivoComprobante(null);
+                      setShowModalComprobante(true);
+                    }}
+                    className="ml-4 text-sm text-blue hover:underline"
+                  >
+                    Reemplazar comprobante
+                  </button>
+                </div>
+              )}
+
               <div className="bg-blue/10 border border-blue/20 rounded-lg p-3">
                 <p className="text-xs text-gray-700 dark:text-gray-300">
-                  <strong>Nota:</strong> Al modificar el monto o la fecha de vencimiento, el sistema recalculará automáticamente los recargos si aplican.
+                  <strong>Nota:</strong> Los cambios en el monto o fecha de vencimiento pueden afectar el cálculo de recargos. Si hay descuentos activos, estos se mantendrán aplicados.
                 </p>
               </div>
+
               <div className="flex gap-3 pt-4">
                 <button
                   onClick={() => {
                     setShowModalEditarPago(false);
                     setSelectedPago(null);
-                    setPagoEditado({ monto: '', fechaVencimiento: '' });
+                    setPagoEditado({
+                      monto: '',
+                      fechaVencimiento: '',
+                      montoPagado: '',
+                      fechaPago: '',
+                      recargoPorcentaje: '',
+                      recargoActivo: true,
+                      observaciones: '',
+                      estado: 'Pendiente',
+                      descripcion: ''
+                    });
                   }}
                   className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                 >
@@ -2455,14 +2637,68 @@ const GestionPagos = () => {
                         return;
                       }
 
-                      await actualizarPago(selectedPago.id, {
+                      const updateData = {
                         monto: montoEditado,
-                        fechaVencimiento: nuevaFecha
-                      });
+                        fechaVencimiento: nuevaFecha,
+                        estado: pagoEditado.estado,
+                        observaciones: pagoEditado.observaciones || '',
+                        descripcion: pagoEditado.descripcion || ''
+                      };
+
+                      // Actualizar monto pagado si se especificó
+                      if (pagoEditado.montoPagado) {
+                        const montoPagadoNum = parseFloat(pagoEditado.montoPagado);
+                        if (!isNaN(montoPagadoNum) && montoPagadoNum >= 0) {
+                          updateData.montoPagado = montoPagadoNum;
+                          // Calcular monto pendiente
+                          const montoTotal = calcularMontoTotal(
+                            montoEditado,
+                            nuevaFecha,
+                            pagoEditado.recargoPorcentaje || configuracion?.recargoPorcentaje || 10,
+                            pagoEditado.recargoActivo && selectedPago.tipo === 'Colegiatura',
+                            null,
+                            selectedPago.tipo
+                          );
+                          const pendiente = Number((montoTotal - montoPagadoNum).toFixed(2));
+                          if (pendiente > 0) {
+                            updateData.montoPendiente = pendiente;
+                          }
+                        }
+                      }
+
+                      // Actualizar fecha de pago si se especificó
+                      if (pagoEditado.fechaPago) {
+                        const fechaPagoDate = new Date(pagoEditado.fechaPago);
+                        if (!isNaN(fechaPagoDate.getTime())) {
+                          if (fechaPagoDate > new Date()) {
+                            showError('La fecha de pago no puede ser futura');
+                            return;
+                          }
+                          updateData.fechaPago = Timestamp.fromDate(fechaPagoDate);
+                        }
+                      }
+
+                      // Actualizar configuración de recargo para colegiaturas
+                      if (selectedPago.tipo === 'Colegiatura') {
+                        updateData.recargoPorcentaje = Number(pagoEditado.recargoPorcentaje) || configuracion?.recargoPorcentaje || 10;
+                        updateData.recargoActivo = pagoEditado.recargoActivo;
+                      }
+
+                      await actualizarPago(selectedPago.id, updateData);
                       success('Pago actualizado exitosamente');
                       setShowModalEditarPago(false);
                       setSelectedPago(null);
-                      setPagoEditado({ monto: '', fechaVencimiento: '' });
+                      setPagoEditado({
+                        monto: '',
+                        fechaVencimiento: '',
+                        montoPagado: '',
+                        fechaPago: '',
+                        recargoPorcentaje: '',
+                        recargoActivo: true,
+                        observaciones: '',
+                        estado: 'Pendiente',
+                        descripcion: ''
+                      });
                       
                       // Recargar pagos
                       const pagosData = await obtenerTodosLosPagos();

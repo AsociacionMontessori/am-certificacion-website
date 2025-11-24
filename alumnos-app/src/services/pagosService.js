@@ -132,7 +132,19 @@ export const aplicarBecaAPagosAlumno = async (alumnoId, beca) => {
       return;
     }
 
-    const montoOriginal = Number(pago.montoOriginal ?? pago.monto ?? 0);
+    // Obtener monto original: si no existe, usar el monto actual (puede que sea el original)
+    // Si el pago ya tiene descuentos aplicados, el montoOriginal debería existir
+    let montoOriginal = Number(pago.montoOriginal ?? pago.monto ?? 0);
+    
+    // Si el pago tiene descuentos aplicados pero no tiene montoOriginal guardado,
+    // intentar calcularlo desde el monto actual y los descuentos
+    if (!pago.montoOriginal && pago.descuentoAplicado && pago.descuentoAplicado > 0) {
+      // Si hay descuento aplicado, el monto original debería ser mayor
+      // Intentar revertir el descuento para obtener el original
+      const descuentoAplicado = Number(pago.descuentoAplicado);
+      montoOriginal = Number((Number(pago.monto) + descuentoAplicado).toFixed(2));
+    }
+    
     const becasActuales = (pago.becasAplicadas || []).filter((item) => item?.id !== beca.id);
     const becaMapeada = mapearBecaParaPago(beca);
     const { montoFinal, totalDescuento, becasDetalladas } = recalcularMontosConBecas(montoOriginal, [...becasActuales, becaMapeada]);
@@ -209,6 +221,133 @@ export const revertirBecaEnPagos = async (alumnoId, becaId) => {
   }));
 
   return { actualizados, sinCambios };
+};
+
+/**
+ * Recalcular todos los pagos de un alumno con todas sus becas activas
+ * Útil para actualizar pagos existentes cuando se crean o modifican descuentos
+ */
+export const recalcularPagosConBecasActivas = async (alumnoId) => {
+  if (!alumnoId) return { actualizados: 0, omitidos: 0 };
+
+  try {
+    // Obtener todas las becas activas del alumno
+    const becasActivas = await obtenerBecasAlumno(alumnoId);
+    
+    if (becasActivas.length === 0) {
+      // Si no hay becas activas, revertir todos los descuentos
+      const pagosSnapshot = await getDocs(query(collection(db, 'pagos'), where('alumnoId', '==', alumnoId)));
+      let actualizados = 0;
+
+      await Promise.all(pagosSnapshot.docs.map(async (docSnap) => {
+        const pago = { id: docSnap.id, ...docSnap.data() };
+        
+        // Solo actualizar pagos pendientes o vencidos
+        if (['Validado', 'Rechazado'].includes(pago.estado)) {
+          return;
+        }
+
+        const montoOriginal = Number(pago.montoOriginal ?? pago.monto ?? 0);
+        
+        const actualizaciones = {
+          monto: montoOriginal,
+          descuentoAplicado: deleteField(),
+          becasAplicadas: deleteField()
+        };
+
+        if (!pago.montoOriginal) {
+          actualizaciones.montoOriginal = deleteField();
+        }
+
+        if (pago.montoPagado) {
+          const pendiente = Number(Math.max(0, (montoOriginal - pago.montoPagado)).toFixed(2));
+          actualizaciones.montoPendiente = pendiente > 0 ? pendiente : deleteField();
+        }
+
+        await updateDoc(doc(db, 'pagos', pago.id), actualizaciones);
+        actualizados += 1;
+      }));
+
+      return { actualizados, omitidos: 0 };
+    }
+
+    // Obtener todos los pagos del alumno
+    const pagosSnapshot = await getDocs(query(collection(db, 'pagos'), where('alumnoId', '==', alumnoId)));
+    let actualizados = 0;
+    let omitidos = 0;
+
+    await Promise.all(pagosSnapshot.docs.map(async (docSnap) => {
+      const pago = { id: docSnap.id, ...docSnap.data() };
+      
+      // Solo actualizar pagos pendientes o vencidos
+      if (['Validado', 'Rechazado'].includes(pago.estado)) {
+        omitidos += 1;
+        return;
+      }
+
+      // Filtrar becas que aplican a este pago
+      const becasAplicables = becasActivas.filter(beca => aplicaBecaAPago(pago, beca));
+      
+      if (becasAplicables.length === 0) {
+        // Si no hay becas aplicables, revertir descuentos
+        const montoOriginal = Number(pago.montoOriginal ?? pago.monto ?? 0);
+        const actualizaciones = {
+          monto: montoOriginal,
+          descuentoAplicado: deleteField(),
+          becasAplicadas: deleteField()
+        };
+
+        if (!pago.montoOriginal) {
+          actualizaciones.montoOriginal = deleteField();
+        }
+
+        if (pago.montoPagado) {
+          const pendiente = Number(Math.max(0, (montoOriginal - pago.montoPagado)).toFixed(2));
+          actualizaciones.montoPendiente = pendiente > 0 ? pendiente : deleteField();
+        }
+
+        await updateDoc(doc(db, 'pagos', pago.id), actualizaciones);
+        actualizados += 1;
+        return;
+      }
+
+      // Obtener monto original
+      let montoOriginal = Number(pago.montoOriginal ?? pago.monto ?? 0);
+      
+      // Si el pago tiene descuentos aplicados pero no tiene montoOriginal guardado,
+      // intentar calcularlo desde el monto actual y los descuentos
+      if (!pago.montoOriginal && pago.descuentoAplicado && pago.descuentoAplicado > 0) {
+        const descuentoAplicado = Number(pago.descuentoAplicado);
+        montoOriginal = Number((Number(pago.monto) + descuentoAplicado).toFixed(2));
+      }
+
+      // Mapear becas aplicables
+      const becasMapeadas = becasAplicables.map(beca => mapearBecaParaPago(beca));
+      
+      // Recalcular montos con todas las becas aplicables
+      const { montoFinal, totalDescuento, becasDetalladas } = recalcularMontosConBecas(montoOriginal, becasMapeadas);
+
+      const actualizaciones = {
+        montoOriginal,
+        monto: montoFinal,
+        descuentoAplicado: totalDescuento,
+        becasAplicadas: becasDetalladas
+      };
+
+      if (pago.montoPagado) {
+        const pendiente = Number((montoFinal - pago.montoPagado).toFixed(2));
+        actualizaciones.montoPendiente = pendiente > 0 ? pendiente : deleteField();
+      }
+
+      await updateDoc(doc(db, 'pagos', pago.id), actualizaciones);
+      actualizados += 1;
+    }));
+
+    return { actualizados, omitidos };
+  } catch (error) {
+    console.error('Error al recalcular pagos con becas activas:', error);
+    throw error;
+  }
 };
 
 /**
@@ -600,7 +739,8 @@ export const crearBeca = async (becaData) => {
     const docRef = await addDoc(collection(db, 'becas'), nuevaBeca);
 
     if (nuevaBeca.activa) {
-      await aplicarBecaAPagosAlumno(baseBeca.alumnoId, { id: docRef.id, ...baseBeca, activa: true });
+      // Recalcular todos los pagos con todas las becas activas para asegurar consistencia
+      await recalcularPagosConBecasActivas(baseBeca.alumnoId);
     }
 
     return docRef.id;
@@ -631,12 +771,9 @@ export const actualizarBeca = async (becaId, becaData) => {
     const becaActualizadaSnap = await getDoc(becaRef);
     const becaActualizada = { id: becaActualizadaSnap.id, ...becaActualizadaSnap.data() };
 
-    // Reaplicar efectos en pagos
-    await revertirBecaEnPagos(becaAnterior.alumnoId, becaId);
-
-    if (becaActualizada.activa !== false) {
-      await aplicarBecaAPagosAlumno(becaActualizada.alumnoId, becaActualizada);
-    }
+    // Recalcular todos los pagos con todas las becas activas para asegurar consistencia
+    // Esto es más robusto que revertir y aplicar individualmente
+    await recalcularPagosConBecasActivas(becaAnterior.alumnoId);
   } catch (error) {
     console.error('Error al actualizar beca:', error);
     throw error;
@@ -661,7 +798,8 @@ export const eliminarBeca = async (becaId) => {
       fechaActualizacion: serverTimestamp()
     });
 
-    await revertirBecaEnPagos(beca.alumnoId, becaId);
+    // Recalcular todos los pagos con todas las becas activas restantes
+    await recalcularPagosConBecasActivas(beca.alumnoId);
   } catch (error) {
     console.error('Error al eliminar beca:', error);
     throw error;
