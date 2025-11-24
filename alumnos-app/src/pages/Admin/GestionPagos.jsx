@@ -298,16 +298,20 @@ const GestionPagos = () => {
   ];
 
   const handleAbrirDescuentos = (alumnoId, pagoId = '') => {
+    console.log('🔓 Abriendo modal de descuentos para alumno:', alumnoId);
     if (!alumnoId) {
+      console.warn('⚠️ No se proporcionó alumnoId');
       showError('Selecciona un alumno para gestionar descuentos');
       return;
     }
     setBecaEditando(null);
-    setBecaForm({
+    const nuevoForm = {
       ...crearBecaFormBase(alumnoId),
       alcance: pagoId ? 'pago' : 'colegiaturas',
       pagoId: pagoId || ''
-    });
+    };
+    console.log('📝 Configurando becaForm:', nuevoForm);
+    setBecaForm(nuevoForm);
     setShowModalBeca(true);
     cargarBecasAlumno(alumnoId);
   };
@@ -2074,10 +2078,22 @@ const GestionPagos = () => {
                       Descuentos activos ({becasAlumno.length})
                     </h4>
                     <div className="flex gap-2">
+                      {(() => {
+                        console.log('🎨 Renderizando botón "Aplicar descuentos"', {
+                          alumnoId: becaForm.alumnoId,
+                          recalculando: recalculandoDescuentos,
+                          disabled: recalculandoDescuentos || !becaForm.alumnoId
+                        });
+                        return null;
+                      })()}
                       <button
-                        onClick={async () => {
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
                           console.log('🔘 Botón "Aplicar descuentos" clickeado');
+                          console.log('📋 becaForm completo:', JSON.stringify(becaForm, null, 2));
                           console.log('📋 becaForm.alumnoId:', becaForm.alumnoId);
+                          console.log('📋 recalculandoDescuentos:', recalculandoDescuentos);
                           
                           if (!becaForm.alumnoId) {
                             console.warn('⚠️ No hay alumnoId seleccionado');
@@ -2085,7 +2101,8 @@ const GestionPagos = () => {
                             return;
                           }
                           
-                          setRecalculandoDescuentos(true);
+                          (async () => {
+                            setRecalculandoDescuentos(true);
                           try {
                             console.log('🔄 Iniciando recalculación de descuentos para alumno:', becaForm.alumnoId);
                             const resultado = await recalcularPagosConBecasActivas(becaForm.alumnoId);
@@ -2116,12 +2133,14 @@ const GestionPagos = () => {
                             setRecalculandoDescuentos(false);
                             console.log('🏁 Proceso de recalculación finalizado');
                           }
+                          })();
                         }}
                         disabled={recalculandoDescuentos || !becaForm.alumnoId}
                         className="text-xs px-3 py-1.5 bg-blue text-white rounded-lg hover:bg-blue/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                        title="Recalcular descuentos en todos los pagos del alumno"
+                        title={!becaForm.alumnoId ? 'Selecciona un alumno primero' : 'Recalcular descuentos en todos los pagos del alumno'}
                       >
                         {recalculandoDescuentos ? 'Recalculando...' : 'Aplicar descuentos'}
+                        {!becaForm.alumnoId && ' (Selecciona alumno)'}
                       </button>
                       <button
                         onClick={() => becaForm.alumnoId && cargarBecasAlumno(becaForm.alumnoId)}
