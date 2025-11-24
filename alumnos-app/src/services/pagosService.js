@@ -47,31 +47,69 @@ const mapearBecaParaPago = (beca) => {
 };
 
 const aplicaBecaAPago = (pago, beca) => {
-  if (!pago || !beca || beca.activa === false) return false;
-  if (['Validado', 'Rechazado'].includes(pago.estado)) return false;
+  console.log(`      🔍 Verificando si beca "${beca.nombre || beca.id}" aplica a pago ${pago.id}:`);
+  console.log(`         - beca.activa: ${beca.activa}`);
+  console.log(`         - pago.estado: ${pago.estado}`);
+  console.log(`         - beca.alcance: ${beca.alcance}`);
+  console.log(`         - pago.tipo: ${pago.tipo}`);
+  
+  if (!pago || !beca || beca.activa === false) {
+    console.log(`         ❌ Rechazado: pago o beca inválidos o beca inactiva`);
+    return false;
+  }
+  if (['Validado', 'Rechazado'].includes(pago.estado)) {
+    console.log(`         ❌ Rechazado: pago ya validado o rechazado`);
+    return false;
+  }
 
   const fechaInicio = normalizarFecha(beca.fechaInicio);
   const fechaFin = normalizarFecha(beca.fechaFin);
   const fechaPago = normalizarFecha(pago.fechaVencimiento) || new Date();
+  
+  console.log(`         - fechaInicio: ${fechaInicio ? fechaInicio.toISOString() : 'null'}`);
+  console.log(`         - fechaFin: ${fechaFin ? fechaFin.toISOString() : 'null'}`);
+  console.log(`         - fechaPago: ${fechaPago.toISOString()}`);
 
-  if (fechaInicio && fechaPago < fechaInicio) return false;
-  if (fechaFin && fechaPago > fechaFin) return false;
+  if (fechaInicio && fechaPago < fechaInicio) {
+    console.log(`         ❌ Rechazado: fecha de pago antes de fecha de inicio`);
+    return false;
+  }
+  if (fechaFin && fechaPago > fechaFin) {
+    console.log(`         ❌ Rechazado: fecha de pago después de fecha de fin`);
+    return false;
+  }
 
+  let resultado = false;
   switch (beca.alcance) {
     case 'colegiaturas':
-      return pago.tipo === 'Colegiatura';
+      resultado = pago.tipo === 'Colegiatura';
+      console.log(`         - Alcance 'colegiaturas': ${resultado ? '✅' : '❌'} (pago.tipo=${pago.tipo})`);
+      break;
     case 'inscripcion':
-      return pago.tipo === 'Inscripción';
+      resultado = pago.tipo === 'Inscripción';
+      console.log(`         - Alcance 'inscripcion': ${resultado ? '✅' : '❌'} (pago.tipo=${pago.tipo})`);
+      break;
     case 'certificado':
-      return pago.tipo === 'Certificado';
+      resultado = pago.tipo === 'Certificado';
+      console.log(`         - Alcance 'certificado': ${resultado ? '✅' : '❌'} (pago.tipo=${pago.tipo})`);
+      break;
     case 'pago':
-      return beca.pagoId && (pago.id === beca.pagoId);
+      resultado = beca.pagoId && (pago.id === beca.pagoId);
+      console.log(`         - Alcance 'pago': ${resultado ? '✅' : '❌'} (beca.pagoId=${beca.pagoId}, pago.id=${pago.id})`);
+      break;
     case 'concepto':
-      return beca.concepto ? (pago.tipo === beca.concepto || pago.descripcion?.toLowerCase().includes(beca.concepto.toLowerCase())) : true;
+      resultado = beca.concepto ? (pago.tipo === beca.concepto || pago.descripcion?.toLowerCase().includes(beca.concepto.toLowerCase())) : true;
+      console.log(`         - Alcance 'concepto': ${resultado ? '✅' : '❌'} (beca.concepto=${beca.concepto})`);
+      break;
     case 'global':
     default:
-      return true;
+      resultado = true;
+      console.log(`         - Alcance 'global' o default: ✅`);
+      break;
   }
+  
+  console.log(`         🎯 RESULTADO FINAL: ${resultado ? '✅ APLICA' : '❌ NO APLICA'}`);
+  return resultado;
 };
 
 const recalcularMontosConBecas = (montoOriginal, becas = []) => {
@@ -296,13 +334,18 @@ export const recalcularPagosConBecasActivas = async (alumnoId) => {
       }
 
       // Filtrar becas que aplican a este pago
+      console.log(`   🔍 Analizando becas para pago ${pago.id} (${pago.tipo}):`);
       const becasAplicables = becasActivas.filter(beca => {
+        console.log(`   📋 Verificando beca:`, {
+          id: beca.id,
+          nombre: beca.nombre,
+          activa: beca.activa,
+          alcance: beca.alcance,
+          fechaInicio: beca.fechaInicio,
+          fechaFin: beca.fechaFin,
+          pagoId: beca.pagoId
+        });
         const aplica = aplicaBecaAPago(pago, beca);
-        if (!aplica) {
-          console.log(`   ❌ Beca "${beca.nombre || beca.id}" NO aplica a pago ${pago.id} (${pago.tipo})`);
-        } else {
-          console.log(`   ✅ Beca "${beca.nombre || beca.id}" SÍ aplica a pago ${pago.id} (${pago.tipo})`);
-        }
         return aplica;
       });
       console.log(`   💰 Pago ${pago.id} (${pago.tipo}): ${becasAplicables.length} becas aplicables de ${becasActivas.length} totales`);
