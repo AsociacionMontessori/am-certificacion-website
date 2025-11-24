@@ -231,10 +231,13 @@ export const recalcularPagosConBecasActivas = async (alumnoId) => {
   if (!alumnoId) return { actualizados: 0, omitidos: 0 };
 
   try {
+    console.log(`🔄 Recalculando descuentos para alumno: ${alumnoId}`);
     // Obtener todas las becas activas del alumno
     const becasActivas = await obtenerBecasAlumno(alumnoId);
+    console.log(`   📋 Becas activas encontradas: ${becasActivas.length}`);
     
     if (becasActivas.length === 0) {
+      console.log(`   ⚠️ No hay becas activas, revirtiendo descuentos...`);
       // Si no hay becas activas, revertir todos los descuentos
       const pagosSnapshot = await getDocs(query(collection(db, 'pagos'), where('alumnoId', '==', alumnoId)));
       let actualizados = 0;
@@ -287,6 +290,7 @@ export const recalcularPagosConBecasActivas = async (alumnoId) => {
 
       // Filtrar becas que aplican a este pago
       const becasAplicables = becasActivas.filter(beca => aplicaBecaAPago(pago, beca));
+      console.log(`   💰 Pago ${pago.id} (${pago.tipo}): ${becasAplicables.length} becas aplicables de ${becasActivas.length} totales`);
       
       if (becasAplicables.length === 0) {
         // Si no hay becas aplicables, revertir descuentos
@@ -316,9 +320,21 @@ export const recalcularPagosConBecasActivas = async (alumnoId) => {
       
       // Si el pago tiene descuentos aplicados pero no tiene montoOriginal guardado,
       // intentar calcularlo desde el monto actual y los descuentos
-      if (!pago.montoOriginal && pago.descuentoAplicado && pago.descuentoAplicado > 0) {
-        const descuentoAplicado = Number(pago.descuentoAplicado);
-        montoOriginal = Number((Number(pago.monto) + descuentoAplicado).toFixed(2));
+      if (!pago.montoOriginal || pago.montoOriginal === pago.monto) {
+        // Si no hay montoOriginal o es igual al monto actual, puede que:
+        // 1. El pago nunca tuvo descuentos (montoOriginal = monto actual)
+        // 2. El pago tiene descuentos pero no se guardó el original
+        if (pago.descuentoAplicado && pago.descuentoAplicado > 0) {
+          // Si hay descuento aplicado, el monto original debería ser mayor
+          const descuentoAplicado = Number(pago.descuentoAplicado);
+          montoOriginal = Number((Number(pago.monto) + descuentoAplicado).toFixed(2));
+        } else if (pago.becasAplicadas && pago.becasAplicadas.length > 0) {
+          // Si hay becas aplicadas pero no descuento registrado, intentar calcular el original
+          // Esto puede pasar si el descuento se calculó incorrectamente
+          // Por seguridad, usar el monto actual como original si no hay descuento registrado
+          montoOriginal = Number(pago.monto);
+        }
+        // Si no hay descuentos ni becas aplicadas, el monto actual es el original
       }
 
       // Mapear becas aplicables
@@ -326,13 +342,25 @@ export const recalcularPagosConBecasActivas = async (alumnoId) => {
       
       // Recalcular montos con todas las becas aplicables
       const { montoFinal, totalDescuento, becasDetalladas } = recalcularMontosConBecas(montoOriginal, becasMapeadas);
+      
+      console.log(`   📊 Pago ${pago.id}: Original=${montoOriginal}, Final=${montoFinal}, Descuento=${totalDescuento}`);
 
       const actualizaciones = {
         montoOriginal,
-        monto: montoFinal,
-        descuentoAplicado: totalDescuento,
-        becasAplicadas: becasDetalladas
+        monto: montoFinal
       };
+
+      if (totalDescuento > 0) {
+        actualizaciones.descuentoAplicado = totalDescuento;
+      } else {
+        actualizaciones.descuentoAplicado = deleteField();
+      }
+
+      if (becasDetalladas.length > 0) {
+        actualizaciones.becasAplicadas = becasDetalladas;
+      } else {
+        actualizaciones.becasAplicadas = deleteField();
+      }
 
       if (pago.montoPagado) {
         const pendiente = Number((montoFinal - pago.montoPagado).toFixed(2));
@@ -1136,12 +1164,12 @@ export const generarPagosPorNivel = async (alumno, configuracion) => {
 
     console.log(`   ✅ Total de pagos generados: ${pagosGenerados.length}`);
     
-    if (pagosGenerados.length > 0) {
+    // Aplicar descuentos activos a todos los pagos del alumno (incluyendo los recién generados)
+    if (pagosGenerados.length > 0 || pagosExistentes.length > 0) {
       try {
-        const becasActivas = await obtenerBecasAlumno(alumno.id);
-        for (const beca of becasActivas) {
-          await aplicarBecaAPagosAlumno(alumno.id, beca);
-        }
+        console.log(`   🔄 Aplicando descuentos activos a los pagos...`);
+        const resultado = await recalcularPagosConBecasActivas(alumno.id);
+        console.log(`   ✅ Descuentos aplicados: ${resultado.actualizados} pagos actualizados, ${resultado.omitidos} omitidos`);
       } catch (errorBecas) {
         console.warn('⚠️ No se pudieron aplicar las becas activas después de generar pagos:', errorBecas);
       }

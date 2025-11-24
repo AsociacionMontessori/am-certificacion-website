@@ -20,7 +20,8 @@ import {
   eliminarPago,
   subirComprobante,
   eliminarComprobante,
-  generarPagosPorNivel
+  generarPagosPorNivel,
+  recalcularPagosConBecasActivas
 } from '../../services/pagosService';
 import {
   formatearMoneda,
@@ -129,6 +130,7 @@ const GestionPagos = () => {
   const [loadingBecas, setLoadingBecas] = useState(false);
   const [guardandoBeca, setGuardandoBeca] = useState(false);
   const [eliminandoBecaId, setEliminandoBecaId] = useState(null);
+  const [recalculandoDescuentos, setRecalculandoDescuentos] = useState(false);
 
   const obtenerNombreNivelAlumno = (alumnoData) => {
     if (!alumnoData) {
@@ -732,6 +734,15 @@ const GestionPagos = () => {
       }
 
       await crearPago(payload);
+
+      // Aplicar descuentos activos al nuevo pago
+      try {
+        if (payload.alumnoId) {
+          await recalcularPagosConBecasActivas(payload.alumnoId);
+        }
+      } catch (errorBecas) {
+        console.warn('No se pudieron aplicar los descuentos al nuevo pago:', errorBecas);
+      }
 
       success('Pago creado exitosamente');
       setShowModalCrearPago(false);
@@ -2056,16 +2067,40 @@ const GestionPagos = () => {
                 </div>
 
                 <div className="space-y-4">
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between gap-2">
                     <h4 className="text-lg font-semibold text-gray-900 dark:text-white">
                       Descuentos activos ({becasAlumno.length})
                     </h4>
-                    <button
-                      onClick={() => becaForm.alumnoId && cargarBecasAlumno(becaForm.alumnoId)}
-                      className="text-xs px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                    >
-                      Actualizar lista
-                    </button>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={async () => {
+                          if (!becaForm.alumnoId) return;
+                          setRecalculandoDescuentos(true);
+                          try {
+                            const resultado = await recalcularPagosConBecasActivas(becaForm.alumnoId);
+                            success(`Descuentos recalculados: ${resultado.actualizados} pagos actualizados`);
+                            await cargarBecasAlumno(becaForm.alumnoId);
+                            await recargarPagos();
+                          } catch (error) {
+                            console.error('Error al recalcular descuentos:', error);
+                            showError('Error al recalcular los descuentos');
+                          } finally {
+                            setRecalculandoDescuentos(false);
+                          }
+                        }}
+                        disabled={recalculandoDescuentos || !becaForm.alumnoId}
+                        className="text-xs px-3 py-1.5 bg-blue text-white rounded-lg hover:bg-blue/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        title="Recalcular descuentos en todos los pagos del alumno"
+                      >
+                        {recalculandoDescuentos ? 'Recalculando...' : 'Aplicar descuentos'}
+                      </button>
+                      <button
+                        onClick={() => becaForm.alumnoId && cargarBecasAlumno(becaForm.alumnoId)}
+                        className="text-xs px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                      >
+                        Actualizar lista
+                      </button>
+                    </div>
                   </div>
 
                   <div className="space-y-3 max-h-[420px] overflow-y-auto pr-1">
