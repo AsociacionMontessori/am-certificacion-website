@@ -549,9 +549,14 @@ const GestionPagos = () => {
         const fechaVenc = selectedPago.fechaVencimiento?.toDate?.() || new Date(selectedPago.fechaVencimiento);
         const fechaPagoReal = fechaPago ? new Date(fechaPago) : new Date();
         const recargoPorcentaje = selectedPago.recargoPorcentaje || configuracion?.recargoPorcentaje || 10;
+        const diaVencimiento = configuracion?.diaVencimiento || 10;
         
-        // Calcular recargo solo si la fecha de pago es después de la fecha de vencimiento
-        if (fechaPagoReal > fechaVenc) {
+        // Crear fecha límite (día 10 del mes de vencimiento, a las 23:59:59)
+        // El recargo se aplica a partir del día 11
+        const fechaLimite = new Date(fechaVenc.getFullYear(), fechaVenc.getMonth(), diaVencimiento, 23, 59, 59, 999);
+        
+        // Calcular recargo solo si la fecha de pago es después de la fecha límite (día 11 o posterior)
+        if (fechaPagoReal > fechaLimite) {
           recargoCalculado = (selectedPago.monto * recargoPorcentaje) / 100;
           montoTotalConRecargo = selectedPago.monto + recargoCalculado;
         }
@@ -1136,13 +1141,15 @@ const GestionPagos = () => {
               const nivelActualAlumno = obtenerNombreNivelAlumno(alumno);
               const fechaVenc = pago.fechaVencimiento?.toDate?.() || new Date(pago.fechaVencimiento);
               // Solo calcular recargo para colegiaturas
+              const diaVencimiento = configuracion?.diaVencimiento || 10;
               const montoTotal = calcularMontoTotal(
                 pago.monto,
                 pago.fechaVencimiento,
                 pago.recargoPorcentaje || configuracion?.recargoPorcentaje,
                 pago.recargoActivo !== undefined ? pago.recargoActivo : (configuracion?.recargoActivo && pago.tipo === 'Colegiatura'),
                 null,
-                pago.tipo
+                pago.tipo,
+                diaVencimiento
               );
 
               // Verificar si el alumno tiene pagos (para mostrar botón de generar)
@@ -1391,12 +1398,17 @@ const GestionPagos = () => {
         const montoBase = selectedPago.monto || 0;
         const recargoPorcentaje = selectedPago.recargoPorcentaje || configuracion?.recargoPorcentaje || 10;
         const recargoActivo = selectedPago.recargoActivo !== undefined ? selectedPago.recargoActivo : (configuracion?.recargoActivo && selectedPago.tipo === 'Colegiatura');
+        const diaVencimiento = configuracion?.diaVencimiento || 10;
+        
+        // Crear fecha límite (día 10 del mes de vencimiento, a las 23:59:59)
+        // El recargo se aplica a partir del día 11
+        const fechaLimite = new Date(fechaVenc.getFullYear(), fechaVenc.getMonth(), diaVencimiento, 23, 59, 59, 999);
         
         // Calcular recargo basado en fecha de pago
         let recargoCalculado = 0;
         let montoTotalConRecargo = montoBase;
         
-        if (selectedPago.tipo === 'Colegiatura' && recargoActivo && fechaPagoReal > fechaVenc) {
+        if (selectedPago.tipo === 'Colegiatura' && recargoActivo && fechaPagoReal > fechaLimite) {
           recargoCalculado = (montoBase * recargoPorcentaje) / 100;
           montoTotalConRecargo = montoBase + recargoCalculado;
         }
@@ -2698,13 +2710,15 @@ const GestionPagos = () => {
                         if (!isNaN(montoPagadoNum) && montoPagadoNum >= 0) {
                           updateData.montoPagado = montoPagadoNum;
                           // Calcular monto pendiente
+                          const diaVencimientoModal = configuracion?.diaVencimiento || 10;
                           const montoTotal = calcularMontoTotal(
                             montoEditado,
                             nuevaFecha,
                             pagoEditado.recargoPorcentaje || configuracion?.recargoPorcentaje || 10,
                             pagoEditado.recargoActivo && selectedPago.tipo === 'Colegiatura',
                             null,
-                            selectedPago.tipo
+                            selectedPago.tipo,
+                            diaVencimientoModal
                           );
                           const pendiente = Number((montoTotal - montoPagadoNum).toFixed(2));
                           if (pendiente > 0) {

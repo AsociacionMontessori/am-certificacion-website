@@ -4,20 +4,25 @@
 
 /**
  * Calcular recargo por retraso
+ * IMPORTANTE: El recargo se aplica a partir del día 11, ya que la fecha límite es el día 10
  */
-export const calcularRecargo = (monto, fechaVencimiento, fechaPago, recargoPorcentaje = 10, recargoActivo = true) => {
+export const calcularRecargo = (monto, fechaVencimiento, fechaPago, recargoPorcentaje = 10, recargoActivo = true, diaVencimiento = 10) => {
   if (!recargoActivo) return 0;
   
   const vencimiento = fechaVencimiento instanceof Date ? fechaVencimiento : fechaVencimiento?.toDate?.() || new Date(fechaVencimiento);
   const pago = fechaPago instanceof Date ? fechaPago : fechaPago?.toDate?.() || new Date(fechaPago);
   
-  // Si el pago es antes o el día del vencimiento, no hay recargo
-  if (pago <= vencimiento) return 0;
+  // Crear fecha límite (día 10 del mes de vencimiento, a las 23:59:59)
+  const fechaLimite = new Date(vencimiento.getFullYear(), vencimiento.getMonth(), diaVencimiento, 23, 59, 59, 999);
   
-  // Calcular días de retraso
-  const diasRetraso = Math.ceil((pago - vencimiento) / (1000 * 60 * 60 * 24));
+  // Si el pago es antes o el día de la fecha límite (día 10), no hay recargo
+  // El recargo se aplica a partir del día 11
+  if (pago <= fechaLimite) return 0;
   
-  // Solo aplicar recargo si hay retraso
+  // Calcular días de retraso desde la fecha límite
+  const diasRetraso = Math.ceil((pago - fechaLimite) / (1000 * 60 * 60 * 24));
+  
+  // Solo aplicar recargo si hay retraso (día 11 o posterior)
   if (diasRetraso > 0) {
     return (monto * recargoPorcentaje) / 100;
   }
@@ -51,8 +56,9 @@ export const aplicaRecargo = (fechaVencimiento, diaVencimiento = 10, recargoActi
 /**
  * Calcular monto total con recargo
  * IMPORTANTE: Los recargos solo se aplican a colegiaturas
+ * El recargo se aplica a partir del día 11, ya que la fecha límite es el día 10
  */
-export const calcularMontoTotal = (monto, fechaVencimiento, recargoPorcentaje = 10, recargoActivo = true, fechaPago = null, tipoPago = null) => {
+export const calcularMontoTotal = (monto, fechaVencimiento, recargoPorcentaje = 10, recargoActivo = true, fechaPago = null, tipoPago = null, diaVencimiento = 10) => {
   // Solo aplicar recargo si es una colegiatura
   if (tipoPago !== 'Colegiatura') {
     return monto;
@@ -63,7 +69,7 @@ export const calcularMontoTotal = (monto, fechaVencimiento, recargoPorcentaje = 
   }
   
   const fechaCalculo = fechaPago || new Date();
-  const recargo = calcularRecargo(monto, fechaVencimiento, fechaCalculo, recargoPorcentaje, recargoActivo);
+  const recargo = calcularRecargo(monto, fechaVencimiento, fechaCalculo, recargoPorcentaje, recargoActivo, diaVencimiento);
   return monto + recargo;
 };
 
@@ -84,12 +90,15 @@ export const calcularSaldoPendiente = (pagos) => {
 /**
  * Calcular monto total adeudado
  */
-export const calcularMontoAdeudado = (pagos, becas = []) => {
+export const calcularMontoAdeudado = (pagos, becas = [], configuracion = null) => {
   if (!pagos || pagos.length === 0) return 0;
   
   const pagosPendientes = pagos.filter(p => 
     p.estado === 'Pendiente' || p.estado === 'Vencido'
   );
+  
+  // Obtener día de vencimiento de la configuración (por defecto 10)
+  const diaVencimiento = configuracion?.diaVencimiento || 10;
   
   let total = pagosPendientes.reduce((suma, pago) => {
     const montoBase = pago.montoOriginal !== undefined ? Number(pago.montoOriginal) : Number(pago.monto || 0);
@@ -99,10 +108,11 @@ export const calcularMontoAdeudado = (pagos, becas = []) => {
     const montoConRecargo = calcularMontoTotal(
       montoConBeca,
       pago.fechaVencimiento,
-      pago.recargoPorcentaje,
-      pago.recargoActivo,
+      pago.recargoPorcentaje || configuracion?.recargoPorcentaje,
+      pago.recargoActivo !== undefined ? pago.recargoActivo : (configuracion?.recargoActivo && pago.tipo === 'Colegiatura'),
       null,
-      pago.tipo // Pasar el tipo de pago para verificar si es colegiatura
+      pago.tipo, // Pasar el tipo de pago para verificar si es colegiatura
+      diaVencimiento
     );
     return suma + montoConRecargo;
   }, 0);
