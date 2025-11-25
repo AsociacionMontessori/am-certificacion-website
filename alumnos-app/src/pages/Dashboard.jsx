@@ -14,17 +14,105 @@ import {
   ClipboardDocumentIcon,
   ShieldCheckIcon,
   LinkIcon,
-  ArrowTopRightOnSquareIcon
+  ArrowTopRightOnSquareIcon,
+  ExclamationTriangleIcon,
+  ArrowRightIcon
 } from '@heroicons/react/24/outline';
 import { Link } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import AlertasMateriasAtraso from '../components/AlertasMateriasAtraso';
+import { obtenerPagosAlumno, obtenerConfiguracionPagos, obtenerBecasAlumno } from '../services/pagosService';
+import { aplicaRecargo, aplicarBeca, calcularMontoTotal, formatearMoneda } from '../utils/calculosPagos';
+import LoadingSpinner from '../components/LoadingSpinner';
 
 const Dashboard = () => {
-  const { userData } = useAuth();
+  const { userData, currentUser } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
+  const [pagosVencidos, setPagosVencidos] = useState([]);
+  const [totalVencidos, setTotalVencidos] = useState(0);
+  const [totalRecargos, setTotalRecargos] = useState(0);
+  const [loadingPagos, setLoadingPagos] = useState(true);
 
   const { success, prompt: showPrompt } = useNotifications();
+
+  // Cargar pagos vencidos
+  useEffect(() => {
+    const cargarPagosVencidos = async () => {
+      if (!currentUser || !userData || userData.estado === 'Inactivo') {
+        setLoadingPagos(false);
+        return;
+      }
+
+      try {
+        const [pagosData, configData, becasData] = await Promise.all([
+          obtenerPagosAlumno(currentUser.uid),
+          obtenerConfiguracionPagos(),
+          obtenerBecasAlumno(currentUser.uid)
+        ]);
+
+        const hoy = new Date();
+        hoy.setHours(0, 0, 0, 0);
+        const diaVencimiento = configData?.diaVencimiento || 10;
+
+        const pagosPendientes = pagosData.filter(p => p.estado === 'Pendiente' || p.estado === 'Vencido');
+        
+        const pagosVencidosDetalle = pagosPendientes
+          .map(pago => {
+            if (!pago || !pago.fechaVencimiento) return null;
+            try {
+              const fechaVenc = pago.fechaVencimiento?.toDate?.() || new Date(pago.fechaVencimiento);
+              if (isNaN(fechaVenc.getTime())) return null;
+              
+              const fechaLimite = new Date(fechaVenc.getFullYear(), fechaVenc.getMonth(), diaVencimiento, 23, 59, 59, 999);
+              if (isNaN(fechaLimite.getTime())) return null;
+              
+              const esVencido = hoy > fechaLimite;
+              if (!esVencido) return null;
+
+              const montoBase = pago.montoOriginal !== undefined ? Number(pago.montoOriginal) : Number(pago.monto || 0);
+              if (isNaN(montoBase)) return null;
+              
+              const montoConDescuentosRegistrados = Number((pago.monto ?? montoBase).toFixed(2));
+              const montoConBeca = aplicarBeca(montoConDescuentosRegistrados, becasData || [], { pago });
+              if (isNaN(montoConBeca)) return null;
+              
+              const montoTotal = calcularMontoTotal(
+                montoConBeca,
+                pago.fechaVencimiento,
+                pago.recargoPorcentaje || configData?.recargoPorcentaje,
+                pago.recargoActivo !== undefined ? pago.recargoActivo : (configData?.recargoActivo && pago.tipo === 'Colegiatura'),
+                null,
+                pago.tipo,
+                diaVencimiento
+              );
+              if (isNaN(montoTotal)) return null;
+              
+              const recargoAplicado = montoTotal - montoConBeca;
+              
+              return {
+                ...pago,
+                montoTotal,
+                recargoAplicado
+              };
+            } catch (error) {
+              console.warn('Error al procesar pago:', error, pago);
+              return null;
+            }
+          })
+          .filter(p => p !== null);
+
+        setPagosVencidos(pagosVencidosDetalle);
+        setTotalVencidos(pagosVencidosDetalle.reduce((sum, p) => sum + (p.montoTotal || 0), 0));
+        setTotalRecargos(pagosVencidosDetalle.reduce((sum, p) => sum + (p.recargoAplicado || 0), 0));
+      } catch (error) {
+        console.error('Error al cargar pagos vencidos:', error);
+      } finally {
+        setLoadingPagos(false);
+      }
+    };
+
+    cargarPagosVencidos();
+  }, [currentUser, userData]);
 
   // Función para copiar al portapapeles
   const handleCopyToClipboard = async (texto, tipo = '') => {
@@ -109,6 +197,45 @@ const Dashboard = () => {
               <li>No asistió a clases o no entregó actividades</li>
               <li>No ingresó al sistema en los últimos tres meses</li>
             </ul>
+          </div>
+        </div>
+      )}
+
+      {/* Alerta de Pagos Vencidos */}
+      {!loadingPagos && userData?.estado !== 'Inactivo' && pagosVencidos.length > 0 && (
+        <div className="bg-gradient-to-r from-red-500 to-red-600 dark:from-red-600 dark:to-red-700 rounded-xl shadow-lg p-6 border-2 border-red-400 dark:border-red-500 text-white">
+          <div className="flex items-start gap-4">
+            <div className="flex-shrink-0">
+              <ExclamationTriangleIcon className="w-10 h-10 text-white" />
+            </div>
+            <div className="flex-1">
+              <h3 className="text-xl font-bold mb-2">
+                ⚠️ Tienes {pagosVencidos.length} {pagosVencidos.length === 1 ? 'pago vencido' : 'pagos vencidos'}
+              </h3>
+              <p className="text-red-50 dark:text-red-100 mb-3">
+                Es importante que realices el pago de tus colegiaturas vencidas lo antes posible para evitar recargos adicionales. 
+                <span className="font-semibold"> Además, el no pago oportuno puede resultar en la baja del servicio educativo.</span>
+                Por favor, sube tu comprobante de pago para que podamos validarlo.
+              </p>
+              <div className="bg-white/20 dark:bg-white/10 rounded-lg p-3 backdrop-blur-sm mb-4">
+                <p className="text-sm font-semibold mb-1">Total de pagos vencidos:</p>
+                <p className="text-2xl font-bold">
+                  {formatearMoneda(totalVencidos || 0)}
+                </p>
+                {totalRecargos > 0 && (
+                  <p className="text-sm mt-1 text-yellow-200">
+                    Incluye {formatearMoneda(totalRecargos)} en recargos aplicados
+                  </p>
+                )}
+              </div>
+              <Link
+                to="/pagos"
+                className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-white text-red-600 dark:text-red-700 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/30 font-semibold transition-colors shadow-md"
+              >
+                Ir a Pagos
+                <ArrowRightIcon className="w-5 h-5" />
+              </Link>
+            </div>
           </div>
         </div>
       )}

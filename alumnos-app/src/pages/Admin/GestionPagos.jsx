@@ -26,7 +26,9 @@ import {
 import {
   formatearMoneda,
   calcularMontoTotal,
-  aplicaRecargo
+  aplicaRecargo,
+  calcularMontoAdeudado,
+  aplicarBeca
 } from '../../utils/calculosPagos';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import {
@@ -916,6 +918,70 @@ const GestionPagos = () => {
     rechazados: pagos.filter(p => p.estado === 'Rechazado').length
   }), [pagos]);
 
+  // Calcular resumen de deuda del alumno seleccionado
+  const alumnoSeleccionadoId = filtroAlumno || alumnoIdParam;
+  const resumenAlumno = useMemo(() => {
+    if (!alumnoSeleccionadoId) return null;
+    
+    const pagosAlumno = pagos.filter(p => p.alumnoId === alumnoSeleccionadoId);
+    const pagosPendientesAlumno = pagosAlumno.filter(p => p.estado === 'Pendiente' || p.estado === 'Vencido');
+    
+    if (pagosPendientesAlumno.length === 0) return null;
+    
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0);
+    const diaVencimiento = configuracion?.diaVencimiento || 10;
+    
+    const pagosDetalle = pagosPendientesAlumno.map(pago => {
+      const fechaVenc = pago.fechaVencimiento?.toDate?.() || new Date(pago.fechaVencimiento);
+      const fechaLimite = new Date(fechaVenc.getFullYear(), fechaVenc.getMonth(), diaVencimiento, 23, 59, 59, 999);
+      const diasVencidos = hoy > fechaLimite ? Math.ceil((hoy - fechaLimite) / (1000 * 60 * 60 * 24)) : 0;
+      const esVencido = hoy > fechaLimite;
+      
+      const montoBase = pago.montoOriginal !== undefined ? Number(pago.montoOriginal) : Number(pago.monto || 0);
+      const montoConDescuentosRegistrados = Number((pago.monto ?? montoBase).toFixed(2));
+      const montoConBeca = aplicarBeca(montoConDescuentosRegistrados, becasAlumno, { pago });
+      const montoTotal = calcularMontoTotal(
+        montoConBeca,
+        pago.fechaVencimiento,
+        pago.recargoPorcentaje || configuracion?.recargoPorcentaje,
+        pago.recargoActivo !== undefined ? pago.recargoActivo : (configuracion?.recargoActivo && pago.tipo === 'Colegiatura'),
+        null,
+        pago.tipo,
+        diaVencimiento
+      );
+      const recargoAplicado = montoTotal - montoConBeca;
+      
+      return {
+        ...pago,
+        fechaVenc,
+        fechaLimite,
+        diasVencidos,
+        esVencido,
+        montoBase: montoConBeca,
+        recargoAplicado,
+        montoTotal
+      };
+    });
+    
+    const pagosVencidos = pagosDetalle.filter(p => p.esVencido);
+    const pagosProximos = pagosDetalle.filter(p => !p.esVencido);
+    
+    const totalVencidos = pagosVencidos.reduce((sum, p) => sum + p.montoTotal, 0);
+    const totalRecargosVencidos = pagosVencidos.reduce((sum, p) => sum + p.recargoAplicado, 0);
+    const totalProximos = pagosProximos.reduce((sum, p) => sum + p.montoTotal, 0);
+    const montoAdeudado = calcularMontoAdeudado(pagosAlumno, becasAlumno, configuracion);
+    
+    return {
+      pagosVencidos,
+      pagosProximos,
+      totalVencidos,
+      totalRecargosVencidos,
+      totalProximos,
+      montoAdeudado
+    };
+  }, [alumnoSeleccionadoId, pagos, becasAlumno, configuracion]);
+
   if (loading) {
     return (
       <LoadingSpinner 
@@ -1005,6 +1071,60 @@ const GestionPagos = () => {
           </div>
         ))}
       </div>
+
+      {/* Resumen de Deuda del Alumno Seleccionado */}
+      {resumenAlumno && alumnos[alumnoSeleccionadoId] && (
+        <div className="space-y-4">
+          <div className="bg-gradient-to-r from-red-50 to-orange-50 dark:from-red-900/20 dark:to-orange-900/20 rounded-xl shadow-lg p-6 border-2 border-red-200 dark:border-red-800">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">
+                  Resumen de Deuda - {alumnos[alumnoSeleccionadoId].nombre || alumnos[alumnoSeleccionadoId].email}
+                </h2>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  {new Date().toLocaleDateString('es-MX', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+                </p>
+              </div>
+              <ExclamationTriangleIcon className="w-12 h-12 text-red" />
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+              <div className="bg-white/70 dark:bg-gray-800/70 rounded-lg p-4">
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Total Adeudado</p>
+                <p className="text-3xl font-bold text-gray-900 dark:text-white">
+                  {formatearMoneda(resumenAlumno.montoAdeudado)}
+                </p>
+              </div>
+              <div className="bg-white/70 dark:bg-gray-800/70 rounded-lg p-4">
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Pagos Vencidos</p>
+                <p className="text-3xl font-bold text-red dark:text-red-400">
+                  {resumenAlumno.pagosVencidos.length}
+                </p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  {formatearMoneda(resumenAlumno.totalVencidos)}
+                </p>
+              </div>
+              <div className="bg-white/70 dark:bg-gray-800/70 rounded-lg p-4">
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Próximos Pagos</p>
+                <p className="text-3xl font-bold text-blue dark:text-blue-400">
+                  {resumenAlumno.pagosProximos.length}
+                </p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  {formatearMoneda(resumenAlumno.totalProximos)}
+                </p>
+              </div>
+            </div>
+            
+            {resumenAlumno.totalRecargosVencidos > 0 && (
+              <div className="bg-yellow-100 dark:bg-yellow-900/30 rounded-lg p-3 border border-yellow-300 dark:border-yellow-700">
+                <p className="text-sm text-yellow-800 dark:text-yellow-200">
+                  <span className="font-semibold">⚠️ Recargos aplicados en pagos vencidos:</span> {formatearMoneda(resumenAlumno.totalRecargosVencidos)}
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Filtros */}
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 space-y-4">
