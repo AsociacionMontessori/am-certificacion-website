@@ -3,6 +3,7 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { collection, query, getDocs, getDoc, doc, updateDoc, serverTimestamp, Timestamp, orderBy } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { useNotifications } from '../../contexts/NotificationContext';
+import { useAuth } from '../../contexts/AuthContext';
 import useCanEdit from '../../hooks/useCanEdit';
 import { useDebouncedValue } from '../../hooks/useDebouncedValue';
 import {
@@ -59,6 +60,7 @@ import { getNivelActivo } from '../../utils/alumnos';
 
 const GestionPagos = () => {
   const canEdit = useCanEdit();
+  const { userData } = useAuth();
   const { success, error: showError, confirm } = useNotifications();
   const [searchParams] = useSearchParams();
   const alumnoIdParam = searchParams.get('alumno');
@@ -71,8 +73,9 @@ const GestionPagos = () => {
   const [filtroTipo, setFiltroTipo] = useState('');
   const [ordenFecha, setOrdenFecha] = useState('desc'); // 'asc' o 'desc'
   const [searchTerm, setSearchTerm] = useState('');
-  const [paginaActual, setPaginaActual] = useState(1);
-  const itemsPorPagina = 20;
+  // Paginación - No se usa actualmente ya que mostramos todos los pagos agrupados
+  // const [paginaActual, setPaginaActual] = useState(1);
+  // const itemsPorPagina = 20;
   
   // Debounce en búsqueda para mejorar performance
   const debouncedSearchTerm = useDebouncedValue(searchTerm, 300);
@@ -148,71 +151,110 @@ const GestionPagos = () => {
   useEffect(() => {
     const loadData = async () => {
       try {
+        // Para usuarios de grupos, pasar alumnos asignados como filtro
+        const filtrosPagos = userData?.rol === 'grupos' && userData?.alumnosAsignados?.length > 0
+          ? { alumnosAsignados: userData.alumnosAsignados }
+          : {};
+        
         const [pagosData, configData] = await Promise.all([
-          obtenerTodosLosPagos(),
+          obtenerTodosLosPagos(filtrosPagos),
           obtenerConfiguracionPagos()
         ]);
-
+        
         setPagos(pagosData);
         setConfiguracion(configData ? JSON.parse(JSON.stringify(configData)) : null);
 
-        // Cargar TODOS los alumnos (no solo los que tienen pagos)
+        // Cargar alumnos según el rol del usuario
         setAlumnosLoading(true);
         let alumnosMap = {};
-        try {
-          // Intentar con orderBy primero
+        
+        // Si es usuario de grupos, solo cargar alumnos asignados
+        if (userData?.rol === 'grupos' && userData?.alumnosAsignados?.length > 0) {
           try {
-            const alumnosQuery = query(
-              collection(db, 'alumnos'),
-              orderBy('nombre', 'asc')
-            );
-            const alumnosSnapshot = await getDocs(alumnosQuery);
-            alumnosSnapshot.docs.forEach(doc => {
-              alumnosMap[doc.id] = { id: doc.id, ...doc.data() };
-            });
-          } catch (orderError) {
-            // Si falla por índice, cargar sin orderBy y ordenar en cliente
-            if (orderError.code === 'failed-precondition') {
-              console.warn('Índice no encontrado, cargando alumnos sin ordenar');
-              const alumnosSnapshot = await getDocs(collection(db, 'alumnos'));
-              const alumnosArray = [];
-              alumnosSnapshot.docs.forEach(doc => {
-                alumnosArray.push({ id: doc.id, ...doc.data() });
-              });
-              // Ordenar en cliente por nombre
-              alumnosArray.sort((a, b) => {
-                const nombreA = (a.nombre || '').toLowerCase();
-                const nombreB = (b.nombre || '').toLowerCase();
-                return nombreA.localeCompare(nombreB);
-              });
-              // Convertir a mapa
-              alumnosArray.forEach(alumno => {
-                alumnosMap[alumno.id] = alumno;
-              });
-            } else {
-              throw orderError;
-            }
-          }
-        } catch (error) {
-          console.error('Error al cargar alumnos:', error);
-          // Fallback: cargar sin orderBy
-          try {
-            const alumnosSnapshot = await getDocs(collection(db, 'alumnos'));
-            alumnosSnapshot.docs.forEach(doc => {
-              alumnosMap[doc.id] = { id: doc.id, ...doc.data() };
-            });
-          } catch (fallbackError) {
-            console.error('Error al cargar alumnos (fallback):', fallbackError);
-            // Si aún falla, intentar cargar solo alumnos con pagos
-            const alumnosIds = [...new Set(pagosData.map(p => p.alumnoId))];
-            for (const alumnoId of alumnosIds) {
+            const alumnosPromises = userData.alumnosAsignados.map(async (alumnoId) => {
               try {
                 const alumnoDoc = await getDoc(doc(db, 'alumnos', alumnoId));
                 if (alumnoDoc.exists()) {
-                  alumnosMap[alumnoId] = { id: alumnoDoc.id, ...alumnoDoc.data() };
+                  return { id: alumnoDoc.id, ...alumnoDoc.data() };
                 }
+                return null;
               } catch (err) {
                 console.warn(`Error al cargar alumno ${alumnoId}:`, err);
+                return null;
+              }
+            });
+            const alumnosArray = (await Promise.all(alumnosPromises)).filter(a => a !== null);
+            // Ordenar por nombre
+            alumnosArray.sort((a, b) => {
+              const nombreA = (a.nombre || '').toLowerCase();
+              const nombreB = (b.nombre || '').toLowerCase();
+              return nombreA.localeCompare(nombreB);
+            });
+            // Convertir a mapa
+            alumnosArray.forEach(alumno => {
+              alumnosMap[alumno.id] = alumno;
+            });
+          } catch (error) {
+            console.error('Error al cargar alumnos asignados:', error);
+            showError('Error al cargar los alumnos asignados');
+          }
+        } else {
+          // Admin, directivo y catedrático cargan todos los alumnos
+          try {
+            // Intentar con orderBy primero
+            try {
+              const alumnosQuery = query(
+                collection(db, 'alumnos'),
+                orderBy('nombre', 'asc')
+              );
+              const alumnosSnapshot = await getDocs(alumnosQuery);
+              alumnosSnapshot.docs.forEach(doc => {
+                alumnosMap[doc.id] = { id: doc.id, ...doc.data() };
+              });
+            } catch (orderError) {
+              // Si falla por índice, cargar sin orderBy y ordenar en cliente
+              if (orderError.code === 'failed-precondition') {
+                console.warn('Índice no encontrado, cargando alumnos sin ordenar');
+                const alumnosSnapshot = await getDocs(collection(db, 'alumnos'));
+                const alumnosArray = [];
+                alumnosSnapshot.docs.forEach(doc => {
+                  alumnosArray.push({ id: doc.id, ...doc.data() });
+                });
+                // Ordenar en cliente por nombre
+                alumnosArray.sort((a, b) => {
+                  const nombreA = (a.nombre || '').toLowerCase();
+                  const nombreB = (b.nombre || '').toLowerCase();
+                  return nombreA.localeCompare(nombreB);
+                });
+                // Convertir a mapa
+                alumnosArray.forEach(alumno => {
+                  alumnosMap[alumno.id] = alumno;
+                });
+              } else {
+                throw orderError;
+              }
+            }
+          } catch (error) {
+            console.error('Error al cargar alumnos:', error);
+            // Fallback: cargar sin orderBy
+            try {
+              const alumnosSnapshot = await getDocs(collection(db, 'alumnos'));
+              alumnosSnapshot.docs.forEach(doc => {
+                alumnosMap[doc.id] = { id: doc.id, ...doc.data() };
+              });
+            } catch (fallbackError) {
+              console.error('Error al cargar alumnos (fallback):', fallbackError);
+              // Si aún falla, intentar cargar solo alumnos con pagos
+              const alumnosIds = [...new Set(pagos.map(p => p.alumnoId))];
+              for (const alumnoId of alumnosIds) {
+                try {
+                  const alumnoDoc = await getDoc(doc(db, 'alumnos', alumnoId));
+                  if (alumnoDoc.exists()) {
+                    alumnosMap[alumnoId] = { id: alumnoDoc.id, ...alumnoDoc.data() };
+                  }
+                } catch (err) {
+                  console.warn(`Error al cargar alumno ${alumnoId}:`, err);
+                }
               }
             }
           }
@@ -235,7 +277,8 @@ const GestionPagos = () => {
     };
 
     loadData();
-  }, [showError]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showError, userData?.rol, userData?.alumnosAsignados?.length]);
 
   const convertirFechaAInput = (valor) => {
     const fecha = valor?.toDate ? valor.toDate() : valor?.seconds ? new Date(valor.seconds * 1000) : typeof valor === 'string' ? new Date(valor) : valor;
@@ -251,7 +294,11 @@ const GestionPagos = () => {
   };
 
   const recargarPagos = async () => {
-    const pagosActualizados = await obtenerTodosLosPagos();
+    // Pasar filtros según el rol del usuario
+    const filtrosPagos = userData?.rol === 'grupos' && userData?.alumnosAsignados?.length > 0
+      ? { alumnosAsignados: userData.alumnosAsignados }
+      : {};
+    const pagosActualizados = await obtenerTodosLosPagos(filtrosPagos);
     setPagos(pagosActualizados);
   };
 
@@ -505,18 +552,123 @@ const GestionPagos = () => {
     return pagos.filter((pago) => pago.alumnoId === becaForm.alumnoId);
   }, [pagos, becaForm.alumnoId]);
 
-  // Paginación
-  const totalPaginas = Math.ceil(filteredPagos.length / itemsPorPagina);
-  const pagosPaginados = useMemo(() => {
-    const inicio = (paginaActual - 1) * itemsPorPagina;
-    const fin = inicio + itemsPorPagina;
-    return filteredPagos.slice(inicio, fin);
-  }, [filteredPagos, paginaActual, itemsPorPagina]);
+  // Paginación - No se usa actualmente ya que mostramos todos los pagos agrupados
+  // const totalPaginas = Math.ceil(filteredPagos.length / itemsPorPagina);
+  // const pagosPaginados = useMemo(() => {
+  //   const inicio = (paginaActual - 1) * itemsPorPagina;
+  //   const fin = inicio + itemsPorPagina;
+  //   return filteredPagos.slice(inicio, fin);
+  // }, [filteredPagos, paginaActual, itemsPorPagina]);
 
-  // Resetear página cuando cambian los filtros
-  useEffect(() => {
-    setPaginaActual(1);
-  }, [filtroEstado, filtroAlumno, filtroTipo, debouncedSearchTerm, ordenFecha]);
+  // Resetear página cuando cambian los filtros - No se usa actualmente ya que mostramos todos los pagos agrupados
+  // useEffect(() => {
+  //   setPaginaActual(1);
+  // }, [filtroEstado, filtroAlumno, filtroTipo, debouncedSearchTerm, ordenFecha]);
+
+  // Calcular resumen general de pagos (similar a Pagos.jsx)
+  const resumenGeneral = useMemo(() => {
+    if (filteredPagos.length === 0) {
+      return {
+        pagosVencidos: [],
+        pagosPendientes: [],
+        pagosValidados: [],
+        pagosRechazados: [],
+        totalVencidos: 0,
+        totalRecargosVencidos: 0,
+        totalPendientes: 0,
+        totalValidados: 0,
+        totalAdeudado: 0
+      };
+    }
+    
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0);
+    const diaVencimiento = configuracion?.diaVencimiento || 10;
+
+    // Procesar todos los pagos filtrados para obtener detalles
+    const pagosDetalle = filteredPagos.map(pago => {
+      if (!pago || !pago.fechaVencimiento) {
+        return null;
+      }
+      try {
+        const fechaVenc = pago.fechaVencimiento?.toDate?.() || new Date(pago.fechaVencimiento);
+        if (isNaN(fechaVenc.getTime())) {
+          return null;
+        }
+        const fechaLimite = new Date(fechaVenc.getFullYear(), fechaVenc.getMonth(), diaVencimiento, 23, 59, 59, 999);
+        if (isNaN(fechaLimite.getTime())) {
+          return null;
+        }
+        const diasVencidos = hoy > fechaLimite ? Math.ceil((hoy - fechaLimite) / (1000 * 60 * 60 * 24)) : 0;
+        const esVencido = hoy > fechaLimite && (pago.estado === 'Pendiente' || pago.estado === 'Vencido');
+        
+        const montoBase = pago.montoOriginal !== undefined ? Number(pago.montoOriginal) : Number(pago.monto || 0);
+        if (isNaN(montoBase)) {
+          return null;
+        }
+        
+        // Obtener becas del alumno (si están disponibles)
+        // Nota: becasAlumno solo está disponible cuando hay un alumno seleccionado
+        // Para el resumen general, usamos las becas aplicadas directamente del pago si están disponibles
+        const becasDelAlumno = Array.isArray(pago.becasAplicadas) ? pago.becasAplicadas : (becasAlumno || []);
+        const montoConBeca = aplicarBeca(montoBase, becasDelAlumno, { pago });
+        if (isNaN(montoConBeca)) {
+          return null;
+        }
+        
+        const montoTotal = calcularMontoTotal(
+          montoConBeca,
+          pago.fechaVencimiento,
+          pago.recargoPorcentaje || configuracion?.recargoPorcentaje,
+          pago.recargoActivo !== undefined ? pago.recargoActivo : (configuracion?.recargoActivo && pago.tipo === 'Colegiatura'),
+          null,
+          pago.tipo,
+          diaVencimiento
+        );
+        if (isNaN(montoTotal)) {
+          return null;
+        }
+        const recargoAplicado = montoTotal - montoConBeca;
+      
+        return {
+          ...pago,
+          fechaVenc,
+          fechaLimite,
+          diasVencidos,
+          esVencido,
+          montoBase: montoConBeca,
+          recargoAplicado,
+          montoTotal
+        };
+      } catch (error) {
+        console.warn('Error al procesar pago:', error, pago);
+        return null;
+      }
+    }).filter(p => p !== null);
+
+    const pagosVencidos = pagosDetalle.filter(p => p.esVencido);
+    const pagosPendientes = pagosDetalle.filter(p => p.estado === 'Pendiente' && !p.esVencido);
+    const pagosValidados = pagosDetalle.filter(p => p.estado === 'Validado');
+    const pagosRechazados = pagosDetalle.filter(p => p.estado === 'Rechazado');
+
+    const totalVencidos = pagosVencidos.reduce((sum, p) => sum + (p.montoTotal || 0), 0);
+    const totalRecargosVencidos = pagosVencidos.reduce((sum, p) => sum + (p.recargoAplicado || 0), 0);
+    const totalPendientes = pagosPendientes.reduce((sum, p) => sum + (p.montoTotal || 0), 0);
+    const totalValidados = pagosValidados.reduce((sum, p) => sum + (p.montoPagado || p.montoTotal || 0), 0);
+    const totalAdeudado = totalVencidos + totalPendientes;
+
+    return {
+      pagosVencidos,
+      pagosPendientes,
+      pagosValidados,
+      pagosRechazados,
+      totalVencidos,
+      totalRecargosVencidos,
+      totalPendientes,
+      totalValidados,
+      totalAdeudado
+    };
+  }, [filteredPagos, configuracion, becasAlumno]);
 
   useEffect(() => {
     if (nuevoPago.tipo !== 'Colegiatura') {
@@ -910,6 +1062,192 @@ const GestionPagos = () => {
     return { texto: 'Pendiente', color: 'text-blue', bg: 'bg-blue/10', icon: ClockIcon };
   };
 
+  // Función helper para renderizar una tarjeta de pago
+  const renderTarjetaPago = (pago) => {
+    const estado = obtenerEstadoPago(pago);
+    const EstadoIcon = estado.icon;
+    const alumno = alumnos[pago.alumnoId];
+    const fechaVenc = pago.fechaVencimiento?.toDate?.() || new Date(pago.fechaVencimiento);
+    const diaVencimiento = configuracion?.diaVencimiento || 10;
+    // Si el pago ya tiene montoTotal calculado (del resumen), usarlo; si no, calcularlo
+    const montoTotal = pago.montoTotal !== undefined ? pago.montoTotal : calcularMontoTotal(
+      pago.monto,
+      pago.fechaVencimiento,
+      pago.recargoPorcentaje || configuracion?.recargoPorcentaje,
+      pago.recargoActivo !== undefined ? pago.recargoActivo : (configuracion?.recargoActivo && pago.tipo === 'Colegiatura'),
+      null,
+      pago.tipo,
+      diaVencimiento
+    );
+
+    const descuentoRegistrado = pago.descuentoAplicado !== undefined
+      ? Number(pago.descuentoAplicado)
+      : pago.montoOriginal !== undefined
+        ? Number((pago.montoOriginal - (pago.monto ?? 0)).toFixed(2))
+        : 0;
+
+    // Determinar colores según estado
+    let borderColor = 'border-gray-200 dark:border-gray-600';
+    let bgColor = 'bg-gray-50 dark:bg-gray-700/50';
+    if (pago.estado === 'Validado') {
+      borderColor = 'border-green-300 dark:border-green-700';
+      bgColor = 'bg-green-50 dark:bg-green-900/20';
+    } else if (pago.estado === 'Rechazado') {
+      borderColor = 'border-red-300 dark:border-red-700';
+      bgColor = 'bg-red-50 dark:bg-red-900/20';
+    } else if (pago.estado === 'Vencido' || (pago.estado === 'Pendiente' && pago.esVencido)) {
+      borderColor = 'border-red-300 dark:border-red-700';
+      bgColor = 'bg-red-50 dark:bg-red-900/20';
+    } else if (pago.estado === 'Pendiente') {
+      borderColor = 'border-blue-300 dark:border-blue-700';
+      bgColor = 'bg-blue-50 dark:bg-blue-900/20';
+    }
+
+    return (
+      <div key={pago.id} className={`${bgColor} rounded-lg p-4 border-2 ${borderColor} shadow-sm hover:shadow-md transition-shadow`}>
+        <div className="flex flex-col h-full">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="font-semibold text-gray-900 dark:text-white text-sm">
+              {pago.tipo === 'Colegiatura' && pago.numeroColegiatura 
+                ? `Colegiatura ${pago.numeroColegiatura}${pago.totalColegiaturas ? `/${pago.totalColegiaturas}` : ''}`
+                : (pago.tipo || 'Colegiatura')}
+            </h3>
+            <span className={`px-2 py-1 rounded-full text-xs font-medium ${estado.bg} ${estado.color} flex items-center gap-1`}>
+              <EstadoIcon className="w-3 h-3" />
+              {estado.texto}
+            </span>
+          </div>
+          
+          <div className="space-y-2 text-sm flex-1">
+            <div>
+              <p className="text-xs text-gray-500 dark:text-gray-400">Alumno</p>
+              <Link to={`/admin/alumno/${pago.alumnoId}`} className="text-blue hover:underline font-medium text-gray-900 dark:text-white">
+                {alumno?.nombre || alumno?.email || 'N/A'}
+              </Link>
+            </div>
+            <div>
+              <p className="text-xs text-gray-500 dark:text-gray-400">Fecha de vencimiento</p>
+              <p className="text-gray-700 dark:text-gray-300 font-medium">
+                {fechaVenc && !isNaN(fechaVenc.getTime()) ? fechaVenc.toLocaleDateString('es-MX') : 'N/A'}
+              </p>
+            </div>
+            <div>
+              <p className="text-xs text-gray-500 dark:text-gray-400">Monto</p>
+              <p className="text-gray-700 dark:text-gray-300 font-medium">
+                {formatearMoneda(pago.monto || 0)}
+                {montoTotal !== pago.monto && (
+                  <span className="text-yellow ml-2 text-xs">
+                    (Total: {formatearMoneda(montoTotal)})
+                  </span>
+                )}
+              </p>
+            </div>
+            {descuentoRegistrado > 0 && (
+              <div>
+                <p className="text-xs text-gray-500 dark:text-gray-400">Descuento aplicado</p>
+                <p className="text-green-700 dark:text-green-300 font-bold">
+                  -{formatearMoneda(descuentoRegistrado)}
+                </p>
+              </div>
+            )}
+            {pago.montoPagado && (
+              <div>
+                <p className="text-xs text-gray-500 dark:text-gray-400">Monto pagado</p>
+                <p className="text-green-700 dark:text-green-300 font-bold">
+                  {formatearMoneda(pago.montoPagado)}
+                </p>
+              </div>
+            )}
+          </div>
+          
+          <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600 flex flex-col gap-2">
+            {pago.comprobanteUrl && (
+              <a
+                href={pago.comprobanteUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full inline-flex items-center justify-center px-3 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors font-semibold text-sm"
+              >
+                <DocumentArrowUpIcon className="w-4 h-4 mr-2" />
+                Ver Comprobante
+              </a>
+            )}
+            {canEdit && (
+              <>
+                <button
+                  onClick={() => {
+                    setSelectedPago(pago);
+                    setArchivoComprobante(null);
+                    setShowModalComprobante(true);
+                  }}
+                  className="w-full inline-flex items-center justify-center px-3 py-2 bg-blue text-white rounded-lg hover:bg-blue/90 transition-colors font-semibold text-sm"
+                >
+                  <DocumentArrowUpIcon className="w-4 h-4 mr-2" />
+                  {pago.comprobanteUrl ? 'Reemplazar' : 'Subir'} Comprobante
+                </button>
+                {pago.estado === 'Pendiente' && (
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => {
+                        setSelectedPago(pago);
+                        setShowModalValidar(true);
+                      }}
+                      className="flex-1 inline-flex items-center justify-center px-3 py-2 bg-green text-white dark:text-gray-900 rounded-lg hover:bg-green/90 transition-colors font-semibold text-sm"
+                    >
+                      <CheckCircleIcon className="w-4 h-4 mr-1" />
+                      Validar
+                    </button>
+                    <button
+                      onClick={() => {
+                        setSelectedPago(pago);
+                        setShowModalRechazar(true);
+                      }}
+                      className="flex-1 inline-flex items-center justify-center px-3 py-2 bg-red text-white rounded-lg hover:bg-red/90 transition-colors font-semibold text-sm"
+                    >
+                      <XCircleIcon className="w-4 h-4 mr-1" />
+                      Rechazar
+                    </button>
+                  </div>
+                )}
+                <button
+                  onClick={() => {
+                    setSelectedPago(pago);
+                    const fechaVenc = pago.fechaVencimiento?.toDate?.() || new Date(pago.fechaVencimiento);
+                    const fechaPagoReal = pago.fechaPago?.toDate?.() || (pago.fechaPago ? new Date(pago.fechaPago) : null);
+                    setPagoEditado({
+                      monto: pago.monto || '',
+                      fechaVencimiento: fechaVenc.toISOString().split('T')[0],
+                      montoPagado: pago.montoPagado || '',
+                      fechaPago: fechaPagoReal ? fechaPagoReal.toISOString().split('T')[0] : '',
+                      recargoPorcentaje: pago.recargoPorcentaje !== undefined ? pago.recargoPorcentaje : (configuracion?.recargoPorcentaje || 10),
+                      recargoActivo: pago.recargoActivo !== undefined ? pago.recargoActivo : (configuracion?.recargoActivo && pago.tipo === 'Colegiatura'),
+                      observaciones: pago.observaciones || '',
+                      estado: pago.estado || 'Pendiente',
+                      descripcion: pago.descripcion || ''
+                    });
+                    setShowModalEditarPago(true);
+                  }}
+                  className="w-full inline-flex items-center justify-center px-3 py-2 bg-purple/10 text-purple rounded-lg hover:bg-purple/20 dark:hover:bg-purple/30 transition-colors text-sm border border-purple/20 font-semibold"
+                >
+                  <PencilIcon className="w-4 h-4 mr-2" />
+                  Editar
+                </button>
+                <button
+                  onClick={() => handleEliminarPago(pago)}
+                  className="w-full inline-flex items-center justify-center px-3 py-2 bg-red/10 text-red rounded-lg hover:bg-red/20 dark:hover:bg-red/30 transition-colors text-sm border border-red/20 font-semibold"
+                  title="Eliminar pago"
+                >
+                  <TrashIcon className="w-4 h-4 mr-2" />
+                  Eliminar
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   // Memoizar estadísticas para evitar recálculos
   const stats = useMemo(() => ({
     total: pagos.length,
@@ -1072,6 +1410,58 @@ const GestionPagos = () => {
         ))}
       </div>
 
+      {/* Resumen General de Estado de Cuenta */}
+      {resumenGeneral && (resumenGeneral.pagosVencidos.length > 0 || resumenGeneral.pagosPendientes.length > 0) && (
+        <div className="bg-gradient-to-r from-red-50 to-orange-50 dark:from-red-900/20 dark:to-orange-900/20 rounded-xl shadow-lg p-6 border-2 border-red-200 dark:border-red-800">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">
+                Estado de Cuenta General
+              </h2>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                {new Date().toLocaleDateString('es-MX', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+              </p>
+            </div>
+            <ExclamationTriangleIcon className="w-12 h-12 text-red" />
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+            <div className="bg-white/70 dark:bg-gray-800/70 rounded-lg p-4 border-2 border-red-300 dark:border-red-700">
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Pagos Vencidos</p>
+              <p className="text-3xl font-bold text-red dark:text-red-400">
+                {resumenGeneral.pagosVencidos.length}
+              </p>
+              <p className="text-lg font-semibold text-gray-900 dark:text-white mt-1">
+                {formatearMoneda(resumenGeneral.totalVencidos)}
+              </p>
+              {resumenGeneral.totalRecargosVencidos > 0 && (
+                <p className="text-xs text-yellow-700 dark:text-yellow-300 mt-1">
+                  Incluye {formatearMoneda(resumenGeneral.totalRecargosVencidos)} en recargos
+                </p>
+              )}
+            </div>
+            <div className="bg-white/70 dark:bg-gray-800/70 rounded-lg p-4">
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Total por Pagar</p>
+              <p className="text-3xl font-bold text-gray-900 dark:text-white">
+                {formatearMoneda(resumenGeneral.totalAdeudado)}
+              </p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                {resumenGeneral.pagosVencidos.length + resumenGeneral.pagosPendientes.length} {resumenGeneral.pagosVencidos.length + resumenGeneral.pagosPendientes.length === 1 ? 'pago pendiente' : 'pagos pendientes'}
+              </p>
+            </div>
+            <div className="bg-white/70 dark:bg-gray-800/70 rounded-lg p-4 border border-blue-300 dark:border-blue-700">
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Próximos Pagos</p>
+              <p className="text-3xl font-bold text-blue dark:text-blue-400">
+                {resumenGeneral.pagosPendientes.length}
+              </p>
+              <p className="text-lg font-semibold text-gray-900 dark:text-white mt-1">
+                {formatearMoneda(resumenGeneral.totalPendientes)}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Resumen de Deuda del Alumno Seleccionado */}
       {resumenAlumno && alumnos[alumnoSeleccionadoId] && (
         <div className="space-y-4">
@@ -1227,289 +1617,124 @@ const GestionPagos = () => {
         </div>
       </div>
 
-      {/* Lista de Pagos */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
-        <div className="divide-y divide-gray-200 dark:divide-gray-700">
-          {filteredPagos.length === 0 ? (
-            <div className="text-center py-12">
-              <CurrencyDollarIcon className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-600 dark:text-gray-400 mb-4">
-                No hay pagos que mostrar
+      {/* Pagos Agrupados por Estado - Vista de Tarjetas */}
+      {filteredPagos.length === 0 ? (
+        <div className="text-center py-12 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+          <CurrencyDollarIcon className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+          <p className="text-gray-600 dark:text-gray-400 mb-4">
+            No hay pagos que mostrar
+          </p>
+          {filtroAlumno && alumnos[filtroAlumno] && canEdit && (
+            <div className="mt-4">
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">
+                El alumno <strong>{alumnos[filtroAlumno].nombre || alumnos[filtroAlumno].email}</strong> no tiene pagos registrados.
               </p>
-              {filtroAlumno && alumnos[filtroAlumno] && canEdit && (
-                <div className="mt-4">
-                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">
-                    El alumno <strong>{alumnos[filtroAlumno].nombre || alumnos[filtroAlumno].email}</strong> no tiene pagos registrados.
-                  </p>
-                  <button
-                    onClick={() => handleGenerarPagosAlumno(filtroAlumno)}
-                    className="inline-flex items-center px-4 py-2 bg-yellow text-gray-900 dark:text-gray-900 rounded-lg hover:bg-yellow/90 transition-colors"
-                    disabled={generandoPagos || !obtenerNombreNivelAlumno(alumnos[filtroAlumno])}
-                    title={!obtenerNombreNivelAlumno(alumnos[filtroAlumno]) ? 'El alumno no tiene nivel asignado' : 'Generar pagos para este alumno'}
-                  >
-                    <PlusIcon className="w-5 h-5 mr-2" />
-                    {generandoPagos ? 'Generando...' : 'Generar Pagos para este Alumno'}
-                  </button>
-                </div>
-              )}
+              <button
+                onClick={() => handleGenerarPagosAlumno(filtroAlumno)}
+                className="inline-flex items-center px-4 py-2 bg-yellow text-gray-900 dark:text-gray-900 rounded-lg hover:bg-yellow/90 transition-colors"
+                disabled={generandoPagos || !obtenerNombreNivelAlumno(alumnos[filtroAlumno])}
+                title={!obtenerNombreNivelAlumno(alumnos[filtroAlumno]) ? 'El alumno no tiene nivel asignado' : 'Generar pagos para este alumno'}
+              >
+                <PlusIcon className="w-5 h-5 mr-2" />
+                {generandoPagos ? 'Generando...' : 'Generar Pagos para este Alumno'}
+              </button>
             </div>
-          ) : (
-            pagosPaginados.map((pago) => {
-              const estado = obtenerEstadoPago(pago);
-              const EstadoIcon = estado.icon;
-              const alumno = alumnos[pago.alumnoId];
-              const nivelActualAlumno = obtenerNombreNivelAlumno(alumno);
-              const fechaVenc = pago.fechaVencimiento?.toDate?.() || new Date(pago.fechaVencimiento);
-              // Solo calcular recargo para colegiaturas
-              const diaVencimiento = configuracion?.diaVencimiento || 10;
-              const montoTotal = calcularMontoTotal(
-                pago.monto,
-                pago.fechaVencimiento,
-                pago.recargoPorcentaje || configuracion?.recargoPorcentaje,
-                pago.recargoActivo !== undefined ? pago.recargoActivo : (configuracion?.recargoActivo && pago.tipo === 'Colegiatura'),
-                null,
-                pago.tipo,
-                diaVencimiento
-              );
-
-              // Verificar si el alumno tiene pagos (para mostrar botón de generar)
-              const becasAplicadasPago = Array.isArray(pago.becasAplicadas) ? pago.becasAplicadas : [];
-              const descuentoRegistrado = pago.descuentoAplicado !== undefined
-                ? Number(pago.descuentoAplicado)
-                : pago.montoOriginal !== undefined
-                  ? Number((pago.montoOriginal - (pago.monto ?? 0)).toFixed(2))
-                  : 0;
-
-              return (
-                <div key={pago.id} className="p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-                  <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-2">
-                        <h3 className="font-semibold text-gray-900 dark:text-white">
-                          {pago.tipo === 'Colegiatura' && pago.numeroColegiatura 
-                            ? `Colegiatura ${pago.numeroColegiatura}${pago.totalColegiaturas ? `/${pago.totalColegiaturas}` : ''}`
-                            : (pago.tipo || 'Colegiatura')}
-                        </h3>
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${estado.bg} ${estado.color} flex items-center gap-1`}>
-                          <EstadoIcon className="w-3 h-3" />
-                          {estado.texto}
-                        </span>
-                      </div>
-                      <div className="text-sm text-gray-600 dark:text-gray-400 space-y-1">
-                        <p>
-                          <span className="font-medium">Alumno:</span>{' '}
-                          <Link to={`/admin/alumno/${pago.alumnoId}`} className="text-blue hover:underline">
-                            {alumno?.nombre || alumno?.email || 'N/A'}
-                          </Link>
-                        </p>
-                        <p>
-                          <span className="font-medium">Vencimiento:</span> {fechaVenc.toLocaleDateString('es-MX')}
-                        </p>
-                        <p>
-                          <span className="font-medium">Monto:</span> {formatearMoneda(pago.monto || 0)}
-                          {montoTotal !== pago.monto && (
-                            <span className="text-yellow ml-2">
-                              (Total con recargo: {formatearMoneda(montoTotal)})
-                            </span>
-                          )}
-                        </p>
-                        {pago.montoOriginal !== undefined && pago.montoOriginal !== null && pago.montoOriginal !== pago.monto && (
-                          <p>
-                            <span className="font-medium">Monto original:</span> {formatearMoneda(pago.montoOriginal)}
-                          </p>
-                        )}
-                        {descuentoRegistrado > 0 && (
-                          <p>
-                            <span className="font-medium">Descuento aplicado:</span> -{formatearMoneda(descuentoRegistrado)}
-                            {becasAplicadasPago.length > 0 && (
-                              <span className="block text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                {becasAplicadasPago.map((beca) => beca.nombre || beca.tipo || 'Descuento').join(', ')}
-                              </span>
-                            )}
-                          </p>
-                        )}
-                        {pago.montoPagado && (
-                          <p>
-                            <span className="font-medium">Pagado:</span> {formatearMoneda(pago.montoPagado)}
-                            {pago.montoPagado < montoTotal && (
-                              <span className="text-orange ml-2">
-                                (Pendiente: {formatearMoneda(montoTotal - pago.montoPagado)})
-                              </span>
-                            )}
-                            {pago.montoPagado > montoTotal && (
-                              <span className="text-green ml-2">
-                                (Excedente: {formatearMoneda(pago.montoPagado - montoTotal)})
-                              </span>
-                            )}
-                          </p>
-                        )}
-                        {pago.observaciones && (
-                          <p>
-                            <span className="font-medium">Observaciones:</span> {pago.observaciones}
-                          </p>
-                        )}
-                        {pago.motivoRechazo && (
-                          <p className="text-red">
-                            <span className="font-medium">Motivo rechazo:</span> {pago.motivoRechazo}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                      {pago.comprobanteUrl && (
-                        <a
-                          href={pago.comprobanteUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center px-3 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors text-sm"
-                        >
-                          <DocumentArrowUpIcon className="w-4 h-4 mr-1" />
-                          Ver Comprobante
-                        </a>
-                      )}
-                      {canEdit && (
-                        <>
-                          <button
-                            onClick={() => {
-                              setSelectedPago(pago);
-                              setArchivoComprobante(null);
-                              setShowModalComprobante(true);
-                            }}
-                            className="inline-flex items-center px-3 py-2 bg-blue text-white rounded-lg hover:bg-blue/90 transition-colors text-sm"
-                          >
-                            <DocumentArrowUpIcon className="w-4 h-4 mr-1" />
-                            {pago.comprobanteUrl ? 'Reemplazar' : 'Subir'} Comprobante
-                          </button>
-                          {alumno && (
-                            <button
-                              onClick={() => handleGenerarPagosAlumno(pago.alumnoId)}
-                              className="inline-flex items-center px-3 py-2 bg-yellow text-gray-900 dark:text-gray-900 rounded-lg hover:bg-yellow/90 transition-colors text-sm"
-                              disabled={generandoPagos || !nivelActualAlumno}
-                              title={!nivelActualAlumno ? 'El alumno no tiene nivel asignado' : 'Generar pagos para este alumno'}
-                            >
-                              <PlusIcon className="w-4 h-4 mr-1" />
-                              Generar Pagos
-                            </button>
-                          )}
-                          {pago.estado === 'Pendiente' && (
-                            <>
-                              <button
-                                onClick={() => {
-                                  setSelectedPago(pago);
-                                  setShowModalValidar(true);
-                                }}
-                                className="inline-flex items-center px-3 py-2 bg-green text-white dark:text-gray-900 rounded-lg hover:bg-green/90 transition-colors text-sm"
-                              >
-                                <CheckCircleIcon className="w-4 h-4 mr-1" />
-                                Validar
-                              </button>
-                              <button
-                                onClick={() => {
-                                  setSelectedPago(pago);
-                                  setShowModalRechazar(true);
-                                }}
-                                className="inline-flex items-center px-3 py-2 bg-red text-white rounded-lg hover:bg-red/90 transition-colors text-sm"
-                              >
-                                <XCircleIcon className="w-4 h-4 mr-1" />
-                                Rechazar
-                              </button>
-                            </>
-                          )}
-                          <button
-                            onClick={() => {
-                              setSelectedPago(pago);
-                              const fechaVenc = pago.fechaVencimiento?.toDate?.() || new Date(pago.fechaVencimiento);
-                              const fechaPagoReal = pago.fechaPago?.toDate?.() || (pago.fechaPago ? new Date(pago.fechaPago) : null);
-                              setPagoEditado({
-                                monto: pago.monto || '',
-                                fechaVencimiento: fechaVenc.toISOString().split('T')[0],
-                                montoPagado: pago.montoPagado || '',
-                                fechaPago: fechaPagoReal ? fechaPagoReal.toISOString().split('T')[0] : '',
-                                recargoPorcentaje: pago.recargoPorcentaje !== undefined ? pago.recargoPorcentaje : (configuracion?.recargoPorcentaje || 10),
-                                recargoActivo: pago.recargoActivo !== undefined ? pago.recargoActivo : (configuracion?.recargoActivo && pago.tipo === 'Colegiatura'),
-                                observaciones: pago.observaciones || '',
-                                estado: pago.estado || 'Pendiente',
-                                descripcion: pago.descripcion || ''
-                              });
-                              setShowModalEditarPago(true);
-                            }}
-                            className="inline-flex items-center px-3 py-2 bg-purple/10 text-purple rounded-lg hover:bg-purple/20 dark:hover:bg-purple/30 transition-colors text-sm border border-purple/20"
-                            title="Editar pago completo"
-                          >
-                            <PencilIcon className="w-4 h-4 mr-1" />
-                            Editar
-                          </button>
-                          <button
-                            onClick={() => handleEliminarPago(pago)}
-                            className="inline-flex items-center px-3 py-2 bg-red/10 text-red rounded-lg hover:bg-red/20 dark:hover:bg-red/30 transition-colors text-sm border border-red/20"
-                            title="Eliminar pago"
-                          >
-                            <TrashIcon className="w-4 h-4 mr-1" />
-                            Eliminar
-                          </button>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              );
-            })
           )}
         </div>
-        
-        {/* Paginación */}
-        {totalPaginas > 1 && (
-          <div className="flex flex-col sm:flex-row items-center justify-between px-4 py-3 bg-gray-50 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 gap-4">
-            <div className="text-sm text-gray-700 dark:text-gray-300">
-              Mostrando {((paginaActual - 1) * itemsPorPagina) + 1} - {Math.min(paginaActual * itemsPorPagina, filteredPagos.length)} de {filteredPagos.length} pagos
-            </div>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => setPaginaActual(p => Math.max(1, p - 1))}
-                disabled={paginaActual === 1}
-                className="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                Anterior
-              </button>
-              <div className="flex items-center gap-1">
-                {Array.from({ length: Math.min(5, totalPaginas) }, (_, i) => {
-                  let pagina;
-                  if (totalPaginas <= 5) {
-                    pagina = i + 1;
-                  } else if (paginaActual <= 3) {
-                    pagina = i + 1;
-                  } else if (paginaActual >= totalPaginas - 2) {
-                    pagina = totalPaginas - 4 + i;
-                  } else {
-                    pagina = paginaActual - 2 + i;
-                  }
-                  
-                  return (
-                    <button
-                      key={pagina}
-                      onClick={() => setPaginaActual(pagina)}
-                      className={`px-3 py-1.5 text-sm rounded-lg transition-colors min-w-[40px] ${
-                        pagina === paginaActual
-                          ? 'bg-blue text-white'
-                          : 'border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600'
-                      }`}
-                    >
-                      {pagina}
-                    </button>
-                  );
-                })}
+      ) : (
+        <div className="space-y-6">
+          {/* Pagos Vencidos */}
+          {resumenGeneral && resumenGeneral.pagosVencidos.length > 0 && (
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 border-2 border-red-200 dark:border-red-800">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h2 className="text-xl font-semibold text-red dark:text-red-400 flex items-center gap-2">
+                    <ExclamationTriangleIcon className="w-6 h-6" />
+                    Pagos Vencidos ({resumenGeneral.pagosVencidos.length})
+                  </h2>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                    Total vencido: <span className="font-bold text-red">{formatearMoneda(resumenGeneral.totalVencidos)}</span>
+                    {resumenGeneral.totalRecargosVencidos > 0 && (
+                      <span className="ml-2 text-yellow-700 dark:text-yellow-300">
+                        (incluye {formatearMoneda(resumenGeneral.totalRecargosVencidos)} en recargos)
+                      </span>
+                    )}
+                  </p>
+                </div>
               </div>
-              <button
-                onClick={() => setPaginaActual(p => Math.min(totalPaginas, p + 1))}
-                disabled={paginaActual === totalPaginas}
-                className="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                Siguiente
-              </button>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {resumenGeneral.pagosVencidos.map((pago) => renderTarjetaPago(pago))}
+              </div>
             </div>
+          )}
+
+          {/* Pagos Pendientes */}
+          {resumenGeneral && resumenGeneral.pagosPendientes.length > 0 && (
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 border border-blue-200 dark:border-blue-800">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h2 className="text-xl font-semibold text-blue dark:text-blue-400 flex items-center gap-2">
+                    <ClockIcon className="w-6 h-6" />
+                    Pagos Pendientes ({resumenGeneral.pagosPendientes.length})
+                  </h2>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                    Total pendiente: <span className="font-bold text-blue">{formatearMoneda(resumenGeneral.totalPendientes)}</span>
+                  </p>
+                </div>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {resumenGeneral.pagosPendientes.map((pago) => renderTarjetaPago(pago))}
+              </div>
+            </div>
+          )}
+
+          {/* Pagos Validados */}
+          {resumenGeneral && resumenGeneral.pagosValidados.length > 0 && (
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 border-2 border-green-200 dark:border-green-800">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h2 className="text-xl font-semibold text-green dark:text-green-400 flex items-center gap-2">
+                    <CheckCircleIcon className="w-6 h-6" />
+                    Pagos Validados ({resumenGeneral.pagosValidados.length})
+                  </h2>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                    Total validado: <span className="font-bold text-green">{formatearMoneda(resumenGeneral.totalValidados)}</span>
+                  </p>
+                </div>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {resumenGeneral.pagosValidados.map((pago) => renderTarjetaPago(pago))}
+              </div>
+            </div>
+          )}
+
+          {/* Pagos Rechazados */}
+          {resumenGeneral && resumenGeneral.pagosRechazados.length > 0 && (
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 border border-gray-200 dark:border-gray-700">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h2 className="text-xl font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                    <XCircleIcon className="w-6 h-6 text-red" />
+                    Pagos Rechazados ({resumenGeneral.pagosRechazados.length})
+                  </h2>
+                </div>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {resumenGeneral.pagosRechazados.map((pago) => renderTarjetaPago(pago))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Información de pagos (sin paginación ya que están agrupados) */}
+      {filteredPagos.length > 0 && (
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4">
+          <div className="text-sm text-gray-700 dark:text-gray-300 text-center">
+            Mostrando {filteredPagos.length} {filteredPagos.length === 1 ? 'pago' : 'pagos'} agrupados por estado
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* Modal Validar Pago */}
       {showModalValidar && selectedPago && (() => {

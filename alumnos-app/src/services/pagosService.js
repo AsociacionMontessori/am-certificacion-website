@@ -784,8 +784,7 @@ export const actualizarBeca = async (becaId, becaData) => {
       fechaActualizacion: serverTimestamp()
     });
 
-    const becaActualizadaSnap = await getDoc(becaRef);
-    const becaActualizada = { id: becaActualizadaSnap.id, ...becaActualizadaSnap.data() };
+    await getDoc(becaRef);
 
     // Recalcular todos los pagos con todas las becas activas para asegurar consistencia
     // Esto es más robusto que revertir y aplicar individualmente
@@ -827,55 +826,113 @@ export const eliminarBeca = async (becaId) => {
  */
 export const obtenerTodosLosPagos = async (filtros = {}) => {
   try {
-    let querySnapshot;
-    const constraints = [];
+    let pagos = [];
+    
+    // Si se proporciona una lista de alumnos asignados (para usuarios de grupos),
+    // hacer consultas individuales por cada alumno para respetar las reglas de seguridad
+    if (filtros.alumnosAsignados && Array.isArray(filtros.alumnosAsignados) && filtros.alumnosAsignados.length > 0) {
+      // Hacer consultas por cada alumno asignado
+      const pagosPromises = filtros.alumnosAsignados.map(async (alumnoId) => {
+        try {
+          let querySnapshot;
+          const constraints = [where('alumnoId', '==', alumnoId)];
+          
+          if (filtros.estado) {
+            constraints.push(where('estado', '==', filtros.estado));
+          }
 
-    // Construir constraints
-    if (filtros.alumnoId) {
-      constraints.push(where('alumnoId', '==', filtros.alumnoId));
-    }
-    if (filtros.estado) {
-      constraints.push(where('estado', '==', filtros.estado));
-    }
+          try {
+            if (filtros.estado) {
+              const pagosQuery = query(
+                collection(db, 'pagos'),
+                ...constraints,
+                orderBy('fechaVencimiento', 'desc')
+              );
+              querySnapshot = await getDocs(pagosQuery);
+            } else {
+              const pagosQuery = query(
+                collection(db, 'pagos'),
+                where('alumnoId', '==', alumnoId),
+                orderBy('fechaVencimiento', 'desc')
+              );
+              querySnapshot = await getDocs(pagosQuery);
+            }
+          } catch (indexError) {
+            if (indexError.code === 'failed-precondition') {
+              const pagosQuery = query(
+                collection(db, 'pagos'),
+                where('alumnoId', '==', alumnoId)
+              );
+              querySnapshot = await getDocs(pagosQuery);
+            } else {
+              throw indexError;
+            }
+          }
 
-    // Intentar consulta con orderBy
-    try {
-      if (constraints.length > 0) {
-        const pagosQuery = query(
-          collection(db, 'pagos'),
-          ...constraints,
-          orderBy('fechaVencimiento', 'desc')
-        );
-        querySnapshot = await getDocs(pagosQuery);
-      } else {
-        const pagosQuery = query(
-          collection(db, 'pagos'),
-          orderBy('fechaVencimiento', 'desc')
-        );
-        querySnapshot = await getDocs(pagosQuery);
+          return querySnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+          }));
+        } catch (error) {
+          console.warn(`Error al obtener pagos del alumno ${alumnoId}:`, error);
+          return [];
+        }
+      });
+
+      const pagosArrays = await Promise.all(pagosPromises);
+      pagos = pagosArrays.flat();
+    } else {
+      // Para admin/directivo: consulta normal sin filtros de alumnos
+      let querySnapshot;
+      const constraints = [];
+
+      // Construir constraints
+      if (filtros.alumnoId) {
+        constraints.push(where('alumnoId', '==', filtros.alumnoId));
       }
-    } catch (indexError) {
-      // Si falla por falta de índice, obtener sin ordenar
-      if (indexError.code === 'failed-precondition') {
-        console.warn('Índice compuesto no encontrado, ordenando en cliente');
+      if (filtros.estado) {
+        constraints.push(where('estado', '==', filtros.estado));
+      }
+
+      // Intentar consulta con orderBy
+      try {
         if (constraints.length > 0) {
-          const pagosQuery = query(collection(db, 'pagos'), ...constraints);
+          const pagosQuery = query(
+            collection(db, 'pagos'),
+            ...constraints,
+            orderBy('fechaVencimiento', 'desc')
+          );
           querySnapshot = await getDocs(pagosQuery);
         } else {
-          const pagosQuery = query(collection(db, 'pagos'));
+          const pagosQuery = query(
+            collection(db, 'pagos'),
+            orderBy('fechaVencimiento', 'desc')
+          );
           querySnapshot = await getDocs(pagosQuery);
         }
-      } else {
-        throw indexError;
+      } catch (indexError) {
+        // Si falla por falta de índice, obtener sin ordenar
+        if (indexError.code === 'failed-precondition') {
+          console.warn('Índice compuesto no encontrado, ordenando en cliente');
+          if (constraints.length > 0) {
+            const pagosQuery = query(collection(db, 'pagos'), ...constraints);
+            querySnapshot = await getDocs(pagosQuery);
+          } else {
+            const pagosQuery = query(collection(db, 'pagos'));
+            querySnapshot = await getDocs(pagosQuery);
+          }
+        } else {
+          throw indexError;
+        }
       }
+
+      pagos = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
     }
 
-    let pagos = querySnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    }));
-
-    // Si no se ordenó en la consulta, ordenar en el cliente
+    // Ordenar en el cliente por fecha de vencimiento (descendente)
     if (pagos.length > 0) {
       pagos.sort((a, b) => {
         const fechaA = a.fechaVencimiento?.toDate?.() || new Date(a.fechaVencimiento || 0);

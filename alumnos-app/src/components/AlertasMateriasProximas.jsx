@@ -25,7 +25,12 @@ const AlertasMateriasProximas = () => {
   useEffect(() => {
     const cargarMateriasProximas = async () => {
       try {
-        const materias = await getMateriasProximas();
+        // Para usuarios de grupos, pasar alumnos asignados
+        const alumnosAsignados = userData?.rol === 'grupos' && userData?.alumnosAsignados?.length > 0
+          ? userData.alumnosAsignados
+          : null;
+        
+        const materias = await getMateriasProximas(alumnosAsignados);
         setMateriasProximas(materias);
         
         // Verificar si ya se envió email hoy
@@ -45,7 +50,8 @@ const AlertasMateriasProximas = () => {
     const interval = setInterval(cargarMateriasProximas, 5 * 60 * 1000);
     
     return () => clearInterval(interval);
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userData?.rol, userData?.alumnosAsignados?.length]);
 
   const handleEnviarEmail = async () => {
     // Obtener email del admin (prioridad: userData.email, luego currentUser.email)

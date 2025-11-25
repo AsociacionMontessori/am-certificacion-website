@@ -30,7 +30,8 @@ const AdminLayout = ({ children }) => {
     { name: 'Inscripciones', href: '/admin/inscripciones', icon: DocumentTextIcon },
     ...(userData?.rol !== 'catedratico' ? [{ name: 'Pagos', href: '/admin/pagos', icon: CurrencyDollarIcon }] : []),
     ...(canEdit ? [{ name: 'Gestión Grupos', href: '/admin/gestion-grupos', icon: UserGroupIcon }] : []),
-    { name: 'Generador QR', href: '/admin/generador-qr', icon: QrCodeIcon },
+    // Generador QR solo para admin y directivo, no para grupos
+    ...(userData?.rol !== 'grupos' && userData?.rol !== 'catedratico' ? [{ name: 'Generador QR', href: '/admin/generador-qr', icon: QrCodeIcon }] : []),
   ];
 
   const herramientasAvanzadas = canEdit ? [

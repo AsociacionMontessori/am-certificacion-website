@@ -20,7 +20,7 @@ const VerificarCertificado = () => {
         try {
           const urlPath = window.location.pathname;
           // Patrón: /verificar/:folio/:codigo
-          const match = urlPath.match(/^\/verificar\/([^\/]+)\/([^\/]+)$/);
+          const match = urlPath.match(/^\/verificar\/([^/]+)\/([^/]+)$/);
           if (match && match.length === 3) {
             folio = match[1];
             codigo = match[2];

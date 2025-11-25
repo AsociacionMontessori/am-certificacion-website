@@ -4,7 +4,7 @@ import { collection, query, where, getDocs, getDoc, doc, updateDoc, deleteDoc, a
 import { db } from '../../config/firebase';
 import { getMateriasPorNivel } from '../../data/materiasPorNivel';
 import { getHistorialNiveles, getNivelActivo } from '../../utils/alumnos';
-import { ArrowLeftIcon, PlusIcon, PencilIcon, TrashIcon, CalendarIcon, DocumentDuplicateIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import { ArrowLeftIcon, PlusIcon, PencilIcon, TrashIcon, CalendarIcon, DocumentDuplicateIcon, XMarkIcon, ExclamationTriangleIcon, CheckCircleIcon, ClockIcon } from '@heroicons/react/24/outline';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import LoadingButton from '../../components/LoadingButton';
 import { formatearFechaLarga, formatearFechaInput } from '../../utils/formatearFecha';
@@ -726,94 +726,216 @@ const GestionMaterias = () => {
             </div>
           )}
 
-          <div className="space-y-4">
-            {materiasFiltradas.map((materia) => {
+          {/* Agrupar materias por estado */}
+          {(() => {
+            const materiasPorEstado = {
+              'Con atraso': materiasFiltradas.filter(m => (m.estado || 'Pendiente').toString().trim() === 'Con atraso'),
+              'Pendiente': materiasFiltradas.filter(m => (m.estado || 'Pendiente').toString().trim() === 'Pendiente'),
+              'En curso': materiasFiltradas.filter(m => (m.estado || 'Pendiente').toString().trim() === 'En curso'),
+              'Completada': materiasFiltradas.filter(m => (m.estado || 'Pendiente').toString().trim() === 'Completada'),
+              'Otros': materiasFiltradas.filter(m => {
+                const estado = (m.estado || 'Pendiente').toString().trim();
+                return !['Con atraso', 'Pendiente', 'En curso', 'Completada'].includes(estado);
+              })
+            };
+
+            const renderTarjetaMateria = (materia) => {
               const estado = (materia.estado || 'Pendiente').toString().trim();
               let estadoClass = 'bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-white';
+              let borderColor = 'border-gray-200 dark:border-gray-600';
+              let bgColor = 'bg-gray-50 dark:bg-gray-700/50';
 
               switch (estado) {
                 case 'Completada':
                   estadoClass = 'bg-green text-gray-900 dark:bg-green/80 dark:text-gray-900';
+                  borderColor = 'border-green-300 dark:border-green-700';
+                  bgColor = 'bg-green-50 dark:bg-green-900/20';
                   break;
                 case 'En curso':
                   estadoClass = 'bg-blue text-white';
+                  borderColor = 'border-blue-300 dark:border-blue-700';
+                  bgColor = 'bg-blue-50 dark:bg-blue-900/20';
                   break;
                 case 'Con atraso':
                   estadoClass = 'bg-red text-white';
+                  borderColor = 'border-red-300 dark:border-red-700';
+                  bgColor = 'bg-red-50 dark:bg-red-900/20';
                   break;
                 case 'Pendiente':
                   estadoClass = 'bg-yellow text-gray-900 dark:bg-yellow/80 dark:text-gray-900';
+                  borderColor = 'border-yellow-300 dark:border-yellow-700';
+                  bgColor = 'bg-yellow-50 dark:bg-yellow-900/20';
                   break;
                 default:
                   estadoClass = 'bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-white';
               }
 
               return (
-              <div key={materia.id} className={`bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 border ${isSelecting && selectedMaterias.includes(materia.id) ? 'border-blue ring-2 ring-blue' : 'border-gray-200 dark:border-gray-600'}`}>
-                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
-                  <div className="flex items-start gap-3 flex-1">
-                    {isSelecting && (
-                      <input
-                        type="checkbox"
-                        checked={selectedMaterias.includes(materia.id)}
-                        onChange={() => handleToggleSelect(materia.id)}
-                        className="mt-1 w-5 h-5 text-blue border-gray-300 rounded focus:ring-blue"
-                      />
-                    )}
-                    <div className="flex-1">
-                      <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                <div key={materia.id} className={`${bgColor} rounded-lg p-4 border-2 ${borderColor} shadow-sm hover:shadow-md transition-shadow ${isSelecting && selectedMaterias.includes(materia.id) ? 'ring-2 ring-blue' : ''}`}>
+                  <div className="flex flex-col h-full">
+                    <div className="flex items-center justify-between mb-3">
+                      <h3 className="font-semibold text-gray-900 dark:text-white text-sm">
                         {materia.nombre}
                       </h3>
-                      <div className="mb-2">
-                        <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-800">
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${estadoClass} flex items-center gap-1`}>
+                        {estado}
+                      </span>
+                    </div>
+                    
+                    <div className="space-y-2 text-sm flex-1">
+                      <div>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">Nivel</p>
+                        <p className="text-gray-700 dark:text-gray-300 font-medium">
                           {materia.nivelNombre || 'Sin nivel asignado'}
-                        </span>
+                        </p>
                       </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-gray-600 dark:text-gray-400">
-                      <div className="flex items-center">
-                        <CalendarIcon className="w-4 h-4 mr-2 flex-shrink-0" />
-                        <span>Inicio: {materia.fechaInicio ? formatearFechaLarga(materia.fechaInicio) : 'Sin fecha'}</span>
+                      <div className="grid grid-cols-1 gap-2">
+                        <div>
+                          <p className="text-xs text-gray-500 dark:text-gray-400">Fecha de inicio</p>
+                          <p className="text-gray-700 dark:text-gray-300 font-medium">
+                            {materia.fechaInicio ? formatearFechaLarga(materia.fechaInicio) : 'Sin fecha'}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-gray-500 dark:text-gray-400">Fecha de fin</p>
+                          <p className="text-gray-700 dark:text-gray-300 font-medium">
+                            {materia.fechaFin ? formatearFechaLarga(materia.fechaFin) : 'Sin fecha'}
+                          </p>
+                        </div>
+                        {materia.aula && (
+                          <div>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">Aula</p>
+                            <p className="text-gray-700 dark:text-gray-300 font-medium">
+                              {materia.aula}
+                            </p>
+                          </div>
+                        )}
                       </div>
-                      <div className="flex items-center">
-                        <CalendarIcon className="w-4 h-4 mr-2 flex-shrink-0" />
-                        <span>Fin: {materia.fechaFin ? formatearFechaLarga(materia.fechaFin) : 'Sin fecha'}</span>
-                      </div>
-                      {materia.aula && (
-                        <div>Aula: {materia.aula}</div>
+                    </div>
+                    
+                    <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600 flex flex-wrap gap-2 justify-end">
+                      {isSelecting && (
+                        <input
+                          type="checkbox"
+                          checked={selectedMaterias.includes(materia.id)}
+                          onChange={() => handleToggleSelect(materia.id)}
+                          className="w-5 h-5 text-blue border-gray-300 rounded focus:ring-blue"
+                        />
+                      )}
+                      {!isSelecting && canEdit && (
+                        <>
+                          <button
+                            onClick={() => handleEdit(materia)}
+                            className="inline-flex items-center px-3 py-2 bg-blue text-white rounded-lg hover:bg-blue/90 transition-colors text-sm"
+                            title="Editar materia"
+                          >
+                            <PencilIcon className="w-4 h-4 mr-1" />
+                            Editar
+                          </button>
+                          <button
+                            onClick={() => handleDelete(materia.id)}
+                            className="inline-flex items-center px-3 py-2 bg-red/10 text-red rounded-lg hover:bg-red/20 dark:hover:bg-red/30 transition-colors text-sm border border-red/20"
+                            title="Eliminar materia"
+                          >
+                            <TrashIcon className="w-4 h-4 mr-1" />
+                            Eliminar
+                          </button>
+                        </>
                       )}
                     </div>
-                    {estado && (
-                      <div className="mt-2">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${estadoClass}`}>
-                          {estado}
-                        </span>
+                  </div>
+                </div>
+              );
+            };
+
+            return (
+              <div className="space-y-6">
+                {/* Materias con atraso */}
+                {materiasPorEstado['Con atraso'].length > 0 && (
+                  <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 border-2 border-red-200 dark:border-red-800">
+                    <div className="flex items-center justify-between mb-4">
+                      <div>
+                        <h2 className="text-xl font-semibold text-red dark:text-red-400 flex items-center gap-2">
+                          <ExclamationTriangleIcon className="w-6 h-6" />
+                          Materias con Atraso ({materiasPorEstado['Con atraso'].length})
+                        </h2>
                       </div>
-                    )}
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {materiasPorEstado['Con atraso'].map((materia) => renderTarjetaMateria(materia))}
                     </div>
                   </div>
-                  {!isSelecting && canEdit && (
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => handleEdit(materia)}
-                        className="p-2 text-blue hover:bg-blue/10 rounded-lg transition-colors"
-                        aria-label="Editar"
-                      >
-                        <PencilIcon className="w-5 h-5" />
-                      </button>
-                      <button
-                        onClick={() => handleDelete(materia.id)}
-                        className="p-2 text-red hover:bg-red/10 rounded-lg transition-colors"
-                        aria-label="Eliminar"
-                      >
-                        <TrashIcon className="w-5 h-5" />
-                      </button>
+                )}
+
+                {/* Materias pendientes */}
+                {materiasPorEstado['Pendiente'].length > 0 && (
+                  <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 border-2 border-yellow-200 dark:border-yellow-800">
+                    <div className="flex items-center justify-between mb-4">
+                      <div>
+                        <h2 className="text-xl font-semibold text-yellow dark:text-yellow-400 flex items-center gap-2">
+                          <ClockIcon className="w-6 h-6" />
+                          Materias Pendientes ({materiasPorEstado['Pendiente'].length})
+                        </h2>
+                      </div>
                     </div>
-                  )}
-                </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {materiasPorEstado['Pendiente'].map((materia) => renderTarjetaMateria(materia))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Materias en curso */}
+                {materiasPorEstado['En curso'].length > 0 && (
+                  <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 border-2 border-blue-200 dark:border-blue-800">
+                    <div className="flex items-center justify-between mb-4">
+                      <div>
+                        <h2 className="text-xl font-semibold text-blue dark:text-blue-400 flex items-center gap-2">
+                          <CalendarIcon className="w-6 h-6" />
+                          Materias en Curso ({materiasPorEstado['En curso'].length})
+                        </h2>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {materiasPorEstado['En curso'].map((materia) => renderTarjetaMateria(materia))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Materias completadas */}
+                {materiasPorEstado['Completada'].length > 0 && (
+                  <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 border-2 border-green-200 dark:border-green-800">
+                    <div className="flex items-center justify-between mb-4">
+                      <div>
+                        <h2 className="text-xl font-semibold text-green dark:text-green-400 flex items-center gap-2">
+                          <CheckCircleIcon className="w-6 h-6" />
+                          Materias Completadas ({materiasPorEstado['Completada'].length})
+                        </h2>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {materiasPorEstado['Completada'].map((materia) => renderTarjetaMateria(materia))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Otras materias */}
+                {materiasPorEstado['Otros'].length > 0 && (
+                  <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 border border-gray-200 dark:border-gray-700">
+                    <div className="flex items-center justify-between mb-4">
+                      <div>
+                        <h2 className="text-xl font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                          Otras Materias ({materiasPorEstado['Otros'].length})
+                        </h2>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {materiasPorEstado['Otros'].map((materia) => renderTarjetaMateria(materia))}
+                    </div>
+                  </div>
+                )}
               </div>
             );
-            })}
-          </div>
+          })()}
 
           {materias.length === 0 ? (
             <div className="text-center py-12">

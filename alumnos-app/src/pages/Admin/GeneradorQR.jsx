@@ -1,13 +1,15 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, getDocs, getDoc, doc } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { QRCodeSVG } from 'qrcode.react';
 import { ArrowLeftIcon, ArrowDownTrayIcon, PrinterIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 import { useNotifications } from '../../contexts/NotificationContext';
+import { useAuth } from '../../contexts/AuthContext';
 
 const GeneradorQR = () => {
   const { error: showError } = useNotifications();
+  const { userData } = useAuth();
   const [alumnos, setAlumnos] = useState([]);
   const [alumnoSeleccionado, setAlumnoSeleccionado] = useState(null);
   const [busqueda, setBusqueda] = useState('');
@@ -16,19 +18,36 @@ const GeneradorQR = () => {
   useEffect(() => {
     const loadAlumnos = async () => {
       try {
-        const alumnosSnapshot = await getDocs(collection(db, 'alumnos'));
-        const alumnosData = alumnosSnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        }));
+        let alumnosData;
+        
+        // Si es usuario de grupos, solo cargar alumnos asignados
+        if (userData?.rol === 'grupos' && userData?.alumnosAsignados?.length > 0) {
+          const alumnosPromises = userData.alumnosAsignados.map(async (alumnoId) => {
+            const alumnoDoc = await getDoc(doc(db, 'alumnos', alumnoId));
+            if (alumnoDoc.exists()) {
+              return { id: alumnoDoc.id, ...alumnoDoc.data() };
+            }
+            return null;
+          });
+          alumnosData = (await Promise.all(alumnosPromises)).filter(a => a !== null);
+        } else {
+          // Admin y directivo cargan todos los alumnos
+          const alumnosSnapshot = await getDocs(collection(db, 'alumnos'));
+          alumnosData = alumnosSnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+          }));
+        }
+        
         setAlumnos(alumnosData);
       } catch (error) {
         console.error('Error al cargar alumnos:', error);
+        showError('Error al cargar los alumnos');
       }
       setLoading(false);
     };
     loadAlumnos();
-  }, []);
+  }, [userData, showError]);
 
   const alumnosFiltrados = alumnos.filter(alumno => {
     const nombre = alumno.nombre?.toLowerCase() || '';

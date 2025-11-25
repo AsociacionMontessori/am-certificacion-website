@@ -193,7 +193,7 @@ function App() {
           <Route
             path="/admin/generador-qr"
             element={
-              <AdminRoute>
+              <AdminRoute allowedRoles={['admin', 'directivo']}>
                 <AdminLayout>
                   <Suspense fallback={<LoadingSpinner fullScreen size="xl" variant="montessori" message="Cargando..." />}>
                     <GeneradorQR />

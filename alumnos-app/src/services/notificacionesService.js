@@ -2,6 +2,7 @@ import {
   collection,
   getDocs,
   query,
+  where,
   getDoc,
   doc
 } from 'firebase/firestore';
@@ -11,9 +12,10 @@ const normalizarTexto = (valor) => (valor || '').toString().trim().toLowerCase()
 
 /**
  * Obtiene todas las materias que inician en 7 días o menos
+ * @param {Array} alumnosAsignados - Lista de IDs de alumnos asignados (para usuarios de grupos)
  * @returns {Promise<Array>} Array de materias próximas con información del alumno
  */
-export const getMateriasProximas = async () => {
+export const getMateriasProximas = async (alumnosAsignados = null) => {
   try {
     const hoy = new Date();
     hoy.setHours(0, 0, 0, 0);
@@ -23,12 +25,34 @@ export const getMateriasProximas = async () => {
     fechaLimite.setDate(fechaLimite.getDate() + 7);
     fechaLimite.setHours(23, 59, 59, 999);
 
-    // Obtener todas las materias
-    // Nota: Firestore no permite consultas eficientes con != null para fechas
-    // Por lo tanto, obtenemos todas y filtramos en el código
-    const materiasQuery = query(collection(db, 'materias'));
+    let materiasSnapshot;
     
-    const materiasSnapshot = await getDocs(materiasQuery);
+    // Si hay alumnos asignados (usuario de grupos), hacer consultas individuales
+    if (alumnosAsignados && Array.isArray(alumnosAsignados) && alumnosAsignados.length > 0) {
+      const materiasPromises = alumnosAsignados.map(async (alumnoId) => {
+        try {
+          const materiasQuery = query(
+            collection(db, 'materias'),
+            where('alumnoId', '==', alumnoId)
+          );
+          return await getDocs(materiasQuery);
+        } catch (error) {
+          console.warn(`Error al obtener materias del alumno ${alumnoId}:`, error);
+          return { docs: [] };
+        }
+      });
+      
+      const snapshots = await Promise.all(materiasPromises);
+      // Combinar todos los documentos
+      materiasSnapshot = {
+        docs: snapshots.flatMap(snapshot => snapshot.docs)
+      };
+    } else {
+      // Para admin/directivo: obtener todas las materias
+      const materiasQuery = query(collection(db, 'materias'));
+      materiasSnapshot = await getDocs(materiasQuery);
+    }
+
     const materiasProximas = [];
 
     for (const materiaDoc of materiasSnapshot.docs) {
