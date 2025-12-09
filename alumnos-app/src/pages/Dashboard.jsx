@@ -201,8 +201,8 @@ const Dashboard = () => {
         </div>
       )}
 
-      {/* Alerta de Pagos Vencidos */}
-      {!loadingPagos && userData?.estado !== 'Inactivo' && pagosVencidos.length > 0 && (
+      {/* TEMPORAL: Alerta de Pagos Vencidos oculta en producción mientras se arreglan cosas */}
+      {/* {!loadingPagos && userData?.estado !== 'Inactivo' && pagosVencidos.length > 0 && (
         <div className="bg-gradient-to-r from-red-500 to-red-600 dark:from-red-600 dark:to-red-700 rounded-xl shadow-lg p-6 border-2 border-red-400 dark:border-red-500 text-white">
           <div className="flex items-start gap-4">
             <div className="flex-shrink-0">
@@ -238,7 +238,7 @@ const Dashboard = () => {
             </div>
           </div>
         </div>
-      )}
+      )} */}
 
       {/* Alertas de Materias con Atraso */}
       {userData?.estado !== 'Inactivo' && <AlertasMateriasAtraso />}

@@ -286,7 +286,8 @@ function App() {
               </AdminRoute>
             }
           />
-          <Route
+          {/* TEMPORAL: Ruta de Pagos oculta en producción mientras se arreglan cosas */}
+          {/* <Route
             path="/admin/pagos"
             element={
               <AdminRoute allowedRoles={['admin', 'directivo', 'grupos']}>
@@ -297,7 +298,7 @@ function App() {
                 </AdminLayout>
               </AdminRoute>
             }
-          />
+          /> */}
           
           {/* Rutas protegidas - Alumnos */}
           <Route
@@ -358,7 +359,8 @@ function App() {
               </ProtectedRoute>
             }
           />
-          <Route
+          {/* TEMPORAL: Ruta de Pagos oculta en producción mientras se arreglan cosas */}
+          {/* <Route
             path="/pagos"
             element={
               <ProtectedRoute>
@@ -369,7 +371,7 @@ function App() {
                 </Layout>
               </ProtectedRoute>
             }
-          />
+          /> */}
           
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

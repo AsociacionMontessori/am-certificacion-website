@@ -26,7 +26,8 @@ const Layout = ({ children }) => {
     { name: 'Mi Expediente', href: '/expediente', icon: DocumentTextIcon },
     { name: 'Calendario', href: '/calendario', icon: CalendarIcon },
     { name: 'Calificaciones', href: '/calificaciones', icon: ChartBarIcon },
-    { name: 'Pagos', href: '/pagos', icon: CurrencyDollarIcon },
+    // TEMPORAL: Ocultado en producción mientras se arreglan cosas
+    // { name: 'Pagos', href: '/pagos', icon: CurrencyDollarIcon },
     { name: 'Graduación', href: '/graduacion', icon: AcademicCapIcon },
   ];
 
