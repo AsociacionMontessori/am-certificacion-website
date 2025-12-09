@@ -8,9 +8,9 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "deploy": "npm run build && firebase deploy --only hosting:alumnos-certificacionmontessori",
-    "firebase:login": "firebase login",
-    "firebase:use": "firebase use certificacionmontessori",
+    "deploy": "npm run build && npx firebase deploy --only hosting:alumnos-certificacionmontessori",
+    "firebase:login": "npx firebase login",
+    "firebase:use": "npx firebase use certificacionmontessori",
     "version:patch": "node scripts/version.js patch",
     "version:minor": "node scripts/version.js minor",
     "version:major": "node scripts/version.js major",
@@ -19,7 +19,7 @@
     "create:config-general": "node scripts/crear-config-pagos-general.js",
     "verify:pagos": "node scripts/verificar-config-pagos.js",
     "migrate:pagos": "node scripts/migrar-pagos-numerados.js",
-    "deploy:rules": "firebase deploy --only firestore:rules,storage:rules"
+    "deploy:rules": "npx firebase deploy --only firestore:rules,storage:rules"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.9",
@@ -41,6 +41,7 @@
     "eslint": "^9.36.0",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.22",
+    "firebase-tools": "^14.27.0",
     "globals": "^16.4.0",
     "postcss": "^8.5.6",
     "tailwindcss": "^3.4.18",
