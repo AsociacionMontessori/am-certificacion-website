@@ -26,22 +26,22 @@ export default function Landing() {
   return (
     <>
       <Layout>
-        <main className="bottom-0 right-0 bg-gradient-to-r from-blue via-purple to-green -z-20">
+        <main className="bottom-0 right-0 left-0 w-full max-w-full overflow-x-hidden bg-gradient-to-r from-blue via-purple to-green -z-20">
           <Nav textColor="text-white" />
-          <main className="overflow-hidden selection:text-white selection:bg-green selection:bg-opacity-20">
+          <main className="min-w-0 overflow-x-hidden overflow-y-visible selection:text-white selection:bg-green selection:bg-opacity-20">
             <section id="home" className="relative flex pb-24 md:pb-32">
               {/* <div aria-hidden="true" className="absolute inset-0 z-[1] bg-gradient-to-b from-white/0 via-gray/20 to-gray"></div> */}
               {/* <img src={imagen} className="fixed inset-0 h-full w-full object-cover" alt="woman in dark" width="4160" height="6240" /> */}
-              <div className="fixed inset-0 w-full object-cover"
+              <div className="fixed inset-0 w-full min-w-0 max-w-full h-full object-cover"
                 style={{
                   backgroundSize: "cover",
                   backgroundImage: "url('https://images.unsplash.com/photo-1557804506-669a67965ba0?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1267&q=80')"
                 }}>
                 <span id="blackOverlay" className="w-full h-full absolute opacity-75 bg-black"></span>
               </div>
-              <div className="container pt-20 relative mx-auto">
-                <div className="flex flex-wrap">
-                  <div className="w-full lg:w-6/12 lg:w-10/12 px-4 ml-auto mr-auto lg:text-center">
+              <div className="container pt-20 relative mx-auto w-full max-w-full px-4">
+                <div className="flex flex-wrap min-w-0">
+                  <div className="w-full min-w-0 lg:w-6/12 lg:w-10/12 px-4 ml-auto mr-auto lg:text-center">
                     <div>
                       <p className="text-sm sm:text-base uppercase tracking-widest text-green-300/90 mb-2">
                         Certificación internacional • 100% en línea • A tu ritmo
@@ -59,8 +59,8 @@ export default function Landing() {
                         Ver programas y precios
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" /></svg>
                       </a>
-                      <div className="relative lg:mt-16 lg:p-10 mt-6 p-2 sm:p-4 border border-white/60 bg-black/40 backdrop-blur-sm lg:border-white/80 lg:hover:border-green transition duration-300 ease-in-out rounded-3xl">
-                        <div className="absolute bottom-0 right-0 lg:-top-[40vh] lg:-left-60 w-20 lg:w-1/2 lg:opacity-50">
+                      <div className="relative overflow-hidden lg:mt-16 lg:p-10 mt-6 p-2 sm:p-4 border border-white/60 bg-black/40 backdrop-blur-sm lg:border-white/80 lg:hover:border-green transition duration-300 ease-in-out rounded-3xl">
+                        <div className="absolute bottom-0 right-0 lg:-top-[40vh] lg:-left-60 w-20 lg:w-1/2 lg:opacity-50 pointer-events-none">
                           <StaticImage src="../images/elements/decor1.png" placeholder="none" alt="decoración" className="w-20 lg:w-full pointer-events-none select-none" />
                         </div>
                         <p className="text-xs sm:text-sm md:text-xl text-gray-200">
@@ -131,9 +131,9 @@ export default function Landing() {
             </div>
           </div>
 
-          <section className="relative bg-gradient-to-r from-blue via-purple to-green pb-20 -mt-24 z-20">
-            <div className="container mx-auto px-4">
-              <div className="flex flex-wrap items-center ">
+          <section className="relative bg-gradient-to-r from-blue via-purple to-green pb-20 -mt-24 z-20 overflow-hidden">
+            <div className="container mx-auto w-full max-w-full px-4">
+              <div className="flex flex-wrap items-center min-w-0">
 
 
 
@@ -196,9 +196,9 @@ export default function Landing() {
                 </div>
 
               </div>
-              <div className="flex flex-wrap lg:pt-12 pt-6">
-                <div className="w-1/2 md:w-4/12 px-2">
-                  <div className=" relative flex flex-col min-w-0 break-words bg-white w-full mb-8 shadow-xl rounded-lg">
+              <div className="flex flex-wrap min-w-0 lg:pt-12 pt-6">
+                <div className="w-1/2 min-w-0 md:w-4/12 px-2">
+                  <div className="relative flex flex-col min-w-0 break-words bg-white w-full mb-8 shadow-xl rounded-lg overflow-hidden">
                     <div className="hover:bg-red hover:bg-opacity-10 px-2 md:px-4 lg:px-6 py-5 flex-auto">
                       <h6 className="text-sm md:text-xl font-semibold text-red">FILOSOFÍA MONTESSORI</h6>
                       <p className="text-xs md:text-sm lg:text-base mt-2 mb-4 text-black">
@@ -207,8 +207,8 @@ export default function Landing() {
                     </div>
                   </div>
                 </div>
-                <div className="w-1/2 md:w-4/12 px-2 ">
-                  <div className="relative flex flex-col min-w-0 break-words bg-white w-full mb-8 shadow-xl rounded-lg">
+                <div className="w-1/2 min-w-0 md:w-4/12 px-2 ">
+                  <div className="relative flex flex-col min-w-0 break-words bg-white w-full mb-8 shadow-xl rounded-lg overflow-hidden">
                     <div className="hover:bg-blue hover:bg-opacity-10 px-2 md:px-4 lg:px-6 py-5 flex-auto">
                       <h6 className="text-sm md:text-xl font-semibold text-blue">MÉTODOS DE OBSERVACIÓN</h6>
                       <p className="text-xs md:text-sm lg:text-base mt-2 mb-4 text-black">
@@ -217,8 +217,8 @@ export default function Landing() {
                     </div>
                   </div>
                 </div>
-                <div className="-mt-5 md:mt-0 w-1/2 md:w-4/12 px-2 ">
-                  <div className="relative flex flex-col min-w-0 break-words bg-white w-full mb-8 shadow-xl rounded-lg">
+                <div className="-mt-5 md:mt-0 w-1/2 min-w-0 md:w-4/12 px-2 ">
+                  <div className="relative flex flex-col min-w-0 break-words bg-white w-full mb-8 shadow-xl rounded-lg overflow-hidden">
                     <div className="hover:bg-orange hover:bg-opacity-10 px-2 md:px-4 lg:px-6 py-5 flex-auto">
                       <h6 className="text-sm md:text-xl font-semibold text-orange">NEURO - EDUCACIÓN</h6>
                       <p className="text-xs md:text-sm lg:text-base mt-2 mb-4 text-black">
@@ -227,8 +227,8 @@ export default function Landing() {
                     </div>
                   </div>
                 </div>
-                <div className="w-1/2 md:w-4/12 px-2 ">
-                  <div className="relative flex flex-col min-w-0 break-words bg-white w-full mb-8 shadow-xl rounded-lg">
+                <div className="w-1/2 min-w-0 md:w-4/12 px-2 ">
+                  <div className="relative flex flex-col min-w-0 break-words bg-white w-full mb-8 shadow-xl rounded-lg overflow-hidden">
                     <div className="hover:bg-green hover:bg-opacity-10 px-2 md:px-4 lg:px-6 py-5 flex-auto">
                       <h6 className="text-sm md:text-xl font-semibold text-green">PSICOLOGÍA EDUCATIVA</h6>
                       <p className="text-xs md:text-sm lg:text-base mt-2 mb-4 text-black">
@@ -237,8 +237,8 @@ export default function Landing() {
                     </div>
                   </div>
                 </div>
-                <div className="-mt-10 md:mt-0 w-1/2 md:w-4/12 px-2 ">
-                  <div className="relative flex flex-col min-w-0 break-words bg-white w-full mb-8 shadow-xl rounded-lg">
+                <div className="-mt-10 md:mt-0 w-1/2 min-w-0 md:w-4/12 px-2 ">
+                  <div className="relative flex flex-col min-w-0 break-words bg-white w-full mb-8 shadow-xl rounded-lg overflow-hidden">
                     <div className="hover:bg-red hover:bg-opacity-10 px-2 md:px-4 lg:px-6 py-5 flex-auto">
                       <h6 className="text-sm md:text-xl font-semibold text-red">MUSICOTERAPIA</h6>
                       <p className="text-xs md:text-sm lg:text-base mt-2 mb-4 text-black">
@@ -247,8 +247,8 @@ export default function Landing() {
                     </div>
                   </div>
                 </div>
-                <div className="w-1/2 md:w-4/12 px-2 ">
-                  <div className="relative flex flex-col min-w-0 break-words bg-white w-full mb-8 shadow-xl rounded-lg">
+                <div className="w-1/2 min-w-0 md:w-4/12 px-2 ">
+                  <div className="relative flex flex-col min-w-0 break-words bg-white w-full mb-8 shadow-xl rounded-lg overflow-hidden">
                     <div className="hover:bg-blue hover:bg-opacity-10 px-2 md:px-4 lg:px-6 py-5 flex-auto">
                       <h6 className="text-sm md:text-xl font-semibold text-blue">PSICO-MOTRICIDAD</h6>
                       <p className="text-xs md:text-sm lg:text-base mt-2 mb-4 text-black">
@@ -257,8 +257,8 @@ export default function Landing() {
                     </div>
                   </div>
                 </div>
-                <div className="-mt-5 lg:mt-0 md:w-2/3 w-1/2 px-2 ">
-                  <div className="relative flex flex-col min-w-0 break-words bg-white w-full mb-8 shadow-xl rounded-lg">
+                <div className="-mt-5 lg:mt-0 md:w-2/3 w-1/2 min-w-0 px-2 ">
+                  <div className="relative flex flex-col min-w-0 break-words bg-white w-full mb-8 shadow-xl rounded-lg overflow-hidden">
                     <div className="hover:bg-orange hover:bg-opacity-10 px-2 md:px-4 lg:px-6 py-5 flex-auto">
                       <h6 className="text-sm md:text-xl font-semibold text-orange">EDUCACIÓN INCLUSIVA</h6>
                       <p className="text-xs md:text-sm lg:text-base mt-2 mb-4 text-black">
@@ -267,8 +267,8 @@ export default function Landing() {
                     </div>
                   </div>
                 </div>
-                <div className="w-1/2 md:w-1/3 px-2 ">
-                  <div className="relative flex flex-col min-w-0 break-words bg-white w-full mb-8 shadow-xl rounded-lg">
+                <div className="w-1/2 min-w-0 md:w-1/3 px-2 ">
+                  <div className="relative flex flex-col min-w-0 break-words bg-white w-full mb-8 shadow-xl rounded-lg overflow-hidden">
                     <div className="hover:bg-green hover:bg-opacity-10 px-2 md:px-4 lg:px-6 py-5 flex-auto">
                       <h6 className="text-sm md:text-xl font-semibold text-green">INTELIGENCIA CREATIVA</h6>
                       <p className="text-xs md:text-sm lg:text-base mt-2 mb-4 text-black">
@@ -295,7 +295,7 @@ export default function Landing() {
             </div>
           </section>
 
-          <section className="relative bg-gradient-to-r from-blue via-purple to-green pb-20 pt-5">
+          <section className="relative overflow-hidden bg-gradient-to-r from-blue via-purple to-green pb-20 pt-5">
             <div
               className="bottom-auto top-0 left-0 right-0 w-full absolute pointer-events-none overflow-hidden -mt-20"
               style={{ height: "80px" }}
@@ -325,9 +325,9 @@ export default function Landing() {
               </svg>
             </div>
 
-            <div className="container mx-auto px-4">
-              <div className="items-center flex flex-wrap">
-                <div className="w-full md:w-4/12 ml-auto mr-auto px-4">
+            <div className="container mx-auto w-full max-w-full px-4">
+              <div className="items-center flex flex-wrap min-w-0">
+                <div className="w-full min-w-0 md:w-4/12 ml-auto mr-auto px-4">
                   <img
                     alt="..."
                     className="max-w-full rounded-lg shadow-lg"
@@ -409,8 +409,8 @@ export default function Landing() {
             </div>
           </section>
 
-          <section id="" className="relative bg-gradient-to-r from-blue to-green pb-20 pt-6">
-            <div className="container mx-auto px-4 text-center mb-8">
+          <section id="" className="relative overflow-hidden bg-gradient-to-r from-blue to-green pb-20 pt-6">
+            <div className="container mx-auto w-full max-w-full px-4 text-center mb-8">
               <p className="text-green-300/90 text-sm uppercase tracking-wider mb-2">Programas y precios</p>
               <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-3">
                 Elige tu programa y da el siguiente paso
@@ -422,7 +422,7 @@ export default function Landing() {
             <CertificationPrice />
           </section>
 
-          <section className="relative block bg-blue">
+          <section className="relative block overflow-hidden bg-blue">
             <div
               className="bottom-auto top-[1px] left-0 right-0 w-full absolute pointer-events-none overflow-hidden -mt-20"
               style={{ height: "80px" }}
@@ -443,8 +443,8 @@ export default function Landing() {
               </svg>
             </div>
 
-            <div className="container mx-auto px-4 lg:pt-24 lg:pb-32">
-              <div className="flex flex-wrap text-center justify-center text-white">
+            <div className="container mx-auto w-full max-w-full px-4 lg:pt-24 lg:pb-32">
+              <div className="flex flex-wrap min-w-0 text-center justify-center text-white">
                 <div className="w-full lg:w-6/12 px-4">
                   <p className="text-green-300/90 text-sm uppercase tracking-wider mb-2">Inscripción</p>
                   <h2 className="text-4xl font-semibold text-white">
