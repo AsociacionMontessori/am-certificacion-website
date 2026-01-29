@@ -24,16 +24,16 @@ const CertificationPrice = () => {
         axios
             .get("https://ipapi.co/json/")
             .then(response => {
-                let data = response.data
-                setState({
-                    ...state,
+                const data = response.data
+                setState(prevState => ({
+                    ...prevState,
                     ip: data.ip,
                     countryName: data.country_name,
                     city: data.city,
-                })
+                }))
             })
             .catch(error => {
-                console.log(error)
+                console.error(error)
             })
     }
 
@@ -45,8 +45,8 @@ const CertificationPrice = () => {
         {
             title: "Certificado",
             subtitle: "único pago",
-            priceMx: "2,500",
-            priceUsd: "140",
+            priceMx: "2,700",
+            priceUsd: "150",
             text: "Único pago de ",
             footer: "+  gasto de envío fuera de México",
         },
@@ -56,24 +56,24 @@ const CertificationPrice = () => {
         {
             title: "Nido",
             subtitle: "y comunidad infantil",
-            priceMx: "2,900",
-            priceUsd: "160",
+            priceMx: "3,100",
+            priceUsd: "170",
             text: "Nido y Comunidad infantil",
             duration: "16 meses",
         },
         {
             title: "Casa de Niños",
             subtitle: "certifícate como guía montessori",
-            priceMx: "3,300",
-            priceUsd: "180",
+            priceMx: "3,500",
+            priceUsd: "195",
             text: "Casa de niños",
             duration: "17 meses",
         },
         {
             title: "Taller",
             subtitle: "único pago",
-            priceMx: "3,600",
-            priceUsd: "200",
+            priceMx: "3,900",
+            priceUsd: "220",
             text: "Taller I y II",
             duration: "20 meses",
         },
@@ -83,8 +83,8 @@ const CertificationPrice = () => {
         {
             title: "Inscripción",
             subtitle: "único pago",
-            priceMx: "4,600",
-            priceUsd: "255",
+            priceMx: "4,900",
+            priceUsd: "270",
             text: "Único pago de",
         },
     ]
