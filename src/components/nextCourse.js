@@ -41,10 +41,17 @@ const DiplomadoCountdown = ({ geoState }) => {
         diff: 0,
     })
 
+    const isMexico = (geo) => {
+        const { countryCode, countryName } = geo
+        if (countryCode === "MX" || countryName === "Mexico" || countryName === "México") return true
+        if (!countryCode && !countryName) return true
+        return false
+    }
+
     const getLocalizedPrice = () => {
-        const { countryName } = geoState
-        const coin = countryName === "Mexico" ? "MXN" : "USD"
-        const priceToShow = countryName === "Mexico" ? "4,500" : "250"
+        const useMxn = isMexico(geoState)
+        const coin = useMxn ? "MXN" : "USD"
+        const priceToShow = useMxn ? "4,500" : "250"
         return { coin, priceToShow }
     }
 
@@ -183,6 +190,7 @@ const NextCourse = () => {
     const [geoState, setGeoState] = useState({
         ip: "",
         countryName: "",
+        countryCode: "",
         city: "",
     })
 
@@ -194,15 +202,16 @@ const NextCourse = () => {
                 setGeoState(prevState => ({
                     ...prevState,
                     ip: data.ip,
-                    countryName: data.country_name,
+                    countryName: data.country_name || "",
+                    countryCode: (data.country_code || "").toUpperCase(),
                     city: data.city,
                 }))
             })
             .catch(error => {
                 console.error(error)
-                // Por defecto, asumir México si falla la detección
                 setGeoState(prevState => ({
                     ...prevState,
+                    countryCode: "MX",
                     countryName: "Mexico",
                 }))
             })
