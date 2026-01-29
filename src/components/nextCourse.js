@@ -132,10 +132,20 @@ const NextCourse = () => {
         <>
             <div className="pb-10 lg:pb-10">
                 <h2 className="py-2">
-                    <span className="text-white text-2xl font-bold">Próximo Diplomado:</span>
+                    <span className="text-white text-2xl font-bold">
+                        Próximo Diplomado en Neuroeducación
+                    </span>
+                    <span className="mt-1 block text-sm font-medium text-white/90 sm:text-base">
+                        Transforma la manera en que acompañas a niñas y niños.
+                    </span>
                 </h2>
                 <div className="relative rounded-3xl border border-white/20 bg-black/30 p-4 backdrop-blur">
                     <DiplomadoCountdown />
+                    <ul className="mt-3 list-disc list-inside text-xs text-white/90 sm:text-sm md:text-base space-y-1">
+                        <li>100% en línea, sin traslados.</li>
+                        <li>Enfoque práctico para aplicar de inmediato con niñas y niños.</li>
+                        <li>Acompañamiento cercano de especialistas en Neuroeducación.</li>
+                    </ul>
                     <div className="pt-4">
                         <a href="https://docs.google.com/forms/d/e/1FAIpQLScmvkdg4BSCWsempnaQhJWc0ZGaYFSrgiFcnJ3hlpQqF8PU0g/viewform" target="__blank" className="group mt-3 sm:mt-0 btn btn-outline hover:text-white hover:bg-blue bg-gradient-to-r from-blue/50 hover:from-gray hover:bg-opacity-70 rounded-full px-10 mr-4 bg-blue text-white bg-opacity-10 w-full md:w-auto">
                             Inscríbete Ahora
@@ -149,6 +159,9 @@ const NextCourse = () => {
                                 <StaticImage className='w-6 h-6' src="../images/elements/decor2.png" alt="decoration" />
                             </div>                        
                         </a>
+                        <p className="mt-3 text-xs text-white/80 sm:text-sm">
+                            Cupo limitado: reserva tu lugar con anticipación.
+                        </p>
                     </div>
                 </div>
             </div>
