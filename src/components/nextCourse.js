@@ -2,7 +2,7 @@ import { StaticImage } from "gatsby-plugin-image"
 import React, { useEffect, useState } from "react"
 import axios from "axios"
 
-const DIPLOMADOS_EN_LINEA = [
+export const DIPLOMADOS_EN_LINEA = [
     // Ciclo 2025–2026
     { date: new Date("2025-11-29T08:00:00-06:00"), label: "29 de noviembre 2025" },
     { date: new Date("2026-01-24T08:00:00-06:00"), label: "24 de enero 2026" },
@@ -21,7 +21,7 @@ const MS_MINUTE = 60 * MS_SECOND
 const MS_HOUR = 60 * MS_MINUTE
 const MS_DAY = 24 * MS_HOUR
 
-const getNextItem = (items) => {
+export const getNextItem = (items) => {
     const now = Date.now()
     return items.find((item) => item.date.getTime() > now) || null
 }
