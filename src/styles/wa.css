@@ -51,13 +51,6 @@ wa__btn_popup_icon
     z-index: 1
 }
 
-.wa__btn_popup .am__btn_popup_icon:before {
-    background-size: 30px;
-    -webkit-background-size: 30px auto;
-    -moz-background-size: 30px auto;
-    z-index: 1
-}
-
 .wa__btn_popup .wa__btn_popup_icon:after,.wa__btn_popup .wa__btn_popup_icon:before {
     content: "";
     height: 100%;
@@ -129,7 +122,13 @@ wa__btn_popup_icon
     transition: all .4s ease;
     -webkit-transition: all .4s ease;
     -moz-transition: all .4s ease;
-    width: 10vw 
+    width: auto;
+    max-width: 228px;
+    min-width: 180px;
+    white-space: normal;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    box-shadow: 0 2px 8px rgba(0,0,0,.1);
 }
 
 .wa__btn_popup.wa__active .wa__btn_popup_txt {
@@ -139,4 +138,121 @@ wa__btn_popup_icon
     -webkit-transform: translateY(15px);
     -moz-transform: translateY(15px);
     visibility: hidden
+}
+
+/* Estilos para el popup de AM - Diseño compacto y moderno */
+.am__btn_popup_container {
+    z-index: 999999998;
+}
+
+.am__popup_card {
+    position: absolute;
+    right: 100%;
+    bottom: 0;
+    margin-right: 12px;
+    width: 220px;
+    background: linear-gradient(180deg, #f0f9ff 0%, #e0f2fe 35%, #ffffff 100%);
+    border-radius: 10px;
+    box-shadow: 0 4px 16px rgba(0, 151, 178, 0.18), 0 2px 4px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    border: 1px solid rgba(0, 151, 178, 0.25);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.am__popup_card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 151, 178, 0.22), 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.am__popup_header {
+    width: 100%;
+    padding: 8px 10px 6px;
+    margin: 0;
+    overflow: hidden;
+    line-height: 0;
+    background: linear-gradient(135deg, #0097B2 0%, #007a91 100%);
+}
+
+.am__popup_image {
+    width: 100%;
+    height: auto;
+    display: block;
+    margin: 0;
+    padding: 0;
+    max-height: 56px;
+    object-fit: contain;
+    border-radius: 4px;
+}
+
+.am__popup_content {
+    width: 100%;
+    height: 100px;
+    overflow: hidden;
+    position: relative;
+    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+    border-top: 1px solid rgba(0, 151, 178, 0.12);
+}
+
+
+.am__popup_iframe {
+    width: 100%;
+    height: 100%;
+    border: 0;
+    margin: 0;
+    padding: 0;
+    display: block;
+    overflow: hidden;
+    transform: scale(1);
+    transform-origin: top left;
+    pointer-events: auto;
+}
+
+/* Responsive adjustments para AM popup - Mobile First */
+@media (max-width: 640px) {
+    .am__btn_popup_container {
+        right: 16px;
+        bottom: 90px;
+    }
+    
+    .am__popup_card {
+        width: 180px;
+        margin-right: 8px;
+        border-radius: 8px;
+    }
+    
+    .am__popup_image {
+        max-height: 50px;
+    }
+    
+    .am__popup_content {
+        height: 85px;
+    }
+}
+
+@media (min-width: 768px) {
+    .am__popup_card {
+        width: 240px;
+    }
+    
+    .am__popup_image {
+        max-height: 65px;
+    }
+    
+    .am__popup_content {
+        height: 110px;
+    }
+}
+
+@media (min-width: 1024px) {
+    .am__popup_card {
+        width: 260px;
+    }
+    
+    .am__popup_image {
+        max-height: 70px;
+    }
+    
+    .am__popup_content {
+        height: 120px;
+    }
 }

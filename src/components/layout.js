@@ -29,7 +29,7 @@ const Layout = ({ children }) => {
           <div id="wa" className="wa__widget_container">
             <a target="_blank" rel="noreferrer" href="https://api.whatsapp.com/send?phone=5215548885013&text=Hola, Me gustaría información sobre la certificación Montessori." >
 
-              <div className="wa__btn_popup" style={{ left: 'unset', right: '30px' }}>
+              <div className="wa__btn_popup" style={{ left: 'unset', right: '20px', bottom: '30px' }}>
                 <Transition
                   show={showWABtn}
                   enter="transition-opacity duration-75"
@@ -41,11 +41,10 @@ const Layout = ({ children }) => {
                 >
                   <div className="hidden md:block">
                     <FadeIn delay="delay-[0ms]">
-                      <div className="wa__btn_popup_txt " style={{ display: 'block', left: 'unset', right: '100%', marginRight: '7px', marginLeft: '0px', width: '228px' }}>
+                      <div className="wa__btn_popup_txt" style={{ display: 'block', left: 'unset', right: '100%', marginRight: '7px', marginLeft: '0px', maxWidth: '228px', minWidth: '180px', whiteSpace: 'normal', wordWrap: 'break-word' }}>
                         <span><strong>Solicita Informes</strong></span>
                       </div>
                     </FadeIn>
-
                   </div>
                 </Transition>
                 <div className="wa__btn_popup_icon" onMouseOut={() => {
@@ -62,7 +61,7 @@ const Layout = ({ children }) => {
 
             </a>
 
-              <div className="wa__btn_popup" style={{ left: 'unset', right: '100px' }}>
+              <div className="wa__btn_popup am__btn_popup_container" style={{ left: 'unset', right: '20px', bottom: '100px' }}>
                 <Transition
                   show={showAMBtn}
                   enter="transition-opacity duration-75"
@@ -72,13 +71,25 @@ const Layout = ({ children }) => {
                   leaveFrom="opacity-100"
                   leaveTo="opacity-0"
                 >
-                  <div className="md:block relative">
+                  <div className="hidden md:block">
                     <FadeIn delay="delay-[0ms]">
-                      <div className="w-[60vw] lg:w-[16vw] p-[0.7rem] absolute  -bottom-10  -right-5 lg:-right-10">
-                        <StaticImage src="../images/notf.png" alt="AM" placeholder="none" />
-                      </div>
-                      <div className="w-[60vw] lg:w-[16vw] lg:h-28  p-[0.7rem] absolute -bottom-16 lg:bottom-10 -right-5 lg:-right-10">
-                        <iframe className="sm:overflow-hidden my-auto" style={{ marginLeft: "10px" }} title="Eventos" src="https://montessorimexico.org/massterclass/" name="myiFrame" scrolling="no" frameborder="1" marginheight="0px" marginwidth="0px" height="100%" width="80%" allowfullscreen></iframe>
+                      <div className="am__popup_card">
+                        <div className="am__popup_header">
+                          <StaticImage src="../images/notf.png" alt="AM" placeholder="none" className="am__popup_image" />
+                        </div>
+                        <div className="am__popup_content">
+                          <iframe 
+                            className="am__popup_iframe" 
+                            title="Eventos" 
+                            src="https://montessorimexico.org/massterclass/" 
+                            name="myiFrame" 
+                            scrolling="no" 
+                            frameBorder="0" 
+                            marginHeight="0" 
+                            marginWidth="0" 
+                            allowFullScreen
+                          ></iframe>
+                        </div>
                       </div>
                     </FadeIn>
                   </div>
