@@ -37,11 +37,12 @@ const AlumnoDetail = () => {
   const [nivelesHistorial, setNivelesHistorial] = useState([]);
   const [nivelesHistorialEdit, setNivelesHistorialEdit] = useState([]);
   const [nivelesDisponibles, setNivelesDisponibles] = useState([]);
+  const [selectedNivelId, setSelectedNivelId] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
   const [notasPrivadas, setNotasPrivadas] = useState('');
   const [notasOriginales, setNotasOriginales] = useState('');
   const [guardandoNotas, setGuardandoNotas] = useState(false);
- 
+
   const { success, error: showError, prompt: showPrompt } = useNotifications();
 
   const notasHanCambiado = notasPrivadas !== notasOriginales;
@@ -85,6 +86,13 @@ const AlumnoDetail = () => {
     const historial = getHistorialNiveles(datos);
     setNivelesHistorial(historial);
     setNivelesHistorialEdit(historial);
+    if (nivelActivoActual?.id) {
+      setSelectedNivelId(nivelActivoActual.id);
+    } else if (historial[0]?.id) {
+      setSelectedNivelId(historial[0].id);
+    } else {
+      setSelectedNivelId(null);
+    }
     setNotasPrivadas(datos.notasPrivadas || '');
     setNotasOriginales(datos.notasPrivadas || '');
   };
@@ -213,7 +221,7 @@ const AlumnoDetail = () => {
       };
 
       await updateDoc(doc(db, 'alumnos', id), updateData);
-      
+
       // Recargar datos
       const alumnoDoc = await getDoc(doc(db, 'alumnos', id));
       if (alumnoDoc.exists()) {
@@ -221,7 +229,7 @@ const AlumnoDetail = () => {
         setAlumno(data);
         prepararFormulario(data);
       }
-      
+
       setEditing(false);
       success('Datos guardados exitosamente');
     } catch (error) {
@@ -329,6 +337,10 @@ const AlumnoDetail = () => {
     const fechaB = convertirFecha(b?.fechaInicio)?.getTime() || 0;
     return fechaB - fechaA;
   });
+
+  const nivelSeleccionado = selectedNivelId
+    ? nivelesHistorialEdit.find((nivel) => nivel.id === selectedNivelId)
+    : null;
 
   if (loading) {
     return (
@@ -664,11 +676,10 @@ const AlumnoDetail = () => {
                             </div>
                             <div className="flex items-center gap-2">
                               <span
-                                className={`inline-flex items-center self-start rounded-full px-2.5 py-1 text-xs font-medium ${
-                                  estadoActivo
+                                className={`inline-flex items-center self-start rounded-full px-2.5 py-1 text-xs font-medium ${estadoActivo
                                     ? 'bg-blue/10 text-blue'
                                     : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300'
-                                }`}
+                                  }`}
                               >
                                 {estadoActivo ? 'Activo' : 'Completado'}
                               </span>
@@ -942,12 +953,78 @@ const AlumnoDetail = () => {
 
         {/* Gestión Académica */}
         <div className="lg:col-span-2 bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-            Gestión Académica
-          </h2>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+              Gestión Académica
+            </h2>
+            {nivelesHistorialEdit.length > 0 && (
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                <span className="text-xs text-gray-500 dark:text-gray-400">
+                  Nivel para revisar detalles:
+                </span>
+                <select
+                  value={selectedNivelId || ''}
+                  onChange={(e) => setSelectedNivelId(e.target.value || null)}
+                  className="px-3 py-1.5 text-xs sm:text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                >
+                  <option value="">Todos / sin nivel específico</option>
+                  {historialOrdenado
+                    .filter((nivel) => nivel?.id && nivel?.nombre)
+                    .map((nivel) => (
+                      <option key={nivel.id} value={nivel.id}>
+                        {nivel.estado === 'activo' ? 'Activo: ' : 'Histórico: '}
+                        {nivel.nombre}
+                      </option>
+                    ))}
+                </select>
+              </div>
+            )}
+          </div>
+
+          {nivelSeleccionado && (
+            <div className="mb-4 p-3 rounded-lg bg-gray-50 dark:bg-gray-900/40 border border-gray-200 dark:border-gray-700 text-xs sm:text-sm text-gray-600 dark:text-gray-300">
+              <p className="font-semibold text-gray-900 dark:text-white mb-1">
+                Nivel seleccionado: {nivelSeleccionado.nombre}
+              </p>
+              <p className="mb-1">
+                <span className="font-medium">Estado:</span>{' '}
+                {nivelSeleccionado.estado === 'activo' ? 'Activo / en curso' : 'Completado'}
+              </p>
+              <p className="mb-1">
+                <span className="font-medium">Periodo:</span>{' '}
+                {convertirFecha(nivelSeleccionado.fechaInicio)
+                  ? formatearFechaLarga(convertirFecha(nivelSeleccionado.fechaInicio))
+                  : 'Sin inicio'}{' '}
+                –{' '}
+                {convertirFecha(nivelSeleccionado.fechaFin)
+                  ? formatearFechaLarga(convertirFecha(nivelSeleccionado.fechaFin))
+                  : 'En curso / sin fin registrado'}
+              </p>
+              {nivelSeleccionado.certificadoUrl && (
+                <p className="mb-1">
+                  <span className="font-medium">Constancia de este nivel:</span>{' '}
+                  <a
+                    href={nivelSeleccionado.certificadoUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue hover:text-blue/80 underline break-words"
+                  >
+                    Ver constancia
+                  </a>
+                </p>
+              )}
+              {nivelSeleccionado.observaciones && (
+                <p>
+                  <span className="font-medium">Notas:</span>{' '}
+                  {nivelSeleccionado.observaciones}
+                </p>
+              )}
+            </div>
+          )}
+
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <Link
-              to={`/admin/alumno/${alumno.id}/materias`}
+              to={`/admin/alumno/${alumno.id}/materias${selectedNivelId ? `?nivel=${selectedNivelId}` : ''}`}
               className="flex items-center p-4 bg-blue/10 dark:bg-blue/20 rounded-lg hover:bg-blue/20 dark:hover:bg-blue/30 transition-colors"
             >
               <CalendarIcon className="w-6 h-6 text-blue mr-3" />
@@ -957,7 +1034,7 @@ const AlumnoDetail = () => {
               </div>
             </Link>
             <Link
-              to={`/admin/alumno/${alumno.id}/calificaciones`}
+              to={`/admin/alumno/${alumno.id}/calificaciones${selectedNivelId ? `?nivel=${selectedNivelId}` : ''}`}
               className="flex items-center p-4 bg-yellow/10 dark:bg-yellow/20 rounded-lg hover:bg-yellow/20 dark:hover:bg-yellow/30 transition-colors"
             >
               <ChartBarIcon className="w-6 h-6 text-yellow mr-3" />
@@ -994,7 +1071,7 @@ const AlumnoDetail = () => {
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
             Enlaces Públicos
           </h2>
-          
+
           {/* Vista Pública */}
           <div className="mb-4">
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">

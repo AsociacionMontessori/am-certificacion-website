@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useSearchParams } from 'react-router-dom';
 import { collection, query, where, getDocs, getDoc, doc, updateDoc, deleteDoc, addDoc, serverTimestamp, writeBatch } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { getMateriasPorNivel } from '../../data/materiasPorNivel';
@@ -12,6 +12,8 @@ import useCanEdit from '../../hooks/useCanEdit';
 
 const GestionCalificaciones = () => {
   const { id } = useParams();
+  const [searchParams] = useSearchParams();
+  const nivelDesdeUrl = searchParams.get('nivel');
   const canEdit = useCanEdit();
   const { success, error: showError, confirm } = useNotifications();
   const [alumno, setAlumno] = useState(null);
@@ -279,7 +281,8 @@ const GestionCalificaciones = () => {
           setNivelesHistorial(historial);
           nivelActivoActual = getNivelActivo(alumnoData);
           setNivelActivo(nivelActivoActual);
-          setNivelFiltro(nivelActivoActual?.id || 'todos');
+          const nivelInicial = nivelDesdeUrl || nivelActivoActual?.id || 'todos';
+          setNivelFiltro(nivelInicial);
           setBulkNivelId(nivelActivoActual?.id || '');
         }
 
@@ -293,12 +296,12 @@ const GestionCalificaciones = () => {
           id: doc.id,
           ...doc.data()
         }));
-        
+
         // Ordenar por materia (asc)
         calificacionesData.sort((a, b) => {
           return (a.materia || '').localeCompare(b.materia || '');
         });
-        
+
         const calificacionesNormalizadas = normalizarCalificaciones(
           calificacionesData,
           historial,
@@ -361,12 +364,12 @@ const GestionCalificaciones = () => {
         id: doc.id,
         ...doc.data()
       }));
-      
+
       // Ordenar por materia (asc)
       calificacionesData.sort((a, b) => {
         return (a.materia || '').localeCompare(b.materia || '');
       });
-      
+
       const calificacionesNormalizadas = normalizarCalificaciones(calificacionesData, nivelesHistorial, nivelActivo, alumno);
       setCalificaciones(calificacionesNormalizadas);
 
@@ -405,7 +408,7 @@ const GestionCalificaciones = () => {
         cancelText: 'Cancelar'
       }
     );
-    
+
     if (confirmed) {
       try {
         await deleteDoc(doc(db, 'calificaciones', calificacionId));
@@ -419,7 +422,7 @@ const GestionCalificaciones = () => {
   };
 
   const handleToggleSelect = (calificacionId) => {
-    setSelectedCalificaciones(prev => 
+    setSelectedCalificaciones(prev =>
       prev.includes(calificacionId)
         ? prev.filter(id => id !== calificacionId)
         : [...prev, calificacionId]
@@ -436,11 +439,11 @@ const GestionCalificaciones = () => {
 
   const handleDeleteSelected = async () => {
     if (selectedCalificaciones.length === 0) return;
-    
+
     const confirmMessage = selectedCalificaciones.length === 1
       ? '¿Estás seguro de eliminar esta calificación?'
       : `¿Estás seguro de eliminar ${selectedCalificaciones.length} calificaciones?`;
-    
+
     const confirmed = await confirm(
       confirmMessage,
       {
@@ -450,7 +453,7 @@ const GestionCalificaciones = () => {
         cancelText: 'Cancelar'
       }
     );
-    
+
     if (!confirmed) return;
 
     try {
@@ -458,9 +461,9 @@ const GestionCalificaciones = () => {
       selectedCalificaciones.forEach(calificacionId => {
         batch.delete(doc(db, 'calificaciones', calificacionId));
       });
-      
+
       await batch.commit();
-      
+
       const count = selectedCalificaciones.length;
       setCalificaciones(calificaciones.filter(c => !selectedCalificaciones.includes(c.id)));
       setSelectedCalificaciones([]);
@@ -477,10 +480,10 @@ const GestionCalificaciones = () => {
     setBulkError('');
     const lineas = texto.split('\n').filter(linea => linea.trim() !== '');
     const calificacionesParseadas = [];
-    
+
     lineas.forEach((linea, index) => {
       const columnas = linea.split('\t').map(col => col.trim());
-      
+
       // Detectar si es encabezado (primera línea)
       if (index === 0 && (
         columnas[0]?.toLowerCase().includes('calificación') ||
@@ -490,28 +493,28 @@ const GestionCalificaciones = () => {
       )) {
         return; // Saltar encabezado
       }
-      
+
       // Formato: Calificación | Materia
       const calificacion = parseFloat(columnas[0]);
       const materia = columnas[1] || '';
-      
+
       // Validar
       if (isNaN(calificacion) || calificacion < 0 || calificacion > 10) {
         setBulkError(`Error en línea ${index + 1}: Calificación inválida: "${columnas[0]}" (debe ser un número entre 0 y 10)`);
         return;
       }
-      
+
       if (!materia) {
         setBulkError(`Error en línea ${index + 1}: Falta el nombre de la materia`);
         return;
       }
-      
+
       calificacionesParseadas.push({
         calificacion,
         materia
       });
     });
-    
+
     setBulkPreview(calificacionesParseadas);
     return calificacionesParseadas;
   };
@@ -585,11 +588,11 @@ const GestionCalificaciones = () => {
         id: doc.id,
         ...doc.data()
       }));
-      
+
       calificacionesData.sort((a, b) => {
         return (a.materia || '').localeCompare(b.materia || '');
       });
-      
+
       const calificacionesNormalizadas = normalizarCalificaciones(calificacionesData, nivelesHistorial, nivelActivo, alumno);
       setCalificaciones(calificacionesNormalizadas);
       setShowBulkModal(false);
@@ -614,8 +617,8 @@ const GestionCalificaciones = () => {
 
   if (loading) {
     return (
-      <LoadingSpinner 
-        size="lg" 
+      <LoadingSpinner
+        size="lg"
         variant="montessori"
         message="Cargando calificaciones..."
         className="h-64"
@@ -672,7 +675,7 @@ const GestionCalificaciones = () => {
                   setBulkData('');
                   setBulkPreview([]);
                   setBulkError('');
-                setBulkNivelId(nivelActivo?.id || '');
+                  setBulkNivelId(nivelActivo?.id || '');
                 }}
                 className="inline-flex items-center justify-center px-4 py-2.5 sm:px-6 sm:py-3 text-sm sm:text-base font-semibold text-gray-900 bg-green rounded-lg shadow-sm hover:bg-green/90 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-green focus:ring-offset-2 transition-all duration-200"
               >
@@ -685,310 +688,312 @@ const GestionCalificaciones = () => {
       </div>
 
       {/* Lista de calificaciones */}
-      {calificaciones.length > 0 ? (
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
-          <div className="p-4 sm:p-6">
-            <div className="mb-4 flex flex-wrap gap-2">
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
+        <div className="p-4 sm:p-6">
+          <div className="mb-4 flex flex-wrap gap-2">
+            <button
+              onClick={() => setNivelFiltro('todos')}
+              className={obtenerClaseFiltro('todos')}
+              type="button"
+            >
+              Todos
+            </button>
+            {nivelesOpciones
+              .filter((nivel) => nivel.id)
+              .map((nivel) => (
+                <button
+                  key={nivel.id}
+                  onClick={() => setNivelFiltro(nivel.id)}
+                  className={obtenerClaseFiltro(nivel.id)}
+                  type="button"
+                  title={nivel.estado === 'activo' ? 'Nivel activo' : 'Nivel histórico'}
+                >
+                  {nivel.estado === 'activo' ? 'Activo: ' : ''}{nivel.nombre}
+                </button>
+              ))}
+            {hayCalificacionesSinNivel && (
               <button
-                onClick={() => setNivelFiltro('todos')}
-                className={obtenerClaseFiltro('todos')}
+                onClick={() => setNivelFiltro('sinNivel')}
+                className={obtenerClaseFiltro('sinNivel')}
                 type="button"
               >
-                Todos
+                Sin nivel
               </button>
-              {nivelesOpciones
-                .filter((nivel) => nivel.id)
-                .map((nivel) => (
+            )}
+          </div>
+
+          {calificaciones.length > 0 ? (
+            <>
+              {/* Botón para activar selección múltiple */}
+              {!isSelecting && calificacionesFiltradas.length > 0 && (
+                <div className="mb-4">
                   <button
-                    key={nivel.id}
-                    onClick={() => setNivelFiltro(nivel.id)}
-                    className={obtenerClaseFiltro(nivel.id)}
-                    type="button"
-                    title={nivel.estado === 'activo' ? 'Nivel activo' : 'Nivel histórico'}
+                    onClick={() => setIsSelecting(true)}
+                    className="inline-flex items-center px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors"
                   >
-                    {nivel.estado === 'activo' ? 'Activo: ' : ''}{nivel.nombre}
+                    Seleccionar múltiples
                   </button>
-                ))}
-              {hayCalificacionesSinNivel && (
-                <button
-                  onClick={() => setNivelFiltro('sinNivel')}
-                  className={obtenerClaseFiltro('sinNivel')}
-                  type="button"
-                >
-                  Sin nivel
-                </button>
+                </div>
               )}
-            </div>
 
-            {/* Botón para activar selección múltiple */}
-          {!isSelecting && calificacionesFiltradas.length > 0 && (
-              <div className="mb-4">
-                <button
-                  onClick={() => setIsSelecting(true)}
-                  className="inline-flex items-center px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors"
-                >
-                  Seleccionar múltiples
-                </button>
-              </div>
-            )}
-
-            {isSelecting && (
-              <div className="mb-4 p-3 bg-blue/10 dark:bg-blue/20 rounded-lg border border-blue/20 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <button
-                    onClick={handleSelectAll}
-                    className="text-sm font-medium text-blue hover:text-blue/80"
-                  >
-                    {selectedCalificaciones.length === calificacionesFiltradas.length ? 'Deseleccionar todas' : 'Seleccionar todas'}
-                  </button>
-                  <span className="text-sm text-gray-600 dark:text-gray-400">
-                    {selectedCalificaciones.length} de {calificacionesFiltradas.length} seleccionadas
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  {selectedCalificaciones.length > 0 && (
+              {isSelecting && (
+                <div className="mb-4 p-3 bg-blue/10 dark:bg-blue/20 rounded-lg border border-blue/20 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
                     <button
-                      onClick={handleDeleteSelected}
-                      className="inline-flex items-center px-3 py-1.5 text-sm font-medium text-red bg-red/10 hover:bg-red/20 rounded-lg transition-colors"
+                      onClick={handleSelectAll}
+                      className="text-sm font-medium text-blue hover:text-blue/80"
                     >
-                      <TrashIcon className="w-4 h-4 mr-1" />
-                      Eliminar ({selectedCalificaciones.length})
+                      {selectedCalificaciones.length === calificacionesFiltradas.length ? 'Deseleccionar todas' : 'Seleccionar todas'}
                     </button>
-                  )}
-                  <button
-                    onClick={() => {
-                      setIsSelecting(false);
-                      setSelectedCalificaciones([]);
-                    }}
-                    className="inline-flex items-center px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
-                  >
-                    <XMarkIcon className="w-4 h-4 mr-1" />
-                    Cancelar
-                  </button>
+                    <span className="text-sm text-gray-600 dark:text-gray-400">
+                      {selectedCalificaciones.length} de {calificacionesFiltradas.length} seleccionadas
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {selectedCalificaciones.length > 0 && (
+                      <button
+                        onClick={handleDeleteSelected}
+                        className="inline-flex items-center px-3 py-1.5 text-sm font-medium text-red bg-red/10 hover:bg-red/20 rounded-lg transition-colors"
+                      >
+                        <TrashIcon className="w-4 h-4 mr-1" />
+                        Eliminar ({selectedCalificaciones.length})
+                      </button>
+                    )}
+                    <button
+                      onClick={() => {
+                        setIsSelecting(false);
+                        setSelectedCalificaciones([]);
+                      }}
+                      className="inline-flex items-center px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                    >
+                      <XMarkIcon className="w-4 h-4 mr-1" />
+                      Cancelar
+                    </button>
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
 
-            {/* Agrupar calificaciones por rango */}
-            {(() => {
-              const agruparPorRango = (calificaciones) => {
-                const grupos = {
-                  'Excelente (9-10)': [],
-                  'Bueno (8-8.9)': [],
-                  'Regular (7-7.9)': [],
-                  'Insuficiente (<7)': [],
-                  'Por cursar/Cursando': []
+              {/* Agrupar calificaciones por rango */}
+              {(() => {
+                const agruparPorRango = (calificaciones) => {
+                  const grupos = {
+                    'Excelente (9-10)': [],
+                    'Bueno (8-8.9)': [],
+                    'Regular (7-7.9)': [],
+                    'Insuficiente (<7)': [],
+                    'Por cursar/Cursando': []
+                  };
+
+                  calificaciones.forEach(cal => {
+                    const num = Number(cal.calificacion);
+                    if (isNaN(num)) {
+                      grupos['Por cursar/Cursando'].push(cal);
+                    } else if (num === 0 || num === 1) {
+                      grupos['Por cursar/Cursando'].push(cal);
+                    } else if (num >= 9) {
+                      grupos['Excelente (9-10)'].push(cal);
+                    } else if (num >= 8) {
+                      grupos['Bueno (8-8.9)'].push(cal);
+                    } else if (num >= 7) {
+                      grupos['Regular (7-7.9)'].push(cal);
+                    } else {
+                      grupos['Insuficiente (<7)'].push(cal);
+                    }
+                  });
+
+                  return grupos;
                 };
 
-                calificaciones.forEach(cal => {
-                  const num = Number(cal.calificacion);
-                  if (isNaN(num)) {
-                    grupos['Por cursar/Cursando'].push(cal);
-                  } else if (num === 0 || num === 1) {
-                    grupos['Por cursar/Cursando'].push(cal);
-                  } else if (num >= 9) {
-                    grupos['Excelente (9-10)'].push(cal);
-                  } else if (num >= 8) {
-                    grupos['Bueno (8-8.9)'].push(cal);
-                  } else if (num >= 7) {
-                    grupos['Regular (7-7.9)'].push(cal);
-                  } else {
-                    grupos['Insuficiente (<7)'].push(cal);
+                const calificacionesPorRango = agruparPorRango(calificacionesFiltradas);
+
+                const renderTarjetaCalificacion = (calificacion) => {
+                  const num = Number(calificacion.calificacion);
+                  const color = obtenerColorCalificacion(calificacion.calificacion);
+                  let borderColor = 'border-gray-200 dark:border-gray-600';
+                  let bgColor = 'bg-gray-50 dark:bg-gray-700/50';
+
+                  if (!isNaN(num)) {
+                    if (num >= 9) {
+                      borderColor = 'border-green-300 dark:border-green-700';
+                      bgColor = 'bg-green-50 dark:bg-green-900/20';
+                    } else if (num >= 8) {
+                      borderColor = 'border-blue-300 dark:border-blue-700';
+                      bgColor = 'bg-blue-50 dark:bg-blue-900/20';
+                    } else if (num >= 7) {
+                      borderColor = 'border-yellow-300 dark:border-yellow-700';
+                      bgColor = 'bg-yellow-50 dark:bg-yellow-900/20';
+                    } else if (num > 1) {
+                      borderColor = 'border-red-300 dark:border-red-700';
+                      bgColor = 'bg-red-50 dark:bg-red-900/20';
+                    }
                   }
-                });
 
-                return grupos;
-              };
+                  return (
+                    <div key={calificacion.id} className={`${bgColor} rounded-lg p-4 border-2 ${borderColor} shadow-sm hover:shadow-md transition-shadow ${isSelecting && selectedCalificaciones.includes(calificacion.id) ? 'ring-2 ring-blue' : ''}`}>
+                      <div className="flex flex-col h-full">
+                        <div className="flex items-center justify-between mb-3">
+                          <h3 className="font-semibold text-gray-900 dark:text-white text-sm">
+                            {calificacion.materia}
+                          </h3>
+                          <span className={`text-xl font-bold ${color}`}>
+                            {formatearValorCalificacion(calificacion.calificacion)}
+                          </span>
+                        </div>
 
-              const calificacionesPorRango = agruparPorRango(calificacionesFiltradas);
+                        <div className="space-y-2 text-sm flex-1">
+                          <div>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">Nivel</p>
+                            <p className="text-gray-700 dark:text-gray-300 font-medium">
+                              {calificacion.nivelNombre || 'Sin nivel asignado'}
+                            </p>
+                          </div>
+                        </div>
 
-              const renderTarjetaCalificacion = (calificacion) => {
-                const num = Number(calificacion.calificacion);
-                const color = obtenerColorCalificacion(calificacion.calificacion);
-                let borderColor = 'border-gray-200 dark:border-gray-600';
-                let bgColor = 'bg-gray-50 dark:bg-gray-700/50';
+                        <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600 flex flex-wrap gap-2 justify-end">
+                          {isSelecting && (
+                            <input
+                              type="checkbox"
+                              checked={selectedCalificaciones.includes(calificacion.id)}
+                              onChange={() => handleToggleSelect(calificacion.id)}
+                              className="w-5 h-5 text-blue border-gray-300 rounded focus:ring-blue"
+                            />
+                          )}
+                          {!isSelecting && canEdit && (
+                            <>
+                              <button
+                                onClick={() => handleEdit(calificacion)}
+                                className="inline-flex items-center px-3 py-2 bg-blue text-white rounded-lg hover:bg-blue/90 transition-colors text-sm"
+                                title="Editar calificación"
+                              >
+                                <PencilIcon className="w-4 h-4 mr-1" />
+                                Editar
+                              </button>
+                              <button
+                                onClick={() => handleDelete(calificacion.id)}
+                                className="inline-flex items-center px-3 py-2 bg-red/10 text-red rounded-lg hover:bg-red/20 dark:hover:bg-red/30 transition-colors text-sm border border-red/20"
+                                title="Eliminar calificación"
+                              >
+                                <TrashIcon className="w-4 h-4 mr-1" />
+                                Eliminar
+                              </button>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                };
 
-                if (!isNaN(num)) {
-                  if (num >= 9) {
-                    borderColor = 'border-green-300 dark:border-green-700';
-                    bgColor = 'bg-green-50 dark:bg-green-900/20';
-                  } else if (num >= 8) {
-                    borderColor = 'border-blue-300 dark:border-blue-700';
-                    bgColor = 'bg-blue-50 dark:bg-blue-900/20';
-                  } else if (num >= 7) {
-                    borderColor = 'border-yellow-300 dark:border-yellow-700';
-                    bgColor = 'bg-yellow-50 dark:bg-yellow-900/20';
-                  } else if (num > 1) {
-                    borderColor = 'border-red-300 dark:border-red-700';
-                    bgColor = 'bg-red-50 dark:bg-red-900/20';
-                  }
+                if (calificacionesFiltradas.length === 0) {
+                  return (
+                    <div className="bg-yellow-50 dark:bg-yellow-900 rounded-lg p-4 border border-yellow-200 dark:border-yellow-700 text-center">
+                      <p className="text-sm text-yellow-800 dark:text-yellow-200">
+                        No hay calificaciones registradas para este nivel.
+                      </p>
+                    </div>
+                  );
                 }
 
                 return (
-                  <div key={calificacion.id} className={`${bgColor} rounded-lg p-4 border-2 ${borderColor} shadow-sm hover:shadow-md transition-shadow ${isSelecting && selectedCalificaciones.includes(calificacion.id) ? 'ring-2 ring-blue' : ''}`}>
-                    <div className="flex flex-col h-full">
-                      <div className="flex items-center justify-between mb-3">
-                        <h3 className="font-semibold text-gray-900 dark:text-white text-sm">
-                          {calificacion.materia}
-                        </h3>
-                        <span className={`text-xl font-bold ${color}`}>
-                          {formatearValorCalificacion(calificacion.calificacion)}
-                        </span>
-                      </div>
-                      
-                      <div className="space-y-2 text-sm flex-1">
-                        <div>
-                          <p className="text-xs text-gray-500 dark:text-gray-400">Nivel</p>
-                          <p className="text-gray-700 dark:text-gray-300 font-medium">
-                            {calificacion.nivelNombre || 'Sin nivel asignado'}
-                          </p>
+                  <div className="space-y-6">
+                    {/* Excelente (9-10) */}
+                    {calificacionesPorRango['Excelente (9-10)'].length > 0 && (
+                      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 border-2 border-green-200 dark:border-green-800">
+                        <div className="flex items-center justify-between mb-4">
+                          <div>
+                            <h2 className="text-xl font-semibold text-green dark:text-green-400 flex items-center gap-2">
+                              <CheckCircleIcon className="w-6 h-6" />
+                              Excelente (9-10) ({calificacionesPorRango['Excelente (9-10)'].length})
+                            </h2>
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                          {calificacionesPorRango['Excelente (9-10)'].map((cal) => renderTarjetaCalificacion(cal))}
                         </div>
                       </div>
-                      
-                      <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600 flex flex-wrap gap-2 justify-end">
-                        {isSelecting && (
-                          <input
-                            type="checkbox"
-                            checked={selectedCalificaciones.includes(calificacion.id)}
-                            onChange={() => handleToggleSelect(calificacion.id)}
-                            className="w-5 h-5 text-blue border-gray-300 rounded focus:ring-blue"
-                          />
-                        )}
-                        {!isSelecting && canEdit && (
-                          <>
-                            <button
-                              onClick={() => handleEdit(calificacion)}
-                              className="inline-flex items-center px-3 py-2 bg-blue text-white rounded-lg hover:bg-blue/90 transition-colors text-sm"
-                              title="Editar calificación"
-                            >
-                              <PencilIcon className="w-4 h-4 mr-1" />
-                              Editar
-                            </button>
-                            <button
-                              onClick={() => handleDelete(calificacion.id)}
-                              className="inline-flex items-center px-3 py-2 bg-red/10 text-red rounded-lg hover:bg-red/20 dark:hover:bg-red/30 transition-colors text-sm border border-red/20"
-                              title="Eliminar calificación"
-                            >
-                              <TrashIcon className="w-4 h-4 mr-1" />
-                              Eliminar
-                            </button>
-                          </>
-                        )}
+                    )}
+
+                    {/* Bueno (8-8.9) */}
+                    {calificacionesPorRango['Bueno (8-8.9)'].length > 0 && (
+                      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 border-2 border-blue-200 dark:border-blue-800">
+                        <div className="flex items-center justify-between mb-4">
+                          <div>
+                            <h2 className="text-xl font-semibold text-blue dark:text-blue-400 flex items-center gap-2">
+                              <ChartBarIcon className="w-6 h-6" />
+                              Bueno (8-8.9) ({calificacionesPorRango['Bueno (8-8.9)'].length})
+                            </h2>
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                          {calificacionesPorRango['Bueno (8-8.9)'].map((cal) => renderTarjetaCalificacion(cal))}
+                        </div>
                       </div>
-                    </div>
+                    )}
+
+                    {/* Regular (7-7.9) */}
+                    {calificacionesPorRango['Regular (7-7.9)'].length > 0 && (
+                      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 border-2 border-yellow-200 dark:border-yellow-800">
+                        <div className="flex items-center justify-between mb-4">
+                          <div>
+                            <h2 className="text-xl font-semibold text-yellow dark:text-yellow-400 flex items-center gap-2">
+                              <ClockIcon className="w-6 h-6" />
+                              Regular (7-7.9) ({calificacionesPorRango['Regular (7-7.9)'].length})
+                            </h2>
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                          {calificacionesPorRango['Regular (7-7.9)'].map((cal) => renderTarjetaCalificacion(cal))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Insuficiente (<7) */}
+                    {calificacionesPorRango['Insuficiente (<7)'].length > 0 && (
+                      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 border-2 border-red-200 dark:border-red-800">
+                        <div className="flex items-center justify-between mb-4">
+                          <div>
+                            <h2 className="text-xl font-semibold text-red dark:text-red-400 flex items-center gap-2">
+                              <ExclamationTriangleIcon className="w-6 h-6" />
+                              Insuficiente (&lt;7) ({calificacionesPorRango['Insuficiente (<7)'].length})
+                            </h2>
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                          {calificacionesPorRango['Insuficiente (<7)'].map((cal) => renderTarjetaCalificacion(cal))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Por cursar/Cursando */}
+                    {calificacionesPorRango['Por cursar/Cursando'].length > 0 && (
+                      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 border border-gray-200 dark:border-gray-700">
+                        <div className="flex items-center justify-between mb-4">
+                          <div>
+                            <h2 className="text-xl font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                              <ClockIcon className="w-6 h-6" />
+                              Por cursar/Cursando ({calificacionesPorRango['Por cursar/Cursando'].length})
+                            </h2>
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                          {calificacionesPorRango['Por cursar/Cursando'].map((cal) => renderTarjetaCalificacion(cal))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 );
-              };
-
-              if (calificacionesFiltradas.length === 0) {
-                return (
-                  <div className="bg-yellow-50 dark:bg-yellow-900 rounded-lg p-4 border border-yellow-200 dark:border-yellow-700 text-center">
-                    <p className="text-sm text-yellow-800 dark:text-yellow-200">
-                      No hay calificaciones registradas para este nivel.
-                    </p>
-                  </div>
-                );
-              }
-
-              return (
-                <div className="space-y-6">
-                  {/* Excelente (9-10) */}
-                  {calificacionesPorRango['Excelente (9-10)'].length > 0 && (
-                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 border-2 border-green-200 dark:border-green-800">
-                      <div className="flex items-center justify-between mb-4">
-                        <div>
-                          <h2 className="text-xl font-semibold text-green dark:text-green-400 flex items-center gap-2">
-                            <CheckCircleIcon className="w-6 h-6" />
-                            Excelente (9-10) ({calificacionesPorRango['Excelente (9-10)'].length})
-                          </h2>
-                        </div>
-                      </div>
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {calificacionesPorRango['Excelente (9-10)'].map((cal) => renderTarjetaCalificacion(cal))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Bueno (8-8.9) */}
-                  {calificacionesPorRango['Bueno (8-8.9)'].length > 0 && (
-                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 border-2 border-blue-200 dark:border-blue-800">
-                      <div className="flex items-center justify-between mb-4">
-                        <div>
-                          <h2 className="text-xl font-semibold text-blue dark:text-blue-400 flex items-center gap-2">
-                            <ChartBarIcon className="w-6 h-6" />
-                            Bueno (8-8.9) ({calificacionesPorRango['Bueno (8-8.9)'].length})
-                          </h2>
-                        </div>
-                      </div>
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {calificacionesPorRango['Bueno (8-8.9)'].map((cal) => renderTarjetaCalificacion(cal))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Regular (7-7.9) */}
-                  {calificacionesPorRango['Regular (7-7.9)'].length > 0 && (
-                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 border-2 border-yellow-200 dark:border-yellow-800">
-                      <div className="flex items-center justify-between mb-4">
-                        <div>
-                          <h2 className="text-xl font-semibold text-yellow dark:text-yellow-400 flex items-center gap-2">
-                            <ClockIcon className="w-6 h-6" />
-                            Regular (7-7.9) ({calificacionesPorRango['Regular (7-7.9)'].length})
-                          </h2>
-                        </div>
-                      </div>
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {calificacionesPorRango['Regular (7-7.9)'].map((cal) => renderTarjetaCalificacion(cal))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Insuficiente (<7) */}
-                  {calificacionesPorRango['Insuficiente (<7)'].length > 0 && (
-                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 border-2 border-red-200 dark:border-red-800">
-                      <div className="flex items-center justify-between mb-4">
-                        <div>
-                          <h2 className="text-xl font-semibold text-red dark:text-red-400 flex items-center gap-2">
-                            <ExclamationTriangleIcon className="w-6 h-6" />
-                            Insuficiente (&lt;7) ({calificacionesPorRango['Insuficiente (<7)'].length})
-                          </h2>
-                        </div>
-                      </div>
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {calificacionesPorRango['Insuficiente (<7)'].map((cal) => renderTarjetaCalificacion(cal))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Por cursar/Cursando */}
-                  {calificacionesPorRango['Por cursar/Cursando'].length > 0 && (
-                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 border border-gray-200 dark:border-gray-700">
-                      <div className="flex items-center justify-between mb-4">
-                        <div>
-                          <h2 className="text-xl font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-                            <ClockIcon className="w-6 h-6" />
-                            Por cursar/Cursando ({calificacionesPorRango['Por cursar/Cursando'].length})
-                          </h2>
-                        </div>
-                      </div>
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {calificacionesPorRango['Por cursar/Cursando'].map((cal) => renderTarjetaCalificacion(cal))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              );
-            })()}
-          </div>
+              })()}
+            </>
+          ) : (
+            <div className="p-8 sm:p-12 text-center">
+              <ChartBarIcon className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+              <p className="text-gray-600 dark:text-gray-400">
+                No hay calificaciones registradas para este alumno.
+              </p>
+            </div>
+          )}
         </div>
-      ) : (
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-8 sm:p-12 text-center">
-          <ChartBarIcon className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-          <p className="text-gray-600 dark:text-gray-400">
-            No hay calificaciones registradas para este alumno.
-          </p>
-        </div>
-      )}
+      </div>
 
       {/* Modal para agregar/editar calificación */}
       {showModal && (
@@ -1104,7 +1109,7 @@ const GestionCalificaciones = () => {
               <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
                 Agregar Calificaciones por Lotes
               </h2>
-              
+
               <div className="mb-4 p-4 bg-blue/10 dark:bg-blue/20 rounded-lg border border-blue/20">
                 <p className="text-sm text-gray-700 dark:text-gray-300 mb-2">
                   <strong>Instrucciones:</strong>
@@ -1147,7 +1152,7 @@ const GestionCalificaciones = () => {
                   </p>
                 </div>
               </div>
- 
+
               <div className="mb-4">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Pega los datos de Excel aquí:

@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useSearchParams } from 'react-router-dom';
 import { collection, query, where, getDocs, getDoc, doc, updateDoc, deleteDoc, addDoc, serverTimestamp, writeBatch } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { getMateriasPorNivel } from '../../data/materiasPorNivel';
@@ -13,6 +13,8 @@ import useCanEdit from '../../hooks/useCanEdit';
 
 const GestionMaterias = () => {
   const { id } = useParams();
+  const [searchParams] = useSearchParams();
+  const nivelDesdeUrl = searchParams.get('nivel');
   const canEdit = useCanEdit();
   const { success, error: showError, confirm } = useNotifications();
   const [alumno, setAlumno] = useState(null);
@@ -145,7 +147,8 @@ const GestionMaterias = () => {
           setNivelesHistorial(historial);
           const nivelActivoActual = getNivelActivo(alumnoData);
           setNivelActivo(nivelActivoActual);
-          setNivelFiltro(nivelActivoActual?.id || 'todos');
+          const nivelInicial = nivelDesdeUrl || nivelActivoActual?.id || 'todos';
+          setNivelFiltro(nivelInicial);
           setBulkNivelId(nivelActivoActual?.id || null);
 
           // Cargar materias del alumno
@@ -294,7 +297,7 @@ const GestionMaterias = () => {
         cancelText: 'Cancelar'
       }
     );
-    
+
     if (confirmed) {
       try {
         await deleteDoc(doc(db, 'materias', materiaId));
@@ -308,7 +311,7 @@ const GestionMaterias = () => {
   };
 
   const handleToggleSelect = (materiaId) => {
-    setSelectedMaterias(prev => 
+    setSelectedMaterias(prev =>
       prev.includes(materiaId)
         ? prev.filter(id => id !== materiaId)
         : [...prev, materiaId]
@@ -325,11 +328,11 @@ const GestionMaterias = () => {
 
   const handleDeleteSelected = async () => {
     if (selectedMaterias.length === 0) return;
-    
+
     const confirmMessage = selectedMaterias.length === 1
       ? '¿Estás seguro de eliminar esta materia?'
       : `¿Estás seguro de eliminar ${selectedMaterias.length} materias?`;
-    
+
     const confirmed = await confirm(
       confirmMessage,
       {
@@ -339,7 +342,7 @@ const GestionMaterias = () => {
         cancelText: 'Cancelar'
       }
     );
-    
+
     if (!confirmed) return;
 
     try {
@@ -347,9 +350,9 @@ const GestionMaterias = () => {
       selectedMaterias.forEach(materiaId => {
         batch.delete(doc(db, 'materias', materiaId));
       });
-      
+
       await batch.commit();
-      
+
       const count = selectedMaterias.length;
       setMaterias(materias.filter(m => !selectedMaterias.includes(m.id)));
       setSelectedMaterias([]);
@@ -364,15 +367,15 @@ const GestionMaterias = () => {
   // Funciones para agregar por lotes
   const parsearFecha = (fechaStr) => {
     if (!fechaStr || fechaStr.trim() === '') return null;
-    
+
     // Intentar diferentes formatos de fecha comunes en Excel
     const fechaStrTrimmed = fechaStr.trim();
-    
+
     // Formato YYYY-MM-DD
     if (/^\d{4}-\d{2}-\d{2}$/.test(fechaStrTrimmed)) {
       return fechaStrTrimmed;
     }
-    
+
     // Formato DD/MM/YYYY o DD-MM-YYYY
     const formatoDMY = /^(\d{1,2})[-/](\d{1,2})[-/](\d{4})$/;
     const matchDMY = fechaStrTrimmed.match(formatoDMY);
@@ -380,7 +383,7 @@ const GestionMaterias = () => {
       const [, dia, mes, año] = matchDMY;
       return `${año}-${mes.padStart(2, '0')}-${dia.padStart(2, '0')}`;
     }
-    
+
     // Formato MM/DD/YYYY o MM-DD-YYYY
     const formatoMDY = /^(\d{1,2})[-/](\d{1,2})[-/](\d{4})$/;
     const matchMDY = fechaStrTrimmed.match(formatoMDY);
@@ -388,13 +391,13 @@ const GestionMaterias = () => {
       const [, mes, dia, año] = matchMDY;
       return `${año}-${mes.padStart(2, '0')}-${dia.padStart(2, '0')}`;
     }
-    
+
     // Intentar parsear como fecha de JavaScript
     const fecha = new Date(fechaStrTrimmed);
     if (!isNaN(fecha.getTime())) {
       return fecha.toISOString().split('T')[0];
     }
-    
+
     return null;
   };
 
@@ -402,13 +405,13 @@ const GestionMaterias = () => {
     setBulkError('');
     const lineas = texto.split('\n').filter(linea => linea.trim() !== '');
     const materiasParseadas = [];
-    
+
     // Verificar si el nivel seleccionado es "Diplomado en Neuroeducación"
     const esDiplomadoNeuroeducacion = nivelBulkSeleccionado?.nombre === 'Diplomado en Neuroeducación';
-    
+
     lineas.forEach((linea, index) => {
       const columnas = linea.split('\t').map(col => col.trim());
-      
+
       // Detectar si es encabezado (primera línea)
       if (index === 0 && (
         columnas[0]?.toLowerCase().includes('materia') ||
@@ -417,7 +420,7 @@ const GestionMaterias = () => {
       )) {
         return; // Saltar encabezado
       }
-      
+
       // Esperamos: Materia | Fecha Inicio (opcional) | Fecha Fin (opcional) | Aula (opcional) | Estado
       const materia = {
         nombre: columnas[0] || '',
@@ -426,28 +429,28 @@ const GestionMaterias = () => {
         aula: columnas[3] || '',
         estado: columnas[4] || 'Pendiente'
       };
-      
+
       // Validar
       if (!materia.nombre) {
         setBulkError(`Error en línea ${index + 1}: Falta el nombre de la materia`);
         return;
       }
-      
+
       // Solo validar fecha de inicio si NO es Diplomado en Neuroeducación
       if (!esDiplomadoNeuroeducacion && !materia.fechaInicio) {
         setBulkError(`Error en línea ${index + 1}: Fecha de inicio inválida: "${columnas[1] || 'vacía'}". Deje en blanco para Diplomado en Neuroeducación.`);
         return;
       }
-      
+
       // Validar estado
       const estadosValidos = ['Pendiente', 'En curso', 'Con atraso', 'Completada'];
       if (materia.estado && !estadosValidos.includes(materia.estado)) {
         materia.estado = 'Pendiente';
       }
-      
+
       materiasParseadas.push(materia);
     });
-    
+
     setBulkPreview(materiasParseadas);
     return materiasParseadas;
   };
@@ -525,7 +528,7 @@ const GestionMaterias = () => {
         id: doc.id,
         ...doc.data()
       }));
-      
+
       materiasData.sort((a, b) => {
         const fechaA = a.fechaInicio?.toDate ? a.fechaInicio.toDate() : null;
         const fechaB = b.fechaInicio?.toDate ? b.fechaInicio.toDate() : null;
@@ -534,7 +537,7 @@ const GestionMaterias = () => {
         if (!fechaB) return -1;
         return fechaA - fechaB;
       });
-      
+
       const materiasNormalizadas = normalizarMaterias(materiasData, nivelesHistorial, nivelActivo, alumno);
       setMaterias(materiasNormalizadas);
       setShowBulkModal(false);
@@ -570,8 +573,8 @@ const GestionMaterias = () => {
 
   if (loading) {
     return (
-      <LoadingSpinner 
-        size="lg" 
+      <LoadingSpinner
+        size="lg"
         variant="montessori"
         message="Cargando materias..."
         className="h-64"
@@ -781,7 +784,7 @@ const GestionMaterias = () => {
                         {estado}
                       </span>
                     </div>
-                    
+
                     <div className="space-y-2 text-sm flex-1">
                       <div>
                         <p className="text-xs text-gray-500 dark:text-gray-400">Nivel</p>
@@ -812,7 +815,7 @@ const GestionMaterias = () => {
                         )}
                       </div>
                     </div>
-                    
+
                     <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600 flex flex-wrap gap-2 justify-end">
                       {isSelecting && (
                         <input
@@ -1115,7 +1118,7 @@ const GestionMaterias = () => {
               <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
                 Agregar Materias por Lotes
               </h2>
-              
+
               <div className="mb-4 p-4 bg-blue/10 dark:bg-blue/20 rounded-lg border border-blue/20">
                 <p className="text-sm text-gray-700 dark:text-gray-300 mb-2">
                   <strong>Instrucciones:</strong>
@@ -1177,7 +1180,7 @@ const GestionMaterias = () => {
                   value={bulkData}
                   onChange={handleBulkChange}
                   onPaste={handleBulkPaste}
-                  placeholder={nivelBulkSeleccionado?.nombre === 'Diplomado en Neuroeducación' 
+                  placeholder={nivelBulkSeleccionado?.nombre === 'Diplomado en Neuroeducación'
                     ? "Materia\t-\t-\tAula 1\tEn curso\nO simplemente: Materia\t\t\t\tEn curso"
                     : "Materia	01/01/2024	30/06/2024	Aula 1	En curso"}
                   rows={8}
