@@ -13,13 +13,14 @@ const CertificadoDigital = () => {
   const [certificado, setCertificado] = useState(null);
   const [loading, setLoading] = useState(true);
   const tipoDocumento = searchParams.get('tipo');
+  const nivelIdParam = searchParams.get('nivel');
   const forzarConstancia = tipoDocumento === 'constancia';
 
   useEffect(() => {
     const loadCertificado = async () => {
       // Log para debugging en Safari iOS
       if (typeof window !== 'undefined') {
-        console.log('🔍 CertificadoDigital - Cargando certificado:', { 
+        console.log('🔍 CertificadoDigital - Cargando certificado:', {
           id,
           userAgent: navigator.userAgent,
           url: window.location.href,
@@ -34,14 +35,14 @@ const CertificadoDigital = () => {
       }
 
       try {
-        const data = await obtenerCertificado(id);
-        
+        const data = await obtenerCertificado(id, nivelIdParam || undefined);
+
         if (!data) {
           console.error('❌ CertificadoDigital - No se encontró certificado para ID:', id);
         } else {
           console.log('✅ CertificadoDigital - Certificado cargado exitosamente');
         }
-        
+
         setCertificado(data);
       } catch (error) {
         console.error('❌ CertificadoDigital - Error al cargar certificado:', error);
@@ -87,7 +88,7 @@ const CertificadoDigital = () => {
     );
   }
 
-  const { folio, codigoVerificacion, promedio, alumno, graduacion } = certificado;
+  const { folio, codigoVerificacion, promedio, alumno, graduacion, nivelEspecifico } = certificado;
   const mostrarCertificado = !forzarConstancia && graduacion?.completa;
   const nivelCertificado = graduacion?.nivel || alumno.nivelGraduacion || alumno.nivel;
   const nivelActual = alumno.nivelActual || alumno.nivel;
@@ -110,7 +111,7 @@ const CertificadoDigital = () => {
   // Generar URL de verificación (React Router maneja automáticamente la codificación)
   // Nota: No usar encodeURIComponent aquí porque React Router ya maneja los parámetros
   // Safari iOS puede tener problemas con parámetros, por eso normalizamos al recibirlos
-  const urlVerificacion = codigoVerificacion 
+  const urlVerificacion = codigoVerificacion
     ? `${window.location.origin}/verificar/${folio}/${codigoVerificacion}`
     : `${window.location.origin}/verificar/${folio}/PENDIENTE`;
   const fechaIngresoCertificado = formatearFechaLarga(graduacion?.fechaIngresoNivel || alumno.fechaIngreso);
@@ -119,8 +120,8 @@ const CertificadoDigital = () => {
   const fechaEgresoEstimadaActual = formatearFechaLarga(alumno.fechaEgresoEstimadaActual);
   const fechaEmision = formatearFechaLarga(mostrarCertificado ? (graduacion?.fechaGraduacion || new Date()) : new Date());
   const lugarEmision = 'Ciudad de México, México';
-  const basePath = `/certificado/${id}`;
-  const constanciaUrl = `${basePath}?tipo=constancia`;
+  const basePath = `/certificado/${id}${nivelIdParam ? `?nivel=${nivelIdParam}` : ''}`;
+  const constanciaUrl = nivelIdParam ? `${basePath}&tipo=constancia` : `${basePath}?tipo=constancia`;
   const certificadoUrl = basePath;
   const descripcionProgramaCertificado = programaCertificado || (esNivelGuia ? `Guía Montessori` : 'Formación Montessori');
   const descripcionProgramaConstancia = programaActual || (esNivelGuia ? `Guía Montessori` : nivelActual || 'Certificación Montessori');
@@ -181,20 +182,20 @@ const CertificadoDigital = () => {
             {/* Texto de certificación */}
             <div className="text-justify leading-relaxed text-gray-800 space-y-4">
               <p className="text-base">
-                La <strong>Asociación Montessori de México A.C.</strong> (RFC: AMM6502191Y4), 
-                constituida el 2 de febrero de 1965 mediante Escritura Pública No. 41,568 ante 
-                el Notario Público No. 105 de la Ciudad de México, Lic. Fermín Fulda Fernández; 
-                y la <strong>Sociedad de Escuelas Montessori S.C.</strong>, constituida el 15 
-                de febrero de 2018 mediante Escritura Pública No. 67,386 ante el Notario Público 
+                La <strong>Asociación Montessori de México A.C.</strong> (RFC: AMM6502191Y4),
+                constituida el 2 de febrero de 1965 mediante Escritura Pública No. 41,568 ante
+                el Notario Público No. 105 de la Ciudad de México, Lic. Fermín Fulda Fernández;
+                y la <strong>Sociedad de Escuelas Montessori S.C.</strong>, constituida el 15
+                de febrero de 2018 mediante Escritura Pública No. 67,386 ante el Notario Público
                 No. 163 de la Ciudad de México, Lic. Francisco Xavier Arredondo Galván;
               </p>
 
               {mostrarCertificado ? (
                 <>
                   <p className="text-lg font-semibold text-center my-6">
-                    <strong>CERTIFICAN</strong> que <strong>{alumno.nombreCompleto}</strong> ha 
-                    cumplido satisfactoriamente con los requisitos académicos y prácticos del 
-                    programa de formación <strong>{descripcionProgramaCertificado}</strong> en el nivel <strong>{nivelCertificado}</strong>, 
+                    <strong>CERTIFICAN</strong> que <strong>{alumno.nombreCompleto}</strong> ha
+                    cumplido satisfactoriamente con los requisitos académicos y prácticos del
+                    programa de formación <strong>{descripcionProgramaCertificado}</strong> en el nivel <strong>{nivelCertificado}</strong>,
                     con fecha de ingreso <strong>{fechaIngresoCertificado || 'Sin registro'}</strong> y fecha de egreso{' '}
                     <strong>{fechaEgresoCertificado || 'Sin registro'}</strong>.
                   </p>
@@ -207,16 +208,16 @@ const CertificadoDigital = () => {
               ) : (
                 <>
                   <p className="text-lg font-semibold text-center my-6">
-                    <strong>CONSTAN</strong> que <strong>{alumno.nombreCompleto}</strong> se encuentra 
+                    <strong>CONSTAN</strong> que <strong>{alumno.nombreCompleto}</strong> se encuentra
                     inscrito en el programa de formación <strong>{descripcionProgramaConstancia}</strong> en el nivel{' '}
                     <strong>{nivelActual}</strong>, con fecha de ingreso{' '}
                     <strong>{fechaIngresoActual || 'Sin registro'}</strong>.
                   </p>
                   <div className="bg-yellow/10 border-l-4 border-yellow p-4 my-6 rounded-r">
                     <p className="text-sm text-gray-700 leading-relaxed">
-                      <strong className="font-semibold">Importante:</strong> La presente constancia únicamente hace constar 
-                      la inscripción del alumno en el programa de formación. Este documento <strong>no constituye un certificado 
-                      ni un diploma</strong> que acredite la certificación Montessori. La certificación oficial se otorgará 
+                      <strong className="font-semibold">Importante:</strong> La presente constancia únicamente hace constar
+                      la inscripción del alumno en el programa de formación. Este documento <strong>no constituye un certificado
+                        ni un diploma</strong> que acredite la certificación Montessori. La certificación oficial se otorgará
                       únicamente una vez completados satisfactoriamente todos los requisitos académicos y prácticos del programa.
                     </p>
                   </div>
@@ -233,11 +234,11 @@ const CertificadoDigital = () => {
                   <strong>Folio de certificado digital:</strong> {folio}
                 </p>
                 <p className="text-sm">
-                  Este documento cuenta con un código de verificación y sello digital. 
+                  Este documento cuenta con un código de verificación y sello digital.
                   Verifica su autenticidad en: <a href={urlVerificacion} className="text-blue hover:underline break-all">{urlVerificacion}</a> usando el folio y el código QR.
                 </p>
                 <p className="text-sm">
-                  <strong>Firmante evaluador CONOCER:</strong> Ana Daniela García González Vega, 
+                  <strong>Firmante evaluador CONOCER:</strong> Ana Daniela García González Vega,
                   Estándar: EC0301, Folio CONOCER: D-0009441521.
                 </p>
               </div>
@@ -266,7 +267,7 @@ const CertificadoDigital = () => {
               <div className="flex flex-col items-center">
                 <h3 className="text-sm font-semibold text-gray-700 mb-4">Código QR</h3>
                 <div className="bg-white p-4 rounded-lg border-2 border-gray-200">
-                  <QRCodeSVG 
+                  <QRCodeSVG
                     value={urlVerificacion}
                     size={150}
                     level="H"

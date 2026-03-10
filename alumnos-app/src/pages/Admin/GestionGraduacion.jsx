@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useState, useEffect, useMemo } from 'react';
+import { useParams, Link, useSearchParams } from 'react-router-dom';
 import { doc, getDoc, setDoc, serverTimestamp, updateDoc } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { ArrowLeftIcon, AcademicCapIcon, CheckCircleIcon, ClockIcon } from '@heroicons/react/24/outline';
@@ -7,15 +7,21 @@ import LoadingSpinner from '../../components/LoadingSpinner';
 import LoadingButton from '../../components/LoadingButton';
 import { useNotifications } from '../../contexts/NotificationContext';
 import useCanEdit from '../../hooks/useCanEdit';
+import { getHistorialNiveles, getNivelActivo } from '../../utils/alumnos';
 
 const GestionGraduacion = () => {
   const { id } = useParams();
+  const [searchParams] = useSearchParams();
+  const nivelDesdeUrl = searchParams.get('nivel');
   const canEdit = useCanEdit();
   const { success, error: showError } = useNotifications();
   const [alumno, setAlumno] = useState(null);
   const [infoGraduacion, setInfoGraduacion] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [nivelesHistorial, setNivelesHistorial] = useState([]);
+  const [nivelActivo, setNivelActivo] = useState(null);
+  const [nivelFiltro, setNivelFiltro] = useState('todos');
   const [formData, setFormData] = useState({
     materiasCompletadas: false,
     promedioMinimo: false,
@@ -29,7 +35,16 @@ const GestionGraduacion = () => {
       try {
         const alumnoDoc = await getDoc(doc(db, 'alumnos', id));
         if (alumnoDoc.exists()) {
-          setAlumno({ id: alumnoDoc.id, ...alumnoDoc.data() });
+          const alumnoData = { id: alumnoDoc.id, ...alumnoDoc.data() };
+          setAlumno(alumnoData);
+
+          // Cargar historial de niveles
+          const historial = getHistorialNiveles(alumnoData);
+          setNivelesHistorial(historial);
+          const nivelActivoActual = getNivelActivo(alumnoData);
+          setNivelActivo(nivelActivoActual);
+          const nivelInicial = nivelDesdeUrl || nivelActivoActual?.id || 'todos';
+          setNivelFiltro(nivelInicial);
         }
 
         const graduacionDoc = await getDoc(doc(db, 'graduacion', id));
@@ -54,6 +69,34 @@ const GestionGraduacion = () => {
       loadData();
     }
   }, [id]);
+
+  // Opciones de niveles para las pestañas
+  const nivelesOpciones = useMemo(() => {
+    const opciones = [];
+    if (nivelActivo?.id && nivelActivo?.nombre) {
+      opciones.push({ ...nivelActivo, estado: 'activo' });
+    }
+    nivelesHistorial.forEach((nivel) => {
+      if (nivel?.id && nivel?.nombre && nivel.id !== nivelActivo?.id) {
+        opciones.push({ ...nivel, estado: nivel.estado || 'completado' });
+      }
+    });
+    return opciones;
+  }, [nivelesHistorial, nivelActivo]);
+
+  // Nivel seleccionado actual
+  const nivelSeleccionadoInfo = useMemo(() => {
+    if (nivelFiltro === 'todos') return null;
+    return nivelesOpciones.find((n) => n.id === nivelFiltro) || null;
+  }, [nivelFiltro, nivelesOpciones]);
+
+  const obtenerClaseFiltro = (filtroId) => {
+    const base = 'px-3 py-1.5 text-xs sm:text-sm font-medium rounded-lg transition-colors';
+    if (filtroId === nivelFiltro) {
+      return `${base} bg-blue text-white shadow-sm`;
+    }
+    return `${base} bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600`;
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -169,8 +212,8 @@ const GestionGraduacion = () => {
 
   if (loading) {
     return (
-      <LoadingSpinner 
-        size="lg" 
+      <LoadingSpinner
+        size="lg"
         variant="montessori"
         message="Cargando información de graduación..."
         className="h-64"
@@ -192,8 +235,44 @@ const GestionGraduacion = () => {
           Gestión de Graduación
         </h1>
         <p className="mt-1 sm:mt-2 text-sm sm:text-base text-gray-600 dark:text-gray-400">
-          {alumno?.nombre} - {alumno?.nivel}
+          {alumno?.nombre} - {nivelSeleccionadoInfo ? nivelSeleccionadoInfo.nombre : alumno?.nivel}
         </p>
+      </div>
+
+      {/* Pestañas de nivel */}
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-4 sm:p-6">
+        <div className="mb-4 flex flex-wrap gap-2">
+          <button
+            onClick={() => setNivelFiltro('todos')}
+            className={obtenerClaseFiltro('todos')}
+            type="button"
+          >
+            Todos
+          </button>
+          {nivelesOpciones
+            .filter((nivel) => nivel.id)
+            .map((nivel) => (
+              <button
+                key={nivel.id}
+                onClick={() => setNivelFiltro(nivel.id)}
+                className={obtenerClaseFiltro(nivel.id)}
+                type="button"
+                title={nivel.estado === 'activo' ? 'Nivel activo' : 'Nivel histórico'}
+              >
+                {nivel.estado === 'activo' ? 'Activo: ' : ''}{nivel.nombre}
+              </button>
+            ))}
+        </div>
+        {nivelSeleccionadoInfo && (
+          <div className="p-3 rounded-lg bg-gray-50 dark:bg-gray-900/40 border border-gray-200 dark:border-gray-700 text-sm text-gray-600 dark:text-gray-300">
+            <p className="font-semibold text-gray-900 dark:text-white">
+              Revisando requisitos para: {nivelSeleccionadoInfo.nombre}
+            </p>
+            <p className="text-xs mt-1">
+              Estado: {nivelSeleccionadoInfo.estado === 'activo' ? 'Nivel activo / en curso' : 'Nivel completado'}
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Progreso General */}
@@ -265,4 +344,3 @@ const GestionGraduacion = () => {
 };
 
 export default GestionGraduacion;
-
