@@ -22,8 +22,7 @@ import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import AlertasMateriasAtraso from '../components/AlertasMateriasAtraso';
 import { obtenerPagosAlumno, obtenerConfiguracionPagos, obtenerBecasAlumno } from '../services/pagosService';
-import { aplicarBeca, calcularMontoTotal, formatearMoneda } from '../utils/calculosPagos';
-import LoadingSpinner from '../components/LoadingSpinner';
+import { aplicarBeca, calcularMontoTotal } from '../utils/calculosPagos';
 
 const Dashboard = () => {
   const { userData, currentUser } = useAuth();

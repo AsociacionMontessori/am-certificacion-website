@@ -37,10 +37,8 @@ const AdminDashboard = () => {
   const [nivelesDisponibles, setNivelesDisponibles] = useState([]);
   const [showFilters, setShowFilters] = useState(false);
   const [viewMode, setViewMode] = useState(() => {
-    // Por defecto, tarjetas en móvil y tabla en desktop
-    // Guardar preferencia en localStorage
     const saved = localStorage.getItem('adminViewMode');
-    return saved || 'auto'; // 'auto', 'table', 'cards'
+    return saved || 'cards'; // 'cards' por defecto, luego 'table' o 'auto'
   });
 
   useEffect(() => {

@@ -35,6 +35,7 @@ const AlumnoDetail = () => {
     passwordClassroom: ''
   });
   const [nivelesHistorial, setNivelesHistorial] = useState([]);
+  const [nivelesHistorialEdit, setNivelesHistorialEdit] = useState([]);
   const [nivelesDisponibles, setNivelesDisponibles] = useState([]);
   const [showPassword, setShowPassword] = useState(false);
   const [notasPrivadas, setNotasPrivadas] = useState('');
@@ -81,7 +82,9 @@ const AlumnoDetail = () => {
       mailClassroom: datos.mailClassroom || '',
       passwordClassroom: datos.passwordClassroom || ''
     });
-    setNivelesHistorial(getHistorialNiveles(datos));
+    const historial = getHistorialNiveles(datos);
+    setNivelesHistorial(historial);
+    setNivelesHistorialEdit(historial);
     setNotasPrivadas(datos.notasPrivadas || '');
     setNotasOriginales(datos.notasPrivadas || '');
   };
@@ -178,7 +181,10 @@ const AlumnoDetail = () => {
       }
 
       const { historialActualizado, nivelActualId } = actualizarHistorialNiveles({
-        alumno,
+        alumno: {
+          ...alumno,
+          niveles: nivelesHistorialEdit
+        },
         nuevoNivelNombre: nombreNivelNuevo,
         fechaInicioNuevo: formData.fechaIngreso ? new Date(formData.fechaIngreso) : undefined,
         fechaFinAnterior
@@ -318,7 +324,7 @@ const AlumnoDetail = () => {
     }
   };
 
-  const historialOrdenado = [...nivelesHistorial].sort((a, b) => {
+  const historialOrdenado = [...nivelesHistorialEdit].sort((a, b) => {
     const fechaA = convertirFecha(a?.fechaInicio)?.getTime() || 0;
     const fechaB = convertirFecha(b?.fechaInicio)?.getTime() || 0;
     return fechaB - fechaA;
@@ -570,16 +576,55 @@ const AlumnoDetail = () => {
               )}
             </div>
             <div>
-              <dt className="text-sm font-medium text-gray-500">Historial de niveles</dt>
+              <dt className="text-sm font-medium text-gray-500 flex items-center justify-between">
+                <span>Historial de niveles</span>
+                {canEdit && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const hoyIso = new Date().toISOString().slice(0, 10);
+                      setNivelesHistorialEdit([
+                        ...nivelesHistorialEdit,
+                        {
+                          id: `temp-${Date.now()}`,
+                          nombre: formData.nivel || '',
+                          estado: 'activo',
+                          fechaInicio: hoyIso,
+                          fechaFin: '',
+                          certificadoUrl: '',
+                          observaciones: ''
+                        }
+                      ]);
+                    }}
+                    className="ml-3 inline-flex items-center px-2 py-1 text-xs font-medium bg-blue text-white rounded-lg hover:bg-blue/90"
+                  >
+                    Agregar nivel
+                  </button>
+                )}
+              </dt>
               <dd className="mt-2">
                 {historialOrdenado.length > 0 ? (
                   <div className="flex flex-col gap-3">
                     {historialOrdenado.map((nivelItem, index) => {
                       const fechaInicioNivel = convertirFecha(nivelItem?.fechaInicio);
                       const fechaFinNivel = convertirFecha(nivelItem?.fechaFin);
-                      const keyBase = `${nivelItem?.nombre || 'nivel'}-${fechaInicioNivel?.getTime() || index}`;
+                      const keyBase = `${nivelItem?.id || nivelItem?.nombre || 'nivel'}-${index}`;
                       const key = nivelItem?.id || keyBase;
                       const estadoActivo = nivelItem?.estado === 'activo';
+                      const handleFieldChange = (field, value) => {
+                        setNivelesHistorialEdit((prev) =>
+                          prev.map((n) =>
+                            (n.id || `${n.nombre}-${index}`) === (nivelItem.id || keyBase)
+                              ? { ...n, [field]: value }
+                              : n
+                          )
+                        );
+                      };
+                      const handleDelete = () => {
+                        setNivelesHistorialEdit((prev) =>
+                          prev.filter((n) => (n.id || `${n.nombre}-${index}`) !== (nivelItem.id || keyBase))
+                        );
+                      };
 
                       return (
                         <div
@@ -587,36 +632,105 @@ const AlumnoDetail = () => {
                           className="rounded-lg border border-gray-200 dark:border-gray-700 p-4 bg-gray-50 dark:bg-gray-900/40"
                         >
                           <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
-                            <div>
-                              <p className="text-base font-semibold text-gray-900 dark:text-white">
-                                {nivelItem?.nombre || 'Nivel sin nombre'}
-                              </p>
-                              <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
-                                {estadoActivo ? 'En progreso' : 'Finalizado'}
-                              </p>
+                            <div className="flex-1 space-y-1">
+                              {editing && canEdit ? (
+                                <>
+                                  <input
+                                    type="text"
+                                    value={nivelItem?.nombre || ''}
+                                    onChange={(e) => handleFieldChange('nombre', e.target.value)}
+                                    className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                                    placeholder="Nombre del nivel"
+                                  />
+                                  <select
+                                    value={nivelItem?.estado || 'activo'}
+                                    onChange={(e) => handleFieldChange('estado', e.target.value)}
+                                    className="w-full px-3 py-2 text-xs border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200"
+                                  >
+                                    <option value="activo">Activo</option>
+                                    <option value="completado">Completado</option>
+                                  </select>
+                                </>
+                              ) : (
+                                <>
+                                  <p className="text-base font-semibold text-gray-900 dark:text-white">
+                                    {nivelItem?.nombre || 'Nivel sin nombre'}
+                                  </p>
+                                  <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                                    {estadoActivo ? 'En progreso' : 'Finalizado'}
+                                  </p>
+                                </>
+                              )}
                             </div>
-                            <span
-                              className={`inline-flex items-center self-start rounded-full px-2.5 py-1 text-xs font-medium ${
-                                estadoActivo
-                                  ? 'bg-blue/10 text-blue'
-                                  : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300'
-                              }`}
-                            >
-                              {estadoActivo ? 'Activo' : 'Completado'}
-                            </span>
+                            <div className="flex items-center gap-2">
+                              <span
+                                className={`inline-flex items-center self-start rounded-full px-2.5 py-1 text-xs font-medium ${
+                                  estadoActivo
+                                    ? 'bg-blue/10 text-blue'
+                                    : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300'
+                                }`}
+                              >
+                                {estadoActivo ? 'Activo' : 'Completado'}
+                              </span>
+                              {editing && canEdit && (
+                                <button
+                                  type="button"
+                                  onClick={handleDelete}
+                                  className="ml-1 text-xs text-red hover:text-red/80"
+                                >
+                                  Eliminar
+                                </button>
+                              )}
+                            </div>
                           </div>
                           <div className="mt-3 grid grid-cols-1 gap-2 text-sm text-gray-600 dark:text-gray-300 sm:grid-cols-2">
-                            <p>
+                            <div>
                               <span className="font-medium text-gray-700 dark:text-gray-200">Inicio:</span>{' '}
-                              {fechaInicioNivel ? formatearFechaLarga(fechaInicioNivel) : 'Sin registro'}
-                            </p>
-                            <p>
+                              {editing && canEdit ? (
+                                <input
+                                  type="date"
+                                  value={
+                                    nivelItem?.fechaInicio
+                                      ? formatearFechaInput(convertirFecha(nivelItem.fechaInicio))
+                                      : ''
+                                  }
+                                  onChange={(e) => handleFieldChange('fechaInicio', e.target.value)}
+                                  className="mt-1 w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm"
+                                />
+                              ) : (
+                                <span>
+                                  {fechaInicioNivel ? formatearFechaLarga(fechaInicioNivel) : 'Sin registro'}
+                                </span>
+                              )}
+                            </div>
+                            <div>
                               <span className="font-medium text-gray-700 dark:text-gray-200">Fin:</span>{' '}
-                              {fechaFinNivel ? formatearFechaLarga(fechaFinNivel) : 'En curso'}
-                            </p>
-                            {nivelItem?.certificadoUrl && (
-                              <p className="sm:col-span-2">
-                                <span className="font-medium text-gray-700 dark:text-gray-200">Certificado:</span>{' '}
+                              {editing && canEdit ? (
+                                <input
+                                  type="date"
+                                  value={
+                                    nivelItem?.fechaFin
+                                      ? formatearFechaInput(convertirFecha(nivelItem.fechaFin))
+                                      : ''
+                                  }
+                                  onChange={(e) => handleFieldChange('fechaFin', e.target.value)}
+                                  className="mt-1 w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm"
+                                />
+                              ) : (
+                                <span>{fechaFinNivel ? formatearFechaLarga(fechaFinNivel) : 'En curso'}</span>
+                              )}
+                            </div>
+                            <div className="sm:col-span-2">
+                              <span className="font-medium text-gray-700 dark:text-gray-200">Certificado:</span>{' '}
+                              {editing && canEdit ? (
+                                <input
+                                  type="url"
+                                  value={nivelItem?.certificadoUrl || ''}
+                                  onChange={(e) => handleFieldChange('certificadoUrl', e.target.value)}
+                                  className="mt-1 w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm"
+                                  placeholder="URL de constancia (opcional)"
+                                />
+                              ) : nivelItem?.certificadoUrl ? (
                                 <a
                                   href={nivelItem.certificadoUrl}
                                   target="_blank"
@@ -625,14 +739,26 @@ const AlumnoDetail = () => {
                                 >
                                   Ver constancia
                                 </a>
-                              </p>
-                            )}
-                            {nivelItem?.observaciones && (
-                              <p className="sm:col-span-2">
-                                <span className="font-medium text-gray-700 dark:text-gray-200">Notas:</span>{' '}
-                                {nivelItem.observaciones}
-                              </p>
-                            )}
+                              ) : (
+                                <span className="text-gray-500 dark:text-gray-400">Sin certificado</span>
+                              )}
+                            </div>
+                            <div className="sm:col-span-2">
+                              <span className="font-medium text-gray-700 dark:text-gray-200">Notas:</span>{' '}
+                              {editing && canEdit ? (
+                                <textarea
+                                  value={nivelItem?.observaciones || ''}
+                                  onChange={(e) => handleFieldChange('observaciones', e.target.value)}
+                                  rows={2}
+                                  className="mt-1 w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm"
+                                  placeholder="Notas internas sobre este nivel (opcional)"
+                                />
+                              ) : nivelItem?.observaciones ? (
+                                <span>{nivelItem.observaciones}</span>
+                              ) : (
+                                <span className="text-gray-500 dark:text-gray-400">Sin notas</span>
+                              )}
+                            </div>
                           </div>
                         </div>
                       );
