@@ -61,6 +61,9 @@ public
 # Mac files
 .DS_Store
 
+# Firebase Hosting cache
+.firebase/hosting.cHVibGlj.cache
+
 # Yarn
 yarn-error.log
 .pnp/
