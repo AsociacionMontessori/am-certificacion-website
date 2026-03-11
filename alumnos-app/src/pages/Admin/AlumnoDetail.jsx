@@ -332,11 +332,13 @@ const AlumnoDetail = () => {
     }
   };
 
-  const historialOrdenado = [...nivelesHistorialEdit].sort((a, b) => {
-    const fechaA = convertirFecha(a?.fechaInicio)?.getTime() || 0;
-    const fechaB = convertirFecha(b?.fechaInicio)?.getTime() || 0;
-    return fechaB - fechaA;
-  });
+  const historialOrdenado = editing
+    ? nivelesHistorialEdit
+    : [...nivelesHistorialEdit].sort((a, b) => {
+      const fechaA = convertirFecha(a?.fechaInicio)?.getTime() || 0;
+      const fechaB = convertirFecha(b?.fechaInicio)?.getTime() || 0;
+      return fechaB - fechaA;
+    });
 
   const nivelSeleccionado = selectedNivelId
     ? nivelesHistorialEdit.find((nivel) => nivel.id === selectedNivelId)
@@ -701,9 +703,11 @@ const AlumnoDetail = () => {
                                 <input
                                   type="date"
                                   value={
-                                    nivelItem?.fechaInicio
-                                      ? formatearFechaInput(convertirFecha(nivelItem.fechaInicio))
-                                      : ''
+                                    typeof nivelItem?.fechaInicio === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(nivelItem.fechaInicio)
+                                      ? nivelItem.fechaInicio
+                                      : nivelItem?.fechaInicio
+                                        ? formatearFechaInput(convertirFecha(nivelItem.fechaInicio))
+                                        : ''
                                   }
                                   onChange={(e) => handleFieldChange('fechaInicio', e.target.value)}
                                   className="mt-1 w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm"
@@ -720,9 +724,11 @@ const AlumnoDetail = () => {
                                 <input
                                   type="date"
                                   value={
-                                    nivelItem?.fechaFin
-                                      ? formatearFechaInput(convertirFecha(nivelItem.fechaFin))
-                                      : ''
+                                    typeof nivelItem?.fechaFin === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(nivelItem.fechaFin)
+                                      ? nivelItem.fechaFin
+                                      : nivelItem?.fechaFin
+                                        ? formatearFechaInput(convertirFecha(nivelItem.fechaFin))
+                                        : ''
                                   }
                                   onChange={(e) => handleFieldChange('fechaFin', e.target.value)}
                                   className="mt-1 w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm"
