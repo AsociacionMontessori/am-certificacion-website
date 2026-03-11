@@ -8,9 +8,9 @@ const PROFESSORS = [
     name: "Roxana Muñoz",
     badge: "Acompañamiento institucional y académico",
     description: [
-      <>Roxana Muñoz es una figura de gran relevancia dentro del ámbito Montessori y una de las principales guías del acompañamiento institucional y académico en este diplomado. Con <strong>más de 30 años de experiencia</strong> como Guía Montessori, aporta una formación profunda, una amplia trayectoria y un compromiso genuino con el desarrollo integral de la infancia.</>,
-      <>Su trabajo se distingue por una convicción esencial: <strong>la educación con amor</strong> es clave para ayudar a cada niño a desarrollar su potencial. Además de su experiencia educativa, es <strong>presidenta de la Asociación Montessori de México A.C.</strong> y cofundadora de la <strong>Sociedad de Escuelas Montessori S.C.</strong>, fortaleciendo el diálogo entre educadores, familias e instituciones.</>,
-      <>También es <strong>autora de libros y artículos</strong> sobre la Pedagogía Científica de María Montessori, y comparte su experiencia en conferencias, talleres y seminarios para docentes y familias. Su acompañamiento dentro del diplomado aporta dirección, profundidad y una mirada fiel a la filosofía Montessori.</>,
+      <>Roxana Muñoz Guevara es <strong>licenciada en Educación Preescolar</strong> por la Universidad Femenina de México, con estudios en Educación Especial, Psicomotricidad Aplicada, Psicología Infantil y formación como <strong>Guía Montessori de Taller I y II</strong> por el Centro de Desarrollo y Comunicación.</>,
+      <>Cuenta además con estudios adicionales realizados con la <strong>Dra. Cato Hanrath</strong>, alumna de María Montessori. Desde <strong>1997 es Presidenta de la Asociación Montessori de México A.C.</strong>, donde coordina los Diplomados Profesionales para Guía Montessori e imparte Antropología filosófica, Filosofía Montessori y Materiales Montessori.</>,
+      <>Actualmente es <strong>Directora General de la Escuela Primaria y del Centro Educativo Montessori Kalpilli</strong>, además de capacitadora de Guías Montessori en México y el extranjero. Su acompañamiento dentro del diplomado aporta profundidad académica, experiencia institucional y una mirada fiel a la filosofía Montessori.</>,
     ],
   },
   {
@@ -59,8 +59,9 @@ function ProfessorPhoto({ id, name }) {
     .join("")
     .slice(0, 2);
 
-  const photoClasses =
-    "w-full h-full object-cover object-center rounded-t-2xl transition-transform duration-500 ease-out group-hover:scale-105";
+  const photoWrapperClasses = "w-full h-full";
+  const photoImageClasses =
+    "rounded-t-2xl transition-transform duration-500 ease-out group-hover:scale-105";
 
   switch (id) {
     case "roxana-munoz":
@@ -69,8 +70,9 @@ function ProfessorPhoto({ id, name }) {
           src="../images/professors/roxana-munoz.webp"
           alt={name}
           placeholder="blurred"
-          className={photoClasses}
-          imgClassName="rounded-t-2xl"
+          className={photoWrapperClasses}
+          imgClassName={photoImageClasses}
+          objectPosition="50% 8%"
         />
       );
     case "ivan-lopez-carmona":
@@ -79,8 +81,9 @@ function ProfessorPhoto({ id, name }) {
           src="../images/professors/ivan-lopez-carmona.webp"
           alt={name}
           placeholder="blurred"
-          className={photoClasses}
-          imgClassName="rounded-t-2xl"
+          className={photoWrapperClasses}
+          imgClassName={photoImageClasses}
+          objectPosition="50% 8%"
         />
       );
     case "carlos-romero":
@@ -89,8 +92,9 @@ function ProfessorPhoto({ id, name }) {
           src="../images/professors/carlos-romero.webp"
           alt={name}
           placeholder="blurred"
-          className={photoClasses}
-          imgClassName="rounded-t-2xl"
+          className={photoWrapperClasses}
+          imgClassName={photoImageClasses}
+          objectPosition="50% 50%"
         />
       );
     default:
