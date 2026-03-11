@@ -173,6 +173,16 @@ function ProfessorCard({ professor, expanded, onToggle }) {
 export default function ProfessorsSection() {
   const isDesktop = useIsDesktop();
 
+  /* Gatsby no hace scroll automático a anchors — lo manejamos aquí */
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.location.hash === "#profesores") {
+      const el = document.getElementById("profesores");
+      if (el) {
+        setTimeout(() => el.scrollIntoView({ behavior: "smooth" }), 300);
+      }
+    }
+  }, []);
+
   /* En desktop: un solo estado global; en móvil: estado por tarjeta */
   const [globalExpanded, setGlobalExpanded] = useState(false);
   const [mobileExpanded, setMobileExpanded] = useState({});
