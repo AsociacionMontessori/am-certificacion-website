@@ -2,7 +2,7 @@
   "name": "functions",
   "description": "Cloud Functions para Firebase - Notificaciones de materias próximas",
   "scripts": {
-    "lint": "eslint .",
+    "lint": "ESLINT_USE_FLAT_CONFIG=false eslint .",
     "serve": "firebase emulators:start --only functions",
     "shell": "firebase functions:shell",
     "start": "npm run shell",
