@@ -56,7 +56,7 @@ const CertificadoDigital = () => {
     };
 
     loadCertificado();
-  }, [id]);
+  }, [id, nivelIdParam]);
 
   if (loading) {
     return (
@@ -88,7 +88,7 @@ const CertificadoDigital = () => {
     );
   }
 
-  const { folio, codigoVerificacion, promedio, alumno, graduacion, nivelEspecifico } = certificado;
+  const { folio, codigoVerificacion, promedio, alumno, graduacion } = certificado;
   const mostrarCertificado = !forzarConstancia && graduacion?.completa;
   const nivelCertificado = graduacion?.nivel || alumno.nivelGraduacion || alumno.nivel;
   const nivelActual = alumno.nivelActual || alumno.nivel;

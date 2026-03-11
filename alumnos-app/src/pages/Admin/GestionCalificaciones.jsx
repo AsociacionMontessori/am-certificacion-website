@@ -318,7 +318,7 @@ const GestionCalificaciones = () => {
     if (id) {
       loadData();
     }
-  }, [id]);
+  }, [id, nivelDesdeUrl]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -1233,4 +1233,3 @@ const GestionCalificaciones = () => {
 };
 
 export default GestionCalificaciones;
-

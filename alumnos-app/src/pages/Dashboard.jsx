@@ -19,99 +19,14 @@ import {
   ArrowRightIcon
 } from '@heroicons/react/24/outline';
 import { Link } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import AlertasMateriasAtraso from '../components/AlertasMateriasAtraso';
-import { obtenerPagosAlumno, obtenerConfiguracionPagos, obtenerBecasAlumno } from '../services/pagosService';
-import { aplicarBeca, calcularMontoTotal } from '../utils/calculosPagos';
 
 const Dashboard = () => {
-  const { userData, currentUser } = useAuth();
+  const { userData } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
-  const [pagosVencidos, setPagosVencidos] = useState([]);
-  const [totalVencidos, setTotalVencidos] = useState(0);
-  const [totalRecargos, setTotalRecargos] = useState(0);
-  const [loadingPagos, setLoadingPagos] = useState(true);
 
   const { success, prompt: showPrompt } = useNotifications();
-
-  // Cargar pagos vencidos
-  useEffect(() => {
-    const cargarPagosVencidos = async () => {
-      if (!currentUser || !userData || userData.estado === 'Inactivo') {
-        setLoadingPagos(false);
-        return;
-      }
-
-      try {
-        const [pagosData, configData, becasData] = await Promise.all([
-          obtenerPagosAlumno(currentUser.uid),
-          obtenerConfiguracionPagos(),
-          obtenerBecasAlumno(currentUser.uid)
-        ]);
-
-        const hoy = new Date();
-        hoy.setHours(0, 0, 0, 0);
-        const diaVencimiento = configData?.diaVencimiento || 10;
-
-        const pagosPendientes = pagosData.filter(p => p.estado === 'Pendiente' || p.estado === 'Vencido');
-        
-        const pagosVencidosDetalle = pagosPendientes
-          .map(pago => {
-            if (!pago || !pago.fechaVencimiento) return null;
-            try {
-              const fechaVenc = pago.fechaVencimiento?.toDate?.() || new Date(pago.fechaVencimiento);
-              if (isNaN(fechaVenc.getTime())) return null;
-              
-              const fechaLimite = new Date(fechaVenc.getFullYear(), fechaVenc.getMonth(), diaVencimiento, 23, 59, 59, 999);
-              if (isNaN(fechaLimite.getTime())) return null;
-              
-              const esVencido = hoy > fechaLimite;
-              if (!esVencido) return null;
-
-              const montoBase = pago.montoOriginal !== undefined ? Number(pago.montoOriginal) : Number(pago.monto || 0);
-              if (isNaN(montoBase)) return null;
-              
-              const montoConDescuentosRegistrados = Number((pago.monto ?? montoBase).toFixed(2));
-              const montoConBeca = aplicarBeca(montoConDescuentosRegistrados, becasData || [], { pago });
-              if (isNaN(montoConBeca)) return null;
-              
-              const montoTotal = calcularMontoTotal(
-                montoConBeca,
-                pago.fechaVencimiento,
-                pago.recargoPorcentaje || configData?.recargoPorcentaje,
-                pago.recargoActivo !== undefined ? pago.recargoActivo : (configData?.recargoActivo && pago.tipo === 'Colegiatura'),
-                null,
-                pago.tipo,
-                diaVencimiento
-              );
-              if (isNaN(montoTotal)) return null;
-              
-              const recargoAplicado = montoTotal - montoConBeca;
-              
-              return {
-                ...pago,
-                montoTotal,
-                recargoAplicado
-              };
-            } catch (error) {
-              console.warn('Error al procesar pago:', error, pago);
-              return null;
-            }
-          })
-          .filter(p => p !== null);
-
-        setPagosVencidos(pagosVencidosDetalle);
-        setTotalVencidos(pagosVencidosDetalle.reduce((sum, p) => sum + (p.montoTotal || 0), 0));
-        setTotalRecargos(pagosVencidosDetalle.reduce((sum, p) => sum + (p.recargoAplicado || 0), 0));
-      } catch (error) {
-        console.error('Error al cargar pagos vencidos:', error);
-      } finally {
-        setLoadingPagos(false);
-      }
-    };
-
-    cargarPagosVencidos();
-  }, [currentUser, userData]);
 
   // Función para copiar al portapapeles
   const handleCopyToClipboard = async (texto, tipo = '') => {

@@ -182,7 +182,7 @@ const GestionMaterias = () => {
     if (id) {
       loadData();
     }
-  }, [id]);
+  }, [id, nivelDesdeUrl]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
