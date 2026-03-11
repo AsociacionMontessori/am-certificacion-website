@@ -68,7 +68,7 @@ const GestionGraduacion = () => {
     if (id) {
       loadData();
     }
-  }, [id]);
+  }, [id, nivelDesdeUrl]);
 
   // Opciones de niveles para las pestañas
   const nivelesOpciones = useMemo(() => {

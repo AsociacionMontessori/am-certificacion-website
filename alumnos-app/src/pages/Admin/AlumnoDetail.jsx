@@ -34,7 +34,6 @@ const AlumnoDetail = () => {
     mailClassroom: '',
     passwordClassroom: ''
   });
-  const [nivelesHistorial, setNivelesHistorial] = useState([]);
   const [nivelesHistorialEdit, setNivelesHistorialEdit] = useState([]);
   const [nivelesDisponibles, setNivelesDisponibles] = useState([]);
   const [selectedNivelId, setSelectedNivelId] = useState(null);
@@ -84,7 +83,6 @@ const AlumnoDetail = () => {
       passwordClassroom: datos.passwordClassroom || ''
     });
     const historial = getHistorialNiveles(datos);
-    setNivelesHistorial(historial);
     setNivelesHistorialEdit(historial);
     if (nivelActivoActual?.id) {
       setSelectedNivelId(nivelActivoActual.id);
