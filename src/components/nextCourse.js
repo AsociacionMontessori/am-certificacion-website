@@ -34,26 +34,26 @@ const getTimeParts = (diffMs) => {
     return { days, hours, minutes, seconds }
 }
 
-const DiplomadoCountdown = ({ geoState }) => {
+const isMexico = (geo) => {
+    const { countryCode, countryName } = geo
+    if (countryCode === "MX" || countryName === "Mexico" || countryName === "México") return true
+    if (!countryCode && !countryName) return true
+    return false
+}
+
+const getLocalizedPrice = (geoState) => {
+    const useMxn = isMexico(geoState)
+    const coin = useMxn ? "MXN" : "USD"
+    const priceToShow = useMxn ? "4,500" : "250"
+    return { coin, priceToShow }
+}
+
+const DiplomadoCountdown = () => {
     const [state, setState] = useState({
         status: "loading", // loading | noMore | live | upcoming
         next: null,
         diff: 0,
     })
-
-    const isMexico = (geo) => {
-        const { countryCode, countryName } = geo
-        if (countryCode === "MX" || countryName === "Mexico" || countryName === "México") return true
-        if (!countryCode && !countryName) return true
-        return false
-    }
-
-    const getLocalizedPrice = () => {
-        const useMxn = isMexico(geoState)
-        const coin = useMxn ? "MXN" : "USD"
-        const priceToShow = useMxn ? "4,500" : "250"
-        return { coin, priceToShow }
-    }
 
     useEffect(() => {
         const update = () => {
@@ -114,8 +114,6 @@ const DiplomadoCountdown = ({ geoState }) => {
 
     const { days, hours, minutes } = getTimeParts(state.diff)
     const isUrgent = days <= 7 // Urgencia cuando quedan 7 días o menos
-    const { coin, priceToShow } = getLocalizedPrice()
-
     return (
         <div className="space-y-4">
             {/* Badge de urgencia */}
@@ -165,23 +163,6 @@ const DiplomadoCountdown = ({ geoState }) => {
                     </div>
                 )}
             </div>
-
-            {/* Precio destacado */}
-            <div className="rounded-xl bg-gradient-to-r from-green/20 to-blue/20 p-4 border border-green/30">
-                <p className="text-xs text-white/90 sm:text-sm md:text-base mb-1">
-                    Inscríbete al Diplomado en Neuroeducación
-                </p>
-                <div className="flex items-baseline gap-2">
-                    <span className="text-3xl font-bold text-white sm:text-4xl md:text-5xl">${priceToShow}</span>
-                    <span className="text-sm text-white/80 sm:text-base">{coin}</span>
-                    <span className="ml-auto rounded-full bg-green/80 px-3 py-1 text-xs font-semibold text-white sm:text-sm">
-                        Pago único
-                    </span>
-                </div>
-                <p className="mt-1 text-xs text-white/80 sm:text-sm">
-                    Duración: 3 meses • A tu ritmo
-                </p>
-            </div>
         </div>
     )
 }
@@ -221,6 +202,8 @@ const NextCourse = () => {
         getGeoInfo()
     }, [])
 
+    const { coin, priceToShow } = getLocalizedPrice(geoState)
+
     return (
         <>
             <div className="pb-10 lg:pb-10">
@@ -236,13 +219,29 @@ const NextCourse = () => {
                     </span>
                 </div>
 
+                <div className="mb-4 rounded-xl border border-green/30 bg-gradient-to-r from-green/20 to-blue/20 p-4 shadow-lg">
+                    <p className="mb-1 text-xs text-white/90 sm:text-sm md:text-base">
+                        Inscríbete al Diplomado en Neuroeducación
+                    </p>
+                    <div className="flex items-baseline gap-2">
+                        <span className="text-3xl font-bold text-white sm:text-4xl md:text-5xl">${priceToShow}</span>
+                        <span className="text-sm text-white/80 sm:text-base">{coin}</span>
+                        <span className="ml-auto rounded-full bg-green/80 px-3 py-1 text-xs font-semibold text-white sm:text-sm">
+                            Pago único
+                        </span>
+                    </div>
+                    <p className="mt-1 text-xs text-white/80 sm:text-sm">
+                        Duración: 3 meses • A tu ritmo
+                    </p>
+                </div>
+
                 {/* Contenedor principal con mejor diseño */}
                 <div className="relative overflow-hidden rounded-3xl border-2 border-white/30 bg-gradient-to-br from-black/40 via-black/30 to-black/40 p-6 shadow-2xl backdrop-blur-lg sm:p-8">
                     {/* Efecto de brillo sutil */}
                     <div className="absolute inset-0 bg-gradient-to-r from-blue/5 via-transparent to-green/5 pointer-events-none"></div>
                     
                     <div className="relative z-10">
-                        <DiplomadoCountdown geoState={geoState} />
+                        <DiplomadoCountdown />
                         
                         {/* Información sobre certificación y diplomados */}
                         <div className="mt-6 rounded-lg bg-white/5 p-4 backdrop-blur-sm border border-white/10">
@@ -349,6 +348,5 @@ const NextCourse = () => {
     )
 }
 export default NextCourse
-
 
 
