@@ -3,6 +3,7 @@ import Nav from "../components/nav";
 import { StaticImage } from "gatsby-plugin-image";
 import Layout from "../components/layout";
 import CertificationPrice from "../components/certificationPrice";
+import ProfessorsSection from "../components/professorsSection";
 import Scholarship from "../components/scholarship";
 import { DIPLOMADOS_EN_LINEA, getNextItem } from "../components/nextCourse";
 
@@ -421,6 +422,8 @@ export default function Landing() {
             </div>
             <CertificationPrice />
           </section>
+
+          <ProfessorsSection />
 
           <section className="relative block overflow-hidden bg-blue">
             <div
