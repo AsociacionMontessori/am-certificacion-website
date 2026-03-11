@@ -1,0 +1,40 @@
+diff --git a/node_modules/gatsby-core-utils/dist/fetch-remote-file.js b/node_modules/gatsby-core-utils/dist/fetch-remote-file.js
+index 2653211..336121c 100644
+--- a/node_modules/gatsby-core-utils/dist/fetch-remote-file.js
++++ b/node_modules/gatsby-core-utils/dist/fetch-remote-file.js
+@@ -14,6 +14,7 @@ var _fetchFile = require("./remote-file-utils/fetch-file");
+ var _getStorage = require("./utils/get-storage");
+ var _mutex = require("./mutex");
+ const GATSBY_CONCURRENT_DOWNLOAD = process.env.GATSBY_CONCURRENT_DOWNLOAD ? parseInt(process.env.GATSBY_CONCURRENT_DOWNLOAD, 10) || 0 : 50;
++const detectFileTypeFromFile = _fileType.default.fileTypeFromFile || _fileType.default.fromFile;
+ const alreadyCopiedFiles = new Set();
+ /**
+  * Downloads a remote file to disk
+@@ -172,7 +173,7 @@ async function fetchFile({
+       // If the user did not provide an extension and we couldn't get one from remote file, try and guess one
+       if (!ext) {
+         // if this is fresh response - try to guess extension and cache result for future
+-        const filetype = await _fileType.default.fromFile(tmpFilename);
++        const filetype = detectFileTypeFromFile ? await detectFileTypeFromFile(tmpFilename) : undefined;
+         if (filetype) {
+           ext = `.${filetype.ext}`;
+           filename += ext;
+diff --git a/node_modules/gatsby-core-utils/dist/fetch-remote-file.mjs b/node_modules/gatsby-core-utils/dist/fetch-remote-file.mjs
+index 06ac693..2b00a59 100644
+--- a/node_modules/gatsby-core-utils/dist/fetch-remote-file.mjs
++++ b/node_modules/gatsby-core-utils/dist/fetch-remote-file.mjs
+@@ -1,4 +1,4 @@
+-import fileType from "file-type";
++import { fileTypeFromFile } from "file-type";
+ import path from "path";
+ import fs from "fs-extra";
+ import Queue from "fastq";
+@@ -167,7 +167,7 @@ async function fetchFile({
+       // If the user did not provide an extension and we couldn't get one from remote file, try and guess one
+       if (!ext) {
+         // if this is fresh response - try to guess extension and cache result for future
+-        const filetype = await fileType.fromFile(tmpFilename);
++        const filetype = await fileTypeFromFile(tmpFilename);
+         if (filetype) {
+           ext = `.${filetype.ext}`;
+           filename += ext;
