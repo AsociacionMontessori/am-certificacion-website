@@ -8,7 +8,8 @@ export const roxanaBooks = [
     volume: 1,
     title: "Montessori: Una presentación del método de la pedagogía científica",
     description:
-      "Primera entrega de la serie: una lectura actualizada de la pedagogía científica de María Montessori para docentes, familias y formadores.",
+      "Primer volumen de la serie AMMAC: Roxana Muñoz Guevara revisa, presenta y actualiza la pedagogía científica de María Montessori — fruto de años de estudio y práctica con niños. Un método adoptado en escuelas de todo el mundo que abre una nueva posibilidad de enseñanza y pone en entredicho los presupuestos de la educación tradicional.",
+    coverImage: "/books/pedagogia-cientifica.jpg",
     amazonUrl: "https://www.amazon.com.mx/dp/B0GZY8N61G",
   },
   {
@@ -16,7 +17,8 @@ export const roxanaBooks = [
     volume: 2,
     title: "Montessori: Una presentación del secreto de la infancia",
     description:
-      "Basado en «El niño, el secreto de la infancia», acerca el método Montessori a un público amplio con revisión contemporánea del enfoque.",
+      "Segundo volumen de la serie basada en las obras originales de María Montessori. Roxana Muñoz Guevara sintetiza las ideas de El niño, el secreto de la infancia: la etapa incipiente de la vida donde el niño guarda el secreto práctico de nuestra propia existencia. Introducción y herramienta de estudio para todo público interesado en el método.",
+    coverImage: "/books/secreto-infancia.jpg",
     amazonUrl: "https://www.amazon.com.mx/dp/B0H13SC1QK",
   },
   {
@@ -24,7 +26,8 @@ export const roxanaBooks = [
     volume: 3,
     title: "Educación Cósmica: Una pedagogía para que el niño se sepa parte del universo",
     description:
-      "Explora la educación cósmica y el lugar del niño en el universo, conectando observación, narrativa y formación integral.",
+      "Alrededor de los seis años, el niño empieza a preguntar por la totalidad: cómo nació el universo, cómo apareció la vida, cómo el ser humano llegó a hablar. La Educación Cósmica de María Montessori toma esa pregunta en serio. Presentación accesible de las cinco grandes lecciones, las cascadas curriculares y la formación del adulto que acompaña al niño.",
+    coverImage: "/books/educacion-cosmica.jpg",
     amazonUrl: "https://www.amazon.com.mx/dp/B0H143L8GN",
   },
   {
@@ -32,7 +35,8 @@ export const roxanaBooks = [
     volume: 4,
     title: "Guiones Cósmicos: Las cinco grandes lecciones y las lecciones complementarias",
     description:
-      "Guía práctica sobre las cinco grandes lecciones y sus lecciones complementarias para el aula Montessori.",
+      "Las grandes lecciones de María Montessori se cuentan, no se leen. Colección completa de once guiones narrativos del Taller del segundo plano: las cinco grandes lecciones (Universo, Vida, Ser Humano, Escritura y Números) y siete lecciones complementarias, con indicaciones técnicas, materiales y notas de seguimiento. Complemento técnico de Educación Cósmica.",
+    coverImage: "/books/guiones-cosmicos.jpg",
     amazonUrl: "https://www.amazon.com.mx/dp/B0H14FT9K4",
   },
 ]

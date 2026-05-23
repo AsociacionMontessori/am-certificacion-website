@@ -3,25 +3,39 @@ import { roxanaBooks } from "../data/roxanaBooks"
 
 function BookCard({ book }) {
   return (
-    <article className="flex h-full flex-col rounded-2xl border border-white/30 bg-white/95 p-5 shadow-xl backdrop-blur-sm sm:p-6">
-      <p className="inline-flex self-start rounded-full bg-yellow/20 px-3 py-1 text-xs font-semibold text-blue">
-        Libro {book.volume}
-      </p>
-      <h3 className="mt-3 text-lg font-bold leading-snug text-blue sm:text-xl">
-        {book.title}
-      </h3>
-      <p className="mt-3 flex-grow text-sm leading-relaxed text-gray sm:text-base">
-        {book.description}
-      </p>
-      <a
-        href={book.amazonUrl}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="mt-5 inline-flex min-h-[44px] w-full items-center justify-center rounded-full bg-blue px-5 py-3 text-center text-sm font-semibold text-white transition duration-150 ease-in-out hover:bg-blue/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow focus-visible:ring-offset-2"
-        title={`Ver «${book.title}» en Amazon`}
-      >
-        Ver en Amazon
-      </a>
+    <article className="flex h-full flex-col overflow-hidden rounded-2xl border border-white/30 bg-white/95 shadow-xl backdrop-blur-sm">
+      <div className="flex justify-center bg-blue/5 px-5 pt-5 sm:px-6 sm:pt-6">
+        <div className="aspect-[2/3] w-full max-w-[160px] overflow-hidden sm:max-w-[200px] md:max-w-[220px]">
+          <img
+            src={book.coverImage}
+            alt={`Portada de «${book.title}»`}
+            className="h-full w-full object-contain object-center"
+            loading="lazy"
+            width={220}
+            height={330}
+          />
+        </div>
+      </div>
+      <div className="flex flex-grow flex-col p-5 sm:p-6">
+        <p className="inline-flex self-start rounded-full bg-yellow/20 px-3 py-1 text-xs font-semibold text-blue">
+          Libro {book.volume}
+        </p>
+        <h3 className="mt-3 text-lg font-bold leading-snug text-blue sm:text-xl">
+          {book.title}
+        </h3>
+        <p className="mt-3 flex-grow text-sm leading-relaxed text-gray sm:text-base">
+          {book.description}
+        </p>
+        <a
+          href={book.amazonUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-5 inline-flex min-h-[44px] w-full items-center justify-center rounded-full bg-blue px-5 py-3 text-center text-sm font-semibold text-white transition duration-150 ease-in-out hover:bg-blue/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow focus-visible:ring-offset-2"
+          title={`Ver «${book.title}» en Amazon`}
+        >
+          Ver en Amazon
+        </a>
+      </div>
     </article>
   )
 }
