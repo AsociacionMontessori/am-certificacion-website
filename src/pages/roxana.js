@@ -4,18 +4,29 @@ import Layout from "../components/layout"
 import Seo from "../components/seo"
 import img1 from '../images/rox.jpg'
 import Nav from "../components/nav"
+import RoxanaBooksSection from "../components/RoxanaBooksSection"
 import { StaticImage } from "gatsby-plugin-image"
 
 
 const roxana = () => {
 
     const introParagraphs = [
-        <>
-            Roxana Muñoz Guevara es <strong>licenciada en Educación Preescolar</strong> por la <strong>Universidad Femenina de México</strong>, con estudios en <strong>Educación Especial</strong>, <strong>Psicomotricidad Aplicada</strong> y <strong>Psicología Infantil</strong>. Es <strong>Guía Montessori de Taller I y II</strong> por el <strong>Centro de Desarrollo y Comunicación</strong>, con formación adicional junto a la <strong>Dra. Cato Hanrath</strong>, alumna de María Montessori.
-        </>,
-        <>
-            Desde <strong>1997</strong> preside la <strong>Asociación Montessori de México A.C.</strong>, donde coordina los <strong>Diplomados Profesionales para Guía Montessori</strong> e imparte <strong>Antropología filosófica</strong>, <strong>Filosofía Montessori</strong> y <strong>Materiales Montessori</strong>. Actualmente es <strong>Directora General de la Escuela Primaria y del Centro Educativo Montessori Kalpilli</strong>, además de <strong>capacitadora de Guías Montessori</strong> en la República mexicana y el extranjero.
-        </>,
+        {
+            id: "roxana-formacion",
+            content: (
+                <>
+                    Roxana Muñoz Guevara es <strong>licenciada en Educación Preescolar</strong> por la <strong>Universidad Femenina de México</strong>, con estudios en <strong>Educación Especial</strong>, <strong>Psicomotricidad Aplicada</strong> y <strong>Psicología Infantil</strong>. Es <strong>Guía Montessori de Taller I y II</strong> por el <strong>Centro de Desarrollo y Comunicación</strong>, con formación adicional junto a la <strong>Dra. Cato Hanrath</strong>, alumna de María Montessori.
+                </>
+            ),
+        },
+        {
+            id: "roxana-trayectoria",
+            content: (
+                <>
+                    Desde <strong>1997</strong> preside la <strong>Asociación Montessori de México A.C.</strong>, donde coordina los <strong>Diplomados Profesionales para Guía Montessori</strong> e imparte <strong>Antropología filosófica</strong>, <strong>Filosofía Montessori</strong> y <strong>Materiales Montessori</strong>. Actualmente es <strong>Directora General de la Escuela Primaria y del Centro Educativo Montessori Kalpilli</strong>, además de <strong>capacitadora de Guías Montessori</strong> en la República mexicana y el extranjero.
+                </>
+            ),
+        },
     ]
 
     return (
@@ -42,9 +53,9 @@ const roxana = () => {
                                         Ciudad de México
                                     </p>
                                     <div className="pt-4 space-y-4 text-md text-black">
-                                        {introParagraphs.map((paragraph, index) => (
-                                            <p key={index}>
-                                                {paragraph}
+                                        {introParagraphs.map((paragraph) => (
+                                            <p key={paragraph.id}>
+                                                {paragraph.content}
                                             </p>
                                         ))}
                                     </div>
@@ -103,10 +114,38 @@ const roxana = () => {
                         </div>
                     </div>
                 </section>
+                <RoxanaBooksSection />
             </main>
         </Layout>
     )
 }
 
-export const Head = () => <Seo title="Roxana Muñoz" description="Dirección de la Asociación Montessori de México" />
+const roxanaSchema = [
+    {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        name: "Roxana Muñoz Guevara",
+        jobTitle: "Presidenta de la Asociación Montessori de México A.C. y Directora General del Centro Educativo Montessori Kalpilli",
+        description: "Licenciada en Educación Preescolar, Guía Montessori de Taller I y II, coordinadora de diplomados profesionales y capacitadora de Guías Montessori.",
+        worksFor: {
+            "@type": "EducationalOrganization",
+            name: "Asociación Montessori de México A.C.",
+            url: "https://certificacionmontessori.com/",
+        },
+        homeLocation: {
+            "@type": "Place",
+            name: "Ciudad de México",
+        },
+        url: "https://certificacionmontessori.com/roxana/",
+    },
+]
+
+export const Head = () => (
+    <Seo
+        title="Roxana Muñoz"
+        pathname="/roxana/"
+        description="Perfil de Roxana Muñoz Guevara, presidenta de la Asociación Montessori de México A.C. y directora general del Centro Educativo Montessori Kalpilli."
+        schema={roxanaSchema}
+    />
+)
 export default roxana
