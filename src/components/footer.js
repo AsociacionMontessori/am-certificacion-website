@@ -36,6 +36,9 @@ export default function Footer() {
                         <a target="_blank" className="hover:underline decoration-red" href="../contact">
                             <p>Contacto</p>
                         </a>
+                        <a target="_blank" className="hover:underline decoration-red" href="/ia/">
+                            <p>Índice IA</p>
+                        </a>
                         <a target="_blank" className="hover:underline decoration-red" href="../contact#Preguntas Frecuentes">
                             <p>Preguntas Frecuentes</p>
                         </a>
@@ -53,7 +56,13 @@ export default function Footer() {
                         <h3 className="text-lg font-semibold mb-2">Escuelas Montassori</h3>
                         <a className="hover:underline decoration-red italic" href="https://www.google.com.mx/maps/place/Primaria+Montessori+Kalpilli/@19.3925921,-99.1847762,17z/data=!4m6!3m5!1s0x85d1ff7b7998ce53:0x3f544be41b8ca559!8m2!3d19.3928452!4d-99.1838964!16s%2Fg%2F11sj5sp5xh?entry=ttu"  target="_blank" rel="noopener noreferrer">Kalpilli</a> ver en mapa
                         <br />
+                        <a href="mailto:admin@certificacionmontessori.com" target="_blank" rel="noopener noreferrer">admin@certificacionmontessori.com</a>
+                        <br />
                         <a href="tel:5555152701" target="_blank" rel="noopener noreferrer">55 5515 2701</a>
+                        <br />
+                        <a href="https://api.whatsapp.com/send?phone=5215548885013&text=Hola,%20Me%20gustar%C3%ADa%20informaci%C3%B3n%20sobre%20la%20certificaci%C3%B3n%20Montessori." target="_blank" rel="noopener noreferrer">WhatsApp: 55 4888 5013</a>
+                        <br />
+                        <span className="text-white/70">Atención por chat de 9am a 6pm</span>
                         <br />
                         <a className="hover:underline decoration-red w-1/4" href="https://www.google.com.mx/maps/place/Primaria+Montessori+Kalpilli/@19.3925921,-99.1847762,17z/data=!4m6!3m5!1s0x85d1ff7b7998ce53:0x3f544be41b8ca559!8m2!3d19.3928452!4d-99.1838964!16s%2Fg%2F11sj5sp5xh?entry=ttu" target="_blank" rel="noopener noreferrer" >Calle Av. Dos 48, San Pedro de los Pinos, Benito Juárez, 03800 Ciudad de México, CDMX</a>
                     </div>

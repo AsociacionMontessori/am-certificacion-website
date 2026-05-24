@@ -27,7 +27,7 @@ const Layout = ({ children }) => {
           </section>
 
           <div id="wa" className="wa__widget_container">
-            <a target="_blank" rel="noreferrer" href="https://api.whatsapp.com/send?phone=5215548885013&text=Hola, Me gustaría información sobre la certificación Montessori." >
+            <a target="_blank" rel="noreferrer" href="https://api.whatsapp.com/send?phone=5215548885013&text=Hola,%20Me%20gustar%C3%ADa%20informaci%C3%B3n%20sobre%20la%20certificaci%C3%B3n%20Montessori." >
 
               <div className="wa__btn_popup" style={{ left: 'unset', right: '20px', bottom: '30px' }}>
                 <Transition

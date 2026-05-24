@@ -5,7 +5,7 @@ import { Helmet } from "react-helmet";
 import Layout from "../components/layout"
 import Seo from "../components/seo"
 import Nav from "../components/nav"
-import Questions from "../components/questions"
+import Questions, { FAQ_ITEMS } from "../components/questions"
 
 import '../styles/publications.css'
 import '../styles/wordpress_publications.css'
@@ -25,7 +25,7 @@ const contact = () => {
                                 <p className="mt-3 ">Nuestro equipo estará encantado de atenderte. La comunicación siempre es la clave.</p>
                             </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs md:text-lg text-left">
+                            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 text-xs md:text-lg text-left">
                                 {contactMethods.map((method, index) => (
                                     <ContactMethod key={index} {...method} />
                                 ))}
@@ -80,8 +80,8 @@ const contactMethods = [
             </svg>
         ),
         title: "Email",
-        description: "Envíanos un correo electrónico.\ninfo@certificacionmontessori.com",
-        link: "mailto:info@certificacionmontessori.com"
+        description: "Envíanos un correo electrónico.\nadmin@certificacionmontessori.com",
+        link: "mailto:admin@certificacionmontessori.com"
     },
     {
         icon: (
@@ -100,15 +100,73 @@ const contactMethods = [
                 <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" />
             </svg>
         ),
-        title: "Contáctanos",
-        description: "Llamadas en Horario: 8am - 5pm.\nNúmero de Teléfono: 55 5515 2701",
-        link: "tel:5558121853"
+        title: "Llámanos",
+        description: "Llamadas en horario de 8am a 5pm.\nNúmero de teléfono: 55 5515 2701",
+        link: "tel:5555152701"
+    },
+    {
+        icon: (
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className={iconsSize}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 10.5h9m-9 3h5.25M6.75 3.75h10.5A2.25 2.25 0 0119.5 6v12a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 18V6a2.25 2.25 0 012.25-2.25z" />
+            </svg>
+        ),
+        title: "WhatsApp",
+        description: "Atención de 9am a 6pm.\nSolo por chat: 55 4888 5013",
+        link: "https://api.whatsapp.com/send?phone=5215548885013&text=Hola,%20Me%20gustar%C3%ADa%20informaci%C3%B3n%20sobre%20la%20certificaci%C3%B3n%20Montessori."
     },
 ];
 
 
 
-export const Head = () => <Seo title="Contacto" description="En Asociación Montessi tienes un contacto humano, moderno y constructivo" />
+const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: FAQ_ITEMS.map(item => ({
+        "@type": "Question",
+        name: item.question,
+        acceptedAnswer: {
+            "@type": "Answer",
+            text: item.answer,
+        },
+    })),
+}
+
+const contactSchema = [
+    {
+        "@context": "https://schema.org",
+        "@type": "ContactPage",
+        name: "Contacto",
+        description: "Datos de contacto institucional de la Asociación Montessori de México A.C.",
+        url: "https://certificacionmontessori.com/contact/",
+    },
+    {
+        "@context": "https://schema.org",
+        "@type": "ContactPoint",
+        contactType: "customer support",
+        email: "admin@certificacionmontessori.com",
+        telephone: "+52 55 5515 2701",
+        availableLanguage: ["es"],
+    },
+    {
+        "@context": "https://schema.org",
+        "@type": "ContactPoint",
+        contactType: "WhatsApp support",
+        telephone: "+52 1 55 4888 5013",
+        url: "https://api.whatsapp.com/send?phone=5215548885013&text=Hola,%20Me%20gustar%C3%ADa%20informaci%C3%B3n%20sobre%20la%20certificaci%C3%B3n%20Montessori.",
+        description: "Atención por WhatsApp de 9:00 a 18:00 horas, solo por chat.",
+        availableLanguage: ["es"],
+    },
+    faqSchema,
+]
+
+export const Head = () => (
+    <Seo
+        title="Contacto"
+        pathname="/contact/"
+        description="Contacta a la Asociación Montessori de México A.C. por correo, teléfono, WhatsApp o visita presencial en Ciudad de México."
+        schema={contactSchema}
+    />
+)
 
 
 export default contact

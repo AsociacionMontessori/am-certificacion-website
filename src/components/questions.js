@@ -1,32 +1,43 @@
 import React, { useState } from "react"
 import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline'
 
+export const FAQ_ITEMS = [
+    {
+        question: "¿Qué ofrece certificacionmontessori.com?",
+        answer: "El sitio público de la Asociación Montessori de México A.C. reúne información institucional sobre diplomados, certificaciones, publicaciones, perfiles docentes, contacto y recursos abiertos relacionados con la formación Montessori."
+    },
+    {
+        question: "¿Los diplomados son en línea o presenciales?",
+        answer: "Los diplomados mostrados en el sitio están planteados como programas en línea. El contenido público explica que puedes estudiar desde cualquier lugar con acompañamiento de catedráticos y acceso a plataforma digital."
+    },
+    {
+        question: "¿Qué certificación obtengo al terminar?",
+        answer: "La oferta pública del sitio comunica que los programas cuentan con certificación internacional y están orientados a formarte como Guía Montessori. Los detalles específicos del programa se encuentran en las páginas de Diplomados y Certifícate."
+    },
+    {
+        question: "¿Quiénes forman parte del equipo docente?",
+        answer: "En la sección de profesores del diplomado se presentan perfiles públicos como Roxana Muñoz, Iván López Carmona y Carlos Romero, con información sobre su trayectoria, formación y rol dentro del programa."
+    },
+    {
+        question: "¿Qué temas se estudian en los diplomados?",
+        answer: "El sitio menciona materias como Filosofía Montessori, Métodos de Observación, Neuroeducación, Psicología Educativa, Musicoterapia y Psicomotricidad, además de materiales y estructura por bloques de trabajo."
+    },
+    {
+        question: "¿Qué documentos se solicitan para el certificado?",
+        answer: "En la página de diplomados se informa que para el certificado con validez internacional se solicitan comprobante de domicilio, identificación oficial, acta de nacimiento y último certificado de estudios."
+    },
+    {
+        question: "¿Cómo puedo pedir informes o iniciar contacto?",
+        answer: "Puedes escribir a admin@certificacionmontessori.com, llamar al 55 5515 2701 o contactar por WhatsApp en el 55 4888 5013. El WhatsApp se atiende de 9am a 6pm y es solo por chat."
+    },
+    {
+        question: "¿Dónde se encuentra la Asociación Montessori de México?",
+        answer: "La dirección pública mostrada en el sitio es Avenida Dos 48, San Pedro de los Pinos, Benito Juárez, 03800 Ciudad de México, CDMX."
+    },
+]
 
 const Questions = () => {
-    const preguntasRespuestas = [
-        {
-            pregunta: "¿Hay un periodo de inscripciones?",
-            respuesta: "En la Escuela Montessori Kalpilli tenemos inscripciones abiertas todo el año para cualquiera de nuestros niveles educativos."
-        },
-        {
-            pregunta: "¿Los alumnos de Montessori Kalpilli salen bien preparados para otro tipo de escuelas?",
-            respuesta: "Sí, los alumnos de Montessori Kalpilli son preparados para la vida académica, social y emocionalmente. Cuentan con un buen desarrollo en los exámenes estandarizados y logran adaptarse muy bien ya que el método y la filosofía Montessori forma su grado de responsabilidad y análisis, mostrando entusiasmo por el aprendizaje y la adaptación a nuevas situaciones."
-        },
-        {
-            pregunta: "¿Por qué Montessori tiene ambientes multigrado?",
-            respuesta: "En el sistema Montessori la enseñanza es personalizada y activa, de manera que cada alumno cuenta con un plan claramente definido para el trabajo individual, al tiempo que tal y como sucede en el entorno social real fuera de la escuela, conviven con una comunidad plural en donde algunos de sus compañeros pueden ser mayores o menores en edad. Los ambientes multigrados favorecen el trabajo en equipo y colectivo, ya que los más pequeños observan las actividades de los mayores, les piden ayuda si es necesario y aprenden y se motivan con ellos; mientras que los mayores desarrollan mayor responsabilidad y observación, ven en los pequeños sus progresos, comparten de sus conocimientos y les prestan su ayuda al hacer actividades comunes."
-        },
-        {
-            pregunta: "¿El sistema Montessori es solo para alumnos con condiciones distintas de aprendizaje?",
-            respuesta: "El método y la filosofía Montessori está diseñado para ayudar a todos los niños a alcanzar su máximo potencial a su propio ritmo. Los ambientes cuentan con alumnos que tienen diferentes habilidades, formando así una comunidad real en la que todos tienen oportunidad de aprender y aportar entre la diversidad."
-        },
-        {
-            pregunta: "Si los niños son libres de elegir su propio trabajo, ¿Cómo asegurarse de que reciban una educación completa?",
-            respuesta: "En el sistema Montessori los alumnos aprenden a distinguir límites y normas, entendiendo así que solo tienen la libertad que pueden manejar con responsabilidad. Por otro lado, si bien en el ambiente los alumnos son libres de seleccionar materiales o actividades diversas, el guía brinda acompañamiento y, aprovechando el interés y necesidad del alumno, realiza ejercicios de transversalidad académica, asegurándose así de que cada niño progrese en todas las materias."
-        },
-    ];
-
-    const [respuestasVisibles, setRespuestasVisibles] = useState(Array(preguntasRespuestas.length).fill(false));
+    const [respuestasVisibles, setRespuestasVisibles] = useState(Array(FAQ_ITEMS.length).fill(false));
 
     const toggleRespuesta = (index) => {
         const newRespuestasVisibles = [...respuestasVisibles];
@@ -38,19 +49,22 @@ const Questions = () => {
             <div className="sm:p-10 p-2" id="Preguntas Frecuentes">
                 <div className="md:p-5 p-2">
                     <h2  className="md:text-3xl lg:text-4xl text-xl font-medium text-red">Preguntas Frecuentes</h2>
+                    <p className="mt-4 max-w-4xl text-sm md:text-lg text-black/80">
+                        Reunimos aquí preguntas reales sobre diplomados, certificación, contacto y contenido institucional para que cualquier persona, buscador o agente de IA encuentre respuestas directas en una sola página.
+                    </p>
                 </div>
                 <div className="md:p-5 p-2">
-                    {preguntasRespuestas.map((item, index) => (
+                    {FAQ_ITEMS.map((item, index) => (
                         <div key={index}>
                             <div className="flex items-center justify-between cursor-pointer sm:mt-10 mt-2" onClick={() => toggleRespuesta(index)}>
-                                <h3 className="md:text-2xl lg:text-3xl text-base md:m-2 m-1 md:font-medium font-normal flex-grow">{item.pregunta}</h3>
+                                <h3 className="md:text-2xl lg:text-3xl text-base md:m-2 m-1 md:font-medium font-normal flex-grow">{item.question}</h3>
                                 {respuestasVisibles[index] ?
                                     <ChevronUpIcon className="h-6 w-6 flex-shrink-0 min-w-[24px]" />
                                     :
                                     <ChevronDownIcon className="h-6 w-6 flex-shrink-0 min-w-[24px]" />}
                             </div>
                             {respuestasVisibles[index] && (
-                                <p className="lg:text-2xl md:text-base text-xs m-1 my-2 md:m-4 font-light">{item.respuesta}</p>
+                                <p className="lg:text-2xl md:text-base text-xs m-1 my-2 md:m-4 font-light">{item.answer}</p>
                             )}
                         </div>
                     ))}
