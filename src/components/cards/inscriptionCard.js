@@ -1,14 +1,9 @@
 import * as React from "react"
-import { useState } from "react"
-import InscriptionCheckoutForm from "../checkout/InscriptionCheckoutForm"
-import CheckoutModal from "../checkout/CheckoutModal"
+import { Link } from "gatsby"
 
 const CardInscription = ({ title, subtitle, price, coin, time, text }) => {
-    const [showCheckout, setShowCheckout] = useState(false)
-
     return (
-        <>
-            <div className="flex justify-start items-center flex-col bg-white w-full max-w-sm lg:w-72 xl:w-80 rounded-3xl text-lg text-black shadow-sm">
+        <div className="flex justify-start items-center flex-col bg-white w-full max-w-sm lg:w-72 xl:w-80 rounded-3xl text-lg text-black shadow-sm">
                 <div className="text-3xl mt-10 sm:mt-12 px-4 text-center selection:text-black selection:bg-blue selection:bg-opacity-20">
                     {title}
                 </div>
@@ -30,37 +25,31 @@ const CardInscription = ({ title, subtitle, price, coin, time, text }) => {
                     </p>
                 </div>
 
-                <div className="flex flex-col w-full justify-center items-center mt-6 mb-10 px-4 gap-3">
-                    <button
-                        type="button"
-                        onClick={() => setShowCheckout(true)}
-                        className="min-h-[48px] w-full max-w-xs inline-flex items-center justify-center px-6 py-3 rounded-full font-semibold text-white bg-gradient-to-r from-blue to-green"
+                <div className="w-full px-4 mt-4 mb-2">
+                    <p className="text-xs text-gray text-center leading-relaxed">
+                        Dos pasos tras el pago: cuenta en el portal y expediente administrativo,
+                    todo vinculado automáticamente (sin comprobante de pago).
+                    </p>
+                </div>
+
+                <div className="flex flex-col w-full justify-center items-stretch mt-4 mb-10 px-4 gap-3">
+                    <Link
+                        to="/inscripcion/pagar"
+                        className="min-h-[48px] w-full inline-flex items-center justify-center px-6 py-3 rounded-full font-semibold text-white bg-gradient-to-r from-blue to-green text-center"
                     >
                         Pagar inscripción en línea
-                    </button>
-                    <a
-                        href="https://forms.gle/8mNepRAmhS82awAr7"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="min-h-[48px] w-full max-w-xs inline-flex items-center justify-center px-6 py-3 rounded-full font-medium text-blue border border-blue/30 text-sm"
+                    </Link>
+                    <Link
+                        to="/inscripcion/transferencia"
+                        className="min-h-[48px] w-full inline-flex items-center justify-center px-6 py-3 rounded-full font-semibold text-blue border-2 border-blue text-center"
                     >
-                        Formulario Google (respaldo)
-                    </a>
+                        Pagar por transferencia
+                    </Link>
+                    <p className="text-xs text-gray text-center leading-relaxed px-2">
+                        Tras confirmar el pago: crear tu cuenta y completar el expediente en el sitio.
+                    </p>
                 </div>
-            </div>
-
-            <CheckoutModal
-                open={showCheckout}
-                onClose={() => setShowCheckout(false)}
-                title="Inscripción en línea"
-            >
-                <InscriptionCheckoutForm
-                    coin={coin}
-                    price={price}
-                    onCancel={() => setShowCheckout(false)}
-                />
-            </CheckoutModal>
-        </>
+        </div>
     )
 }
 

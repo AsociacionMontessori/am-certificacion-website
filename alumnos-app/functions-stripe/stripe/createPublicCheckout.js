@@ -112,7 +112,7 @@ exports.createPublicCheckoutHandler = onRequest(
           mode: "payment",
           customer_email: email,
           line_items: lineItems,
-          success_url: `${siteUrl}/checkout/success?orden=${ordenRef.id}`,
+          success_url: `${siteUrl}/checkout/success?orden=${ordenRef.id}&tipo=${tipo}`,
           cancel_url: `${siteUrl}/checkout/cancel?orden=${ordenRef.id}`,
           metadata: {
             ordenId: ordenRef.id,

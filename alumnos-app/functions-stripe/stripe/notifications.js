@@ -59,4 +59,48 @@ async function notifyAdminOrdenPagada(db, orden) {
   });
 }
 
-module.exports = {notifyAdminPago, notifyAdminOrdenPagada};
+/**
+ * Email de bienvenida al alumno tras crear cuenta (cola emails_pendientes → Gmail).
+ * @param {import('firebase-admin').firestore.Firestore} db
+ * @param {object} data
+ */
+async function notifyAlumnoCuentaCreada(db, data) {
+  const {
+    nombre,
+    emailContacto,
+    emailInstitucional,
+    portalUrl,
+    nivelEspecializacion,
+  } = data;
+
+  if (!emailContacto) return;
+
+  const html = `
+    <h2>Bienvenido/a a Certificación Montessori</h2>
+    <p>Hola ${nombre || ""},</p>
+    <p>Tu pago de inscripción fue registrado y ya creamos tu cuenta en el portal de alumnos.</p>
+    <ul>
+      <li><strong>Usuario:</strong> ${emailInstitucional}</li>
+      <li><strong>Portal:</strong> <a href="${portalUrl}">${portalUrl}</a></li>
+      <li><strong>Programa:</strong> ${nivelEspecializacion || "—"}</li>
+      <li><strong>Modalidad:</strong> En línea</li>
+    </ul>
+    <p>Usa la contraseña que elegiste al registrarte. En los próximos pasos completa tu expediente administrativo (documentos y reglamento firmado).</p>
+    <p>Próximamente también recibirás acceso a Google Classroom (Portal Montessori).</p>
+    <p>Asociación Montessori de México A.C.</p>
+  `;
+  const text = `Cuenta creada: ${emailInstitucional} — Portal: ${portalUrl}`;
+
+  await db.collection("emails_pendientes").add({
+    to: emailContacto,
+    subject: "Tu cuenta en Certificación Montessori está lista",
+    html,
+    text,
+    tipo: "inscripcion_cuenta_creada",
+    fechaCreacion: admin.firestore.FieldValue.serverTimestamp(),
+    estado: "pendiente",
+    intentos: 0,
+  });
+}
+
+module.exports = {notifyAdminPago, notifyAdminOrdenPagada, notifyAlumnoCuentaCreada};

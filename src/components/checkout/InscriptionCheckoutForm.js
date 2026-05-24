@@ -1,21 +1,14 @@
 import * as React from "react"
 import { useState } from "react"
+import { Link } from "gatsby"
 import { createPublicCheckoutSession } from "../../utils/stripeCheckout"
+import { PROGRAMAS_INSCRIPCION } from "../../data/inscripcionPublic"
 
-const PROGRAMAS = [
-  "Nido y Comunidad Infantil",
-  "Casa de Niños",
-  "Taller",
-  "Neuroeducación",
-  "Grandes Lecciones",
-  "Otro / Aún no definido",
-]
-
-const InscriptionCheckoutForm = ({ coin, price, onCancel }) => {
+const InscriptionCheckoutForm = ({ coin, price, cancelHref = "/" }) => {
   const [nombre, setNombre] = useState("")
   const [email, setEmail] = useState("")
   const [telefono, setTelefono] = useState("")
-  const [programa, setPrograma] = useState(PROGRAMAS[0])
+  const [programa, setPrograma] = useState(PROGRAMAS_INSCRIPCION[0])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
 
@@ -43,10 +36,11 @@ const InscriptionCheckoutForm = ({ coin, price, onCancel }) => {
   return (
     <form onSubmit={handleSubmit} className="w-full text-left space-y-4">
       <p className="text-sm text-gray leading-relaxed">
-        Pago seguro con tarjeta (Stripe). Monto de inscripción:{" "}
+        Monto de inscripción:{" "}
         <strong className="text-blue">
           {coin} {price}
         </strong>
+        . Tu pago quedará vinculado automáticamente a tu solicitud.
       </p>
 
       <div className="space-y-3">
@@ -105,7 +99,7 @@ const InscriptionCheckoutForm = ({ coin, price, onCancel }) => {
             onChange={(e) => setPrograma(e.target.value)}
             className="w-full min-h-[48px] px-4 py-2.5 rounded-xl border border-gray/25 text-black text-base bg-white"
           >
-            {PROGRAMAS.map((p) => (
+            {PROGRAMAS_INSCRIPCION.map((p) => (
               <option key={p} value={p}>
                 {p}
               </option>
@@ -128,29 +122,13 @@ const InscriptionCheckoutForm = ({ coin, price, onCancel }) => {
         >
           {loading ? "Redirigiendo…" : "Continuar al pago seguro"}
         </button>
-        {onCancel && (
-          <button
-            type="button"
-            onClick={onCancel}
-            className="min-h-[48px] w-full px-6 py-3 rounded-full font-medium text-blue border border-blue/30 bg-white"
-          >
-            Cancelar
-          </button>
-        )}
-      </div>
-
-      <p className="text-xs text-gray text-center leading-relaxed pb-1">
-        También puedes{" "}
-        <a
-          href="https://forms.gle/8mNepRAmhS82awAr7"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-blue underline"
+        <Link
+          to={cancelHref}
+          className="min-h-[48px] w-full inline-flex items-center justify-center px-6 py-3 rounded-full font-medium text-blue border border-blue/30 bg-white text-center"
         >
-          inscribirte con el formulario Google
-        </a>{" "}
-        (respaldo).
-      </p>
+          Cancelar
+        </Link>
+      </div>
     </form>
   )
 }

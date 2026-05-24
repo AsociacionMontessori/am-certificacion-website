@@ -1,8 +1,9 @@
 import * as React from "react"
 import { useState } from "react"
+import { Link } from "gatsby"
 import { createPublicCheckoutSession } from "../../utils/stripeCheckout"
 
-const BookCheckoutForm = ({ book, onCancel }) => {
+const BookCheckoutForm = ({ book, cancelHref, onCancel }) => {
   const [nombre, setNombre] = useState("")
   const [email, setEmail] = useState("")
   const [loading, setLoading] = useState(false)
@@ -91,7 +92,14 @@ const BookCheckoutForm = ({ book, onCancel }) => {
         >
           {loading ? "Redirigiendo…" : "Continuar al pago seguro"}
         </button>
-        {onCancel && (
+        {cancelHref ? (
+          <Link
+            to={cancelHref}
+            className="min-h-[48px] w-full inline-flex items-center justify-center rounded-full border border-blue/30 text-blue text-sm font-medium text-center"
+          >
+            Cancelar
+          </Link>
+        ) : onCancel ? (
           <button
             type="button"
             onClick={onCancel}
@@ -99,7 +107,7 @@ const BookCheckoutForm = ({ book, onCancel }) => {
           >
             Cancelar
           </button>
-        )}
+        ) : null}
       </div>
     </form>
   )

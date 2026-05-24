@@ -52,7 +52,7 @@ async function handleOrdenPublicaPagada(db, ordenId, session) {
 
   if (orden.tipo === "inscripcion") {
     const cliente = orden.cliente || {};
-    await db.collection("inscripciones").add({
+    const inscripcionRef = await db.collection("inscripciones").add({
       nombre: cliente.nombre || session.customer_details?.name || "",
       email: cliente.email || session.customer_email || "",
       telefono: cliente.telefono || null,
@@ -63,7 +63,9 @@ async function handleOrdenPublicaPagada(db, ordenId, session) {
       stripeCheckoutSessionId: session.id,
       fechaInscripcion: admin.firestore.FieldValue.serverTimestamp(),
       origen: "sitio_publico_stripe",
+      formularioCompleto: false,
     });
+    await ordenRef.update({inscripcionId: inscripcionRef.id});
   }
 }
 
