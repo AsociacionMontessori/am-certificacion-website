@@ -166,7 +166,7 @@ const CertificationPrice = () => {
                                 </p>
                             </div>
                         </div>
-                        <div className="pb-5 my-10 sm:my-0 max-h-128 outline outline-offset-2 outline-blue sm:outline-none sm:flex sm:flex-end items-center justify-center bg-white rounded-3xl sm:absolute sm:left-1/2 sm:translate-x-52 lg:translate-x-52 xl:translate-x-80 transform 2xl:translate-x-96 md:translate-y-[-5rem] lg:translate-y-[-4rem] md:h-[36rem] lg:h-[32rem]">
+                        <div className="pb-5 my-10 sm:my-0 w-full max-w-sm mx-auto outline outline-offset-2 outline-blue sm:outline-none sm:flex sm:flex-end sm:items-start items-center justify-center bg-white rounded-3xl sm:absolute sm:left-1/2 sm:translate-x-52 lg:translate-x-52 xl:translate-x-80 transform 2xl:translate-x-96 md:translate-y-[-5rem] lg:translate-y-[-4rem] sm:min-h-0 sm:h-auto md:min-h-[28rem] lg:min-h-[26rem]">
                             {inscripcion.map((price, index) => {
                                 const { title, subtitle, text } = price;
                                 const { coin, priceToShow } = getLocalizedPrice(state, price);

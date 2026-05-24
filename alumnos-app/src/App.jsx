@@ -33,6 +33,7 @@ const DiagnosticoCodigos = lazy(() => import('./pages/Admin/DiagnosticoCodigos')
 const GestionGrupos = lazy(() => import('./pages/Admin/GestionGrupos'));
 const GestionNiveles = lazy(() => import('./pages/Admin/GestionNiveles'));
 const GestionPagos = lazy(() => import('./pages/Admin/GestionPagos'));
+const OrdenesPublicas = lazy(() => import('./pages/Admin/OrdenesPublicas'));
 const Pagos = lazy(() => import('./pages/Pagos'));
 const UsuariosAdministrativos = lazy(() => import('./pages/Admin/UsuariosAdministrativos'));
 
@@ -286,8 +287,7 @@ function App() {
               </AdminRoute>
             }
           />
-          {/* TEMPORAL: Ruta de Pagos oculta en producción mientras se arreglan cosas */}
-          {/* <Route
+          <Route
             path="/admin/pagos"
             element={
               <AdminRoute allowedRoles={['admin', 'directivo', 'grupos']}>
@@ -298,7 +298,19 @@ function App() {
                 </AdminLayout>
               </AdminRoute>
             }
-          /> */}
+          />
+          <Route
+            path="/admin/ordenes"
+            element={
+              <AdminRoute allowedRoles={['admin', 'directivo']}>
+                <AdminLayout>
+                  <Suspense fallback={<LoadingSpinner fullScreen size="xl" variant="montessori" message="Cargando..." />}>
+                    <OrdenesPublicas />
+                  </Suspense>
+                </AdminLayout>
+              </AdminRoute>
+            }
+          />
           
           {/* Rutas protegidas - Alumnos */}
           <Route
@@ -359,8 +371,7 @@ function App() {
               </ProtectedRoute>
             }
           />
-          {/* TEMPORAL: Ruta de Pagos oculta en producción mientras se arreglan cosas */}
-          {/* <Route
+          <Route
             path="/pagos"
             element={
               <ProtectedRoute>
@@ -371,7 +382,7 @@ function App() {
                 </Layout>
               </ProtectedRoute>
             }
-          /> */}
+          />
           
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

@@ -28,8 +28,12 @@ const AdminLayout = ({ children }) => {
     { name: 'Dashboard', href: '/admin', icon: HomeIcon },
     ...(canEdit ? [{ name: 'Crear Usuario', href: '/admin/crear-usuario', icon: UserGroupIcon }] : []),
     { name: 'Inscripciones', href: '/admin/inscripciones', icon: DocumentTextIcon },
-    // TEMPORAL: Ocultado en producción mientras se arreglan cosas
-    // ...(userData?.rol !== 'catedratico' ? [{ name: 'Pagos', href: '/admin/pagos', icon: CurrencyDollarIcon }] : []),
+    ...(userData?.rol !== 'catedratico' ? [
+      { name: 'Pagos', href: '/admin/pagos', icon: CurrencyDollarIcon },
+      ...(userData?.rol === 'admin' || userData?.rol === 'directivo' ?
+        [{ name: 'Órdenes web', href: '/admin/ordenes', icon: CurrencyDollarIcon }] :
+        []),
+    ] : []),
     ...(canEdit ? [{ name: 'Gestión Grupos', href: '/admin/gestion-grupos', icon: UserGroupIcon }] : []),
     // Generador QR solo para admin y directivo, no para grupos
     ...(userData?.rol !== 'grupos' && userData?.rol !== 'catedratico' ? [{ name: 'Generador QR', href: '/admin/generador-qr', icon: QrCodeIcon }] : []),

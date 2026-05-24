@@ -27,7 +27,7 @@ const Layout = ({ children }) => {
     { name: 'Calendario', href: '/calendario', icon: CalendarIcon },
     { name: 'Calificaciones', href: '/calificaciones', icon: ChartBarIcon },
     // TEMPORAL: Ocultado en producción mientras se arreglan cosas
-    // { name: 'Pagos', href: '/pagos', icon: CurrencyDollarIcon },
+    { name: 'Pagos', href: '/pagos', icon: CurrencyDollarIcon },
     { name: 'Graduación', href: '/graduacion', icon: AcademicCapIcon },
   ];
 

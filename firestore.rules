@@ -188,9 +188,11 @@ service cloud.firestore {
       allow create: if request.auth != null && 
                       request.resource.data.alumnoId == request.auth.uid &&
                       request.resource.data.estado == 'Pendiente';
-      // El alumno puede actualizar sus pagos pendientes (subir comprobantes, etc.)
+      // El alumno puede actualizar sus pagos pendientes (comprobante, ids Stripe)
+      // No puede cambiar estado a Validado (solo webhook/admin)
       allow update: if isOwnAlumno(resource.data.alumnoId) && 
-                      resource.data.estado == 'Pendiente';
+                      resource.data.estado == 'Pendiente' &&
+                      request.resource.data.estado == 'Pendiente';
       // Solo admin puede validar/rechazar pagos y crear/actualizar pagos validados
       allow write: if isAdmin();
     }
@@ -203,6 +205,23 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
     
+    // Colección: ordenes (pagos sitio público — solo Functions escriben)
+    match /ordenes/{ordenId} {
+      allow read: if canReadAdmin();
+      allow write: if false;
+    }
+
+    // Eventos Stripe procesados (idempotencia webhook)
+    match /stripe_events/{eventId} {
+      allow read, write: if false;
+    }
+
+    // Catálogo Stripe (price IDs por SKU)
+    match /stripeCatalog/{docId} {
+      allow read: if canReadAdmin();
+      allow write: if isAdmin();
+    }
+
     // Colección: becas
     match /becas/{becaId} {
       // El alumno puede leer sus propias becas

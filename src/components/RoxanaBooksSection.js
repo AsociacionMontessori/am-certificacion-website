@@ -1,42 +1,76 @@
 import * as React from "react"
+import { useState } from "react"
 import { roxanaBooks } from "../data/roxanaBooks"
+import CheckoutModal from "./checkout/CheckoutModal"
+import BookCheckoutForm from "./checkout/BookCheckoutForm"
 
 function BookCard({ book }) {
+  const [showBuyForm, setShowBuyForm] = useState(false)
+
   return (
-    <article className="flex h-full flex-col overflow-hidden rounded-2xl border border-white/30 bg-white/95 shadow-xl backdrop-blur-sm">
-      <div className="flex justify-center bg-blue/5 px-5 pt-5 sm:px-6 sm:pt-6">
-        <div className="aspect-[2/3] w-full max-w-[160px] overflow-hidden sm:max-w-[200px] md:max-w-[220px]">
-          <img
-            src={book.coverImage}
-            alt={`Portada de «${book.title}»`}
-            className="h-full w-full object-contain object-center"
-            loading="lazy"
-            width={220}
-            height={330}
-          />
+    <>
+      <article className="flex h-full flex-col overflow-hidden rounded-2xl border border-white/30 bg-white/95 shadow-xl backdrop-blur-sm">
+        <div className="flex justify-center bg-blue/5 px-5 pt-5 sm:px-6 sm:pt-6">
+          <div className="aspect-[2/3] w-full max-w-[160px] overflow-hidden sm:max-w-[200px] md:max-w-[220px]">
+            <img
+              src={book.coverImage}
+              alt={`Portada de «${book.title}»`}
+              className="h-full w-full object-contain object-center"
+              loading="lazy"
+              width={220}
+              height={330}
+            />
+          </div>
         </div>
-      </div>
-      <div className="flex flex-grow flex-col p-5 sm:p-6">
-        <p className="inline-flex self-start rounded-full bg-yellow/20 px-3 py-1 text-xs font-semibold text-blue">
-          Libro {book.volume}
-        </p>
-        <h3 className="mt-3 text-lg font-bold leading-snug text-blue sm:text-xl">
-          {book.title}
-        </h3>
-        <p className="mt-3 flex-grow text-sm leading-relaxed text-gray sm:text-base">
-          {book.description}
-        </p>
-        <a
-          href={book.amazonUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-5 inline-flex min-h-[44px] w-full items-center justify-center rounded-full bg-blue px-5 py-3 text-center text-sm font-semibold text-white transition duration-150 ease-in-out hover:bg-blue/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow focus-visible:ring-offset-2"
-          title={`Ver «${book.title}» en Amazon`}
-        >
-          Ver en Amazon
-        </a>
-      </div>
-    </article>
+        <div className="flex flex-grow flex-col p-5 sm:p-6">
+          <p className="inline-flex self-start rounded-full bg-yellow/20 px-3 py-1 text-xs font-semibold text-blue">
+            Libro {book.volume}
+          </p>
+          <h3 className="mt-3 text-lg font-bold leading-snug text-blue sm:text-xl">
+            {book.title}
+          </h3>
+          {book.priceMx && (
+            <p className="mt-2 text-base font-semibold text-blue">
+              ${book.priceMx} MXN
+              <span className="block text-xs font-normal text-gray">
+                Envío dentro de México (se solicitará en el pago)
+              </span>
+            </p>
+          )}
+          <p className="mt-3 flex-grow text-sm leading-relaxed text-gray sm:text-base">
+            {book.description}
+          </p>
+
+          <div className="mt-5 flex flex-col gap-2">
+            <button
+              type="button"
+              onClick={() => setShowBuyForm(true)}
+              className="inline-flex min-h-[48px] w-full items-center justify-center rounded-full bg-green px-5 py-3 text-center text-sm font-semibold text-white transition duration-150 ease-in-out hover:bg-green/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow focus-visible:ring-offset-2"
+            >
+              Comprar con la asociación
+            </button>
+            <a
+              href={book.amazonUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex min-h-[48px] w-full items-center justify-center rounded-full border border-blue/40 bg-white px-5 py-3 text-center text-sm font-semibold text-blue transition hover:bg-blue/5 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue"
+              title={`Ver «${book.title}» en Amazon`}
+            >
+              Ver en Amazon
+            </a>
+          </div>
+        </div>
+      </article>
+
+      <CheckoutModal
+        open={showBuyForm}
+        onClose={() => setShowBuyForm(false)}
+        title={`Comprar libro ${book.volume}`}
+        titleId={`book-checkout-title-${book.id}`}
+      >
+        <BookCheckoutForm book={book} onCancel={() => setShowBuyForm(false)} />
+      </CheckoutModal>
+    </>
   )
 }
 
@@ -59,8 +93,8 @@ const RoxanaBooksSection = () => {
             Sus libros
           </h2>
           <p className="mt-3 text-sm text-white/90 sm:text-base">
-            Serie en español basada en las obras de María Montessori, con revisión
-            actualizada del método. Disponibles en{" "}
+            Serie en español basada en las obras de María Montessori. Compra directa con
+            pago seguro o en{" "}
             <strong className="font-semibold text-yellow">Amazon México</strong>.
           </p>
         </div>
@@ -74,15 +108,8 @@ const RoxanaBooksSection = () => {
         </ul>
 
         <p className="mx-auto mt-8 max-w-2xl text-center text-xs text-white/80 sm:text-sm">
-          También puedes adquirirlos directamente con la Asociación Montessori de
-          México A.C. mediante{" "}
-          <a
-            href="/publicaciones/"
-            className="font-semibold text-yellow underline-offset-2 hover:underline"
-          >
-            nuestra sección de publicaciones
-          </a>
-          .
+          Los precios en sitio son referencia; el monto final se confirma en la pasarela
+          Stripe al crear el pedido.
         </p>
       </div>
     </section>
