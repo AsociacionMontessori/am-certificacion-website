@@ -56,6 +56,12 @@ const masterclasses = () => {
   )
 }
 
-export const Head = () => <Seo title="MasterClasses" description="Clases Magistrales de referentes en el Método Montessori" />
+export const Head = () => (
+  <Seo
+    title="MasterClasses"
+    pathname="/masterclasses/"
+    description="Explora las masterclasses y clases magistrales vinculadas con el método Montessori y la formación docente."
+  />
+)
 
 export default masterclasses

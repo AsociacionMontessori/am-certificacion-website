@@ -172,5 +172,11 @@ const IndexPage = () => {
   );
 }
 
-export const Head = () => <Seo title="Inicio" description="Conoce la Asociación Montessori De México A.C." />
+export const Head = () => (
+  <Seo
+    title="Inicio"
+    pathname="/"
+    description="Conoce la Asociación Montessori de México A.C., sus diplomados, certificaciones y recursos públicos sobre formación Montessori."
+  />
+)
 export default IndexPage

@@ -1,9 +1,32 @@
 module.exports = {
   siteMetadata: {
-    title: `Asociacion Montessori De Mexico, A.C.`,
-    description: `Certificaciones en en el método Montessori. Certificaciones, cursos y diplomados. Asociacion Montessori De Mexico, A.C. `,
+    title: `Asociación Montessori de México A.C.`,
+    siteName: `Certificación Montessori`,
+    description: `Formación y certificaciones en el método Montessori. Conoce diplomados, publicaciones, contacto institucional y al equipo docente de la Asociación Montessori de México A.C.`,
     author: `@AsociacionMontessori`,
-    siteUrl: `https://certificacionmontessori.com/`,
+    siteUrl: `https://certificacionmontessori.com`,
+    defaultOgImage: `/og-default.svg`,
+    language: `es-MX`,
+    organizationName: `Asociación Montessori de México A.C.`,
+    legalName: `Asociación Montessori de México A.C.`,
+    email: `admin@certificacionmontessori.com`,
+    telephone: `+52 55 5515 2701`,
+    whatsappUrl: `https://api.whatsapp.com/send?phone=5215548885013&text=Hola,%20Me%20gustar%C3%ADa%20informaci%C3%B3n%20sobre%20la%20certificaci%C3%B3n%20Montessori.`,
+    whatsappNumber: `+52 1 55 4888 5013`,
+    whatsappHours: `Atención por WhatsApp de 9:00 a 18:00 horas, solo por chat.`,
+    address: `Avenida Dos 48, San Pedro de los Pinos, Benito Juárez, 03800 Ciudad de México, CDMX, México`,
+    streetAddress: `Avenida Dos 48, San Pedro de los Pinos`,
+    addressLocality: `Ciudad de México`,
+    addressRegion: `CDMX`,
+    postalCode: `03800`,
+    addressCountry: `MX`,
+    sameAs: [
+      `https://www.facebook.com/asociacionmontessori`,
+      `https://www.instagram.com/asociacionmontessori/`,
+      `https://www.linkedin.com/in/asociaci%C3%B3n-montessori-de-m%C3%A9xico-a-c-5a868417a/?originalSubdomain=mx`,
+      `https://www.youtube.com/@montessorimx`,
+      `https://www.tiktok.com/@montessorimx`,
+    ],
   },
   plugins: [
     'gatsby-plugin-postcss',
@@ -25,6 +48,19 @@ module.exports = {
     `gatsby-transformer-json`,
     `gatsby-transformer-sharp`,
     `gatsby-plugin-sharp`,
+    {
+      resolve: `gatsby-plugin-sitemap`,
+      options: {
+        excludes: [
+          `/404`,
+          `/404.html`,
+          `/dev-404-page`,
+          `/offline-plugin-app-shell-fallback`,
+          `/alumnos-app`,
+          `/alumnos-app/*`,
+        ],
+      },
+    },
     {
       resolve: `gatsby-plugin-manifest`,
       options: {

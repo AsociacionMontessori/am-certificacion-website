@@ -28,6 +28,13 @@ const NotFoundPage = () => (
   </>
 )
 
-export const Head = () => <Seo title="404: Not Found" />
+export const Head = () => (
+  <Seo
+    title="404: Recurso no encontrado"
+    pathname="/404.html"
+    description="Página no encontrada."
+    robots="noindex,nofollow"
+  />
+)
 
 export default NotFoundPage

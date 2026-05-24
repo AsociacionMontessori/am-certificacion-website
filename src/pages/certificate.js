@@ -12,6 +12,23 @@ const nextCourseProps = {
   URLButton: '#certificacion_internacional',
 };
 
+const certificateSchema = [
+  {
+    "@context": "https://schema.org",
+    "@type": "EducationalOccupationalProgram",
+    name: "Certificación internacional como Guía Montessori",
+    description: "Programas de certificación y diplomados para formarte como Guía Montessori con validez internacional.",
+    educationalProgramMode: "online",
+    occupationalCategory: "Guía Montessori",
+    provider: {
+      "@type": "EducationalOrganization",
+      name: "Asociación Montessori de México A.C.",
+      url: "https://certificacionmontessori.com/",
+    },
+    url: "https://certificacionmontessori.com/certificate/",
+  },
+]
+
 const Certificate = () => {
   return (
     <Layout>
@@ -44,5 +61,12 @@ const Certificate = () => {
     </Layout>
   )
 }
-export const Head = () => <Seo title="Certifícate" description="Conviertete en guía Montessori, con Certificación Internacional" />
+export const Head = () => (
+  <Seo
+    title="Certifícate"
+    pathname="/certificate/"
+    description="Conviértete en Guía Montessori con certificación internacional y conoce la oferta formativa pública de la Asociación Montessori de México A.C."
+    schema={certificateSchema}
+  />
+)
 export default Certificate

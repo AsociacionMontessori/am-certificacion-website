@@ -5,6 +5,7 @@ import Layout from "../components/layout";
 import CertificationPrice from "../components/certificationPrice";
 import ProfessorsSection from "../components/professorsSection";
 import Scholarship from "../components/scholarship";
+import Seo from "../components/seo";
 import { DIPLOMADOS_EN_LINEA, getNextItem } from "../components/nextCourse";
 
 const FORM_INSCRIPCION = "https://forms.gle/pQKbTjGKCMYtnjuY6";
@@ -526,3 +527,29 @@ export default function Landing() {
     </>
   );
 }
+
+const diplomadosSchema = [
+  {
+    "@context": "https://schema.org",
+    "@type": "EducationalOccupationalProgram",
+    name: "Diplomados Guía Montessori",
+    description: "Diplomados en línea para formarte como Guía Montessori con acompañamiento docente y certificación internacional.",
+    educationalProgramMode: "online",
+    occupationalCategory: "Guía Montessori",
+    provider: {
+      "@type": "EducationalOrganization",
+      name: "Asociación Montessori de México A.C.",
+      url: "https://certificacionmontessori.com/",
+    },
+    url: "https://certificacionmontessori.com/diplomados/",
+  },
+]
+
+export const Head = () => (
+  <Seo
+    title="Diplomados Guía Montessori"
+    pathname="/diplomados/"
+    description="Conoce los diplomados en línea para formarte como Guía Montessori con certificación internacional, equipo docente y estructura del programa."
+    schema={diplomadosSchema}
+  />
+)

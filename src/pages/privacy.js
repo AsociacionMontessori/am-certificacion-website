@@ -69,6 +69,12 @@ const Privacy = () => (
         </main>
     </Layout>
 )
-export const Head = () => <Seo title="Aviso de Privacidad" description="Asociación Montessori." />
+export const Head = () => (
+    <Seo
+        title="Aviso de Privacidad"
+        pathname="/privacy/"
+        description="Aviso de privacidad de la Asociación Montessori de México A.C. para el uso del sitio certificacionmontessori.com."
+    />
+)
 
 export default Privacy

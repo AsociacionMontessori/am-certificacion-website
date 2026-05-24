@@ -193,6 +193,12 @@ const Buscador = () => {
 
 }
 
-export const Head = () => <Seo title="Aviso de Privacidad" description="Asociación Montessori." />
+export const Head = () => (
+    <Seo
+        title="Buscador de Escuelas Montessori"
+        pathname="/buscador/"
+        description="Consulta el buscador público de escuelas Montessori y los recursos abiertos de la Asociación Montessori de México A.C."
+    />
+)
 
 export default Buscador
