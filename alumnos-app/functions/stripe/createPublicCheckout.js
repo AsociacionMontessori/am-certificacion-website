@@ -71,6 +71,8 @@ exports.createPublicCheckoutHandler = onRequest(
         const email = String(cliente.email || "").trim().toLowerCase();
         const telefono = String(cliente.telefono || "").trim();
         const programa = String(body.programa || "").trim();
+        const requiereFacturaFiscal = Boolean(body.requiereFacturaFiscal);
+        const cuentaContable = String(body.cuentaContable || (requiereFacturaFiscal ? "banorte" : "hsbc")).trim();
 
         if (!nombre || nombre.length < 2) {
           res.status(400).json({error: "Nombre requerido"});
@@ -120,6 +122,8 @@ exports.createPublicCheckoutHandler = onRequest(
             origen: "sitio_publico",
             skus: skus.join(","),
             programa: programa.slice(0, 200),
+            requiereFacturaFiscal: requiereFacturaFiscal ? "1" : "0",
+            cuentaContable: cuentaContable.slice(0, 32),
           },
           ...(requiresShipping ? {
             shipping_address_collection: {allowed_countries: ["MX", "US"]},
@@ -133,6 +137,8 @@ exports.createPublicCheckoutHandler = onRequest(
           cliente: {nombre, email, telefono: telefono || null},
           lineItems: ordenLineItems,
           programa: programa || null,
+          requiereFacturaFiscal,
+          cuentaContable,
           moneda: "mxn",
           monto: null,
           origen: "sitio_publico",
