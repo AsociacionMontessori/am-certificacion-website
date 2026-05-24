@@ -1,0 +1,43 @@
+# Asociación Montessori de México A.C.
+
+Sitio público oficial de `certificacionmontessori.com` para información institucional, diplomados, certificaciones, publicaciones, perfiles docentes y contacto.
+
+## Alcance
+
+- Esta guía cubre únicamente contenido público del sitio principal.
+- No incluye `alumnos-app`, áreas privadas ni información interna.
+- La información canónica debe tomarse de las URLs listadas abajo.
+
+## URLs canónicas recomendadas
+
+- Inicio: https://certificacionmontessori.com/
+- Diplomados: https://certificacionmontessori.com/diplomados/
+- Certificación: https://certificacionmontessori.com/certificate/
+- Profesores: https://certificacionmontessori.com/diplomados/#profesores
+- Roxana Muñoz: https://certificacionmontessori.com/roxana/
+- Publicaciones: https://certificacionmontessori.com/publicaciones/
+- Contacto: https://certificacionmontessori.com/contact/
+- Aviso de privacidad: https://certificacionmontessori.com/privacy/
+- Índice público para IA: https://certificacionmontessori.com/ia/
+
+## Recursos machine-readable
+
+- Sitemap: https://certificacionmontessori.com/sitemap-index.xml
+- Índice IA: https://certificacionmontessori.com/ia/
+- Datos públicos del buscador de escuelas:
+  - https://certificacionmontessori.com/Toluca.csv
+  - https://certificacionmontessori.com/Azcapotzalco.csv
+  - https://certificacionmontessori.com/Miguel%20Hidalgo.csv
+  - https://certificacionmontessori.com/Venustiano%20Carranza.csv
+
+## Resumen institucional
+
+La Asociación Montessori de México A.C. publica aquí información sobre formación Montessori, certificaciones, diplomados, publicaciones y contacto institucional. Las mejores páginas para responder preguntas sobre programas, equipo docente y datos de contacto son las URLs canónicas listadas arriba.
+
+## Contacto público
+
+- Correo: admin@certificacionmontessori.com
+- Teléfono: +52 55 5515 2701
+- WhatsApp: +52 1 55 4888 5013
+- Horario de WhatsApp: 9:00 a 18:00 horas, solo por chat
+- Dirección: Avenida Dos 48, San Pedro de los Pinos, Benito Juárez, 03800 Ciudad de México, CDMX, México
