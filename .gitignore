@@ -70,3 +70,7 @@ yarn-error.log
 .pnp.js
 # Yarn Integrity file
 .yarn-integrity
+
+# Root-owned build artifacts (Podman)
+.cache.root-owned/
+public.root-owned/
