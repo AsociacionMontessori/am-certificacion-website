@@ -51,6 +51,22 @@ const NIVEL_PORTAL_MAP = {
   Otro: "Propedéutico",
 };
 
+/** Labels de checkout Stripe → nivel de formulario (alineado con programasOferta.js). */
+const PROGRAMA_CHECKOUT_A_NIVEL = {
+  "Guía en Nido y Comunidad Infantil": "Guía en Nido & Comunidad Infantil (Duración 16 meses)",
+  "Guía en Casa de Niños": "Guía en Casa de Niños (con duración 17 meses)",
+  "Guía en Taller I y II": "Guía en Taller I y II (con duración 20 meses)",
+  "Educación Cósmica y Grandes Lecciones":
+    "Diplomado en Educación Cósmica y Grandes Lecciones (5 meses)",
+  "Diplomado en Neuroeducación": "Diplomado en Neuroeducación (3 meses)",
+  "Inscripción (primer programa)": "Otro",
+};
+
+function getNivelFromProgramaCheckout(programaLabel) {
+  const key = String(programaLabel || "").trim();
+  return PROGRAMA_CHECKOUT_A_NIVEL[key] || null;
+}
+
 const TIPO_PROGRAMA_MAP = {
   "Guía en Nido & Comunidad Infantil (Duración 16 meses)": "guia",
   "Guía en Casa de Niños (con duración 17 meses)": "guia",
@@ -113,6 +129,7 @@ module.exports = {
   getReglamentoUrl,
   getNivelPortal,
   getTipoPrograma,
+  getNivelFromProgramaCheckout,
   buildEmailInstitucional,
   isUsuarioLocalValid,
 };

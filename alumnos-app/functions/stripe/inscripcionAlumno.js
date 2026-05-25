@@ -35,6 +35,8 @@ async function crearAlumnoDesdeInscripcion(db, params) {
     nacionalidad,
     fechaNacimiento,
     usuarioInstitucional,
+    passwordClassroom,
+    passwordTemporal,
   } = params;
 
   const userRecord = await admin.auth().createUser({
@@ -65,6 +67,9 @@ async function crearAlumnoDesdeInscripcion(db, params) {
     origenInscripcion: "sitio_publico_stripe",
     fechaCreacion: admin.firestore.FieldValue.serverTimestamp(),
     inscripcionAutomatica: true,
+    passwordClassroom: passwordClassroom || null,
+    passwordTemporal: passwordTemporal || null,
+    mailClassroom: emailInstitucional,
   };
 
   await db.collection("alumnos").doc(uid).set(alumnoData);

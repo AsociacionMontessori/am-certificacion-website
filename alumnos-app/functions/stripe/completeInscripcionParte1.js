@@ -9,10 +9,14 @@ const {
   getNivelPortal,
   getReglamentoUrl,
   getTipoPrograma,
+  getNivelFromProgramaCheckout,
 } = require("./inscripcionCatalog");
 const {crearAlumnoDesdeInscripcion} = require("./inscripcionAlumno");
 const {notifyAlumnoCuentaCreada} = require("./notifications");
 const {isOrdenFlujoInscripcion} = require("./programasCheckout");
+const {resolvePasswordInscripcion} = require("./inscripcionPassword");
+const {provisionGoogleWorkspaceAlumno} = require("./googleWorkspaceProvision");
+const {GOOGLE_SERVICE_ACCOUNT_JSON} = require("./googleWorkspaceClient");
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -33,7 +37,12 @@ async function getInscripcionByOrden(db, ordenId) {
  * Parte 1: datos básicos + creación de cuenta institucional del alumno.
  */
 exports.completeInscripcionParte1Handler = onRequest(
-    {region: "us-central1", cors: false, invoker: "public"},
+    {
+      region: "us-central1",
+      cors: false,
+      invoker: "public",
+      secrets: [GOOGLE_SERVICE_ACCOUNT_JSON],
+    },
     async (req, res) => {
       if (handleCors(req, res)) return;
       if (rejectIfOriginNotAllowed(req, res)) return;
@@ -52,7 +61,6 @@ exports.completeInscripcionParte1Handler = onRequest(
         const nivelEspecializacion = String(body.nivelEspecializacion || body.nivel || "").trim();
         const nacionalidad = String(body.nacionalidad || "").trim();
         const usuarioLocal = String(body.usuarioInstitucional || "").trim().toLowerCase();
-        const password = String(body.password || "");
 
         if (!ordenId) {
           res.status(400).json({error: "Referencia de orden requerida"});
@@ -70,10 +78,6 @@ exports.completeInscripcionParte1Handler = onRequest(
           res.status(400).json({error: "Teléfono móvil requerido"});
           return;
         }
-        if (!NIVELES_ESPECIALIZACION.has(nivelEspecializacion)) {
-          res.status(400).json({error: "Nivel de especialización no válido"});
-          return;
-        }
         if (!nacionalidad || nacionalidad.length < 2) {
           res.status(400).json({error: "Nacionalidad requerida"});
           return;
@@ -84,11 +88,6 @@ exports.completeInscripcionParte1Handler = onRequest(
           });
           return;
         }
-        if (!password || password.length < 8) {
-          res.status(400).json({error: "La contraseña debe tener al menos 8 caracteres"});
-          return;
-        }
-
         const fechaNacimiento = parseDateField(body.fechaNacimiento);
         if (!fechaNacimiento) {
           res.status(400).json({error: "Fecha de nacimiento requerida"});
@@ -103,12 +102,33 @@ exports.completeInscripcionParte1Handler = onRequest(
           return;
         }
         const orden = ordenSnap.data();
+        const {password, passwordClassroom, generada: passwordGenerada} =
+          resolvePasswordInscripcion(body.password);
+
         if (!isOrdenFlujoInscripcion(orden.tipo)) {
           res.status(400).json({error: "Esta referencia no corresponde a una inscripción"});
           return;
         }
         if (orden.estado !== "pagado") {
           res.status(402).json({error: "El pago de inscripción aún no está confirmado"});
+          return;
+        }
+
+        const ordenProgramaLabel = String(orden.programa || "").trim();
+        const nivelEsperadoOrden = getNivelFromProgramaCheckout(ordenProgramaLabel);
+        if (nivelEsperadoOrden) {
+          if (!nivelEspecializacion) {
+            res.status(400).json({error: "Nivel de especialización requerido"});
+            return;
+          }
+          if (nivelEspecializacion !== nivelEsperadoOrden) {
+            res.status(400).json({
+              error: "El programa pagado no coincide con el nivel indicado. Contacta a soporte.",
+            });
+            return;
+          }
+        } else if (!NIVELES_ESPECIALIZACION.has(nivelEspecializacion)) {
+          res.status(400).json({error: "Nivel de especialización no válido"});
           return;
         }
 
@@ -147,6 +167,8 @@ exports.completeInscripcionParte1Handler = onRequest(
           nacionalidad,
           fechaNacimiento,
           usuarioInstitucional: usuarioLocal,
+          passwordClassroom,
+          passwordTemporal: password,
         });
 
         const inscripcionPayload = {
@@ -188,7 +210,36 @@ exports.completeInscripcionParte1Handler = onRequest(
         }
 
         await ordenRef.set({inscripcionId, alumnoId: uid, parte1Completa: true}, {merge: true});
-        await db.collection("alumnos").doc(uid).set({inscripcionId, ordenId}, {merge: true});
+
+        const googleWorkspace = await provisionGoogleWorkspaceAlumno({
+          emailInstitucional,
+          nombreCompleto: nombre,
+          password,
+          nivelPortal,
+          emailContacto,
+        });
+
+        await db.collection("alumnos").doc(uid).set({
+          inscripcionId,
+          ordenId,
+          googleWorkspace,
+          googleWorkspaceAt: admin.firestore.FieldValue.serverTimestamp(),
+        }, {merge: true});
+
+        if (googleWorkspace.status === "partial" || googleWorkspace.status === "error") {
+          await db.collection("emails_pendientes").add({
+            to: "admin@certificacionmontessori.com",
+            subject: `[Inscripción] Revisar alta Google — ${emailInstitucional}`,
+            html: `<p>La cuenta Firebase se creó, pero Google Workspace/Classroom requiere revisión.</p>
+              <p><strong>Alumno:</strong> ${nombre} (${emailInstitucional})</p>
+              <p><strong>Nivel:</strong> ${nivelEspecializacion}</p>
+              <pre>${JSON.stringify(googleWorkspace, null, 2)}</pre>`,
+            text: `Revisar Google Workspace para ${emailInstitucional}: ${JSON.stringify(googleWorkspace)}`,
+            tipo: "google_provision_alerta",
+            ordenId,
+            alumnoId: uid,
+          });
+        }
 
         await notifyAlumnoCuentaCreada(db, {
           nombre,
@@ -196,6 +247,7 @@ exports.completeInscripcionParte1Handler = onRequest(
           emailInstitucional,
           portalUrl: "https://alumnos.certificacionmontessori.com",
           nivelEspecializacion,
+          passwordGenerada,
         });
 
         res.json({
@@ -205,6 +257,7 @@ exports.completeInscripcionParte1Handler = onRequest(
           emailInstitucional,
           portalUrl: "https://alumnos.certificacionmontessori.com",
           reglamentoUrl: getReglamentoUrl(nivelEspecializacion),
+          googleWorkspace,
         });
       } catch (err) {
         console.error("completeInscripcionParte1:", err);

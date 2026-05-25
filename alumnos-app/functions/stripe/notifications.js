@@ -71,9 +71,14 @@ async function notifyAlumnoCuentaCreada(db, data) {
     emailInstitucional,
     portalUrl,
     nivelEspecializacion,
+    passwordGenerada,
   } = data;
 
   if (!emailContacto) return;
+
+  const accesoTexto = passwordGenerada
+    ? "<p>Te asignamos una contraseña institucional unificada para el portal de alumnos y Google Classroom. Recibirás los datos de acceso por un canal seguro o en tu expediente; si no los tienes, escríbenos por WhatsApp.</p>"
+    : "<p>Usa la contraseña institucional que te proporcionó la Asociación (misma para el portal y Google Classroom).</p>";
 
   const html = `
     <h2>Bienvenido/a a Certificación Montessori</h2>
@@ -85,8 +90,8 @@ async function notifyAlumnoCuentaCreada(db, data) {
       <li><strong>Programa:</strong> ${nivelEspecializacion || "—"}</li>
       <li><strong>Modalidad:</strong> En línea</li>
     </ul>
-    <p>Usa la contraseña que elegiste al registrarte. En los próximos pasos completa tu expediente administrativo (documentos y reglamento firmado).</p>
-    <p>Próximamente también recibirás acceso a Google Classroom (Portal Montessori).</p>
+    ${accesoTexto}
+    <p>En los próximos pasos completa tu expediente administrativo (documentos y reglamento firmado).</p>
     <p>Asociación Montessori de México A.C.</p>
   `;
   const text = `Cuenta creada: ${emailInstitucional} — Portal: ${portalUrl}`;
