@@ -25,7 +25,7 @@ export const PROGRAMAS_DESTACADOS = [
   const p = PROGRAMAS_OFERTA.find((x) => x.id === id)
   return {
     id: p.id,
-    tipo: p.tipo === "guia" ? "Guía" : p.tipo === "diplomado" ? "Diplomado" : "Inscripción",
+    tipo: p.tipo === "guia" ? "Certificación" : p.tipo === "diplomado" ? "Diplomado" : "Inscripción",
     title: p.cardTitle,
     subtitle: p.cardSubtitle,
     priceMx: p.priceMx,
