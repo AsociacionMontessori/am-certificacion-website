@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react"
 import { Link } from "gatsby"
 import axios from "axios"
 import imagen from "../../images/banners/home.png"
+import { StaticImage } from "gatsby-plugin-image"
 import DiplomadoCountdown from "./DiplomadoCountdown"
 import {
   BENEFICIOS_HERO,
@@ -258,6 +259,8 @@ const ProgramAlbumDeck = ({ coin, useMxn }) => {
 
 const HomeMarketingHero = () => {
   const [geo, setGeo] = useState({ countryCode: "MX", countryName: "Mexico" })
+  const [decorOffset, setDecorOffset] = useState({ x: 0, y: 0 })
+  const heroRef = useRef(null)
 
   useEffect(() => {
     axios
@@ -274,6 +277,35 @@ const HomeMarketingHero = () => {
       })
   }, [])
 
+  useEffect(() => {
+    const hero = heroRef.current
+    if (!hero || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return undefined
+
+    let frame = null
+
+    const updateDecorOffset = (event) => {
+      const rect = hero.getBoundingClientRect()
+      const x = ((event.clientX - rect.left) / rect.width - 0.5) * -42
+      const y = ((event.clientY - rect.top) / rect.height - 0.5) * -42
+
+      if (frame) window.cancelAnimationFrame(frame)
+      frame = window.requestAnimationFrame(() => {
+        setDecorOffset({ x, y })
+      })
+    }
+
+    const resetDecorOffset = () => setDecorOffset({ x: 0, y: 0 })
+
+    hero.addEventListener("pointermove", updateDecorOffset)
+    hero.addEventListener("pointerleave", resetDecorOffset)
+
+    return () => {
+      if (frame) window.cancelAnimationFrame(frame)
+      hero.removeEventListener("pointermove", updateDecorOffset)
+      hero.removeEventListener("pointerleave", resetDecorOffset)
+    }
+  }, [])
+
   const useMxn = isMexico(geo)
   const { coin, price: inscripcionPrice } = getLocalizedPrice(
     geo,
@@ -285,18 +317,39 @@ const HomeMarketingHero = () => {
     : INSCRIPCION_MARKETING.anchorPriceUsd
 
   return (
-    <section id="home" className="relative min-h-[92vh] flex items-end sm:items-center">
-      <div
-        aria-hidden="true"
-        className="absolute inset-0 z-0 bg-gradient-to-b from-black/30 via-black/50 to-black/75"
-      />
+    <section
+      id="home"
+      ref={heroRef}
+      className="relative min-h-[92vh] flex items-end overflow-hidden sm:items-center"
+    >
       <img
         src={imagen}
-        className="absolute inset-0 h-full w-full object-cover"
+        className="fixed inset-0 h-full w-full object-cover"
         alt="Formación Montessori en línea"
         width="4160"
         height="6240"
       />
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 z-[1] bg-gradient-to-b from-black/30 via-black/50 to-black/75"
+      />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 z-[1] overflow-hidden opacity-80"
+      >
+        <div
+          className="absolute -inset-10 transition-transform duration-150 ease-out"
+          style={{ transform: "translate3d(" + decorOffset.x + "px, " + decorOffset.y + "px, 0)" }}
+        >
+          <StaticImage
+            src="../../images/elements/decorwall.png"
+            placeholder="none"
+            alt=""
+            className="h-full w-full"
+            imgClassName="h-full w-full object-cover"
+          />
+        </div>
+      </div>
 
       <div className="relative z-10 mx-auto w-full max-w-7xl px-4 pb-10 pt-24 sm:px-6 sm:pb-16 lg:px-12 lg:pt-28">
         <div className="grid gap-8 lg:grid-cols-2 lg:gap-10 lg:items-start">
