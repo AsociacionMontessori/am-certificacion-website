@@ -5,6 +5,11 @@ const priceLibro1 = defineString("STRIPE_PRICE_LIBRO_1", {default: ""});
 const priceLibro2 = defineString("STRIPE_PRICE_LIBRO_2", {default: ""});
 const priceLibro3 = defineString("STRIPE_PRICE_LIBRO_3", {default: ""});
 const priceLibro4 = defineString("STRIPE_PRICE_LIBRO_4", {default: ""});
+const priceEbook1 = defineString("STRIPE_PRICE_EBOOK_1", {default: ""});
+const priceEbook2 = defineString("STRIPE_PRICE_EBOOK_2", {default: ""});
+const priceEbook3 = defineString("STRIPE_PRICE_EBOOK_3", {default: ""});
+const priceEbook4 = defineString("STRIPE_PRICE_EBOOK_4", {default: ""});
+const priceEbookPack4 = defineString("STRIPE_PRICE_EBOOK_PACK_4", {default: ""});
 const priceColegiaturaNido = defineString("STRIPE_PRICE_COLEGIATURA_NIDO", {default: ""});
 const priceColegiaturaCasa = defineString("STRIPE_PRICE_COLEGIATURA_CASA", {default: ""});
 const priceColegiaturaTaller = defineString("STRIPE_PRICE_COLEGIATURA_TALLER", {default: ""});
@@ -62,6 +67,11 @@ const CATALOG_META = {
   libro_ammac_2: {tipo: "libro", descripcion: "Libro 2 - Secreto de la infancia", requiresShipping: true, amountMxn: 450},
   libro_ammac_3: {tipo: "libro", descripcion: "Libro 3 - Educación cósmica", requiresShipping: true, amountMxn: 450},
   libro_ammac_4: {tipo: "libro", descripcion: "Libro 4 - Guiones cósmicos", requiresShipping: true, amountMxn: 450},
+  ebook_ammac_1: {tipo: "ebook", descripcion: "Ebook 1 - Pedagogía científica", requiresShipping: false, amountMxn: 213},
+  ebook_ammac_2: {tipo: "ebook", descripcion: "Ebook 2 - Secreto de la infancia", requiresShipping: false, amountMxn: 213},
+  ebook_ammac_3: {tipo: "ebook", descripcion: "Ebook 3 - Educación cósmica", requiresShipping: false, amountMxn: 317},
+  ebook_ammac_4: {tipo: "ebook", descripcion: "Ebook 4 - Guiones cósmicos", requiresShipping: false, amountMxn: 317},
+  ebook_pack_ammac_4: {tipo: "ebook", descripcion: "Paquete digital - 4 ebooks Roxana Muñoz", requiresShipping: false, amountMxn: 839},
   colegiatura_nido: {tipo: "colegiatura", descripcion: "Colegiatura mensual - Nido", requiresShipping: false, amountMxn: 3100},
   colegiatura_casa: {tipo: "colegiatura", descripcion: "Colegiatura mensual - Casa de Niños", requiresShipping: false, amountMxn: 3500},
   colegiatura_taller: {tipo: "colegiatura", descripcion: "Colegiatura mensual - Taller", requiresShipping: false, amountMxn: 3900},
@@ -74,6 +84,11 @@ const PARAM_PRICE_MAP = {
   libro_ammac_2: priceLibro2,
   libro_ammac_3: priceLibro3,
   libro_ammac_4: priceLibro4,
+  ebook_ammac_1: priceEbook1,
+  ebook_ammac_2: priceEbook2,
+  ebook_ammac_3: priceEbook3,
+  ebook_ammac_4: priceEbook4,
+  ebook_pack_ammac_4: priceEbookPack4,
   colegiatura_nido: priceColegiaturaNido,
   colegiatura_casa: priceColegiaturaCasa,
   colegiatura_taller: priceColegiaturaTaller,

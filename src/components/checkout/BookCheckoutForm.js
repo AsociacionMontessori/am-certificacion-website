@@ -3,11 +3,17 @@ import { useState } from "react"
 import { Link } from "gatsby"
 import { createPublicCheckoutSession } from "../../utils/stripeCheckout"
 
-const BookCheckoutForm = ({ book, cancelHref, onCancel }) => {
+const BookCheckoutForm = ({ book, purchase = "physical", cancelHref, onCancel }) => {
   const [nombre, setNombre] = useState("")
   const [email, setEmail] = useState("")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
+
+  const isDigital = purchase === "digital"
+  const selectedSku = isDigital ? book.digital?.stripeSku : book.stripeSku
+  const selectedPrice = isDigital ? book.digital?.priceMx : book.priceMx
+  const digitalFormats = book.digital?.formats?.join(" + ")
+  const label = book.volume ? `Libro ${book.volume}` : "Paquete digital"
 
   const handleBuy = async (e) => {
     e.preventDefault()
@@ -15,7 +21,7 @@ const BookCheckoutForm = ({ book, cancelHref, onCancel }) => {
     setLoading(true)
     try {
       const { url } = await createPublicCheckoutSession({
-        sku: book.stripeSku,
+        sku: selectedSku,
         quantity: 1,
         cliente: {
           nombre: nombre.trim(),
@@ -34,15 +40,19 @@ const BookCheckoutForm = ({ book, cancelHref, onCancel }) => {
   return (
     <form onSubmit={handleBuy} className="w-full text-left space-y-4">
       <p className="text-sm text-gray leading-relaxed">
-        <span className="font-semibold text-blue">Libro {book.volume}</span>
+        <span className="font-semibold text-blue">
+          {label} · {isDigital ? "Ebook" : "Impreso"}
+        </span>
         <br />
         {book.title}
       </p>
-      {book.priceMx && (
+      {selectedPrice && (
         <p className="text-base font-semibold text-blue">
-          ${book.priceMx} MXN
+          ${selectedPrice} MXN
           <span className="block text-xs font-normal text-gray mt-1">
-            Envío dentro de México (se solicitará en el pago)
+            {isDigital
+              ? `Incluye ${digitalFormats}; descarga disponible después del pago. Precio final con comisión de pago.`
+              : "Envío dentro de México (se solicitará en el pago)"}
           </span>
         </p>
       )}
@@ -90,7 +100,7 @@ const BookCheckoutForm = ({ book, cancelHref, onCancel }) => {
           disabled={loading}
           className="min-h-[48px] w-full rounded-full bg-green px-5 py-3 text-sm font-semibold text-white disabled:opacity-60"
         >
-          {loading ? "Redirigiendo…" : "Continuar al pago seguro"}
+          {loading ? "Redirigiendo..." : "Continuar al pago seguro"}
         </button>
         {cancelHref ? (
           <Link

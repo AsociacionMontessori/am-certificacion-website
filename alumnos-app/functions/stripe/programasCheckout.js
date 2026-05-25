@@ -116,13 +116,16 @@ function buildCheckoutItemsFromRequest(options = {}) {
 function resolveOrdenTipo(skus, programaLabel = "") {
   const prog = getProgramaCheckout(programaLabel);
   const hasInscripcion = skus.includes(SKU_INSCRIPCION);
-  const hasPrograma = skus.some((s) => s !== SKU_INSCRIPCION && !s.startsWith("libro_"));
+  const hasPrograma = skus.some(
+      (s) => s !== SKU_INSCRIPCION && !s.startsWith("libro_") && !s.startsWith("ebook_"),
+  );
   if (prog?.promoInscripcionIncluida && hasPrograma && !hasInscripcion) {
     return "inicio_programa";
   }
   if (hasInscripcion && hasPrograma) return "inicio_programa";
   if (hasInscripcion) return "inscripcion";
   if (skus.some((s) => s.startsWith("libro_"))) return "libro";
+  if (skus.some((s) => s.startsWith("ebook_"))) return "ebook";
   return "programa";
 }
 

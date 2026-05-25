@@ -1,6 +1,7 @@
 const {onRequest} = require("firebase-functions/v2/https");
 const {defineSecret} = require("firebase-functions/params");
 const admin = require("firebase-admin");
+const crypto = require("crypto");
 const Stripe = require("stripe");
 const {handleCors, rejectIfOriginNotAllowed} = require("./cors");
 const {enforceRateLimit} = require("./rateLimit");
@@ -15,6 +16,10 @@ const {
 const stripeSecretKey = defineSecret("STRIPE_SECRET_KEY");
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+function hashDownloadToken(token) {
+  return crypto.createHash("sha256").update(String(token || "")).digest("hex");
+}
 
 /**
  * @param {object} body
@@ -145,6 +150,19 @@ exports.createPublicCheckoutHandler = onRequest(
         const progConfig = programaLabel ? getProgramaCheckout(programaLabel) : null;
         const nivelFormulario = progConfig?.nivelFormulario || "";
         const promoQuery = promoInscripcionIncluida ? "&promo=1" : "";
+        const ebookSkus = skus.filter((sku) => sku.startsWith("ebook_"));
+        const digitalDownloadToken = ebookSkus.length ? crypto.randomBytes(32).toString("base64url") : "";
+        const digitalQuery = digitalDownloadToken ?
+          `&download=${encodeURIComponent(digitalDownloadToken)}&sku=${encodeURIComponent(ebookSkus[0])}` :
+          "";
+        const digitalDelivery = digitalDownloadToken ? {
+          tokenHash: hashDownloadToken(digitalDownloadToken),
+          tokenVersion: 1,
+          skus: ebookSkus,
+          maxDownloads: ebookSkus.includes("ebook_pack_ammac_4") ? 40 : 20,
+          expiresAt: admin.firestore.Timestamp.fromDate(new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)),
+          createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        } : null;
 
         const stripe = new Stripe(stripeSecretKey.value());
 
@@ -176,7 +194,7 @@ exports.createPublicCheckoutHandler = onRequest(
           mode: "payment",
           customer_email: email,
           line_items: lineItems,
-          success_url: `${siteUrl}/checkout/success?orden=${ordenRef.id}&tipo=${tipo}${promoQuery}`,
+          success_url: `${siteUrl}/checkout/success?orden=${ordenRef.id}&tipo=${tipo}${promoQuery}${digitalQuery}`,
           cancel_url: `${siteUrl}/checkout/cancel?orden=${ordenRef.id}`,
           metadata: {
             ordenId: ordenRef.id,
@@ -211,6 +229,7 @@ exports.createPublicCheckoutHandler = onRequest(
           moneda: "mxn",
           monto: null,
           origen: "sitio_publico",
+          ...(digitalDelivery ? {digitalDelivery} : {}),
           createdAt: admin.firestore.FieldValue.serverTimestamp(),
         });
 

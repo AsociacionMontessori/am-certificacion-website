@@ -4,6 +4,19 @@ import CheckoutPageShell from "../../components/checkout/CheckoutPageShell"
 import Seo from "../../components/seo"
 import BookCheckoutForm from "../../components/checkout/BookCheckoutForm"
 import { roxanaBooks } from "../../data/roxanaBooks"
+import { roxanaBookBundle } from "../../data/roxanaBookOffers"
+
+const bundleBook = {
+  id: roxanaBookBundle.id,
+  title: roxanaBookBundle.title,
+  description: roxanaBookBundle.description,
+  digital: {
+    enabled: true,
+    stripeSku: roxanaBookBundle.stripeSku,
+    priceMx: roxanaBookBundle.priceMx,
+    formats: roxanaBookBundle.formats,
+  },
+}
 
 const LibroCheckoutPage = () => {
   const [sku, setSku] = React.useState("")
@@ -13,7 +26,9 @@ const LibroCheckoutPage = () => {
     setSku(params.get("sku") || "")
   }, [])
 
-  const book = roxanaBooks.find((b) => b.stripeSku === sku)
+  const isBundle = sku === roxanaBookBundle.stripeSku
+  const book = isBundle ? bundleBook : roxanaBooks.find((b) => b.stripeSku === sku || b.digital?.stripeSku === sku)
+  const isDigital = isBundle || Boolean(book?.digital?.stripeSku === sku)
 
   if (!book) {
     return (
@@ -28,11 +43,11 @@ const LibroCheckoutPage = () => {
 
   return (
     <CheckoutPageShell
-      title={`Comprar · Libro ${book.volume}`}
+      title={isBundle ? "Comprar paquete digital" : isDigital ? `Comprar ebook · Libro ${book.volume}` : `Comprar impreso · Libro ${book.volume}`}
       description={book.title}
       backTo="/roxana"
     >
-      <BookCheckoutForm book={book} cancelHref="/roxana" />
+      <BookCheckoutForm book={book} purchase={isDigital ? "digital" : "physical"} cancelHref="/roxana" />
     </CheckoutPageShell>
   )
 }

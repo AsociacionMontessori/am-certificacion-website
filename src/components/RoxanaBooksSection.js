@@ -1,15 +1,18 @@
 import * as React from "react"
 import { Link } from "gatsby"
 import { roxanaBooks } from "../data/roxanaBooks"
+import { roxanaBookBundle } from "../data/roxanaBookOffers"
 
 const DEFAULT_DESCRIPTION = (
   <>
-    Serie en español basada en las obras de María Montessori. Compra directa con
-    pago seguro o en <strong className="font-semibold text-yellow">Amazon México</strong>.
+    Serie en español basada en las obras de María Montessori. Elige libro
+    impreso, ebook o compra en <strong className="font-semibold text-yellow">Amazon México</strong>.
   </>
 )
 
 function BookCard({ book }) {
+  const digitalFormats = book.digital?.formats?.join(" + ")
+
   return (
     <article className="flex h-full flex-col overflow-hidden rounded-lg border border-white/30 bg-white/95 shadow-xl backdrop-blur-sm">
       <div className="flex justify-center bg-blue/5 px-5 pt-5 sm:px-6 sm:pt-6">
@@ -31,14 +34,24 @@ function BookCard({ book }) {
         <h3 className="mt-3 text-lg font-bold leading-snug text-blue sm:text-xl">
           {book.title}
         </h3>
-        {book.priceMx && (
-          <p className="mt-2 text-base font-semibold text-blue">
-            ${book.priceMx} MXN
-            <span className="block text-xs font-normal text-gray">
-              Envío dentro de México (se solicitará en el pago)
-            </span>
-          </p>
-        )}
+        <div className="mt-3 grid gap-2 text-sm text-blue">
+          {book.priceMx && (
+            <p className="rounded-md bg-blue/5 px-3 py-2 font-semibold">
+              Impreso: ${book.priceMx} MXN
+              <span className="block text-xs font-normal text-gray">
+                Envío dentro de México
+              </span>
+            </p>
+          )}
+          {book.digital?.enabled && (
+            <p className="rounded-md bg-green/10 px-3 py-2 font-semibold">
+              Ebook: ${book.digital.priceMx} MXN
+              <span className="block text-xs font-normal text-gray">
+                {digitalFormats} descargable; precio final con comisión de pago
+              </span>
+            </p>
+          )}
+        </div>
         <p className="mt-3 flex-grow text-sm leading-relaxed text-gray sm:text-base">
           {book.description}
         </p>
@@ -48,8 +61,16 @@ function BookCard({ book }) {
             to={`/checkout/libro?sku=${book.stripeSku}`}
             className="inline-flex min-h-[48px] w-full items-center justify-center rounded-lg bg-green px-5 py-3 text-center text-sm font-semibold text-white transition duration-150 ease-in-out hover:bg-green/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow focus-visible:ring-offset-2"
           >
-            Comprar con la asociación
+            Comprar impreso
           </Link>
+          {book.digital?.enabled && (
+            <Link
+              to={`/checkout/libro?sku=${book.digital.stripeSku}`}
+              className="inline-flex min-h-[48px] w-full items-center justify-center rounded-lg border border-green/50 bg-white px-5 py-3 text-center text-sm font-semibold text-green transition hover:bg-green/5 focus:outline-none focus-visible:ring-2 focus-visible:ring-green"
+            >
+              Comprar ebook
+            </Link>
+          )}
           <a
             href={book.amazonUrl}
             target="_blank"
@@ -62,6 +83,38 @@ function BookCard({ book }) {
         </div>
       </div>
     </article>
+  )
+}
+
+function BundleCard() {
+  return (
+    <div className="mt-8 overflow-hidden rounded-lg border border-yellow/40 bg-white/95 p-5 text-left shadow-xl sm:p-6">
+      <div className="grid gap-5 md:grid-cols-[1fr_auto] md:items-center">
+        <div>
+          <p className="inline-flex rounded-md bg-yellow/20 px-3 py-1 text-xs font-semibold text-blue">
+            Paquete digital
+          </p>
+          <h3 className="mt-3 text-xl font-bold text-blue">
+            {roxanaBookBundle.title}
+          </h3>
+          <p className="mt-2 text-sm leading-relaxed text-gray sm:text-base">
+            {roxanaBookBundle.description}
+          </p>
+          <p className="mt-3 text-base font-semibold text-blue">
+            ${roxanaBookBundle.priceMx} MXN
+            <span className="block text-xs font-normal text-gray">
+              Precio final con comisión de pago; incluye PDF + EPUB de los 4 libros
+            </span>
+          </p>
+        </div>
+        <Link
+          to={`/checkout/libro?sku=${roxanaBookBundle.stripeSku}`}
+          className="inline-flex min-h-[48px] items-center justify-center rounded-lg bg-green px-6 py-3 text-center text-sm font-semibold text-white transition hover:bg-green/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow focus-visible:ring-offset-2"
+        >
+          Comprar paquete
+        </Link>
+      </div>
+    </div>
   )
 }
 
@@ -98,6 +151,8 @@ const RoxanaBooksSection = ({
             </p>
           )}
         </div>
+
+        <BundleCard />
 
         <ul className="mt-8 grid list-none grid-cols-1 gap-4 p-0 sm:gap-6 md:grid-cols-2">
           {roxanaBooks.map((book) => (
