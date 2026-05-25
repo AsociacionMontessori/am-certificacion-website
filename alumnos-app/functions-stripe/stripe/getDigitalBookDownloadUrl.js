@@ -17,6 +17,12 @@ function getRequestFingerprint(req) {
   return crypto.createHash("sha256").update(raw).digest("hex").slice(0, 32);
 }
 
+function escapeFileName(fileName) {
+  return String(fileName || "ebook")
+      .replace(/[\\"]/g, "")
+      .replace(/[\r\n]/g, "");
+}
+
 exports.getDigitalBookDownloadUrlHandler = onRequest(
     {
       region: "us-central1",
@@ -110,15 +116,6 @@ exports.getDigitalBookDownloadUrlHandler = onRequest(
           return;
         }
 
-        const expiresAt = Date.now() + 60 * 60 * 1000;
-        const [url] = await file.getSignedUrl({
-          version: "v4",
-          action: "read",
-          expires: expiresAt,
-          responseDisposition: `attachment; filename="${asset.fileName}"`,
-          responseType: asset.contentType,
-        });
-
         const countKey = `digitalDelivery.downloadCounts.${sku}_${format}`;
         await ordenRef.update({
           [countKey]: admin.firestore.FieldValue.increment(1),
@@ -135,11 +132,21 @@ exports.getDigitalBookDownloadUrlHandler = onRequest(
           createdAt: admin.firestore.FieldValue.serverTimestamp(),
         });
 
-        res.status(200).json({
-          url,
-          fileName: asset.fileName,
-          expiresInSeconds: 3600,
-        });
+        const fileName = escapeFileName(asset.fileName);
+        res.set("Content-Type", asset.contentType);
+        res.set("Content-Disposition", `attachment; filename="${fileName}"`);
+        res.set("Cache-Control", "private, no-store, max-age=0");
+
+        file.createReadStream()
+            .on("error", (error) => {
+              console.error("Error al leer archivo digital:", error);
+              if (!res.headersSent) {
+                res.status(500).json({error: "No se pudo preparar la descarga"});
+              } else {
+                res.end();
+              }
+            })
+            .pipe(res);
       } catch (error) {
         console.error("getDigitalBookDownloadUrl:", error);
         res.status(500).json({error: "No se pudo preparar la descarga"});

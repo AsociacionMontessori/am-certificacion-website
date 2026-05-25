@@ -26,6 +26,7 @@ function handleCors(req, res) {
   }
   res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.set("Access-Control-Expose-Headers", "Content-Disposition");
   res.set("Access-Control-Max-Age", "3600");
 
   if (req.method === "OPTIONS") {

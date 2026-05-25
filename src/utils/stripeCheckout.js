@@ -34,26 +34,29 @@ export async function createPublicCheckoutSession(payload) {
   return data
 }
 
+function getFileNameFromDisposition(disposition) {
+  const match = String(disposition || "").match(/filename="([^"]+)"/)
+  return match?.[1] || "ebook"
+}
+
 /**
  * @param {object} payload
- * @returns {Promise<{ url: string, fileName: string, expiresInSeconds: number }>}
+ * @returns {Promise<{ blob: Blob, fileName: string }>}
  */
-export async function getDigitalBookDownloadUrl(payload) {
+export async function downloadDigitalBookFile(payload) {
   const response = await fetch(getDigitalDownloadApiUrl(), {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
   })
 
-  const data = await response.json().catch(() => ({}))
-
   if (!response.ok) {
+    const data = await response.json().catch(() => ({}))
     throw new Error(data.error || "No se pudo preparar la descarga")
   }
 
-  if (!data.url) {
-    throw new Error("Respuesta de descarga incompleta")
+  return {
+    blob: await response.blob(),
+    fileName: getFileNameFromDisposition(response.headers.get("Content-Disposition")),
   }
-
-  return data
 }

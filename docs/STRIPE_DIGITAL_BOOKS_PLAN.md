@@ -40,13 +40,13 @@ El paquete descuenta el libro de menor precio como "uno gratis". Si se decide un
 3. Stripe redirige a `/checkout/success` con `orden`, `tipo=ebook`, `sku` y `download`.
 4. Después del webhook `checkout.session.completed`, la orden pasa a `pagado`.
 5. `getDigitalBookDownloadUrl` valida orden pagada, token, SKU comprado y formato solicitado.
-6. La función genera una URL firmada temporal de Storage y registra auditoría de descarga.
+6. La función transmite el archivo desde Storage privado como descarga y registra auditoría.
 
 ## Controles mínimos
 
 - Los PDF/EPUB no quedan en `public/` ni tienen URL estable.
 - El token se guarda hasheado; el token real solo viaja en la URL de éxito de Stripe.
-- Las URLs firmadas expiran en 60 minutos.
+- No se generan URLs firmadas públicas; el archivo se sirve desde la función después de validar la orden.
 - La orden permite descarga durante 30 días.
 - Límite por orden: 20 descargas individuales o 40 para paquete.
 - La función de descarga tiene rate limit.

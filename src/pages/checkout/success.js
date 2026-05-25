@@ -5,7 +5,7 @@ import Nav from "../../components/nav"
 import { Link } from "gatsby"
 import { roxanaBooks } from "../../data/roxanaBooks"
 import { roxanaBookBundle } from "../../data/roxanaBookOffers"
-import { getDigitalBookDownloadUrl } from "../../utils/stripeCheckout"
+import { downloadDigitalBookFile } from "../../utils/stripeCheckout"
 
 const CheckoutSuccessPage = () => {
   const [checkoutParams, setCheckoutParams] = React.useState({
@@ -46,14 +46,21 @@ const CheckoutSuccessPage = () => {
     const key = `${downloadSku}_${format.toLowerCase()}`
     setDownloadState((prev) => ({ ...prev, [key]: { loading: true, error: "" } }))
     try {
-      const data = await getDigitalBookDownloadUrl({
+      const data = await downloadDigitalBookFile({
         ordenId,
         token: downloadToken,
         sku: downloadSku,
         format: format.toLowerCase(),
       })
       if (typeof window !== "undefined") {
-        window.location.href = data.url
+        const url = window.URL.createObjectURL(data.blob)
+        const anchor = document.createElement("a")
+        anchor.href = url
+        anchor.download = data.fileName
+        document.body.appendChild(anchor)
+        anchor.click()
+        anchor.remove()
+        window.URL.revokeObjectURL(url)
       }
       setDownloadState((prev) => ({ ...prev, [key]: { loading: false, error: "" } }))
     } catch (err) {
