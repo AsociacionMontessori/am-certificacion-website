@@ -90,7 +90,9 @@ const CertificationPrice = () => {
             text: "",
             time: neuro.duration,
             paymentNote: neuro.paymentNote,
-            footer: `Inscripción aparte (${INSCRIPCION_MARKETING_COPY.textoMonto})`,
+            footer: neuro.promoInscripcionIncluida
+                ? "Inscripción incluida (promoción)"
+                : `Inscripción aparte (${INSCRIPCION_MARKETING_COPY.textoMonto})`,
         },
         {
             cardType: "certification",
@@ -126,43 +128,55 @@ const CertificationPrice = () => {
                         Certificación Montessori
                     </span>
                 </h2>
-                <div className="bg-white rounded-3xl mx-4 sm:mx-6 lg:mx-auto max-w-7xl">
-                    <div className="px-6 pb-8 pt-10 lg:px-12 xl:px-6 2xl:px-0 max-w-3xl">
-                        <h3>
-                            <span className="text-red md:text-2xl text-xl">
-                                Certificación internacional
-                            </span>
-                        </h3>
-                        <h2 className="mt-5">
-                            <span className="font-medium text-black md:text-6xl text-3xl">
-                                Guía Montessori
-                            </span>
-                        </h2>
-                        <p className="mt-6 text-base sm:text-lg text-black leading-relaxed">
-                            Programas con reconocimiento internacional. Los precios de programa
-                            (colegiatura o diplomado) son independientes de la inscripción, que solo
-                            se paga una vez.
-                        </p>
+                <div className="bg-white rounded-3xl mx-4 sm:mx-6 lg:mx-auto max-w-7xl overflow-visible">
+                    <div className="px-6 pt-10 pb-8 lg:px-12 lg:pb-4 xl:px-6 2xl:px-0">
+                        <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_auto] lg:gap-x-6 xl:gap-x-10 lg:items-start">
+                            <div className="max-w-3xl">
+                                <h3>
+                                    <span className="text-red md:text-2xl text-xl">
+                                        Certificación internacional
+                                    </span>
+                                </h3>
+                                <h2 className="mt-5">
+                                    <span className="font-medium text-black md:text-6xl text-3xl">
+                                        Guía Montessori
+                                    </span>
+                                </h2>
+                                <p className="mt-6 text-base sm:text-lg text-black leading-relaxed">
+                                    Programas con reconocimiento internacional. Los precios de
+                                    programa (colegiatura o diplomado) son independientes de la
+                                    inscripción, que solo se paga una vez.
+                                </p>
+                            </div>
+
+                            <div className="relative z-20 mt-8 flex justify-center lg:mt-2 lg:justify-end lg:translate-y-8 xl:translate-y-10 shrink-0">
+                                <div className="w-full max-w-sm shadow-2xl rounded-3xl ring-2 ring-blue/15 lg:w-72 xl:w-80">
+                                    {(() => {
+                                        const { coin, priceToShow } = getLocalizedPrice(
+                                            state,
+                                            inscripcion
+                                        )
+                                        return (
+                                            <CardInscription
+                                                title={inscripcion.title}
+                                                subtitle={inscripcion.subtitle}
+                                                coin={coin}
+                                                price={priceToShow}
+                                                text={inscripcion.text}
+                                                badge={inscripcion.badge}
+                                            />
+                                        )
+                                    })()}
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <section id="prices" className="mt-8 mb-10 px-4 sm:mx-auto max-w-7xl sm:px-6 lg:px-12 xl:px-6 2xl:px-0">
-                    <div className="flex justify-center mb-10 px-2">
-                        {(() => {
-                            const { coin, priceToShow } = getLocalizedPrice(state, inscripcion)
-                            return (
-                                <CardInscription
-                                    title={inscripcion.title}
-                                    subtitle={inscripcion.subtitle}
-                                    coin={coin}
-                                    price={priceToShow}
-                                    text={inscripcion.text}
-                                    badge={inscripcion.badge}
-                                />
-                            )
-                        })()}
-                    </div>
-
+                <section
+                    id="prices"
+                    className="relative z-10 mb-10 px-4 sm:mx-auto max-w-7xl sm:px-6 lg:px-12 xl:px-6 2xl:px-0 pt-10 sm:pt-12 lg:pt-44 xl:pt-48"
+                >
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 gap-y-10 justify-items-center">
                         {allCards.map((item, index) => {
                             const { coin, priceToShow } = getLocalizedPrice(state, item)
