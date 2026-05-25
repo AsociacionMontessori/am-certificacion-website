@@ -1,5 +1,6 @@
 const admin = require("firebase-admin");
 const {getMateriasPorNivel} = require("./materiasPorNivel");
+const {encryptPassword, CREDENTIALS_SCHEMA_VERSION} = require("./credenciales");
 
 function buildNivelEntry(nombre, fechaInicio) {
   const id = `nivel-${Date.now()}-${Math.random().toString(16).slice(2, 10)}`;
@@ -72,6 +73,30 @@ async function crearAlumnoDesdeInscripcion(db, params) {
   };
 
   await db.collection("alumnos").doc(uid).set(alumnoData);
+
+  // Dual-write F-03: además del plaintext (legacy, leído por el frontend
+  // durante la coexistencia), guardar las credenciales cifradas en una
+  // colección separada con reglas estrictas. Si la clave maestra no está
+  // configurada todavía, no rompemos la creación de la cuenta — sólo
+  // dejamos un warning para que el equipo lo detecte y aprovisione el
+  // secret antes del cleanup final.
+  try {
+    const passwordEnc = encryptPassword(passwordTemporal);
+    const passwordClassroomEnc = encryptPassword(passwordClassroom);
+    if (passwordEnc || passwordClassroomEnc) {
+      await db.collection("alumnoCredenciales").doc(uid).set({
+        passwordEnc: passwordEnc || null,
+        passwordClassroomEnc: passwordClassroomEnc || null,
+        version: CREDENTIALS_SCHEMA_VERSION,
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        rotatedAt: null,
+        origen: "inscripcion_alumno",
+      });
+    }
+  } catch (credErr) {
+    console.warn("crearAlumnoDesdeInscripcion: no se pudo guardar alumnoCredenciales", credErr.message);
+  }
 
   const materias = getMateriasPorNivel(nivelPortal);
   if (materias.length > 0) {

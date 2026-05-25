@@ -19,6 +19,7 @@ const {resolvePasswordInscripcion} = require("./inscripcionPassword");
 const {provisionGoogleWorkspaceAlumno} = require("./googleWorkspaceProvision");
 const {GOOGLE_SERVICE_ACCOUNT_JSON} = require("./googleWorkspaceClient");
 const {escapeHtml} = require("./escape");
+const {credentialsEncryptionKey} = require("./credenciales");
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -43,7 +44,7 @@ exports.completeInscripcionParte1Handler = onRequest(
       region: "us-central1",
       cors: false,
       invoker: "public",
-      secrets: [GOOGLE_SERVICE_ACCOUNT_JSON],
+      secrets: [GOOGLE_SERVICE_ACCOUNT_JSON, credentialsEncryptionKey],
     },
     async (req, res) => {
       if (handleCors(req, res)) return;

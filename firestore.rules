@@ -227,6 +227,18 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    // Colección: alumnoCredenciales (F-03 — credenciales cifradas).
+    // Solo el propio alumno o un admin/directivo pueden leer su documento.
+    // Catedráticos y grupos no acceden a credenciales aunque puedan ver al alumno.
+    // Listado nunca permitido; escritura solo desde Admin SDK (Cloud Functions).
+    match /alumnoCredenciales/{alumnoId} {
+      allow get: if (request.auth != null && request.auth.uid == alumnoId)
+                    || isAdmin()
+                    || isDirectivo();
+      allow list: if false;
+      allow write: if false;
+    }
+
     // Colección: becas
     match /becas/{becaId} {
       // El alumno puede leer sus propias becas

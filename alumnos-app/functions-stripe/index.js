@@ -14,6 +14,7 @@ const {completeInscripcionParte1Handler} = require("./stripe/completeInscripcion
 const {completeInscripcionParte2Handler} = require("./stripe/completeInscripcionParte2");
 const {getInscripcionUploadUrlHandler} = require("./stripe/getInscripcionUploadUrl");
 const {getDigitalBookDownloadUrlHandler} = require("./stripe/getDigitalBookDownloadUrl");
+const {getCredencialesAlumnoHandler} = require("./stripe/getCredencialesAlumno");
 
 exports.createPublicCheckout = createPublicCheckoutHandler;
 exports.createAlumnoCheckout = createAlumnoCheckoutHandler;
@@ -25,3 +26,4 @@ exports.completeInscripcionParte1 = completeInscripcionParte1Handler;
 exports.completeInscripcionParte2 = completeInscripcionParte2Handler;
 exports.getInscripcionUploadUrl = getInscripcionUploadUrlHandler;
 exports.getDigitalBookDownloadUrl = getDigitalBookDownloadUrlHandler;
+exports.getCredencialesAlumno = getCredencialesAlumnoHandler;
