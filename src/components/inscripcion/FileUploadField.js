@@ -5,7 +5,7 @@ import { requestInscripcionUploadUrl, uploadFileToSignedUrl } from "../../utils/
 const ACCEPT = "image/jpeg,image/png,image/webp,application/pdf"
 const MAX_MB = 10
 
-const FileUploadField = ({ ordenId, docId, label, hint, required, value, onUploaded }) => {
+const FileUploadField = ({ ordenId, accessToken, docId, label, hint, required, value, onUploaded }) => {
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState("")
 
@@ -19,7 +19,7 @@ const FileUploadField = ({ ordenId, docId, label, hint, required, value, onUploa
     }
     setUploading(true)
     try {
-      const { uploadUrl, storagePath } = await requestInscripcionUploadUrl(ordenId, docId, file)
+      const { uploadUrl, storagePath } = await requestInscripcionUploadUrl(ordenId, docId, file, accessToken)
       await uploadFileToSignedUrl(uploadUrl, file)
       onUploaded(docId, { storagePath, fileName: file.name, contentType: file.type })
     } catch (err) {

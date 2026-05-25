@@ -19,6 +19,7 @@ const emptyForm = {
 
 const InscripcionParte1Form = ({
   ordenId,
+  accessToken,
   initialValues = {},
   nivelEspecializacionFijo = "",
   programaPagadoLabel = "",
@@ -60,7 +61,7 @@ const InscripcionParte1Form = ({
         telefonoMovil: form.telefonoMovil.trim(),
         emailContacto: form.emailContacto.trim(),
         usuarioInstitucional: form.usuarioInstitucional.trim().toLowerCase(),
-      })
+      }, accessToken)
       onSuccess?.(result)
     } catch (err) {
       setError(err.message || "No se pudo crear tu cuenta")

@@ -11,12 +11,13 @@ const InscripcionCompletarPage = () => {
   const [ordenFromUrl, setOrdenFromUrl] = useState("")
   const [ordenId, setOrdenId] = useState("")
   const [ordenInput, setOrdenInput] = useState("")
+  const [accessToken, setAccessToken] = useState("")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const [context, setContext] = useState(null)
   const [cuentaCreada, setCuentaCreada] = useState(null)
 
-  const loadOrden = async (id) => {
+  const loadOrden = async (id, token) => {
     const trimmed = id.trim()
     if (!trimmed) {
       setError("Indica la referencia de tu pago")
@@ -25,7 +26,7 @@ const InscripcionCompletarPage = () => {
     setLoading(true)
     setError("")
     try {
-      const data = await fetchInscripcionOrden(trimmed)
+      const data = await fetchInscripcionOrden(trimmed, token)
       setOrdenId(trimmed)
       setContext(data)
       if (data.parte1Completa) {
@@ -45,21 +46,25 @@ const InscripcionCompletarPage = () => {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
     const orden = params.get("orden") || ""
+    // F-02: accessToken viaja en `?t=` del success_url de Stripe.
+    const token = params.get("t") || ""
 
     setOrdenFromUrl(orden)
     setOrdenId(orden)
     setOrdenInput(orden)
+    setAccessToken(token)
   }, [])
 
   useEffect(() => {
-    if (ordenFromUrl) loadOrden(ordenFromUrl)
-  }, [ordenFromUrl])
+    if (ordenFromUrl) loadOrden(ordenFromUrl, accessToken)
+  }, [ordenFromUrl, accessToken])
 
   useEffect(() => {
     if (context?.parte1Completa && !context?.parte2Completa && ordenId && typeof window !== "undefined") {
-      navigate(`/inscripcion/documentos?orden=${encodeURIComponent(ordenId)}`)
+      const tokenSuffix = accessToken ? `&t=${encodeURIComponent(accessToken)}` : ""
+      navigate(`/inscripcion/documentos?orden=${encodeURIComponent(ordenId)}${tokenSuffix}`)
     }
-  }, [context, ordenId])
+  }, [context, ordenId, accessToken])
 
   const initialValues = context?.datosParte1
     ? {
@@ -80,7 +85,8 @@ const InscripcionCompletarPage = () => {
   const handleParte1Success = (result) => {
     setCuentaCreada(result)
     if (typeof window !== "undefined") {
-      navigate(`/inscripcion/documentos?orden=${encodeURIComponent(ordenId)}`)
+      const tokenSuffix = accessToken ? `&t=${encodeURIComponent(accessToken)}` : ""
+      navigate(`/inscripcion/documentos?orden=${encodeURIComponent(ordenId)}${tokenSuffix}`)
     }
   }
 
@@ -181,6 +187,7 @@ const InscripcionCompletarPage = () => {
       {!loading && context?.pagado && !cuentaCreada && (
         <InscripcionParte1Form
           ordenId={ordenId}
+          accessToken={accessToken}
           initialValues={initialValues}
           nivelEspecializacionFijo={
             mapProgramaCheckoutANivel(context?.programa) ||

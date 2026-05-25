@@ -30,26 +30,36 @@ async function postJson(url, body) {
   return data
 }
 
-export async function fetchInscripcionOrden(ordenId) {
-  return postJson(getInscripcionOrdenUrl(), { ordenId })
+// F-02: el `accessToken` viaja en `?t=` del success_url y debe acompañar a
+// cada llamada a los endpoints de inscripción para autorizar acceso a la
+// orden. Si la orden es legacy (sin `accessTokenHash` en Firestore), el
+// backend acepta llamadas sin token; este shim solo añade el campo cuando
+// el frontend lo tiene disponible.
+function withToken(body, accessToken) {
+  if (!accessToken) return body
+  return { ...body, accessToken }
 }
 
-export async function submitInscripcionParte1(ordenId, datos) {
-  return postJson(getCompleteParte1Url(), { ordenId, ...datos })
+export async function fetchInscripcionOrden(ordenId, accessToken) {
+  return postJson(getInscripcionOrdenUrl(), withToken({ ordenId }, accessToken))
 }
 
-export async function submitInscripcionParte2(ordenId, datos) {
-  return postJson(getCompleteParte2Url(), { ordenId, ...datos })
+export async function submitInscripcionParte1(ordenId, datos, accessToken) {
+  return postJson(getCompleteParte1Url(), withToken({ ordenId, ...datos }, accessToken))
 }
 
-export async function requestInscripcionUploadUrl(ordenId, docType, file) {
-  return postJson(getUploadUrlEndpoint(), {
+export async function submitInscripcionParte2(ordenId, datos, accessToken) {
+  return postJson(getCompleteParte2Url(), withToken({ ordenId, ...datos }, accessToken))
+}
+
+export async function requestInscripcionUploadUrl(ordenId, docType, file, accessToken) {
+  return postJson(getUploadUrlEndpoint(), withToken({
     ordenId,
     docType,
     fileName: file.name,
     contentType: file.type,
     fileSize: file.size,
-  })
+  }, accessToken))
 }
 
 export async function uploadFileToSignedUrl(uploadUrl, file) {

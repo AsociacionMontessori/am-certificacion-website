@@ -11,12 +11,13 @@ const InscripcionDocumentosPage = () => {
   const [ordenFromUrl, setOrdenFromUrl] = useState("")
   const [ordenId, setOrdenId] = useState("")
   const [ordenInput, setOrdenInput] = useState("")
+  const [accessToken, setAccessToken] = useState("")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const [context, setContext] = useState(null)
   const [enviado, setEnviado] = useState(false)
 
-  const loadOrden = async (id) => {
+  const loadOrden = async (id, token) => {
     const trimmed = id.trim()
     if (!trimmed) {
       setError("Indica la referencia de tu pago")
@@ -25,7 +26,7 @@ const InscripcionDocumentosPage = () => {
     setLoading(true)
     setError("")
     try {
-      const data = await fetchInscripcionOrden(trimmed)
+      const data = await fetchInscripcionOrden(trimmed, token)
       setOrdenId(trimmed)
       setContext(data)
       if (data.parte2Completa) setEnviado(true)
@@ -40,15 +41,17 @@ const InscripcionDocumentosPage = () => {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
     const orden = params.get("orden") || ""
+    const token = params.get("t") || ""
 
     setOrdenFromUrl(orden)
     setOrdenId(orden)
     setOrdenInput(orden)
+    setAccessToken(token)
   }, [])
 
   useEffect(() => {
-    if (ordenFromUrl) loadOrden(ordenFromUrl)
-  }, [ordenFromUrl])
+    if (ordenFromUrl) loadOrden(ordenFromUrl, accessToken)
+  }, [ordenFromUrl, accessToken])
 
   const nivelEsp =
     context?.datosParte1?.nivelEspecializacion || context?.programa || "Otro"
@@ -90,7 +93,7 @@ const InscripcionDocumentosPage = () => {
         <div className="rounded-2xl border border-yellow/30 bg-yellow/10 px-4 py-4 text-sm text-gray space-y-3">
           <p>Primero debes crear tu cuenta (paso 2).</p>
           <Link
-            to={`/inscripcion/completar?orden=${encodeURIComponent(ordenId)}`}
+            to={`/inscripcion/completar?orden=${encodeURIComponent(ordenId)}${accessToken ? `&t=${encodeURIComponent(accessToken)}` : ""}`}
             className="font-semibold text-blue underline"
           >
             Ir al paso 2
@@ -119,6 +122,7 @@ const InscripcionDocumentosPage = () => {
       {!loading && context?.parte1Completa && !enviado && (
         <InscripcionParte2Form
           ordenId={ordenId}
+          accessToken={accessToken}
           nivelEspecializacion={nivelEsp}
           initialValues={context.datosParte2 || {}}
           onSuccess={() => setEnviado(true)}

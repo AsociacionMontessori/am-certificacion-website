@@ -17,7 +17,7 @@ const emptyForm = {
   telefonoEmpresa: "",
 }
 
-const InscripcionParte2Form = ({ ordenId, nivelEspecializacion, initialValues = {}, onSuccess }) => {
+const InscripcionParte2Form = ({ ordenId, accessToken, nivelEspecializacion, initialValues = {}, onSuccess }) => {
   const [form, setForm] = useState({ ...emptyForm, ...initialValues })
   const [documentos, setDocumentos] = useState(initialValues.documentos || {})
   const [loading, setLoading] = useState(false)
@@ -46,7 +46,7 @@ const InscripcionParte2Form = ({ ordenId, nivelEspecializacion, initialValues = 
     }
     setLoading(true)
     try {
-      await submitInscripcionParte2(ordenId, { ...form, documentos })
+      await submitInscripcionParte2(ordenId, { ...form, documentos }, accessToken)
       onSuccess?.()
     } catch (err) {
       setError(err.message || "No se pudo enviar el expediente")
@@ -129,6 +129,7 @@ const InscripcionParte2Form = ({ ordenId, nivelEspecializacion, initialValues = 
           <FileUploadField
             key={doc.id}
             ordenId={ordenId}
+            accessToken={accessToken}
             docId={doc.id}
             label={doc.label}
             hint={doc.hint}
