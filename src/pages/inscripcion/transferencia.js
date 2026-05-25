@@ -8,7 +8,7 @@ const pasosTransferencia = [
   {
     titulo: "1. Realiza la transferencia",
     texto:
-      "Transfiere el monto de inscripción a la cuenta indicada. En el concepto incluye tu nombre completo.",
+      "Transfiere el monto de inscripción a la cuenta que corresponda según si necesitas factura fiscal o recibo normal. Incluye tu nombre completo en el concepto.",
   },
   {
     titulo: "2. Envía tu comprobante",

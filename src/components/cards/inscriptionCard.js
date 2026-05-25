@@ -1,7 +1,7 @@
 import * as React from "react"
 import { Link } from "gatsby"
 
-const CardInscription = ({ title, subtitle, price, coin, time, text }) => {
+const CardInscription = ({ title, subtitle, price, coin, text, badge }) => {
     return (
         <div className="flex justify-start items-center flex-col bg-white w-full max-w-sm lg:w-72 xl:w-80 rounded-3xl text-lg text-black shadow-sm">
                 <div className="text-3xl mt-10 sm:mt-12 px-4 text-center selection:text-black selection:bg-blue selection:bg-opacity-20">
@@ -10,6 +10,11 @@ const CardInscription = ({ title, subtitle, price, coin, time, text }) => {
                 <div className="text-gray text-base px-4 text-center selection:text-black selection:bg-blue selection:bg-opacity-20">
                     {subtitle}
                 </div>
+                {badge && (
+                    <p className="mt-3 mx-4 text-xs font-semibold text-green text-center leading-relaxed rounded-xl bg-green/10 px-3 py-2 border border-green/25">
+                        ✓ {badge}
+                    </p>
+                )}
                 <div className="text-blue selection:text-blue text-4xl font-semibold mt-8 sm:mt-12 selection:bg-blue selection:bg-opacity-20">
                     {coin} {price}
                 </div>

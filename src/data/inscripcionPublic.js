@@ -1,25 +1,19 @@
 /** Datos públicos del flujo de inscripción (sitio Gatsby). */
 
+import {
+  INSCRIPCION_PRECIO,
+  PROGRAMAS_CHECKOUT_OPCIONES,
+  mapProgramaCheckoutANivel,
+  getResumenPagoInscripcion,
+  getProgramaByCheckoutLabel,
+} from "./programasOferta"
+
 export const INSCRIPCION_PUBLIC = {
   sku: "inscripcion_diplomado",
-  priceMx: "4,900",
-  priceUsd: "270",
+  priceMx: INSCRIPCION_PRECIO.priceMx,
+  priceUsd: INSCRIPCION_PRECIO.priceUsd,
 }
 
-export const PROGRAMAS_INSCRIPCION = [
-  "Nido y Comunidad Infantil",
-  "Casa de Niños",
-  "Taller",
-  "Neuroeducación",
-  "Grandes Lecciones",
-  "Otro / Aún no definido",
-]
+export const PROGRAMAS_INSCRIPCION = PROGRAMAS_CHECKOUT_OPCIONES
 
-/** Niveles del formulario administrativo (alineado con portal alumnos). */
-export const NIVELES_INSCRIPCION = [
-  "Propedéutico",
-  "Nido & Comunidad infantil",
-  "Casa de Niños",
-  "Taller",
-  "Neuroeducación",
-]
+export { mapProgramaCheckoutANivel, getResumenPagoInscripcion, getProgramaByCheckoutLabel }

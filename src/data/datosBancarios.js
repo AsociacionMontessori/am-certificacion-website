@@ -1,12 +1,31 @@
 /**
- * Datos bancarios para inscripción por transferencia (sin tarjeta).
- * Actualizar aquí cuando cambien; también visibles en /inscripcion/transferencia
+ * Cuentas bancarias para inscripción por transferencia.
+ * HSBC: recibo normal / público en general (sin factura fiscal con RFC).
+ * BANORTE: factura fiscal para deducciones.
  */
+
+export const CUENTAS_BANCARIAS = {
+  recibo: {
+    id: "hsbc",
+    label: "Recibo normal",
+    subtitulo: "Sin factura fiscal (público en general)",
+    titular: "Carlos Alfonso Romero Muñoz",
+    banco: "HSBC",
+    cuenta: "6514494223",
+    clabe: "021180065144942230",
+  },
+  factura: {
+    id: "banorte",
+    label: "Factura fiscal",
+    subtitulo: "Con RFC para deducciones fiscales",
+    titular: "Ernestina Roxana Muñoz Guevara",
+    banco: "BANORTE",
+    cuenta: "0245193426",
+    clabe: "072180002451934260",
+  },
+}
+
 export const DATOS_BANCARIOS_INSCRIPCION = {
-  titular: "Asociación Montessori de México A.C.",
-  banco: process.env.GATSBY_INSCRIPCION_BANCO || "BBVA México",
-  cuenta: process.env.GATSBY_INSCRIPCION_CUENTA || "",
-  clabe: process.env.GATSBY_INSCRIPCION_CLABE || "",
   moneda: "MXN",
   montoReferencia: "$4,900",
   concepto:
@@ -16,5 +35,16 @@ export const DATOS_BANCARIOS_INSCRIPCION = {
     "inscripciones@certificacionmontessori.com",
 }
 
+/** @param {boolean} requiereFacturaFiscal */
+export const getCuentaBancaria = (requiereFacturaFiscal) =>
+  requiereFacturaFiscal ? CUENTAS_BANCARIAS.factura : CUENTAS_BANCARIAS.recibo
+
 export const tieneDatosBancariosCompletos = () =>
-  Boolean(DATOS_BANCARIOS_INSCRIPCION.clabe || DATOS_BANCARIOS_INSCRIPCION.cuenta)
+  Boolean(
+    CUENTAS_BANCARIAS.recibo.clabe &&
+      CUENTAS_BANCARIAS.factura.clabe
+  )
+
+/** Etiqueta contable para órdenes (Stripe / admin). */
+export const getCuentaContableId = (requiereFacturaFiscal) =>
+  requiereFacturaFiscal ? "banorte" : "hsbc"

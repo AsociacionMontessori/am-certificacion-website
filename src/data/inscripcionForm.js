@@ -1,5 +1,7 @@
 /** Catálogo del formulario de inscripción (sitio público Gatsby). */
 
+import { mapProgramaCheckoutANivel as mapFromOferta } from "./programasOferta"
+
 export const DOMINIO_INSTITUCIONAL = "certificacionmontessori.com"
 
 /** Todos los programas actuales son en línea. */
@@ -133,12 +135,19 @@ export const PORTAL_ALUMNOS_URL =
 
 /** Mapeo programa de pago Stripe → nivel sugerido */
 export const mapProgramaCheckoutANivel = (programa) => {
+  const fromOferta = mapFromOferta(programa)
+  if (fromOferta) return fromOferta
   const map = {
     "Nido y Comunidad Infantil": NIVELES_ESPECIALIZACION[0].label,
+    "Guía en Nido y Comunidad Infantil": NIVELES_ESPECIALIZACION[0].label,
     "Casa de Niños": NIVELES_ESPECIALIZACION[1].label,
+    "Guía en Casa de Niños": NIVELES_ESPECIALIZACION[1].label,
     Taller: NIVELES_ESPECIALIZACION[2].label,
+    "Guía en Taller I y II": NIVELES_ESPECIALIZACION[2].label,
     Neuroeducación: NIVELES_ESPECIALIZACION[4].label,
+    "Diplomado en Neuroeducación": NIVELES_ESPECIALIZACION[4].label,
     "Grandes Lecciones": NIVELES_ESPECIALIZACION[3].label,
+    "Educación Cósmica y Grandes Lecciones": NIVELES_ESPECIALIZACION[3].label,
   }
   return map[programa] || ""
 }

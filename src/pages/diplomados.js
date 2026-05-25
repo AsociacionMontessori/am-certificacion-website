@@ -6,7 +6,7 @@ import CertificationPrice from "../components/certificationPrice";
 import ProfessorsSection from "../components/professorsSection";
 import Scholarship from "../components/scholarship";
 import Seo from "../components/seo";
-import { DIPLOMADOS_EN_LINEA, getNextItem } from "../components/nextCourse";
+import { DIPLOMADOS_EN_LINEA, getNextItem } from "../data/diplomadosCalendario";
 
 const FORM_INSCRIPCION = "https://forms.gle/pQKbTjGKCMYtnjuY6";
 

@@ -2,7 +2,7 @@ import * as React from "react"
 import Clock from "../../images/gifs/clock.gif"
 import E from "../../images/e.png"
 
-const CardCertification = ({ title, subtitle, price, coin, footer, text, time, }) => {
+const CardCertification = ({ title, subtitle, price, coin, footer, text, time, paymentNote }) => {
     return (
         <>
             <div className="flex justify-center items-center flex-col bg-white w-56 rounded-3xl text-xs text-black">
@@ -41,7 +41,11 @@ const CardCertification = ({ title, subtitle, price, coin, footer, text, time, }
                         <p className="selection:text-black selection:bg-blue selection:bg-opacity-20">
                             <span className="text-blue selection:text-black selection:bg-blue selection:bg-opacity-20">
                                 {price}
-                            </span> {coin} <span className="text-gray text-xs">pago único</span>
+                            </span>{" "}
+                            {coin}{" "}
+                            <span className="text-gray text-xs block sm:inline mt-0.5 sm:mt-0">
+                                {paymentNote || "programa"}
+                            </span>
                         </p>
                     </div>
                 </div>
