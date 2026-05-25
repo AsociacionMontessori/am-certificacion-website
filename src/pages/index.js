@@ -69,7 +69,7 @@ const IndexPage = ({ location }) => {
   return (
     <Layout>
       <div className="bg-gradient-to-r from-blue via-purple to-green">
-      <Nav textColor="text-white" />
+      <Nav textColor="text-white" transparent />
       <main>
         <HomeMarketingHero />
         <section id="work" className="relative py-5 z-10 bg-white dark:bg-gray lg:pt-0">
