@@ -5,6 +5,8 @@ import Seo from "../components/seo"
 import Nav from "../components/nav"
 import RoxanaBooksSection from "../components/RoxanaBooksSection"
 
+const BLOG_URL = "https://montessorimexico.org/"
+
 const PublicacionesPage = () => {
   return (
     <Layout>
@@ -52,6 +54,44 @@ const PublicacionesPage = () => {
           }
           className="pt-4"
         />
+
+        <section
+          id="blog"
+          aria-labelledby="blog-heading"
+          className="bg-white px-4 py-10 sm:px-6 lg:px-12"
+        >
+          <div className="mx-auto max-w-6xl">
+            <div className="flex flex-col gap-4 pb-6 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wide text-green">
+                  Blog
+                </p>
+                <h2 id="blog-heading" className="mt-2 text-2xl font-bold text-blue md:text-3xl">
+                  Entradas recientes
+                </h2>
+                <p className="mt-2 max-w-2xl text-sm leading-relaxed text-gray md:text-base">
+                  Artículos, avisos y recursos publicados en Montessori México.
+                </p>
+              </div>
+              <a
+                href={BLOG_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex min-h-[44px] items-center justify-center rounded-lg bg-blue px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue/90"
+              >
+                Abrir blog
+              </a>
+            </div>
+            <div className="h-[42rem] overflow-hidden rounded-lg border border-blue/15 bg-white shadow-xl sm:h-[36rem]">
+              <iframe
+                src={BLOG_URL}
+                title="Blog Montessori México"
+                className="h-full w-full"
+                loading="lazy"
+              />
+            </div>
+          </div>
+        </section>
       </section>
     </Layout>
   )
