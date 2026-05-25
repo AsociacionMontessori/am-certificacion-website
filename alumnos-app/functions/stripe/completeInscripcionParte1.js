@@ -211,45 +211,75 @@ exports.completeInscripcionParte1Handler = onRequest(
 
         await ordenRef.set({inscripcionId, alumnoId: uid, parte1Completa: true}, {merge: true});
 
-        const googleWorkspace = await provisionGoogleWorkspaceAlumno({
-          emailInstitucional,
-          nombreCompleto: nombre,
-          password,
-          nivelPortal,
-          emailContacto,
-        });
+        let googleWorkspace = {
+          status: "skipped",
+          reason: "No ejecutado",
+        };
+        const warnings = [];
 
-        await db.collection("alumnos").doc(uid).set({
-          inscripcionId,
-          ordenId,
-          googleWorkspace,
-          googleWorkspaceAt: admin.firestore.FieldValue.serverTimestamp(),
-        }, {merge: true});
-
-        if (googleWorkspace.status === "partial" || googleWorkspace.status === "error") {
-          await db.collection("emails_pendientes").add({
-            to: "admin@certificacionmontessori.com",
-            subject: `[Inscripción] Revisar alta Google — ${emailInstitucional}`,
-            html: `<p>La cuenta Firebase se creó, pero Google Workspace/Classroom requiere revisión.</p>
-              <p><strong>Alumno:</strong> ${nombre} (${emailInstitucional})</p>
-              <p><strong>Nivel:</strong> ${nivelEspecializacion}</p>
-              <pre>${JSON.stringify(googleWorkspace, null, 2)}</pre>`,
-            text: `Revisar Google Workspace para ${emailInstitucional}: ${JSON.stringify(googleWorkspace)}`,
-            tipo: "google_provision_alerta",
-            ordenId,
-            alumnoId: uid,
+        try {
+          googleWorkspace = await provisionGoogleWorkspaceAlumno({
+            emailInstitucional,
+            nombreCompleto: nombre,
+            password,
+            nivelPortal,
+            emailContacto,
           });
+        } catch (googleErr) {
+          console.error("completeInscripcionParte1:googleWorkspace", googleErr);
+          googleWorkspace = {
+            status: "error",
+            errors: [{step: "workspace", message: googleErr.message || String(googleErr)}],
+          };
+          warnings.push("No se pudo completar Google Workspace/Classroom automáticamente");
         }
 
-        await notifyAlumnoCuentaCreada(db, {
-          nombre,
-          emailContacto,
-          emailInstitucional,
-          portalUrl: "https://alumnos.certificacionmontessori.com",
-          nivelEspecializacion,
-          passwordGenerada,
-          passwordAcceso: passwordGenerada ? password : null,
-        });
+        try {
+          await db.collection("alumnos").doc(uid).set({
+            inscripcionId,
+            ordenId,
+            googleWorkspace,
+            googleWorkspaceAt: admin.firestore.FieldValue.serverTimestamp(),
+          }, {merge: true});
+        } catch (alumnoUpdateErr) {
+          console.error("completeInscripcionParte1:updateAlumno", alumnoUpdateErr);
+          warnings.push("No se pudo guardar el estado de Google en el expediente");
+        }
+
+        if (googleWorkspace.status === "partial" || googleWorkspace.status === "error") {
+          try {
+            await db.collection("emails_pendientes").add({
+              to: "admin@certificacionmontessori.com",
+              subject: `[Inscripción] Revisar alta Google — ${emailInstitucional}`,
+              html: `<p>La cuenta Firebase se creó, pero Google Workspace/Classroom requiere revisión.</p>
+                <p><strong>Alumno:</strong> ${nombre} (${emailInstitucional})</p>
+                <p><strong>Nivel:</strong> ${nivelEspecializacion}</p>
+                <pre>${JSON.stringify(googleWorkspace, null, 2)}</pre>`,
+              text: `Revisar Google Workspace para ${emailInstitucional}: ${JSON.stringify(googleWorkspace)}`,
+              tipo: "google_provision_alerta",
+              ordenId,
+              alumnoId: uid,
+            });
+          } catch (emailPendienteErr) {
+            console.error("completeInscripcionParte1:googleAlert", emailPendienteErr);
+            warnings.push("No se pudo notificar al equipo sobre la incidencia de Google Workspace");
+          }
+        }
+
+        try {
+          await notifyAlumnoCuentaCreada(db, {
+            nombre,
+            emailContacto,
+            emailInstitucional,
+            portalUrl: "https://alumnos.certificacionmontessori.com",
+            nivelEspecializacion,
+            passwordGenerada,
+            passwordAcceso: passwordGenerada ? password : null,
+          });
+        } catch (notifyErr) {
+          console.error("completeInscripcionParte1:notify", notifyErr);
+          warnings.push("No se pudo enviar el correo automático de bienvenida");
+        }
 
         res.json({
           ok: true,
@@ -259,6 +289,7 @@ exports.completeInscripcionParte1Handler = onRequest(
           portalUrl: "https://alumnos.certificacionmontessori.com",
           reglamentoUrl: getReglamentoUrl(nivelEspecializacion),
           googleWorkspace,
+          warnings,
         });
       } catch (err) {
         console.error("completeInscripcionParte1:", err);

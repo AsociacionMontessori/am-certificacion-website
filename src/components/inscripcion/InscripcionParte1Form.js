@@ -220,10 +220,25 @@ const InscripcionParte1Form = ({
       <button
         type="submit"
         disabled={loading}
-        className="min-h-[48px] w-full inline-flex items-center justify-center px-6 py-3 rounded-full font-semibold text-white bg-gradient-to-r from-blue to-green disabled:opacity-60"
+        className="min-h-[48px] w-full inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full font-semibold text-white bg-gradient-to-r from-blue to-green disabled:opacity-60"
       >
-        {loading ? "Creando cuenta…" : "Crear mi cuenta y continuar"}
+        {loading ? (
+          <>
+            <span
+              className="inline-block h-5 w-5 rounded-full border-2 border-white/40 border-t-white animate-spin"
+              aria-hidden="true"
+            />
+            Creando tu cuenta…
+          </>
+        ) : (
+          "Crear mi cuenta y continuar"
+        )}
       </button>
+      {loading && (
+        <p className="text-xs text-gray text-center">
+          Estamos configurando tu acceso al portal y Google Classroom.
+        </p>
+      )}
     </form>
   )
 }

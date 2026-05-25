@@ -105,7 +105,24 @@ const InscripcionCompletarPage = ({ location }) => {
         </div>
       )}
 
-      {loading && <p className="text-sm text-gray text-center py-8">Verificando tu pago…</p>}
+      {loading && (
+        <div className="py-8">
+          <div className="mx-auto w-full max-w-md rounded-2xl border border-blue/20 bg-white/90 px-5 py-6 shadow-sm">
+            <div className="flex items-center gap-3">
+              <span
+                className="inline-block h-6 w-6 rounded-full border-[3px] border-blue/30 border-t-blue animate-spin"
+                aria-hidden="true"
+              />
+              <div>
+                <p className="text-sm font-semibold text-blue">Verificando tu pago…</p>
+                <p className="text-xs text-gray mt-1">
+                  Esto puede tardar unos segundos mientras validamos tu orden y habilitamos el siguiente paso.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {error && (
         <div className="rounded-xl bg-red/5 border border-red/20 px-4 py-3 mb-4">
