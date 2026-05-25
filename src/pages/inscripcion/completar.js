@@ -2,16 +2,16 @@ import * as React from "react"
 import { useEffect, useState } from "react"
 import { Link, navigate } from "gatsby"
 import CheckoutPageShell from "../../components/checkout/CheckoutPageShell"
+import Seo from "../../components/seo"
 import InscripcionParte1Form from "../../components/inscripcion/InscripcionParte1Form"
 import { fetchInscripcionOrden } from "../../utils/inscripcionApi"
 import { mapProgramaCheckoutANivel, PORTAL_ALUMNOS_URL } from "../../data/inscripcionForm"
 
-const InscripcionCompletarPage = ({ location }) => {
-  const params = new URLSearchParams(location?.search || "")
-  const ordenFromUrl = params.get("orden") || ""
-  const [ordenId, setOrdenId] = useState(ordenFromUrl)
-  const [ordenInput, setOrdenInput] = useState(ordenFromUrl)
-  const [loading, setLoading] = useState(Boolean(ordenFromUrl))
+const InscripcionCompletarPage = () => {
+  const [ordenFromUrl, setOrdenFromUrl] = useState("")
+  const [ordenId, setOrdenId] = useState("")
+  const [ordenInput, setOrdenInput] = useState("")
+  const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const [context, setContext] = useState(null)
   const [cuentaCreada, setCuentaCreada] = useState(null)
@@ -41,6 +41,15 @@ const InscripcionCompletarPage = ({ location }) => {
       setLoading(false)
     }
   }
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const orden = params.get("orden") || ""
+
+    setOrdenFromUrl(orden)
+    setOrdenId(orden)
+    setOrdenInput(orden)
+  }, [])
 
   useEffect(() => {
     if (ordenFromUrl) loadOrden(ordenFromUrl)
@@ -184,5 +193,13 @@ const InscripcionCompletarPage = ({ location }) => {
     </CheckoutPageShell>
   )
 }
+
+export const Head = () => (
+  <Seo
+    title="Paso 2 · Tu cuenta en el portal"
+    description="Datos básicos para crear tu usuario institucional. El pago ya está vinculado automáticamente."
+    pathname="/inscripcion/completar"
+  />
+)
 
 export default InscripcionCompletarPage

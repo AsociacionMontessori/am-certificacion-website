@@ -1,16 +1,14 @@
 import * as React from "react"
 import { Link } from "gatsby"
 import Layout from "../layout"
-import Seo from "../seo"
 import Nav from "../nav"
 import InscripcionAyudaWhatsApp from "../inscripcion/InscripcionAyudaWhatsApp"
 
 const CheckoutPageShell = ({ title, description, backTo = "/", children }) => (
   <Layout>
-    <Seo title={title} description={description} />
     <div className="bg-gradient-to-r from-blue via-purple to-green">
     <Nav textColor="text-white" />
-    <main className="min-h-screen px-4 py-20 sm:py-24 pb-12">
+    <section className="min-h-screen px-4 py-20 sm:py-24 pb-12">
       <div className="max-w-lg mx-auto">
         <Link
           to={backTo}
@@ -31,7 +29,7 @@ const CheckoutPageShell = ({ title, description, backTo = "/", children }) => (
           </div>
         </article>
       </div>
-    </main>
+    </section>
     </div>
   </Layout>
 )

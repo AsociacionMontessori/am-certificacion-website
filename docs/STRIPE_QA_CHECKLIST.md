@@ -32,6 +32,7 @@
 
 - [ ] `sk_` no aparece en build Gatsby ni Vite (`grep -r sk_ dist public`)
 - [ ] Endpoint público rechaza origen no permitido
+- [ ] Endpoint público responde `429` al exceder rate limit
 - [ ] Alumno no puede marcar su pago como `Validado` desde el cliente
 
 ## Go-live

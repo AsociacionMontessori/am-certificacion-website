@@ -3,6 +3,7 @@ import { useEffect, useState } from "react"
 import axios from "axios"
 import { Link } from "gatsby"
 import CheckoutPageShell from "../../components/checkout/CheckoutPageShell"
+import Seo from "../../components/seo"
 import InscriptionCheckoutForm from "../../components/checkout/InscriptionCheckoutForm"
 import DatosBancariosCard from "../../components/inscripcion/DatosBancariosCard"
 import { INSCRIPCION_PUBLIC } from "../../data/inscripcionPublic"
@@ -77,5 +78,13 @@ const InscripcionPagarPage = () => {
     </CheckoutPageShell>
   )
 }
+
+export const Head = () => (
+  <Seo
+    title="Paso 1 · Pago de inscripción"
+    description="Pago seguro con tarjeta en línea. Al confirmarlo, continuarás con tu cuenta y expediente en nuestro sistema."
+    pathname="/inscripcion/pagar"
+  />
+)
 
 export default InscripcionPagarPage

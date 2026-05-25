@@ -216,6 +216,11 @@ service cloud.firestore {
       allow read, write: if false;
     }
 
+    // Contadores de rate limiting para Functions públicas
+    match /rate_limits/{limitId} {
+      allow read, write: if false;
+    }
+
     // Catálogo Stripe (price IDs por SKU)
     match /stripeCatalog/{docId} {
       allow read: if canReadAdmin();

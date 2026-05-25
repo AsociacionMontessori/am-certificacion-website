@@ -2,16 +2,16 @@ import * as React from "react"
 import { useEffect, useState } from "react"
 import { Link } from "gatsby"
 import CheckoutPageShell from "../../components/checkout/CheckoutPageShell"
+import Seo from "../../components/seo"
 import InscripcionParte2Form from "../../components/inscripcion/InscripcionParte2Form"
 import { fetchInscripcionOrden } from "../../utils/inscripcionApi"
 import { PORTAL_ALUMNOS_URL } from "../../data/inscripcionForm"
 
-const InscripcionDocumentosPage = ({ location }) => {
-  const params = new URLSearchParams(location?.search || "")
-  const ordenFromUrl = params.get("orden") || ""
-  const [ordenId, setOrdenId] = useState(ordenFromUrl)
-  const [ordenInput, setOrdenInput] = useState(ordenFromUrl)
-  const [loading, setLoading] = useState(Boolean(ordenFromUrl))
+const InscripcionDocumentosPage = () => {
+  const [ordenFromUrl, setOrdenFromUrl] = useState("")
+  const [ordenId, setOrdenId] = useState("")
+  const [ordenInput, setOrdenInput] = useState("")
+  const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const [context, setContext] = useState(null)
   const [enviado, setEnviado] = useState(false)
@@ -36,6 +36,15 @@ const InscripcionDocumentosPage = ({ location }) => {
       setLoading(false)
     }
   }
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const orden = params.get("orden") || ""
+
+    setOrdenFromUrl(orden)
+    setOrdenId(orden)
+    setOrdenInput(orden)
+  }, [])
 
   useEffect(() => {
     if (ordenFromUrl) loadOrden(ordenFromUrl)
@@ -118,5 +127,13 @@ const InscripcionDocumentosPage = ({ location }) => {
     </CheckoutPageShell>
   )
 }
+
+export const Head = () => (
+  <Seo
+    title="Paso 3 · Expediente administrativo"
+    description="Documentos e información complementaria. No necesitas comprobante de pago de inscripción."
+    pathname="/inscripcion/documentos"
+  />
+)
 
 export default InscripcionDocumentosPage

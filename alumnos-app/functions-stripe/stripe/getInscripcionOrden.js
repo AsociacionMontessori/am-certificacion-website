@@ -1,6 +1,7 @@
 const {onRequest} = require("firebase-functions/v2/https");
 const admin = require("firebase-admin");
 const {handleCors, rejectIfOriginNotAllowed} = require("./cors");
+const {enforceRateLimit} = require("./rateLimit");
 const {getReglamentoUrl} = require("./inscripcionCatalog");
 const {isOrdenFlujoInscripcion} = require("./programasCheckout");
 
@@ -23,13 +24,19 @@ exports.getInscripcionOrdenHandler = onRequest(
       }
 
       try {
+        const db = admin.firestore();
+        if (await enforceRateLimit(db, req, res, {
+          key: "getInscripcionOrden",
+          limit: 80,
+          windowSeconds: 600,
+        })) return;
+
         const ordenId = String(req.body?.ordenId || "").trim();
         if (!ordenId) {
           res.status(400).json({error: "Referencia de orden requerida"});
           return;
         }
 
-        const db = admin.firestore();
         const ordenSnap = await db.collection("ordenes").doc(ordenId).get();
         if (!ordenSnap.exists) {
           res.status(404).json({error: "Orden no encontrada"});

@@ -1,6 +1,7 @@
 const {onRequest} = require("firebase-functions/v2/https");
 const admin = require("firebase-admin");
 const {handleCors, rejectIfOriginNotAllowed} = require("./cors");
+const {enforceRateLimit} = require("./rateLimit");
 const {
   MODALIDAD_INSCRIPCION,
   NIVELES_ESPECIALIZACION,
@@ -52,6 +53,13 @@ exports.completeInscripcionParte1Handler = onRequest(
       }
 
       try {
+        const db = admin.firestore();
+        if (await enforceRateLimit(db, req, res, {
+          key: "completeInscripcionParte1",
+          limit: 12,
+          windowSeconds: 600,
+        })) return;
+
         const body = req.body || {};
         const ordenId = String(body.ordenId || "").trim();
         const nombre = String(body.nombreCompleto || "").trim();
@@ -94,7 +102,6 @@ exports.completeInscripcionParte1Handler = onRequest(
           return;
         }
 
-        const db = admin.firestore();
         const ordenRef = db.collection("ordenes").doc(ordenId);
         const ordenSnap = await ordenRef.get();
         if (!ordenSnap.exists) {

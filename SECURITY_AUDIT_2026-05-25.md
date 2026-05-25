@@ -18,7 +18,7 @@ El reporte previo pegado en la conversación describía un servidor Express mín
 
 Después de la primera fase de remediación, el estado cambió de **riesgo medio-alto** a **riesgo medio controlado**. La deuda crítica de dependencias quedó cerrada: `npm audit` reporta **0 vulnerabilidades** en los cuatro lockfiles principales.
 
-Aún no considero el sistema listo para abrir pagos reales en producción hasta completar las capas pendientes: rate limiting/App Check o control equivalente en endpoints públicos de Stripe, verificación de secretos live, webhook live, monitoreo/alertas, revisión de CORS por entorno y pruebas de pago real controlado.
+Aún no considero el sistema listo para abrir pagos reales en producción hasta completar las capas pendientes: verificación de secretos live, webhook live, monitoreo/alertas, revisión de CORS por entorno y pruebas de pago real controlado. El rate limiting server-side de endpoints públicos de Stripe ya quedó aplicado en esta fase.
 
 ---
 
@@ -117,17 +117,13 @@ No se agregó todavía CSP estricta ni HSTS desde el repo. CSP requiere pruebas 
 ### S-03 — Endpoints públicos de Stripe sin rate limiting visible
 
 **Severidad:** Alta
-**Estado:** Abierto
+**Estado:** Cerrado en esta fase
 
-**Evidencia:** Las funciones `createPublicCheckout`, `getInscripcionOrden`, `completeInscripcionParte1`, `completeInscripcionParte2` y `getInscripcionUploadUrl` son HTTP públicas con validación funcional y CORS, pero no hay control de tasa persistente por IP/origen/cliente ni App Check visible.
+**Evidencia:** Se agregó `alumnos-app/functions-stripe/stripe/rateLimit.js` y se aplicó a `createPublicCheckout`, `getInscripcionOrden`, `completeInscripcionParte1`, `completeInscripcionParte2` y `getInscripcionUploadUrl`. El control usa Firestore con IP hasheada, ventana fija y respuesta `429` con `Retry-After`.
 
-**Impacto:** abuso de endpoints, costos, ruido operativo, creación de órdenes basura o intentos automatizados contra el flujo de inscripción.
+**Impacto mitigado:** reduce abuso de endpoints, costos, ruido operativo, creación de órdenes basura e intentos automatizados contra el flujo de inscripción.
 
-**Recomendación:** antes de producción, implementar una de estas opciones:
-
-1. Firebase App Check para llamadas desde frontend, si encaja con Hosting y pruebas.
-2. Rate limiting server-side en Firestore/MemoryStore por IP/origen/endpoint.
-3. WAF/Cloud Armor o reglas equivalentes si se expone mediante infraestructura compatible.
+**Pendiente opcional:** evaluar Firebase App Check o Cloud Armor si el volumen público crece o se detecta abuso que requiera una capa edge adicional.
 
 ### S-04 — CORS con orígenes de desarrollo en código de producción
 
@@ -237,7 +233,7 @@ No se agregó todavía CSP estricta ni HSTS desde el repo. CSP requiere pruebas 
 
 - [x] CORS allowlist existente.
 - [ ] CORS por entorno sin localhost en producción.
-- [ ] Rate limiting o App Check.
+- [x] Rate limiting server-side en endpoints públicos de Stripe.
 - [ ] Límites operativos por función (`maxInstances`, timeouts, memoria) revisados.
 - [ ] Lint/CI limpio o exclusiones documentadas.
 
@@ -268,6 +264,6 @@ No se agregó todavía CSP estricta ni HSTS desde el repo. CSP requiere pruebas 
 
 ## 6) Conclusión
 
-La primera fase redujo el riesgo de dependencias a cero hallazgos de `npm audit` en todos los paquetes relevantes y agregó hardening básico de Hosting. El sistema está más cerca de producción, pero todavía no debe abrir Stripe live sin resolver o aceptar explícitamente los hallazgos S-03, S-05, S-07 y S-09.
+La primera fase redujo el riesgo de dependencias a cero hallazgos de `npm audit` en todos los paquetes relevantes y agregó hardening básico de Hosting. El sistema está más cerca de producción, pero todavía no debe abrir Stripe live sin resolver o aceptar explícitamente los hallazgos S-05, S-07 y S-09.
 
-Siguiente paso recomendado: **endurecer endpoints públicos de Stripe (rate limiting/App Check), después validar secretos y webhook live**.
+Siguiente paso recomendado: **validar secretos, webhook live y prueba controlada end-to-end**.

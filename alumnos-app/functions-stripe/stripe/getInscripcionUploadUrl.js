@@ -1,6 +1,7 @@
 const {onRequest} = require("firebase-functions/v2/https");
 const admin = require("firebase-admin");
 const {handleCors, rejectIfOriginNotAllowed} = require("./cors");
+const {enforceRateLimit} = require("./rateLimit");
 const {
   DOCUMENTOS_PARTE2,
   MAX_FILE_BYTES,
@@ -27,6 +28,13 @@ exports.getInscripcionUploadUrlHandler = onRequest(
       }
 
       try {
+        const db = admin.firestore();
+        if (await enforceRateLimit(db, req, res, {
+          key: "getInscripcionUploadUrl",
+          limit: 40,
+          windowSeconds: 600,
+        })) return;
+
         const body = req.body || {};
         const ordenId = String(body.ordenId || "").trim();
         const docType = String(body.docType || "").trim();
@@ -47,7 +55,6 @@ exports.getInscripcionUploadUrlHandler = onRequest(
           return;
         }
 
-        const db = admin.firestore();
         const inscripcionesSnap = await db.collection("inscripciones")
             .where("ordenId", "==", ordenId)
             .limit(1)

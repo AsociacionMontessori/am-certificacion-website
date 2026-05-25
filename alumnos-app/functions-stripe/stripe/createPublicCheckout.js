@@ -3,6 +3,7 @@ const {defineSecret} = require("firebase-functions/params");
 const admin = require("firebase-admin");
 const Stripe = require("stripe");
 const {handleCors, rejectIfOriginNotAllowed} = require("./cors");
+const {enforceRateLimit} = require("./rateLimit");
 const {resolveSku, SITE_URL, CATALOG_META} = require("./catalog");
 const {
   buildCheckoutItemsFromRequest,
@@ -106,6 +107,13 @@ exports.createPublicCheckoutHandler = onRequest(
       }
 
       try {
+        const db = admin.firestore();
+        if (await enforceRateLimit(db, req, res, {
+          key: "createPublicCheckout",
+          limit: 20,
+          windowSeconds: 600,
+        })) return;
+
         const body = req.body || {};
         const cliente = body.cliente || {};
         const nombre = String(cliente.nombre || "").trim();
@@ -138,7 +146,6 @@ exports.createPublicCheckoutHandler = onRequest(
         const nivelFormulario = progConfig?.nivelFormulario || "";
         const promoQuery = promoInscripcionIncluida ? "&promo=1" : "";
 
-        const db = admin.firestore();
         const stripe = new Stripe(stripeSecretKey.value());
 
         const lineItems = [];

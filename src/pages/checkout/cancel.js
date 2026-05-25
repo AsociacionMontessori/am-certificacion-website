@@ -6,9 +6,8 @@ import { Link } from "gatsby"
 
 const CheckoutCancelPage = () => (
   <Layout>
-    <Seo title="Pago cancelado" description="El pago no se completó." />
     <Nav textColor="text-white" />
-    <main className="min-h-[60vh] flex items-center justify-center px-6 py-24">
+    <section className="min-h-[60vh] flex items-center justify-center px-6 py-24">
       <article className="max-w-lg w-full bg-white rounded-3xl shadow-xl p-8 text-center">
         <h1 className="text-2xl font-bold text-blue mb-3">Pago cancelado</h1>
         <p className="text-gray text-base leading-relaxed mb-6">
@@ -30,8 +29,12 @@ const CheckoutCancelPage = () => (
           </Link>
         </div>
       </article>
-    </main>
+    </section>
   </Layout>
+)
+
+export const Head = () => (
+  <Seo title="Pago cancelado" description="El pago no se completó." pathname="/checkout/cancel" />
 )
 
 export default CheckoutCancelPage

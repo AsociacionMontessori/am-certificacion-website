@@ -4,14 +4,27 @@ import Seo from "../../components/seo"
 import Nav from "../../components/nav"
 import { Link } from "gatsby"
 
-const CheckoutSuccessPage = ({ location }) => {
-  const params = new URLSearchParams(location?.search || "")
-  const ordenId = params.get("orden")
-  const tipo = params.get("tipo")
+const CheckoutSuccessPage = () => {
+  const [checkoutParams, setCheckoutParams] = React.useState({
+    ordenId: "",
+    tipo: "",
+    promoNeuro: false,
+  })
+
+  React.useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+
+    setCheckoutParams({
+      ordenId: params.get("orden") || "",
+      tipo: params.get("tipo") || "",
+      promoNeuro: params.get("promo") === "1",
+    })
+  }, [])
+
+  const { ordenId, tipo, promoNeuro } = checkoutParams
   const esInscripcion =
     tipo === "inscripcion" || tipo === "inicio_programa" || !tipo
   const inicioCompleto = tipo === "inicio_programa"
-  const promoNeuro = params.get("promo") === "1"
 
   const completarUrl = ordenId
     ? `/inscripcion/completar?orden=${encodeURIComponent(ordenId)}`
@@ -19,9 +32,8 @@ const CheckoutSuccessPage = ({ location }) => {
 
   return (
     <Layout>
-      <Seo title="Pago recibido" description="Tu pago fue procesado correctamente." />
       <Nav textColor="text-white" />
-      <main className="min-h-[60vh] flex items-center justify-center px-6 py-24">
+      <section className="min-h-[60vh] flex items-center justify-center px-6 py-24">
         <article className="max-w-lg w-full bg-white rounded-3xl shadow-xl p-8 text-center">
           <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-green/20 flex items-center justify-center">
             <span className="text-3xl text-green" aria-hidden="true">✓</span>
@@ -72,9 +84,13 @@ const CheckoutSuccessPage = ({ location }) => {
             Volver al inicio
           </Link>
         </article>
-      </main>
+      </section>
     </Layout>
   )
 }
+
+export const Head = () => (
+  <Seo title="Pago recibido" description="Tu pago fue procesado correctamente." pathname="/checkout/success" />
+)
 
 export default CheckoutSuccessPage

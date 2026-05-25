@@ -1,12 +1,18 @@
 import * as React from "react"
 import { Link } from "gatsby"
 import CheckoutPageShell from "../../components/checkout/CheckoutPageShell"
+import Seo from "../../components/seo"
 import BookCheckoutForm from "../../components/checkout/BookCheckoutForm"
 import { roxanaBooks } from "../../data/roxanaBooks"
 
-const LibroCheckoutPage = ({ location }) => {
-  const params = new URLSearchParams(location?.search || "")
-  const sku = params.get("sku")
+const LibroCheckoutPage = () => {
+  const [sku, setSku] = React.useState("")
+
+  React.useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    setSku(params.get("sku") || "")
+  }, [])
+
   const book = roxanaBooks.find((b) => b.stripeSku === sku)
 
   if (!book) {
@@ -30,5 +36,13 @@ const LibroCheckoutPage = ({ location }) => {
     </CheckoutPageShell>
   )
 }
+
+export const Head = () => (
+  <Seo
+    title="Compra de libro"
+    description="Compra segura de publicaciones Montessori."
+    pathname="/checkout/libro"
+  />
+)
 
 export default LibroCheckoutPage

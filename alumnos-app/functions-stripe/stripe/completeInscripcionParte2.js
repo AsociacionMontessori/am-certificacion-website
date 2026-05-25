@@ -1,6 +1,7 @@
 const {onRequest} = require("firebase-functions/v2/https");
 const admin = require("firebase-admin");
 const {handleCors, rejectIfOriginNotAllowed} = require("./cors");
+const {enforceRateLimit} = require("./rateLimit");
 const {ESCOLARIDAD, DOCUMENTOS_PARTE2_REQUERIDOS, DOCUMENTOS_PARTE2_OPCIONALES} = require("./inscripcionCatalog");
 
 async function fileExists(bucket, path) {
@@ -26,6 +27,13 @@ exports.completeInscripcionParte2Handler = onRequest(
       }
 
       try {
+        const db = admin.firestore();
+        if (await enforceRateLimit(db, req, res, {
+          key: "completeInscripcionParte2",
+          limit: 12,
+          windowSeconds: 600,
+        })) return;
+
         const body = req.body || {};
         const ordenId = String(body.ordenId || "").trim();
         const escolaridad = String(body.escolaridad || "").trim();
@@ -57,7 +65,6 @@ exports.completeInscripcionParte2Handler = onRequest(
           return;
         }
 
-        const db = admin.firestore();
         const ordenSnap = await db.collection("ordenes").doc(ordenId).get();
         if (!ordenSnap.exists) {
           res.status(404).json({error: "Orden no encontrada"});

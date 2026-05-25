@@ -1,6 +1,7 @@
 import * as React from "react"
 import { Link } from "gatsby"
 import CheckoutPageShell from "../../components/checkout/CheckoutPageShell"
+import Seo from "../../components/seo"
 import DatosBancariosCard from "../../components/inscripcion/DatosBancariosCard"
 import { DATOS_BANCARIOS_INSCRIPCION } from "../../data/datosBancarios"
 import { useVisitorGeo } from "../../hooks/useVisitorGeo"
@@ -67,5 +68,13 @@ const InscripcionTransferenciaPage = () => {
   </CheckoutPageShell>
   )
 }
+
+export const Head = () => (
+  <Seo
+    title="Pago por transferencia bancaria"
+    description="Alternativa para quienes no desean pagar con tarjeta en línea."
+    pathname="/inscripcion/transferencia"
+  />
+)
 
 export default InscripcionTransferenciaPage

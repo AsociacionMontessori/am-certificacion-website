@@ -10,7 +10,8 @@ Documento operativo para **Certificación Montessori** (Asociación Montessori d
 4. **Secretos fuera del repo** — `STRIPE_SECRET_KEY` y `STRIPE_WEBHOOK_SECRET` en Firebase Secrets; claves `sk_` / `whsec_` en `.gitignore`.
 5. **CORS restringido** — `createPublicCheckout` y flujo de inscripción validan origen (`cors.js`); no usar `*` en producción.
 6. **Datos mínimos en metadata** — En Checkout metadata: `ordenId`, `tipo`, `programa`, `skus`, flags fiscales. No RFC, CURP ni contraseñas.
-7. **Firestore rules** — `ordenes` y `stripe_events` no escribibles por clientes; catálogo `stripeCatalog` solo administración.
+7. **Firestore rules** — `ordenes`, `stripe_events` y `rate_limits` no escribibles por clientes; catálogo `stripeCatalog` solo administración.
+8. **Rate limiting** — Endpoints públicos de checkout/inscripción usan contador en Firestore por IP hasheada y ventana de tiempo.
 
 ## Checkout público (inscripción)
 
@@ -57,7 +58,7 @@ Las colegiaturas **mensuales recurrentes** (`colegiatura_*`) se usan en el porta
 
 - Reglas Firestore: sin lectura pública de `ordenes` pagadas ajenas; inscripción por `ordenId` solo vía Functions autenticadas por token de flujo donde aplique.
 - No loguear `STRIPE_SECRET_KEY`, PaymentIntent completos ni datos de tarjeta.
-- Functions Gen2 con `invoker: public` solo en endpoints que validan CORS + payload; el resto restringido.
+- Functions Gen2 con `invoker: public` solo en endpoints que validan CORS + payload + rate limiting; el resto restringido.
 - Hosting: sin exponer `.env` con claves; `GATSBY_*` solo URLs públicas de API.
 
 ## Operación
