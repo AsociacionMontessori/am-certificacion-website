@@ -1,11 +1,13 @@
 import * as React from "react"
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import { Link } from "gatsby"
 import { createPublicCheckoutSession } from "../../utils/stripeCheckout"
 import {
   PROGRAMAS_INSCRIPCION,
   getResumenPagoInscripcion,
   getTotalPagoCheckout,
+  programaTienePromoInscripcionIncluida,
+  PROMO_NEURO_INSCRIPCION_INCLUIDA,
 } from "../../data/inscripcionPublic"
 import { getCuentaContableId } from "../../data/datosBancarios"
 import { INSCRIPCION_PRECIO } from "../../data/programasOferta"
@@ -22,6 +24,14 @@ const InscriptionCheckoutForm = ({ coin, price, cancelHref = "/" }) => {
   const [requiereFacturaFiscal, setRequiereFacturaFiscal] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
+
+  const esPromoNeuro = programaTienePromoInscripcionIncluida(programa)
+
+  useEffect(() => {
+    if (esPromoNeuro && soloInscripcion) {
+      setSoloInscripcion(false)
+    }
+  }, [esPromoNeuro, soloInscripcion])
 
   const resumenPrograma = useMemo(
     () => getResumenPagoInscripcion(programa, coin, soloInscripcion),
@@ -44,7 +54,7 @@ const InscriptionCheckoutForm = ({ coin, price, cancelHref = "/" }) => {
     try {
       const { url } = await createPublicCheckoutSession({
         programa,
-        soloInscripcion,
+        soloInscripcion: esPromoNeuro ? false : soloInscripcion,
         requiereFacturaFiscal,
         cuentaContable: getCuentaContableId(requiereFacturaFiscal),
         cliente: { nombre: nombre.trim(), email: email.trim(), telefono: telefono.trim() },
@@ -58,56 +68,70 @@ const InscriptionCheckoutForm = ({ coin, price, cancelHref = "/" }) => {
     }
   }
 
-  const botonLabel = soloInscripcion
-    ? `Pagar inscripción (${coin} ${price})`
-    : `Pagar inicio completo (${coin} $${montoHoy})`
+  let botonLabel = `Pagar inicio completo (${coin} $${montoHoy})`
+  if (esPromoNeuro) {
+    botonLabel = `Pagar diplomado (${coin} $${montoHoy})`
+  } else if (soloInscripcion) {
+    botonLabel = `Pagar inscripción (${coin} ${price})`
+  }
 
   return (
     <form onSubmit={handleSubmit} className="w-full text-left space-y-4">
-      <div className="rounded-xl border border-blue/25 bg-blue/5 px-4 py-4 space-y-2">
-        <p className="text-sm text-gray leading-relaxed">
-          <strong className="text-blue">Recomendado:</strong> paga inscripción y tu
-          programa en un solo checkout para activar tu lugar de inmediato.
-        </p>
-        <p className="text-xs font-semibold text-green">
-          La inscripción se paga una sola vez; otros diplomados o cursos posteriores no la
-          incluyen de nuevo.
-        </p>
-      </div>
+      {esPromoNeuro ? (
+        <div className="rounded-xl border-2 border-green/40 bg-green/10 px-4 py-4 space-y-2">
+          <p className="text-sm font-bold text-green">{PROMO_NEURO_INSCRIPCION_INCLUIDA.badge}</p>
+          <p className="text-sm text-gray leading-relaxed">
+            {PROMO_NEURO_INSCRIPCION_INCLUIDA.detalle}
+          </p>
+        </div>
+      ) : (
+        <div className="rounded-xl border border-blue/25 bg-blue/5 px-4 py-4 space-y-2">
+          <p className="text-sm text-gray leading-relaxed">
+            <strong className="text-blue">Recomendado:</strong> paga inscripción y tu
+            programa en un solo checkout para activar tu lugar de inmediato.
+          </p>
+          <p className="text-xs font-semibold text-green">
+            La inscripción se paga una sola vez; otros diplomados o cursos posteriores no la
+            incluyen de nuevo.
+          </p>
+        </div>
+      )}
 
-      <fieldset className="space-y-2 rounded-xl border border-gray/20 bg-white px-4 py-4">
-        <legend className="text-sm font-medium text-black px-1">¿Qué pagas hoy?</legend>
-        <label className="flex items-start gap-3 min-h-[44px] cursor-pointer">
-          <input
-            type="radio"
-            name="modoPago"
-            checked={!soloInscripcion}
-            onChange={() => setSoloInscripcion(false)}
-            className="mt-1"
-          />
-          <span className="text-sm text-black">
-            <span className="font-medium">Inicio completo</span>
-            <span className="block text-xs text-gray">
-              Inscripción + primer pago del programa (Stripe)
+      {!esPromoNeuro && (
+        <fieldset className="space-y-2 rounded-xl border border-gray/20 bg-white px-4 py-4">
+          <legend className="text-sm font-medium text-black px-1">¿Qué pagas hoy?</legend>
+          <label className="flex items-start gap-3 min-h-[44px] cursor-pointer">
+            <input
+              type="radio"
+              name="modoPago"
+              checked={!soloInscripcion}
+              onChange={() => setSoloInscripcion(false)}
+              className="mt-1"
+            />
+            <span className="text-sm text-black">
+              <span className="font-medium">Inicio completo</span>
+              <span className="block text-xs text-gray">
+                Inscripción + primer pago del programa (Stripe)
+              </span>
             </span>
-          </span>
-        </label>
-        <label className="flex items-start gap-3 min-h-[44px] cursor-pointer">
-          <input
-            type="radio"
-            name="modoPago"
-            checked={soloInscripcion}
-            onChange={() => setSoloInscripcion(true)}
-            className="mt-1"
-          />
-          <span className="text-sm text-black">
-            <span className="font-medium">Solo inscripción hoy</span>
-            <span className="block text-xs text-gray">
-              El programa se liquida después (portal o transferencia)
+          </label>
+          <label className="flex items-start gap-3 min-h-[44px] cursor-pointer">
+            <input
+              type="radio"
+              name="modoPago"
+              checked={soloInscripcion}
+              onChange={() => setSoloInscripcion(true)}
+              className="mt-1"
+            />
+            <span className="text-sm text-black">
+              <span className="font-medium">Solo inscripción hoy</span>
+              <span className="block text-xs text-gray">
+                El programa se liquida después (portal o transferencia)
+              </span>
             </span>
-          </span>
-        </label>
-      </fieldset>
+          </label>
+        </fieldset>
+      )}
 
       <fieldset className="space-y-2 rounded-xl border border-gray/20 bg-gray/5 px-4 py-4">
         <legend className="text-sm font-medium text-black px-1">
@@ -200,6 +224,9 @@ const InscriptionCheckoutForm = ({ coin, price, cancelHref = "/" }) => {
             {PROGRAMAS_INSCRIPCION.map((p) => (
               <option key={p} value={p}>
                 {p}
+                {programaTienePromoInscripcionIncluida(p)
+                  ? ` · ${PROMO_NEURO_INSCRIPCION_INCLUIDA.badge}`
+                  : ""}
               </option>
             ))}
           </select>

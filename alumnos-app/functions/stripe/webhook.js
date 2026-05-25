@@ -76,6 +76,10 @@ async function handleOrdenPublicaPagada(db, ordenId, session) {
       origen: "sitio_publico_stripe",
       formularioCompleto: false,
       inicioCompleto: orden.tipo === "inicio_programa",
+      inscripcionIncluidaEnPromo: Boolean(
+          orden.promoInscripcionIncluida ||
+          session.metadata?.promoInscripcionIncluida === "1",
+      ),
       lineItemsPagados: orden.lineItems || [],
     });
     await ordenRef.update({inscripcionId: inscripcionRef.id});

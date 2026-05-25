@@ -29,10 +29,13 @@ function resolveCheckoutFromBody(body) {
       soloInscripcion: Boolean(body.soloInscripcion),
     });
     const parsed = parseLineItems({items: built.items});
+    const tipo = resolveOrdenTipo(parsed.skus, built.programaLabel);
     return {
       ...parsed,
+      tipo,
       modoPago: built.modo,
       programaLabel: built.programaLabel,
+      promoInscripcionIncluida: Boolean(built.promoInscripcionIncluida),
     };
   }
 
@@ -52,7 +55,14 @@ function resolveCheckoutFromBody(body) {
   }
 
   const parsed = parseLineItems({items});
-  return {...parsed, modoPago: null, programaLabel: programa || null};
+  const tipo = resolveOrdenTipo(parsed.skus, programa);
+  return {
+    ...parsed,
+    tipo,
+    modoPago: null,
+    programaLabel: programa || null,
+    promoInscripcionIncluida: false,
+  };
 }
 
 /**
@@ -76,8 +86,7 @@ function parseLineItems(input) {
     if (quantity < 1 || quantity > 10) throw new Error("Cantidad no válida");
   });
 
-  const tipo = resolveOrdenTipo(skus);
-  return {items, tipo, requiresShipping, skus};
+  return {items, requiresShipping, skus};
 }
 
 exports.createPublicCheckoutHandler = onRequest(
@@ -122,10 +131,12 @@ exports.createPublicCheckoutHandler = onRequest(
           skus,
           modoPago,
           programaLabel,
+          promoInscripcionIncluida,
         } = resolveCheckoutFromBody(body);
 
         const progConfig = programaLabel ? getProgramaCheckout(programaLabel) : null;
         const nivelFormulario = progConfig?.nivelFormulario || "";
+        const promoQuery = promoInscripcionIncluida ? "&promo=1" : "";
 
         const db = admin.firestore();
         const stripe = new Stripe(stripeSecretKey.value());
@@ -158,7 +169,7 @@ exports.createPublicCheckoutHandler = onRequest(
           mode: "payment",
           customer_email: email,
           line_items: lineItems,
-          success_url: `${siteUrl}/checkout/success?orden=${ordenRef.id}&tipo=${tipo}`,
+          success_url: `${siteUrl}/checkout/success?orden=${ordenRef.id}&tipo=${tipo}${promoQuery}`,
           cancel_url: `${siteUrl}/checkout/cancel?orden=${ordenRef.id}`,
           metadata: {
             ordenId: ordenRef.id,
@@ -170,6 +181,7 @@ exports.createPublicCheckoutHandler = onRequest(
             nivelFormulario: nivelFormulario.slice(0, 200),
             requiereFacturaFiscal: requiereFacturaFiscal ? "1" : "0",
             cuentaContable: cuentaContable.slice(0, 32),
+            promoInscripcionIncluida: promoInscripcionIncluida ? "1" : "0",
           },
           ...(requiresShipping ? {
             shipping_address_collection: {allowed_countries: ["MX", "US"]},
@@ -185,6 +197,7 @@ exports.createPublicCheckoutHandler = onRequest(
           programa: programaLabel || programa || null,
           nivelFormulario: nivelFormulario || null,
           modoPago: modoPago || null,
+          promoInscripcionIncluida: promoInscripcionIncluida || false,
           montoEstimadoMxn,
           requiereFacturaFiscal,
           cuentaContable,

@@ -18,6 +18,9 @@ Documento operativo para **Certificación Montessori** (Asociación Montessori d
 |------|----------------|---------------|
 | Inicio completo (recomendado) | `inscripcion_diplomado` + programa | `inicio_programa` |
 | Solo inscripción | `inscripcion_diplomado` | `inscripcion` |
+| **Promo Neuro** (inscripción incluida) | solo `diplomado_neuroeducacion` | `inicio_programa` + `promoInscripcionIncluida` |
+
+Activar/desactivar promo: `PROMO_NEURO_INSCRIPCION_INCLUIDA.activa` y `promoInscripcionIncluida` en `programasOferta.js` / `programasCheckout.js`.
 
 Programas (alineados a `programasOferta.js` / `programasCheckout.js`):
 

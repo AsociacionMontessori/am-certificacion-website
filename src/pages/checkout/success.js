@@ -11,6 +11,7 @@ const CheckoutSuccessPage = ({ location }) => {
   const esInscripcion =
     tipo === "inscripcion" || tipo === "inicio_programa" || !tipo
   const inicioCompleto = tipo === "inicio_programa"
+  const promoNeuro = params.get("promo") === "1"
 
   const completarUrl = ordenId
     ? `/inscripcion/completar?orden=${encodeURIComponent(ordenId)}`
@@ -28,9 +29,11 @@ const CheckoutSuccessPage = ({ location }) => {
           <h1 className="text-2xl font-bold text-blue mb-3">¡Pago recibido!</h1>
           <p className="text-gray text-base leading-relaxed mb-4">
             {esInscripcion
-              ? inicioCompleto
-                ? "Tu inscripción y el pago inicial de tu programa quedaron registrados. Sigue con la creación de tu cuenta y el expediente administrativo."
-                : "Tu pago de inscripción quedó registrado. Sigue con la creación de tu cuenta y el expediente administrativo."
+              ? promoNeuro
+                ? "Tu pago del diplomado quedó registrado. Con la promoción vigente, tu inscripción institucional va incluida. Sigue con la creación de tu cuenta y el expediente administrativo."
+                : inicioCompleto
+                  ? "Tu inscripción y el pago inicial de tu programa quedaron registrados. Sigue con la creación de tu cuenta y el expediente administrativo."
+                  : "Tu pago de inscripción quedó registrado. Sigue con la creación de tu cuenta y el expediente administrativo."
               : "Gracias por tu pago. En las próximas 24–48 horas revisaremos tu pedido y te contactaremos por correo."}
           </p>
           {ordenId && (

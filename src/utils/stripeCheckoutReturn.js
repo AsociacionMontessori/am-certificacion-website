@@ -8,6 +8,7 @@ export function redirectStripeCheckoutReturn(location) {
   const tipo = params.get("tipo")
   if (!orden) return
   if (tipo === "inscripcion" || tipo === "inicio_programa") {
-    navigate(`/checkout/success${location.search}`, { replace: true })
+    const search = location.search || ""
+    navigate(`/checkout/success${search}`, { replace: true })
   }
 }

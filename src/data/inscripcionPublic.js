@@ -7,6 +7,8 @@ import {
   getResumenPagoInscripcion,
   getTotalPagoCheckout,
   getProgramaByCheckoutLabel,
+  programaTienePromoInscripcionIncluida,
+  PROMO_NEURO_INSCRIPCION_INCLUIDA,
 } from "./programasOferta"
 
 export const INSCRIPCION_PUBLIC = {
@@ -22,4 +24,6 @@ export {
   getResumenPagoInscripcion,
   getTotalPagoCheckout,
   getProgramaByCheckoutLabel,
+  programaTienePromoInscripcionIncluida,
+  PROMO_NEURO_INSCRIPCION_INCLUIDA,
 }

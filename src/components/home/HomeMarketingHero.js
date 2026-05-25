@@ -41,7 +41,12 @@ const ProgramCard = ({ programa, coin, useMxn }) => {
           Más accesible
         </span>
       )}
-      {programa.featured && programa.id !== "cosmica" && (
+      {programa.promoInscripcionIncluida && (
+        <span className="inline-block mt-2 rounded-full bg-green/25 text-green text-xs font-semibold px-2 py-0.5">
+          Inscripción incluida
+        </span>
+      )}
+      {programa.featured && programa.id !== "cosmica" && !programa.promoInscripcionIncluida && (
         <span className="inline-block mt-2 rounded-full bg-yellow/30 text-black text-xs font-semibold px-2 py-0.5">
           Popular
         </span>

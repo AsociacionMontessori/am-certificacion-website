@@ -8,6 +8,15 @@ export const INSCRIPCION_PRECIO = {
   anchorPriceMx: "5,900",
 }
 
+/** Promoción activa: Neuro incluye inscripción sin cargo extra en checkout Stripe. */
+export const PROMO_NEURO_INSCRIPCION_INCLUIDA = {
+  activa: true,
+  programaId: "neuro",
+  badge: "Inscripción incluida",
+  detalle:
+    "Promoción vigente: al inscribirte al Diplomado en Neuroeducación pagas solo el programa; la inscripción institucional va incluida.",
+}
+
 export const INSCRIPCION_MARKETING_COPY = {
   titulo: "Inscripción",
   subtitulo:
@@ -59,8 +68,9 @@ export const PROGRAMAS_OFERTA = [
     priceMx: "4,500",
     priceUsd: "250",
     anchorPriceMx: "5,500",
-    priceNote: `Programa $4,500 + inscripción $${INSCRIPCION_PRECIO.priceMx} (solo la primera vez)`,
-    paymentNote: "programa + inscripción",
+    priceNote: "Promoción: $4,500 todo incluido (programa + inscripción)",
+    paymentNote: "promo todo incluido",
+    promoInscripcionIncluida: true,
     duration: "3 meses",
     cta: "/inscripcion/pagar",
     featured: true,
@@ -115,10 +125,23 @@ export const PROGRAMAS_OFERTA = [
 
 export const PROGRAMAS_CHECKOUT_OPCIONES = PROGRAMAS_OFERTA.filter(
   (p) => p.id !== "inscripcion"
-).map((p) => p.checkoutLabel)
+)
+  .sort((a, b) => {
+    if (a.promoInscripcionIncluida && !b.promoInscripcionIncluida) return -1
+    if (!a.promoInscripcionIncluida && b.promoInscripcionIncluida) return 1
+    return 0
+  })
+  .map((p) => p.checkoutLabel)
 
 export const getProgramaByCheckoutLabel = (label) =>
   PROGRAMAS_OFERTA.find((p) => p.checkoutLabel === label) || null
+
+/** @param {string} checkoutLabel */
+export const programaTienePromoInscripcionIncluida = (checkoutLabel) => {
+  if (!PROMO_NEURO_INSCRIPCION_INCLUIDA.activa) return false
+  const p = getProgramaByCheckoutLabel(checkoutLabel)
+  return Boolean(p?.promoInscripcionIncluida)
+}
 
 const parsePrecioMx = (priceMx) =>
   Number(String(priceMx || "").replace(/,/g, "")) || 0
@@ -130,7 +153,11 @@ const formatPrecioMx = (n) =>
 export const getTotalPagoCheckout = (checkoutLabel, soloInscripcion = false) => {
   const ins = parsePrecioMx(INSCRIPCION_PRECIO.priceMx)
   const programa = getProgramaByCheckoutLabel(checkoutLabel)
-  if (soloInscripcion || !programa) return ins
+  if (!programa) return ins
+  if (soloInscripcion) return ins
+  if (programaTienePromoInscripcionIncluida(checkoutLabel)) {
+    return parsePrecioMx(programa.priceMx)
+  }
   return ins + parsePrecioMx(programa.priceMx)
 }
 
@@ -144,6 +171,12 @@ export const getResumenPagoInscripcion = (
   const ins = INSCRIPCION_PRECIO.priceMx
   if (!programa) {
     return `Hoy pagas la inscripción (${coin} ${ins}). Después definimos el plan de tu programa.`
+  }
+  if (programaTienePromoInscripcionIncluida(checkoutLabel)) {
+    if (soloInscripcion) {
+      return `Este diplomado tiene la inscripción incluida en la promoción. Elige «Inicio completo» y paga solo ${coin} ${programa.priceMx}.`
+    }
+    return `${PROMO_NEURO_INSCRIPCION_INCLUIDA.detalle} Total hoy en Stripe: ${coin} $${programa.priceMx}.`
   }
   if (soloInscripcion) {
     return `Hoy pagas solo la inscripción (${coin} ${ins}). El programa (${programa.cardTitle}) se liquida después en el portal o por transferencia. La inscripción no se vuelve a cobrar en otros programas.`

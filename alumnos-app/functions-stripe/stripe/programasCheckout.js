@@ -15,6 +15,7 @@ const PROGRAMAS_CHECKOUT = {
     skuPrograma: "diplomado_neuroeducacion",
     amountMxnPrograma: 4500,
     nivelFormulario: "Diplomado en Neuroeducación (3 meses)",
+    promoInscripcionIncluida: true,
   },
   "Guía en Taller I y II": {
     tipo: "guia",
@@ -63,11 +64,25 @@ function buildCheckoutItemsFromRequest(options = {}) {
     if (!prog) {
       throw new Error("Programa no válido para pago en línea");
     }
+    if (soloInscripcion && prog.promoInscripcionIncluida) {
+      throw new Error(
+          "Este programa incluye la inscripción en la promoción. Elige inicio completo.",
+      );
+    }
     if (soloInscripcion) {
       return {
         items: [{sku: SKU_INSCRIPCION, quantity: 1}],
         programaLabel,
         modo: "solo_inscripcion",
+        promoInscripcionIncluida: false,
+      };
+    }
+    if (prog.promoInscripcionIncluida) {
+      return {
+        items: [{sku: prog.skuPrograma, quantity: 1}],
+        programaLabel,
+        modo: "inicio_completo_promo",
+        promoInscripcionIncluida: true,
       };
     }
     return {
@@ -77,6 +92,7 @@ function buildCheckoutItemsFromRequest(options = {}) {
       ],
       programaLabel,
       modo: "inicio_completo",
+      promoInscripcionIncluida: false,
     };
   }
 
@@ -92,9 +108,18 @@ function buildCheckoutItemsFromRequest(options = {}) {
  * @param {string[]} skus
  * @return {string}
  */
-function resolveOrdenTipo(skus) {
+/**
+ * @param {string[]} skus
+ * @param {string} [programaLabel]
+ * @return {string}
+ */
+function resolveOrdenTipo(skus, programaLabel = "") {
+  const prog = getProgramaCheckout(programaLabel);
   const hasInscripcion = skus.includes(SKU_INSCRIPCION);
   const hasPrograma = skus.some((s) => s !== SKU_INSCRIPCION && !s.startsWith("libro_"));
+  if (prog?.promoInscripcionIncluida && hasPrograma && !hasInscripcion) {
+    return "inicio_programa";
+  }
   if (hasInscripcion && hasPrograma) return "inicio_programa";
   if (hasInscripcion) return "inscripcion";
   if (skus.some((s) => s.startsWith("libro_"))) return "libro";

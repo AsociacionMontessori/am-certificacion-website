@@ -36,6 +36,7 @@ export const PROGRAMAS_DESTACADOS = [
     duration: p.duration,
     cta: p.cta,
     featured: Boolean(p.featured),
+    promoInscripcionIncluida: Boolean(p.promoInscripcionIncluida),
   }
 })
 
