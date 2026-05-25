@@ -56,6 +56,8 @@ module.exports = {
           `/404.html`,
           `/dev-404-page`,
           `/offline-plugin-app-shell-fallback`,
+          `/masterclasses`,
+          `/masterclasses/*`,
           `/alumnos-app`,
           `/alumnos-app/*`,
         ],

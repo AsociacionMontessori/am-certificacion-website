@@ -57,6 +57,49 @@ const PROGRAMAS_ALBUM = [
   ...PROGRAMAS_DESTACADOS.filter(({ id }) => id === "neuro"),
 ]
 
+const parsePriceAmount = (price) =>
+  Number(String(price || "").replace(/,/g, "")) || 0
+
+const getLowestProgramPrice = (tipo, useMxn) =>
+  PROGRAMAS_DESTACADOS.filter((programa) => programa.tipo === tipo)
+    .map((programa) => (useMxn ? programa.priceMx : programa.priceUsd))
+    .filter(Boolean)
+    .sort((a, b) => parsePriceAmount(a) - parsePriceAmount(b))[0] || null
+
+const PaymentClarity = ({ coin, inscripcionPrice, useMxn }) => {
+  const guiaDesde = getLowestProgramPrice("Guía", useMxn)
+  const diplomadoDesde = getLowestProgramPrice("Diplomado", useMxn)
+
+  return (
+    <div className="mt-4 border-t border-white/15 pt-4">
+      <p className="text-xs font-semibold uppercase tracking-wide text-green">
+        Pagos sin sorpresas
+      </p>
+      <div className="mt-3 grid gap-3 sm:grid-cols-2">
+        <div className="space-y-1">
+          <p className="text-sm font-bold text-white">Qué pagas hoy</p>
+          <p className="text-xs leading-relaxed text-white/75">
+            Inscripción única de {" "}
+            <strong className="text-white">${inscripcionPrice} {coin}</strong>. Si
+            eliges inicio completo, también cubres el primer pago del programa en
+            Stripe.
+          </p>
+        </div>
+        <div className="space-y-1">
+          <p className="text-sm font-bold text-white">Qué pagas después</p>
+          <p className="text-xs leading-relaxed text-white/75">
+            Guías desde {" "}
+            <strong className="text-white">${guiaDesde} {coin} al mes</strong> o
+            diplomados cortos desde {" "}
+            <strong className="text-white">${diplomadoDesde} {coin}</strong>. La
+            inscripción no se repite.
+          </p>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 const ProgramAlbumCard = ({ programa, coin, useMxn }) => {
   const price = useMxn ? programa.priceMx : programa.priceUsd
   const anchor = useMxn ? programa.anchorPriceMx : programa.anchorPriceUsd
@@ -343,6 +386,12 @@ const HomeMarketingHero = () => {
                   {INSCRIPCION_MARKETING.beneficioUnica}. Colegiaturas según el programa que elijas.
                 </p>
               </div>
+
+              <PaymentClarity
+                coin={coin}
+                inscripcionPrice={inscripcionPrice}
+                useMxn={useMxn}
+              />
 
               <div className="mt-4 grid grid-cols-2 gap-2">
                 {BENEFICIOS_HERO.slice(0, 4).map((b) => (

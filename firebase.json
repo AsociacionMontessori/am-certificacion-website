@@ -12,6 +12,18 @@
       "**/.*",
       "**/node_modules/**"
     ],
+    "redirects": [
+      {
+        "source": "/masterclasses",
+        "destination": "/diplomados",
+        "type": 301
+      },
+      {
+        "source": "/masterclasses/**",
+        "destination": "/diplomados",
+        "type": 301
+      }
+    ],
     "rewrites": [
       {
         "source": "**",
