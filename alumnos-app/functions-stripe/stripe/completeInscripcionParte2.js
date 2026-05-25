@@ -92,6 +92,16 @@ exports.completeInscripcionParte2Handler = onRequest(
           return;
         }
 
+        // Bloquear re-submission del expediente. Si ya quedó completo, solo admin
+        // puede corregir desde el portal interno. Evita que un atacante con el
+        // ordenId sobrescriba documentos o datos legítimos (F-02).
+        if (inscripcion.parte2Completa || inscripcion.expedienteCompleto) {
+          res.status(409).json({
+            error: "El expediente ya fue entregado. Para corregir datos contacta a la administración.",
+          });
+          return;
+        }
+
         const alumnoId = inscripcion.alumnoId;
         const bucket = admin.storage().bucket();
         const documentosValidados = {};

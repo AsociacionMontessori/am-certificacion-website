@@ -10,10 +10,15 @@ function hashDownloadToken(token) {
 }
 
 function getRequestFingerprint(req) {
-  const raw = [
-    req.get("x-forwarded-for") || req.ip || "",
-    req.get("user-agent") || "",
-  ].join("|");
+  // Mismo razonamiento que en rateLimit.js: tomar la última IP del XFF
+  // (la añadida por GCP) en vez de la primera, para que el atacante no
+  // pueda falsificar el fingerprint con un header arbitrario.
+  const xff = String(req.get("x-forwarded-for") || "")
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
+  const ip = xff[xff.length - 1] || req.ip || "";
+  const raw = [ip, req.get("user-agent") || ""].join("|");
   return crypto.createHash("sha256").update(raw).digest("hex").slice(0, 32);
 }
 

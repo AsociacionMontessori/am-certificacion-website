@@ -4,6 +4,7 @@ const admin = require("firebase-admin");
 const Stripe = require("stripe");
 const {notifyAdminOrdenPagada, notifyAdminPago} = require("./notifications");
 const {isOrdenFlujoInscripcion, getProgramaCheckout} = require("./programasCheckout");
+const {escapeHtml} = require("./escape");
 
 const stripeSecretKey = defineSecret("STRIPE_SECRET_KEY");
 const stripeWebhookSecret = defineSecret("STRIPE_WEBHOOK_SECRET");
@@ -110,7 +111,7 @@ async function handlePagoAlumnoPagado(db, pagoId, session) {
 
   await notifyAdminPago(db, {
     subject: `Pago Stripe validado — ${pagoSnap.data().tipo || "Pago"}`,
-    html: `<p>El pago <strong>${pagoId}</strong> fue validado automáticamente por Stripe.</p>`,
+    html: `<p>El pago <strong>${escapeHtml(pagoId)}</strong> fue validado automáticamente por Stripe.</p>`,
     text: `Pago ${pagoId} validado por Stripe`,
     tipo: "stripe_pago_alumno",
   });
@@ -202,7 +203,7 @@ async function handleInvoiceFailed(db, invoice) {
 
   await notifyAdminPago(db, {
     subject: "Fallo en cobro de colegiatura (Stripe)",
-    html: `<p>Falló el cobro de suscripción para el alumno <strong>${alumno.data().nombre || alumno.id}</strong>.</p>`,
+    html: `<p>Falló el cobro de suscripción para el alumno <strong>${escapeHtml(alumno.data().nombre || alumno.id)}</strong>.</p>`,
     text: `Fallo suscripción alumno ${alumno.id}`,
     tipo: "stripe_suscripcion_fallo",
   });

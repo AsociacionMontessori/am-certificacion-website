@@ -2,10 +2,15 @@ const crypto = require("crypto");
 const admin = require("firebase-admin");
 
 function getRequestIp(req) {
-  const forwardedFor = String(req.get("x-forwarded-for") || "")
-      .split(",")[0]
-      .trim();
-  return forwardedFor || req.ip || req.socket?.remoteAddress || "unknown";
+  // En Cloud Functions v2 (Cloud Run), el cliente puede prefijar su propio
+  // valor en X-Forwarded-For; GCP lo concatena después con la IP real y los
+  // load balancers. Tomar el último valor del header — el añadido por GCP —
+  // hace mucho más caro falsificar la huella de rate limit.
+  const xff = String(req.get("x-forwarded-for") || "")
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
+  return xff[xff.length - 1] || req.ip || req.socket?.remoteAddress || "unknown";
 }
 
 function getRateLimitFingerprint(req) {

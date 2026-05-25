@@ -1,4 +1,5 @@
 const admin = require("firebase-admin");
+const {escapeHtml} = require("./escape");
 
 /**
  * @param {import('firebase-admin').firestore.Firestore} db
@@ -39,15 +40,17 @@ async function notifyAdminPago(db, options) {
  */
 async function notifyAdminOrdenPagada(db, orden) {
   const cliente = orden.cliente || {};
-  const lineas = (orden.lineItems || []).map((l) => l.descripcion).join(", ");
+  const lineasEsc = (orden.lineItems || [])
+      .map((l) => escapeHtml(l?.descripcion))
+      .join(", ");
   const html = `
     <h2>Nuevo pago recibido (Stripe)</h2>
-    <p><strong>Tipo:</strong> ${orden.tipo}</p>
-    <p><strong>Cliente:</strong> ${cliente.nombre || "—"} (${cliente.email || "—"})</p>
-    <p><strong>Monto:</strong> ${orden.monto} ${orden.moneda}</p>
-    <p><strong>Conceptos:</strong> ${lineas}</p>
-    <p><strong>Orden:</strong> ${orden.id}</p>
-    ${orden.programa ? `<p><strong>Programa:</strong> ${orden.programa}</p>` : ""}
+    <p><strong>Tipo:</strong> ${escapeHtml(orden.tipo)}</p>
+    <p><strong>Cliente:</strong> ${escapeHtml(cliente.nombre || "—")} (${escapeHtml(cliente.email || "—")})</p>
+    <p><strong>Monto:</strong> ${escapeHtml(orden.monto)} ${escapeHtml(orden.moneda)}</p>
+    <p><strong>Conceptos:</strong> ${lineasEsc}</p>
+    <p><strong>Orden:</strong> ${escapeHtml(orden.id)}</p>
+    ${orden.programa ? `<p><strong>Programa:</strong> ${escapeHtml(orden.programa)}</p>` : ""}
   `;
   const text = `Pago Stripe: ${orden.tipo} - ${cliente.nombre} - ${orden.monto} ${orden.moneda} - Orden ${orden.id}`;
 
@@ -79,18 +82,18 @@ async function notifyAlumnoCuentaCreada(db, data) {
 
   const incluyePassword = passwordGenerada && passwordAcceso;
   const accesoHtml = incluyePassword
-    ? `<p><strong>Contraseña inicial</strong> (misma para el portal y Google Classroom): <code>${passwordAcceso}</code></p>
+    ? `<p><strong>Contraseña inicial</strong> (misma para el portal y Google Classroom): <code>${escapeHtml(passwordAcceso)}</code></p>
        <p>Te recomendamos guardarla en un lugar seguro. También queda registrada en tu expediente del portal.</p>`
     : "<p>Usa la contraseña que te indicó la asociación para el portal y Classroom.</p>";
 
   const html = `
     <h2>Bienvenido/a a Certificación Montessori</h2>
-    <p>Hola ${nombre || ""},</p>
+    <p>Hola ${escapeHtml(nombre || "")},</p>
     <p>Tu pago de inscripción fue registrado. Ya creamos tu usuario institucional y tu acceso al portal.</p>
     <ul>
-      <li><strong>Usuario:</strong> ${emailInstitucional}</li>
-      <li><strong>Portal:</strong> <a href="${portalUrl}">${portalUrl}</a></li>
-      <li><strong>Programa:</strong> ${nivelEspecializacion || "—"}</li>
+      <li><strong>Usuario:</strong> ${escapeHtml(emailInstitucional)}</li>
+      <li><strong>Portal:</strong> <a href="${escapeHtml(portalUrl)}">${escapeHtml(portalUrl)}</a></li>
+      <li><strong>Programa:</strong> ${escapeHtml(nivelEspecializacion || "—")}</li>
       <li><strong>Modalidad:</strong> En línea</li>
     </ul>
     ${accesoHtml}

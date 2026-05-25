@@ -18,6 +18,7 @@ const {isOrdenFlujoInscripcion} = require("./programasCheckout");
 const {resolvePasswordInscripcion} = require("./inscripcionPassword");
 const {provisionGoogleWorkspaceAlumno} = require("./googleWorkspaceProvision");
 const {GOOGLE_SERVICE_ACCOUNT_JSON} = require("./googleWorkspaceClient");
+const {escapeHtml} = require("./escape");
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -259,9 +260,9 @@ exports.completeInscripcionParte1Handler = onRequest(
               to: "admin@certificacionmontessori.com",
               subject: `[Inscripción] Revisar alta Google — ${emailInstitucional}`,
               html: `<p>La cuenta Firebase se creó, pero Google Workspace/Classroom requiere revisión.</p>
-                <p><strong>Alumno:</strong> ${nombre} (${emailInstitucional})</p>
-                <p><strong>Nivel:</strong> ${nivelEspecializacion}</p>
-                <pre>${JSON.stringify(googleWorkspace, null, 2)}</pre>`,
+                <p><strong>Alumno:</strong> ${escapeHtml(nombre)} (${escapeHtml(emailInstitucional)})</p>
+                <p><strong>Nivel:</strong> ${escapeHtml(nivelEspecializacion)}</p>
+                <pre>${escapeHtml(JSON.stringify(googleWorkspace, null, 2))}</pre>`,
               text: `Revisar Google Workspace para ${emailInstitucional}: ${JSON.stringify(googleWorkspace)}`,
               tipo: "google_provision_alerta",
               ordenId,

@@ -1,17 +1,31 @@
-const ALLOWED_ORIGINS = new Set([
+// Allowlist por entorno. Cuando STRIPE_FUNCTIONS_ENV === "production",
+// solo se permiten orígenes de producción (Live). En cualquier otro caso
+// (test, preview, local) se incluyen también los orígenes de desarrollo.
+// Esto evita que un atacante use un wrapper local para llamar a las
+// Functions de Live desde un origen permitido.
+const PROD_ORIGINS = [
   "https://certificacionmontessori.com",
   "https://www.certificacionmontessori.com",
-  "http://localhost:8000",
-  "http://127.0.0.1:8000",
   "https://certificacionmontessori.web.app",
   "https://certificacionmontessori.firebaseapp.com",
-  "https://certificacionmontessori--stripe-test-sl45bkl4.web.app",
   "https://alumnos.certificacionmontessori.com",
   "https://alumnos-certificacionmontessori.web.app",
   "https://alumnos-certificacionmontessori.firebaseapp.com",
+];
+
+const TEST_ORIGINS = [
+  "https://certificacionmontessori--stripe-test-sl45bkl4.web.app",
+  "http://localhost:8000",
+  "http://127.0.0.1:8000",
   "http://localhost:5173",
   "http://127.0.0.1:5173",
-]);
+];
+
+const IS_PRODUCTION = String(process.env.STRIPE_FUNCTIONS_ENV || "").toLowerCase() === "production";
+
+const ALLOWED_ORIGINS = new Set(
+    IS_PRODUCTION ? PROD_ORIGINS : [...PROD_ORIGINS, ...TEST_ORIGINS],
+);
 
 /**
  * @param {import('firebase-functions/v2/https').Request} req

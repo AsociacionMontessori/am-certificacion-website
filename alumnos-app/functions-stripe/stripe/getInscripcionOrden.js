@@ -61,6 +61,16 @@ exports.getInscripcionOrdenHandler = onRequest(
         const parte2Completa = Boolean(inscripcion?.parte2Completa || inscripcion?.expedienteCompleto);
         const nivelEsp = inscripcion?.nivelEspecializacion || orden.programa || "";
 
+        // Respuesta mínima — F-02: el ordenId se filtra en success_url y no
+        // debe ser suficiente para reconstruir el expediente completo.
+        // Hasta que Fase 1 introduzca accessToken por orden:
+        //   - SÍ exponemos: estado del flujo, datos de contacto del comprador
+        //     (que ya conoce Stripe), emailInstitucional/alumnoId (necesarios
+        //     para la pantalla de "cuenta creada"), y campos de Parte 1 para
+        //     autorrelleno del formulario antes de completar el paso.
+        //   - NO exponemos: CURP/pasaporte, domicilio, ocupación, empresa,
+        //     teléfono empresa, lista de documentos del expediente ni
+        //     usuarioInstitucional.
         res.json({
           ok: true,
           pagado,
@@ -87,16 +97,6 @@ exports.getInscripcionOrdenHandler = onRequest(
             nivelEspecializacion: inscripcion.nivelEspecializacion || inscripcion.nivel || "",
             nacionalidad: inscripcion.nacionalidad || "",
             fechaNacimiento: inscripcion.fechaNacimiento?.toDate?.()?.toISOString?.()?.slice(0, 10) || "",
-            usuarioInstitucional: inscripcion.usuarioInstitucional || "",
-          } : {},
-          datosParte2: inscripcion ? {
-            escolaridad: inscripcion.escolaridad || "",
-            domicilio: inscripcion.domicilio || "",
-            curpPasaporte: inscripcion.curpPasaporte || "",
-            ocupacion: inscripcion.ocupacion || "",
-            empresa: inscripcion.empresa || "",
-            telefonoEmpresa: inscripcion.telefonoEmpresa || "",
-            documentos: inscripcion.documentos || {},
           } : {},
           programa: orden.programa || "",
         });
