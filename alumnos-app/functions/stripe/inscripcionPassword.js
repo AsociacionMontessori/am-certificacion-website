@@ -1,23 +1,44 @@
 const crypto = require("crypto");
-const {defineString} = require("firebase-functions/params");
 
-/** Contraseña única portal + Classroom (configurar en Firebase / .env). */
-const INSCRIPCION_PASSWORD_UNIFICADA = defineString("INSCRIPCION_PASSWORD_UNIFICADA", {
-  default: "",
-});
+const LOWER = "abcdefghijklmnopqrstuvwxyz";
+const UPPER = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+const DIGITS = "0123456789";
+const SPECIAL = "!@#$%^&*()-_=+";
+const ALL = LOWER + UPPER + DIGITS + SPECIAL;
 
 /**
- * Contraseña institucional: prioridad secret unificado; si no hay, genera una temporal.
- * @param {string} [bodyPassword] — ignorado en flujo público (ya no la envía el alumno).
- * @return {{ password: string, passwordClassroom: string, generada: boolean }}
+ * Contraseña única por alumno (misma en Firebase Auth y Google Directory).
+ * Estilo compatible con workspace-directory-admin (16 caracteres, mix de clases).
  */
-function resolvePasswordInscripcion(bodyPassword) {
-  const unified = String(INSCRIPCION_PASSWORD_UNIFICADA.value() || "").trim();
-  if (unified.length >= 8) {
-    return {password: unified, passwordClassroom: unified, generada: false};
+function generatePasswordInscripcion(length = 16) {
+  const minLen = Math.max(12, length);
+  const pick = (charset) => charset[crypto.randomInt(0, charset.length)];
+
+  const chars = [pick(LOWER), pick(UPPER), pick(DIGITS), pick(SPECIAL)];
+  while (chars.length < minLen) {
+    chars.push(pick(ALL));
   }
-  const generated = crypto.randomBytes(9).toString("base64url").slice(0, 12);
-  return {password: generated, passwordClassroom: generated, generada: true};
+
+  for (let i = chars.length - 1; i > 0; i -= 1) {
+    const j = crypto.randomInt(0, i + 1);
+    const tmp = chars[i];
+    chars[i] = chars[j];
+    chars[j] = tmp;
+  }
+
+  return chars.join("");
 }
 
-module.exports = {resolvePasswordInscripcion, INSCRIPCION_PASSWORD_UNIFICADA};
+/**
+ * @return {{ password: string, passwordClassroom: string, generada: boolean }}
+ */
+function resolvePasswordInscripcion() {
+  const password = generatePasswordInscripcion(16);
+  return {
+    password,
+    passwordClassroom: password,
+    generada: true,
+  };
+}
+
+module.exports = {generatePasswordInscripcion, resolvePasswordInscripcion};

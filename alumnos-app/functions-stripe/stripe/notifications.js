@@ -72,29 +72,34 @@ async function notifyAlumnoCuentaCreada(db, data) {
     portalUrl,
     nivelEspecializacion,
     passwordGenerada,
+    passwordAcceso,
   } = data;
 
   if (!emailContacto) return;
 
-  const accesoTexto = passwordGenerada
-    ? "<p>Te asignamos una contraseña institucional unificada para el portal de alumnos y Google Classroom. Recibirás los datos de acceso por un canal seguro o en tu expediente; si no los tienes, escríbenos por WhatsApp.</p>"
-    : "<p>Usa la contraseña institucional que te proporcionó la Asociación (misma para el portal y Google Classroom).</p>";
+  const incluyePassword = passwordGenerada && passwordAcceso;
+  const accesoHtml = incluyePassword
+    ? `<p><strong>Contraseña inicial</strong> (misma para el portal y Google Classroom): <code>${passwordAcceso}</code></p>
+       <p>Te recomendamos guardarla en un lugar seguro. También queda registrada en tu expediente del portal.</p>`
+    : "<p>Usa la contraseña que te indicó la asociación para el portal y Classroom.</p>";
 
   const html = `
     <h2>Bienvenido/a a Certificación Montessori</h2>
     <p>Hola ${nombre || ""},</p>
-    <p>Tu pago de inscripción fue registrado y ya creamos tu cuenta en el portal de alumnos.</p>
+    <p>Tu pago de inscripción fue registrado. Ya creamos tu usuario institucional y tu acceso al portal.</p>
     <ul>
       <li><strong>Usuario:</strong> ${emailInstitucional}</li>
       <li><strong>Portal:</strong> <a href="${portalUrl}">${portalUrl}</a></li>
       <li><strong>Programa:</strong> ${nivelEspecializacion || "—"}</li>
       <li><strong>Modalidad:</strong> En línea</li>
     </ul>
-    ${accesoTexto}
+    ${accesoHtml}
     <p>En los próximos pasos completa tu expediente administrativo (documentos y reglamento firmado).</p>
     <p>Asociación Montessori de México A.C.</p>
   `;
-  const text = `Cuenta creada: ${emailInstitucional} — Portal: ${portalUrl}`;
+  const text = incluyePassword
+    ? `Cuenta: ${emailInstitucional} — Portal: ${portalUrl} — Contraseña enviada en este correo.`
+    : `Cuenta creada: ${emailInstitucional} — Portal: ${portalUrl}`;
 
   await db.collection("emails_pendientes").add({
     to: emailContacto,

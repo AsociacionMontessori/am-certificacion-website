@@ -103,7 +103,7 @@ exports.completeInscripcionParte1Handler = onRequest(
         }
         const orden = ordenSnap.data();
         const {password, passwordClassroom, generada: passwordGenerada} =
-          resolvePasswordInscripcion(body.password);
+          resolvePasswordInscripcion();
 
         if (!isOrdenFlujoInscripcion(orden.tipo)) {
           res.status(400).json({error: "Esta referencia no corresponde a una inscripción"});
@@ -248,6 +248,7 @@ exports.completeInscripcionParte1Handler = onRequest(
           portalUrl: "https://alumnos.certificacionmontessori.com",
           nivelEspecializacion,
           passwordGenerada,
+          passwordAcceso: passwordGenerada ? password : null,
         });
 
         res.json({

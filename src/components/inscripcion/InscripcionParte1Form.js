@@ -95,14 +95,14 @@ const InscripcionParte1Form = ({
 
       <div className="rounded-xl border border-yellow/30 bg-yellow/10 px-4 py-3 space-y-2">
         <p className="text-sm text-gray leading-relaxed">
-          <strong className="text-black">Contraseña:</strong> la asignamos de forma unificada
-          para el portal de alumnos y Google Classroom (misma clave). Te la comunicamos por
-          correo o en tu expediente.
+          <strong className="text-black">Acceso:</strong> generamos una contraseña única para ti
+          (la misma en el portal de alumnos y en Google Classroom). La enviamos a tu correo de
+          contacto y queda en tu expediente del portal.
         </p>
         <p className="text-sm text-gray leading-relaxed">
-          <strong className="text-black">Google Workspace:</strong> al continuar creamos tu
-          usuario <strong>@certificacionmontessori.com</strong>, te ubicamos en la unidad
-          organizativa de tu programa e inscribimos tus clases en Classroom.
+          <strong className="text-black">Google:</strong> creamos tu usuario{" "}
+          <strong>@certificacionmontessori.com</strong>, te asignamos la unidad organizativa de
+          tu programa y te inscribimos en tus clases de Classroom.
         </p>
       </div>
 

@@ -8,9 +8,21 @@ Tras el pago Stripe, `completeInscripcionParte1` puede automatizar:
 
 La cuenta **Firebase** del portal de alumnos se sigue creando siempre; Google es un paso adicional (no bloquea el flujo si falla).
 
+## Contexto operativo
+
+Si ya tienes **classroom-mcp** y **workspace-directory-admin** funcionando (OU, delegación, service account), solo falta:
+
+1. Subir el mismo JSON a `GOOGLE_SERVICE_ACCOUNT_JSON` en Firebase.
+2. Configurar `GOOGLE_CLASSROOM_COURSE_MAP` con los IDs de curso.
+3. Activar `GOOGLE_WORKSPACE_PROVISION_ENABLED=true` y desplegar.
+
+**Contraseñas:** se generan solas por inscripción (16 caracteres, únicas). La misma clave se usa en Firebase Auth y en Google; se envía al correo de contacto del alumno y se guarda en `passwordTemporal`.
+
+Guía corta para humanos: `docs/INSCRIPCION_PASO2_GUIA_HUMANO.md`.
+
 ## Requisitos en Google Cloud
 
-1. **Service account** con **Domain-Wide Delegation** (misma familia que `classroom-mcp` / `workspace-directory-admin`).
+1. **Service account** con **Domain-Wide Delegation** (reutilizar la de `classroom-mcp` / `workspace-directory-admin`).
 2. En **Admin Console → Seguridad → Controles de API → Delegación en todo el dominio**, autorizar el `client_id` de la SA con estos alcances:
 
 | Alcance |
@@ -25,13 +37,10 @@ La cuenta **Firebase** del portal de alumnos se sigue creando siempre; Google es
 ```bash
 cd alumnos-app
 
-# JSON completo de la service account (una línea)
+# JSON completo de la service account (mismo que classroom-mcp)
 firebase functions:secrets:set GOOGLE_SERVICE_ACCOUNT_JSON
 
-# Contraseña unificada portal + Classroom (mín. 8 caracteres)
-firebase functions:secrets:set INSCRIPCION_PASSWORD_UNIFICADA
-
-# Activar provisión (test: false hasta validar OU y cursos)
+# Activar provisión (test: false hasta validar mapa de cursos)
 firebase functions:config:set google.workspace_provision_enabled=false
 # En Functions v2 params (recomendado tras deploy):
 # GOOGLE_WORKSPACE_PROVISION_ENABLED=true
