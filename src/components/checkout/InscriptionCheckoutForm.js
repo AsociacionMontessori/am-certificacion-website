@@ -10,22 +10,71 @@ import {
   PROMO_NEURO_INSCRIPCION_INCLUIDA,
 } from "../../data/inscripcionPublic"
 import { getCuentaContableId } from "../../data/datosBancarios"
-import { INSCRIPCION_PRECIO } from "../../data/programasOferta"
+import ComprobanteFiscalMexico from "./ComprobanteFiscalMexico"
+import { useVisitorGeo } from "../../hooks/useVisitorGeo"
+import {
+  INSCRIPCION_PRECIO,
+  getCheckoutLabelFromProgramaId,
+} from "../../data/programasOferta"
 
 const formatMonto = (n) =>
   Number(n).toLocaleString("es-MX", { maximumFractionDigits: 0 })
 
-const InscriptionCheckoutForm = ({ coin, price, cancelHref = "/" }) => {
+const readProgramaIdFromUrl = () => {
+  if (typeof window === "undefined") return null
+  return new URLSearchParams(window.location.search).get("programa")
+}
+
+const InscriptionCheckoutForm = ({
+  coin,
+  price,
+  cancelHref = "/",
+  initialProgramaId = null,
+}) => {
   const [nombre, setNombre] = useState("")
   const [email, setEmail] = useState("")
   const [telefono, setTelefono] = useState("")
-  const [programa, setPrograma] = useState(PROGRAMAS_INSCRIPCION[0])
+  const [programa, setPrograma] = useState(() => {
+    const fromProp = initialProgramaId
+      ? getCheckoutLabelFromProgramaId(initialProgramaId)
+      : null
+    const fromUrl = getCheckoutLabelFromProgramaId(readProgramaIdFromUrl())
+    const label = fromProp || fromUrl
+    if (label && PROGRAMAS_INSCRIPCION.includes(label)) {
+      return label
+    }
+    return PROGRAMAS_INSCRIPCION[0]
+  })
   const [soloInscripcion, setSoloInscripcion] = useState(false)
   const [requiereFacturaFiscal, setRequiereFacturaFiscal] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
+  const { esMexico: visitanteEnMexico } = useVisitorGeo()
 
   const esPromoNeuro = programaTienePromoInscripcionIncluida(programa)
+
+  useEffect(() => {
+    if (!visitanteEnMexico) {
+      setRequiereFacturaFiscal(false)
+    }
+  }, [visitanteEnMexico])
+
+  useEffect(() => {
+    if (!initialProgramaId) return
+    const label = getCheckoutLabelFromProgramaId(initialProgramaId)
+    if (label && PROGRAMAS_INSCRIPCION.includes(label)) {
+      setPrograma(label)
+    }
+  }, [initialProgramaId])
+
+  useEffect(() => {
+    const id = readProgramaIdFromUrl()
+    if (!id) return
+    const label = getCheckoutLabelFromProgramaId(id)
+    if (label && PROGRAMAS_INSCRIPCION.includes(label)) {
+      setPrograma(label)
+    }
+  }, [])
 
   useEffect(() => {
     if (esPromoNeuro && soloInscripcion) {
@@ -133,37 +182,17 @@ const InscriptionCheckoutForm = ({ coin, price, cancelHref = "/" }) => {
         </fieldset>
       )}
 
-      <fieldset className="space-y-2 rounded-xl border border-gray/20 bg-gray/5 px-4 py-4">
-        <legend className="text-sm font-medium text-black px-1">
-          Comprobante fiscal *
-        </legend>
-        <label className="flex items-start gap-3 min-h-[44px] cursor-pointer">
-          <input
-            type="radio"
-            name="facturaFiscal"
-            checked={!requiereFacturaFiscal}
-            onChange={() => setRequiereFacturaFiscal(false)}
-            className="mt-1"
-          />
-          <span className="text-sm text-black">
-            <span className="font-medium">Recibo normal</span>
-            <span className="block text-xs text-gray">Sin factura fiscal (público en general)</span>
-          </span>
-        </label>
-        <label className="flex items-start gap-3 min-h-[44px] cursor-pointer">
-          <input
-            type="radio"
-            name="facturaFiscal"
-            checked={requiereFacturaFiscal}
-            onChange={() => setRequiereFacturaFiscal(true)}
-            className="mt-1"
-          />
-          <span className="text-sm text-black">
-            <span className="font-medium">Factura fiscal con RFC</span>
-            <span className="block text-xs text-gray">Para deducciones; solicitaremos tus datos fiscales</span>
-          </span>
-        </label>
-      </fieldset>
+      {visitanteEnMexico ? (
+        <ComprobanteFiscalMexico
+          requiereFacturaFiscal={requiereFacturaFiscal}
+          onChange={setRequiereFacturaFiscal}
+        />
+      ) : (
+        <p className="text-sm text-gray rounded-xl border border-gray/20 bg-gray/5 px-4 py-3 leading-relaxed">
+          Comprobante: <strong className="text-black">recibo normal</strong> (sin factura fiscal
+          mexicana). La factura con RFC solo aplica para pagos desde México.
+        </p>
+      )}
 
       <div className="space-y-3">
         <div>

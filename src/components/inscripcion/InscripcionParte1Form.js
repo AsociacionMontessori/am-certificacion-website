@@ -3,17 +3,8 @@ import { useState } from "react"
 import {
   DOMINIO_INSTITUCIONAL,
   MODALIDAD_INSCRIPCION,
-  NIVELES_ESPECIALIZACION,
-  getNivelByLabel,
 } from "../../data/inscripcionForm"
 import { submitInscripcionParte1 } from "../../utils/inscripcionApi"
-
-const TIPO_PROGRAMA_ETIQUETA = {
-  guia: "Guía",
-  diplomado: "Diplomado",
-  curso: "Curso",
-  otro: "Otro",
-}
 
 const emptyForm = {
   nombreCompleto: "",
@@ -23,12 +14,21 @@ const emptyForm = {
   telefonoMovil: "",
   emailContacto: "",
   usuarioInstitucional: "",
-  password: "",
-  confirmPassword: "",
 }
 
-const InscripcionParte1Form = ({ ordenId, initialValues = {}, onSuccess }) => {
-  const [form, setForm] = useState({ ...emptyForm, ...initialValues })
+const InscripcionParte1Form = ({
+  ordenId,
+  initialValues = {},
+  nivelEspecializacionFijo = "",
+  programaPagadoLabel = "",
+  onSuccess,
+}) => {
+  const nivelFijo = nivelEspecializacionFijo || initialValues.nivelEspecializacion || ""
+  const [form, setForm] = useState({
+    ...emptyForm,
+    ...initialValues,
+    nivelEspecializacion: nivelFijo,
+  })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
 
@@ -40,19 +40,11 @@ const InscripcionParte1Form = ({ ordenId, initialValues = {}, onSuccess }) => {
     setForm((prev) => ({ ...prev, [name]: value }))
   }
 
-  const handleNivelChange = (label) => {
-    setForm((prev) => ({ ...prev, nivelEspecializacion: label }))
-  }
-
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError("")
-    if (!form.nivelEspecializacion) {
-      setError("Selecciona tu nivel de especialización")
-      return
-    }
-    if (form.password !== form.confirmPassword) {
-      setError("Las contraseñas no coinciden")
+    if (!nivelFijo) {
+      setError("No se encontró el programa de tu pago. Contacta a soporte.")
       return
     }
     setLoading(true)
@@ -62,11 +54,10 @@ const InscripcionParte1Form = ({ ordenId, initialValues = {}, onSuccess }) => {
         fechaNacimiento: form.fechaNacimiento,
         nacionalidad: form.nacionalidad.trim(),
         modalidad: MODALIDAD_INSCRIPCION,
-        nivelEspecializacion: form.nivelEspecializacion,
+        nivelEspecializacion: nivelFijo,
         telefonoMovil: form.telefonoMovil.trim(),
         emailContacto: form.emailContacto.trim(),
         usuarioInstitucional: form.usuarioInstitucional.trim().toLowerCase(),
-        password: form.password,
       })
       onSuccess?.(result)
     } catch (err) {
@@ -87,75 +78,111 @@ const InscripcionParte1Form = ({ ordenId, initialValues = {}, onSuccess }) => {
         <p className="text-sm font-semibold text-blue">{MODALIDAD_INSCRIPCION}</p>
       </div>
 
+      <div className="rounded-xl border-2 border-green/30 bg-green/5 px-4 py-4">
+        <p className="text-xs font-semibold uppercase tracking-wide text-green mb-1">
+          Programa pagado (no modificable)
+        </p>
+        <p className="text-sm font-semibold text-black leading-snug">
+          {nivelFijo}
+        </p>
+        {programaPagadoLabel && (
+          <p className="text-xs text-gray mt-2">
+            Checkout: {programaPagadoLabel}. Cada programa tiene un costo distinto; por eso no
+            se puede cambiar después del pago.
+          </p>
+        )}
+      </div>
+
+      <div className="rounded-xl border border-yellow/30 bg-yellow/10 px-4 py-3 space-y-2">
+        <p className="text-sm text-gray leading-relaxed">
+          <strong className="text-black">Contraseña:</strong> la asignamos de forma unificada
+          para el portal de alumnos y Google Classroom (misma clave). Te la comunicamos por
+          correo o en tu expediente.
+        </p>
+        <p className="text-sm text-gray leading-relaxed">
+          <strong className="text-black">Google Workspace:</strong> al continuar creamos tu
+          usuario <strong>@certificacionmontessori.com</strong>, te ubicamos en la unidad
+          organizativa de tu programa e inscribimos tus clases en Classroom.
+        </p>
+      </div>
+
       <div>
         <label className="block text-sm font-medium text-black mb-1.5" htmlFor="p1-nombre">
           Nombre completo (nombre(s) y apellidos) *
         </label>
-        <input id="p1-nombre" name="nombreCompleto" required minLength={2} value={form.nombreCompleto} onChange={handleChange} className={inputClass} autoComplete="name" />
+        <input
+          id="p1-nombre"
+          name="nombreCompleto"
+          required
+          minLength={2}
+          value={form.nombreCompleto}
+          onChange={handleChange}
+          className={inputClass}
+          autoComplete="name"
+        />
       </div>
 
       <div>
         <label className="block text-sm font-medium text-black mb-1.5" htmlFor="p1-nacimiento">
           Fecha de nacimiento *
         </label>
-        <input id="p1-nacimiento" name="fechaNacimiento" type="date" required value={form.fechaNacimiento} onChange={handleChange} className={inputClass} />
+        <input
+          id="p1-nacimiento"
+          name="fechaNacimiento"
+          type="date"
+          required
+          value={form.fechaNacimiento}
+          onChange={handleChange}
+          className={inputClass}
+        />
       </div>
 
       <div>
         <label className="block text-sm font-medium text-black mb-1.5" htmlFor="p1-nacionalidad">
           Nacionalidad *
         </label>
-        <input id="p1-nacionalidad" name="nacionalidad" required value={form.nacionalidad} onChange={handleChange} className={inputClass} placeholder="Ej. Mexicana" />
+        <input
+          id="p1-nacionalidad"
+          name="nacionalidad"
+          required
+          value={form.nacionalidad}
+          onChange={handleChange}
+          className={inputClass}
+          placeholder="Ej. Mexicana"
+        />
       </div>
-
-      <fieldset className="space-y-3">
-        <legend className="block text-sm font-medium text-black mb-2">
-          Nivel de especialización *
-        </legend>
-        {NIVELES_ESPECIALIZACION.map((nivel) => {
-          const selected = form.nivelEspecializacion === nivel.label
-          const tipoEtiqueta = TIPO_PROGRAMA_ETIQUETA[nivel.tipoPrograma] || "Programa"
-          return (
-            <label
-              key={nivel.id}
-              className={`block rounded-2xl border px-4 py-4 cursor-pointer transition-colors min-h-[48px] ${
-                selected
-                  ? "border-blue bg-blue/5 ring-2 ring-blue/30"
-                  : "border-gray/25 bg-white hover:border-blue/40"
-              }`}
-            >
-              <input
-                type="radio"
-                name="nivelEspecializacion"
-                value={nivel.label}
-                checked={selected}
-                onChange={() => handleNivelChange(nivel.label)}
-                className="sr-only"
-              />
-              <span className="inline-block text-xs font-semibold uppercase tracking-wide text-blue mb-1">
-                {tipoEtiqueta}
-              </span>
-              <span className="block text-sm text-black leading-snug">{nivel.label}</span>
-              {selected && getNivelByLabel(nivel.label) && (
-                <span className="block text-xs text-green font-medium mt-2">Seleccionado</span>
-              )}
-            </label>
-          )
-        })}
-      </fieldset>
 
       <div>
         <label className="block text-sm font-medium text-black mb-1.5" htmlFor="p1-tel">
           Teléfono móvil de contacto *
         </label>
-        <input id="p1-tel" name="telefonoMovil" type="tel" required minLength={8} value={form.telefonoMovil} onChange={handleChange} className={inputClass} autoComplete="tel" />
+        <input
+          id="p1-tel"
+          name="telefonoMovil"
+          type="tel"
+          required
+          minLength={8}
+          value={form.telefonoMovil}
+          onChange={handleChange}
+          className={inputClass}
+          autoComplete="tel"
+        />
       </div>
 
       <div>
         <label className="block text-sm font-medium text-black mb-1.5" htmlFor="p1-email">
           Correo electrónico de contacto *
         </label>
-        <input id="p1-email" name="emailContacto" type="email" required value={form.emailContacto} onChange={handleChange} className={inputClass} autoComplete="email" />
+        <input
+          id="p1-email"
+          name="emailContacto"
+          type="email"
+          required
+          value={form.emailContacto}
+          onChange={handleChange}
+          className={inputClass}
+          autoComplete="email"
+        />
         <p className="text-xs text-gray mt-1.5">
           Recibirás aquí la confirmación de tu cuenta y acceso al portal.
         </p>
@@ -184,25 +211,17 @@ const InscripcionParte1Form = ({ ordenId, initialValues = {}, onSuccess }) => {
         </div>
       </div>
 
-      <div>
-        <label className="block text-sm font-medium text-black mb-1.5" htmlFor="p1-pass">
-          Contraseña para el portal *
-        </label>
-        <input id="p1-pass" name="password" type="password" required minLength={8} value={form.password} onChange={handleChange} className={inputClass} autoComplete="new-password" />
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-black mb-1.5" htmlFor="p1-pass2">
-          Confirmar contraseña *
-        </label>
-        <input id="p1-pass2" name="confirmPassword" type="password" required minLength={8} value={form.confirmPassword} onChange={handleChange} className={inputClass} autoComplete="new-password" />
-      </div>
-
       {error && (
-        <p className="text-sm text-red rounded-lg bg-red/5 px-3 py-2" role="alert">{error}</p>
+        <p className="text-sm text-red rounded-lg bg-red/5 px-3 py-2" role="alert">
+          {error}
+        </p>
       )}
 
-      <button type="submit" disabled={loading} className="min-h-[48px] w-full inline-flex items-center justify-center px-6 py-3 rounded-full font-semibold text-white bg-gradient-to-r from-blue to-green disabled:opacity-60">
+      <button
+        type="submit"
+        disabled={loading}
+        className="min-h-[48px] w-full inline-flex items-center justify-center px-6 py-3 rounded-full font-semibold text-white bg-gradient-to-r from-blue to-green disabled:opacity-60"
+      >
         {loading ? "Creando cuenta…" : "Crear mi cuenta y continuar"}
       </button>
     </form>

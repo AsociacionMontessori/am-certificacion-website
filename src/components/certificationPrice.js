@@ -4,7 +4,11 @@ import Card from "./cards/card"
 import CardInscription from "./cards/inscriptionCard"
 import CardCertification from "./cards/cardCertification"
 import axios from "axios"
-import { INSCRIPCION_MARKETING_COPY, PROGRAMAS_OFERTA } from "../data/programasOferta"
+import ProgramCheckoutLink from "./checkout/ProgramCheckoutLink"
+import {
+    INSCRIPCION_MARKETING_COPY,
+    PROGRAMAS_OFERTA,
+} from "../data/programasOferta"
 
 const CertificationPrice = () => {
     const [state, setState] = useState({
@@ -73,6 +77,7 @@ const CertificationPrice = () => {
     const allCards = [
         ...guias.map((p) => ({
             cardType: "monthly",
+            programaId: p.id,
             title: p.cardTitle,
             subtitle: p.cardSubtitle,
             priceMx: p.priceMx,
@@ -83,6 +88,7 @@ const CertificationPrice = () => {
         })),
         {
             cardType: "certification",
+            programaId: neuro.id,
             title: neuro.cardTitle,
             subtitle: neuro.cardSubtitle,
             priceMx: neuro.priceMx,
@@ -96,6 +102,7 @@ const CertificationPrice = () => {
         },
         {
             cardType: "certification",
+            programaId: cosmica.id,
             title: cosmica.cardTitle,
             subtitle: cosmica.cardSubtitle,
             priceMx: cosmica.priceMx,
@@ -105,7 +112,7 @@ const CertificationPrice = () => {
             paymentNote: cosmica.paymentNote,
             footer: `Inscripción aparte (${INSCRIPCION_MARKETING_COPY.textoMonto})`,
         },
-        certificado,
+        { ...certificado, programaId: null },
     ]
 
     const inscripcion = {
@@ -128,10 +135,13 @@ const CertificationPrice = () => {
                         Certificación Montessori
                     </span>
                 </h2>
-                <div className="bg-white rounded-3xl mx-4 sm:mx-6 lg:mx-auto max-w-7xl overflow-visible">
-                    <div className="px-6 pt-10 pb-8 lg:px-12 lg:pb-4 xl:px-6 2xl:px-0">
-                        <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_auto] lg:gap-x-6 xl:gap-x-10 lg:items-start">
-                            <div className="max-w-3xl">
+                <section
+                    id="prices"
+                    className="relative z-10 mb-10 px-4 sm:mx-auto max-w-7xl sm:px-6 lg:px-12 xl:px-6 2xl:px-0 mt-6 lg:mt-8"
+                >
+                    <div className="flex flex-col-reverse gap-8 lg:grid lg:grid-cols-[minmax(0,1fr)_auto] lg:gap-x-8 xl:gap-x-10 lg:items-start">
+                        <div className="min-w-0 space-y-8 lg:col-start-1">
+                            <div className="bg-white rounded-3xl px-6 py-8 sm:px-8 max-w-3xl">
                                 <h3>
                                     <span className="text-red md:text-2xl text-xl">
                                         Certificación internacional
@@ -149,65 +159,52 @@ const CertificationPrice = () => {
                                 </p>
                             </div>
 
-                            <div className="relative z-20 mt-8 flex justify-center lg:mt-2 lg:justify-end lg:translate-y-8 xl:translate-y-10 shrink-0">
-                                <div className="w-full max-w-sm shadow-2xl rounded-3xl ring-2 ring-blue/15 lg:w-72 xl:w-80">
-                                    {(() => {
-                                        const { coin, priceToShow } = getLocalizedPrice(
-                                            state,
-                                            inscripcion
-                                        )
-                                        return (
-                                            <CardInscription
-                                                title={inscripcion.title}
-                                                subtitle={inscripcion.subtitle}
-                                                coin={coin}
-                                                price={priceToShow}
-                                                text={inscripcion.text}
-                                                badge={inscripcion.badge}
-                                            />
-                                        )
-                                    })()}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <section
-                    id="prices"
-                    className="relative z-10 mb-10 px-4 sm:mx-auto max-w-7xl sm:px-6 lg:px-12 xl:px-6 2xl:px-0 pt-10 sm:pt-12 lg:pt-44 xl:pt-48"
-                >
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 gap-y-10 justify-items-center">
-                        {allCards.map((item, index) => {
+                            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 gap-y-10 justify-items-center">
+                        {allCards.map((item) => {
                             const { coin, priceToShow } = getLocalizedPrice(state, item)
                             const wrapperClass = "w-full flex justify-center"
+                            const cardKey = item.programaId || item.title
+
                             if (item.cardType === "certification") {
                                 return (
-                                    <div className={wrapperClass} key={item.title}>
-                                        <CardCertification
+                                    <div className={wrapperClass} key={cardKey}>
+                                        <ProgramCheckoutLink
+                                            programaId={item.programaId}
                                             title={item.title}
-                                            subtitle={item.subtitle}
-                                            coin={coin}
-                                            price={priceToShow}
-                                            text={item.text}
-                                            time={item.time}
-                                            footer={item.footer}
-                                            paymentNote={item.paymentNote}
-                                        />
+                                            className="w-full max-w-[14rem]"
+                                            disabled={!item.programaId}
+                                        >
+                                            <CardCertification
+                                                title={item.title}
+                                                subtitle={item.subtitle}
+                                                coin={coin}
+                                                price={priceToShow}
+                                                text={item.text}
+                                                time={item.time}
+                                                footer={item.footer}
+                                                paymentNote={item.paymentNote}
+                                            />
+                                        </ProgramCheckoutLink>
                                     </div>
                                 )
                             }
                             return (
-                                <div className={wrapperClass} key={item.title}>
-                                    <div className="space-y-2 flex flex-col items-center">
-                                        <Card
+                                <div className={wrapperClass} key={cardKey}>
+                                    <div className="space-y-2 flex flex-col items-center w-full max-w-[14rem]">
+                                        <ProgramCheckoutLink
+                                            programaId={item.programaId}
                                             title={item.title}
-                                            subtitle={item.subtitle}
-                                            coin={coin}
-                                            price={priceToShow}
-                                            text={item.text}
-                                            time={item.duration}
-                                        />
+                                            className="w-full"
+                                        >
+                                            <Card
+                                                title={item.title}
+                                                subtitle={item.subtitle}
+                                                coin={coin}
+                                                price={priceToShow}
+                                                text={item.text}
+                                                time={item.duration}
+                                            />
+                                        </ProgramCheckoutLink>
                                         {item.footnote && (
                                             <p className="text-xs text-white/90 text-center max-w-[14rem] leading-relaxed px-2">
                                                 {item.footnote}
@@ -217,8 +214,9 @@ const CertificationPrice = () => {
                                 </div>
                             )
                         })}
-                    </div>
-                    <div className="mt-10 mx-auto max-w-3xl rounded-2xl border-2 border-white/40 bg-white/10 px-6 py-5 backdrop-blur-sm">
+                            </div>
+
+                            <div className="mx-auto max-w-3xl rounded-2xl border-2 border-white/40 bg-white/10 px-6 py-5 backdrop-blur-sm">
                         <p className="text-center text-white text-sm leading-relaxed md:text-base">
                             <span className="font-semibold">¿Vas por más de un nivel?</span> Si ya
                             cursaste Nido y Comunidad Infantil o Casa de Niños, puedes revalidar el
@@ -230,10 +228,33 @@ const CertificationPrice = () => {
                             cuando ya terminaste un nivel con nosotros o si tomas otro programa
                             después.
                         </p>
+                            </div>
+                            <p className="text-white md:text-sm text-xs text-center sm:text-left">
+                                Precios sujetos a disponibilidad. Aplican Términos y Condiciones.
+                            </p>
+                        </div>
+
+                        <div className="flex justify-center lg:col-start-2 lg:row-start-1 lg:justify-end lg:sticky lg:top-24 z-20 shrink-0">
+                            <div className="w-full max-w-sm shadow-2xl rounded-3xl ring-2 ring-white/50 lg:w-72 xl:w-80">
+                                {(() => {
+                                    const { coin, priceToShow } = getLocalizedPrice(
+                                        state,
+                                        inscripcion
+                                    )
+                                    return (
+                                        <CardInscription
+                                            title={inscripcion.title}
+                                            subtitle={inscripcion.subtitle}
+                                            coin={coin}
+                                            price={priceToShow}
+                                            text={inscripcion.text}
+                                            badge={inscripcion.badge}
+                                        />
+                                    )
+                                })()}
+                            </div>
+                        </div>
                     </div>
-                    <p className="mt-6 text-white md:text-sm text-xs text-center sm:text-left">
-                        Precios sujetos a disponibilidad. Aplican Términos y Condiciones.
-                    </p>
                 </section>
             </section>
         </>

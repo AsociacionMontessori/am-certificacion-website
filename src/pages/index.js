@@ -68,6 +68,7 @@ const IndexPage = ({ location }) => {
 
   return (
     <Layout>
+      <div className="bg-gradient-to-r from-blue via-purple to-green">
       <Nav textColor="text-white" />
       <main>
         <HomeMarketingHero />
@@ -127,6 +128,7 @@ const IndexPage = ({ location }) => {
           <Timeline />
         </section>
       </main>
+      </div>
     </Layout>
   )
 }

@@ -3,10 +3,12 @@ import { Link } from "gatsby"
 import Layout from "../layout"
 import Seo from "../seo"
 import Nav from "../nav"
+import InscripcionAyudaWhatsApp from "../inscripcion/InscripcionAyudaWhatsApp"
 
 const CheckoutPageShell = ({ title, description, backTo = "/", children }) => (
   <Layout>
     <Seo title={title} description={description} />
+    <div className="bg-gradient-to-r from-blue via-purple to-green">
     <Nav textColor="text-white" />
     <main className="min-h-screen px-4 py-20 sm:py-24 pb-12">
       <div className="max-w-lg mx-auto">
@@ -23,14 +25,14 @@ const CheckoutPageShell = ({ title, description, backTo = "/", children }) => (
               <p className="mt-2 text-sm text-gray leading-relaxed">{description}</p>
             )}
           </header>
-          <div
-            className="px-5 sm:px-6 py-6"
-          >
+          <div className="px-5 sm:px-6 py-6 space-y-6">
+            <InscripcionAyudaWhatsApp />
             {children}
           </div>
         </article>
       </div>
     </main>
+    </div>
   </Layout>
 )
 

@@ -156,6 +156,11 @@ const InscripcionCompletarPage = ({ location }) => {
         <InscripcionParte1Form
           ordenId={ordenId}
           initialValues={initialValues}
+          nivelEspecializacionFijo={
+            mapProgramaCheckoutANivel(context?.programa) ||
+            initialValues.nivelEspecializacion
+          }
+          programaPagadoLabel={context?.programa || ""}
           onSuccess={handleParte1Success}
         />
       )}

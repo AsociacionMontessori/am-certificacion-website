@@ -3,6 +3,7 @@ import { Link } from "gatsby"
 import CheckoutPageShell from "../../components/checkout/CheckoutPageShell"
 import DatosBancariosCard from "../../components/inscripcion/DatosBancariosCard"
 import { DATOS_BANCARIOS_INSCRIPCION } from "../../data/datosBancarios"
+import { useVisitorGeo } from "../../hooks/useVisitorGeo"
 
 const pasosTransferencia = [
   {
@@ -26,13 +27,16 @@ const pasosTransferencia = [
   },
 ]
 
-const InscripcionTransferenciaPage = () => (
+const InscripcionTransferenciaPage = () => {
+  const { esMexico } = useVisitorGeo()
+
+  return (
   <CheckoutPageShell
     title="Pago por transferencia bancaria"
     description="Alternativa para quienes no desean pagar con tarjeta en línea."
     backTo="/inscripcion/pagar"
   >
-    <DatosBancariosCard />
+    <DatosBancariosCard esMexico={esMexico} />
 
     <div className="mt-6 space-y-4">
       {pasosTransferencia.map((paso) => (
@@ -61,6 +65,7 @@ const InscripcionTransferenciaPage = () => (
       </Link>
     </div>
   </CheckoutPageShell>
-)
+  )
+}
 
 export default InscripcionTransferenciaPage

@@ -55,7 +55,7 @@ export const PROGRAMAS_OFERTA = [
     priceNote: `Programa $2,800 + inscripción $${INSCRIPCION_PRECIO.priceMx} (solo la primera vez)`,
     paymentNote: "programa + inscripción",
     duration: "5 meses",
-    cta: "/inscripcion/pagar",
+    cta: "/inscripcion/pagar?programa=cosmica",
     featured: true,
     nivelFormulario: "Diplomado en Educación Cósmica y Grandes Lecciones (5 meses)",
   },
@@ -72,7 +72,7 @@ export const PROGRAMAS_OFERTA = [
     paymentNote: "promo todo incluido",
     promoInscripcionIncluida: true,
     duration: "3 meses",
-    cta: "/inscripcion/pagar",
+    cta: "/inscripcion/pagar?programa=neuro",
     featured: true,
     nivelFormulario: "Diplomado en Neuroeducación (3 meses)",
   },
@@ -88,7 +88,7 @@ export const PROGRAMAS_OFERTA = [
     priceNote: `Inscripción $${INSCRIPCION_PRECIO.priceMx} (1 vez) + colegiatura mensual`,
     paymentNote: "colegiatura mensual",
     duration: "20 meses",
-    cta: "/diplomados/#certificacion_internacional",
+    cta: "/inscripcion/pagar?programa=taller",
     nivelFormulario: "Guía en Taller I y II (con duración 20 meses)",
   },
   {
@@ -103,7 +103,7 @@ export const PROGRAMAS_OFERTA = [
     priceNote: `Inscripción $${INSCRIPCION_PRECIO.priceMx} (1 vez) + colegiatura mensual`,
     paymentNote: "colegiatura mensual",
     duration: "17 meses",
-    cta: "/diplomados/#certificacion_internacional",
+    cta: "/inscripcion/pagar?programa=casa",
     nivelFormulario: "Guía en Casa de Niños (con duración 17 meses)",
   },
   {
@@ -118,7 +118,7 @@ export const PROGRAMAS_OFERTA = [
     priceNote: `Inscripción $${INSCRIPCION_PRECIO.priceMx} (1 vez) + colegiatura mensual`,
     paymentNote: "colegiatura mensual",
     duration: "16 meses",
-    cta: "/diplomados/#certificacion_internacional",
+    cta: "/inscripcion/pagar?programa=nido",
     nivelFormulario: "Guía en Nido & Comunidad Infantil (Duración 16 meses)",
   },
 ]
@@ -135,6 +135,27 @@ export const PROGRAMAS_CHECKOUT_OPCIONES = PROGRAMAS_OFERTA.filter(
 
 export const getProgramaByCheckoutLabel = (label) =>
   PROGRAMAS_OFERTA.find((p) => p.checkoutLabel === label) || null
+
+export const getProgramaById = (id) =>
+  PROGRAMAS_OFERTA.find((p) => p.id === id) || null
+
+/** Ruta de pago en línea; `programa` preselecciona el checkout (id de PROGRAMAS_OFERTA). */
+export const getInscripcionPagarUrl = (programaId = null) => {
+  if (!programaId || programaId === "inscripcion") {
+    return "/inscripcion/pagar"
+  }
+  const p = getProgramaById(programaId)
+  if (!p) return "/inscripcion/pagar"
+  if (typeof p.cta === "string" && p.cta.startsWith("http")) {
+    return p.cta
+  }
+  return `/inscripcion/pagar?programa=${encodeURIComponent(programaId)}`
+}
+
+export const getCheckoutLabelFromProgramaId = (programaId) => {
+  const p = getProgramaById(programaId)
+  return p?.checkoutLabel || null
+}
 
 /** @param {string} checkoutLabel */
 export const programaTienePromoInscripcionIncluida = (checkoutLabel) => {

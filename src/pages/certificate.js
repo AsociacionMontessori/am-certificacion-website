@@ -3,9 +3,10 @@ import Layout from '../components/layout';
 import Seo from '../components/seo';
 import imagen from '../images/banners/cert.png';
 import CertificationPrice from '../components/certificationPrice';
-import Scholarship from '../components/scholarship';
 import Nav from '../components/nav';
 import NextCourse from '../components/nextCourse';
+import ProgramasCarruselDesktop from '../components/home/ProgramasCarruselDesktop';
+import { useVisitorGeo } from '../hooks/useVisitorGeo';
 
 const nextCourseProps = {
   URLiframe: 'https://montessorimexico.org/proxima-certificacion/',
@@ -30,10 +31,17 @@ const certificateSchema = [
 ]
 
 const Certificate = () => {
+  const { geo } = useVisitorGeo()
+
   return (
     <Layout>
       <Nav textColor="text-white" />
       <main className="overflow-x-hidden selection:text-white selection:bg-green selection:bg-opacity-20">
+        <style>{`
+          @media (min-width: 1024px) {
+            #home .grid.grid-cols-2.sm\\:grid-cols-4 { display: none !important; }
+          }
+        `}</style>
         <section id="home" className="relative flex min-h-screen items-center">
           <div aria-hidden="true" className="absolute inset-0 z-[1] bg-gradient-to-b from-white/0 via-gray/20 to-gray"></div>
           <img src={imagen} className="fixed inset-0 h-full w-full object-cover" alt="woman in dark" width="4160" height="6240" />
@@ -49,6 +57,7 @@ const Certificate = () => {
                   Descubre Nuestros Diplomados de certificación con validez internacional, conoce el método Montessori y aprende a implementarlo en tu salón de clases.
                 </p>
                 <NextCourse {...nextCourseProps} />
+                <ProgramasCarruselDesktop geo={geo} />
               </div>
             </div>
           </div>

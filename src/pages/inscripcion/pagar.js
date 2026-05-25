@@ -8,8 +8,18 @@ import DatosBancariosCard from "../../components/inscripcion/DatosBancariosCard"
 import { INSCRIPCION_PUBLIC } from "../../data/inscripcionPublic"
 import { getLocalizedPrice } from "../../utils/localizedPrice"
 
+const readProgramaQuery = () => {
+  if (typeof window === "undefined") return null
+  return new URLSearchParams(window.location.search).get("programa")
+}
+
 const InscripcionPagarPage = () => {
   const [geo, setGeo] = useState({ countryCode: "MX", countryName: "Mexico" })
+  const [programaId, setProgramaId] = useState(null)
+
+  useEffect(() => {
+    setProgramaId(readProgramaQuery())
+  }, [])
 
   useEffect(() => {
     axios
@@ -38,7 +48,12 @@ const InscripcionPagarPage = () => {
       description="Pago seguro con tarjeta en línea. Al confirmarlo, continuarás con tu cuenta y expediente en nuestro sistema."
       backTo="/diplomados"
     >
-      <InscriptionCheckoutForm coin={coin} price={price} cancelHref="/#precios" />
+      <InscriptionCheckoutForm
+        coin={coin}
+        price={price}
+        cancelHref="/diplomados/#certificacion_internacional"
+        initialProgramaId={programaId}
+      />
 
       <div className="mt-8 pt-6 border-t border-gray/15 space-y-4">
         <p className="text-sm font-semibold text-black text-center">

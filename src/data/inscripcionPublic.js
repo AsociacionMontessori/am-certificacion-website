@@ -7,6 +7,9 @@ import {
   getResumenPagoInscripcion,
   getTotalPagoCheckout,
   getProgramaByCheckoutLabel,
+  getProgramaById,
+  getInscripcionPagarUrl,
+  getCheckoutLabelFromProgramaId,
   programaTienePromoInscripcionIncluida,
   PROMO_NEURO_INSCRIPCION_INCLUIDA,
 } from "./programasOferta"
@@ -24,6 +27,9 @@ export {
   getResumenPagoInscripcion,
   getTotalPagoCheckout,
   getProgramaByCheckoutLabel,
+  getProgramaById,
+  getInscripcionPagarUrl,
+  getCheckoutLabelFromProgramaId,
   programaTienePromoInscripcionIncluida,
   PROMO_NEURO_INSCRIPCION_INCLUIDA,
 }

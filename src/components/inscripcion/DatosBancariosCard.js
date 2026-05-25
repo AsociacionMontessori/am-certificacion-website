@@ -5,6 +5,10 @@ import {
   DATOS_BANCARIOS_INSCRIPCION,
   getCuentaBancaria,
 } from "../../data/datosBancarios"
+import {
+  DATOS_FISCALES_FACTURA_MX,
+  FACTURA_FISCAL_SOLO_MEXICO,
+} from "../../data/datosFiscalesMexico"
 
 const OpcionFiscal = ({ id, selected, onSelect, titulo, subtitulo }) => (
   <label
@@ -27,7 +31,7 @@ const OpcionFiscal = ({ id, selected, onSelect, titulo, subtitulo }) => (
   </label>
 )
 
-const DatosBancariosCard = ({ compact = false, value, onChange }) => {
+const DatosBancariosCard = ({ compact = false, value, onChange, esMexico = true }) => {
   const [interno, setInterno] = useState("recibo")
   const tipo = value ?? interno
   const setTipo = onChange ?? setInterno
@@ -41,28 +45,37 @@ const DatosBancariosCard = ({ compact = false, value, onChange }) => {
       <div>
         <p className="text-sm font-semibold text-blue">Pago por transferencia bancaria</p>
         <p className="text-xs text-gray leading-relaxed mt-1">
-          Elige el tipo de comprobante fiscal. La cuenta de depósito depende de si
-          necesitas factura con RFC o solo recibo normal.
+          {esMexico
+            ? "Elige el tipo de comprobante fiscal. La cuenta de depósito depende de si necesitas factura con RFC o solo recibo normal."
+            : "Desde fuera de México solo aplica recibo normal (sin factura fiscal mexicana)."}
         </p>
       </div>
 
-      <fieldset className="space-y-2">
-        <legend className="sr-only">Tipo de comprobante fiscal</legend>
-        <OpcionFiscal
-          id="recibo"
-          selected={tipo === "recibo"}
-          onSelect={setTipo}
-          titulo={CUENTAS_BANCARIAS.recibo.label}
-          subtitulo={CUENTAS_BANCARIAS.recibo.subtitulo}
-        />
-        <OpcionFiscal
-          id="factura"
-          selected={tipo === "factura"}
-          onSelect={setTipo}
-          titulo={CUENTAS_BANCARIAS.factura.label}
-          subtitulo={CUENTAS_BANCARIAS.factura.subtitulo}
-        />
-      </fieldset>
+      {esMexico ? (
+        <fieldset className="space-y-2">
+          <legend className="sr-only">Tipo de comprobante fiscal (México)</legend>
+          <p className="text-xs text-gray leading-relaxed">{FACTURA_FISCAL_SOLO_MEXICO}</p>
+          <OpcionFiscal
+            id="recibo"
+            selected={tipo === "recibo"}
+            onSelect={setTipo}
+            titulo={CUENTAS_BANCARIAS.recibo.label}
+            subtitulo={CUENTAS_BANCARIAS.recibo.subtitulo}
+          />
+          <OpcionFiscal
+            id="factura"
+            selected={tipo === "factura"}
+            onSelect={setTipo}
+            titulo={CUENTAS_BANCARIAS.factura.label}
+            subtitulo={CUENTAS_BANCARIAS.factura.subtitulo}
+          />
+        </fieldset>
+      ) : (
+        <p className="text-sm rounded-xl border border-gray/20 bg-white px-4 py-3 text-gray">
+          <span className="font-semibold text-black">Recibo normal</span> — sin opción de factura
+          fiscal (solo disponible en México).
+        </p>
+      )}
 
       <article className="rounded-xl border border-blue/20 bg-white px-4 py-4 space-y-2">
         <p className="text-xs font-semibold uppercase tracking-wide text-blue">
@@ -96,11 +109,26 @@ const DatosBancariosCard = ({ compact = false, value, onChange }) => {
         </ul>
       </article>
 
-      {tipo === "factura" && (
-        <p className="text-xs text-gray bg-yellow/10 border border-yellow/30 rounded-lg px-3 py-2 leading-relaxed">
-          Para factura fiscal, envía también tu RFC, razón social, régimen fiscal, uso de
-          CFDI y correo para facturación junto con tu comprobante.
-        </p>
+      {esMexico && tipo === "factura" && (
+        <div className="rounded-xl border border-yellow/30 bg-yellow/10 px-3 py-3 space-y-2">
+          <p className="text-xs font-semibold text-black">
+            Datos fiscales a enviar (exclusivo México)
+          </p>
+          <ul className="space-y-1.5">
+            {DATOS_FISCALES_FACTURA_MX.map((item) => (
+              <li key={item.campo} className="text-xs text-gray leading-relaxed">
+                <span className="font-semibold text-black">{item.campo}:</span> {item.detalle}
+              </li>
+            ))}
+          </ul>
+          <p className="text-xs text-gray leading-relaxed pt-1 border-t border-yellow/25">
+            Envía estos datos con tu comprobante de transferencia a{" "}
+            <a href={`mailto:${datos.correoComprobante}`} className="text-blue underline">
+              {datos.correoComprobante}
+            </a>
+            .
+          </p>
+        </div>
       )}
 
       <p className="text-xs text-gray leading-relaxed">
