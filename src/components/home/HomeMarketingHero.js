@@ -4,21 +4,76 @@ import { Link } from "gatsby"
 import axios from "axios"
 import imagen from "../../images/banners/home.png"
 import DiplomadoCountdown from "./DiplomadoCountdown"
-import ProgramasAlbumGrid from "./ProgramasAlbumGrid"
-import { useHeroParallax } from "../../hooks/useHeroParallax"
 import {
   BENEFICIOS_HERO,
   INSCRIPCION_MARKETING,
+  PROGRAMAS_DESTACADOS,
   TRUST_BADGES,
 } from "../../data/marketingPrograms"
 import { WHATSAPP_INSCRIPCION_URL } from "../../data/contactoWhatsApp"
 import { getLocalizedPrice, isMexico } from "../../utils/localizedPrice"
 
+const ProgramCard = ({ programa, coin, useMxn }) => {
+  const price = useMxn ? programa.priceMx : programa.priceUsd
+  const anchor = useMxn ? programa.anchorPriceMx : programa.anchorPriceUsd
+  const isExternal = programa.cta.startsWith("http")
+
+  const inner = (
+    <>
+      <span className="inline-block text-xs font-bold uppercase tracking-wide text-blue mb-1">
+        {programa.tipo}
+      </span>
+      <h3 className="text-base font-bold text-black leading-snug">{programa.title}</h3>
+      <p className="text-xs text-gray mt-1 leading-relaxed">{programa.subtitle}</p>
+      {programa.duration && (
+        <p className="text-xs text-gray/80 mt-1">Duración: {programa.duration}</p>
+      )}
+      <div className="mt-3 flex items-end gap-2 flex-wrap">
+        {anchor && (
+          <span className="text-sm text-gray line-through">${anchor}</span>
+        )}
+        <span className="text-2xl font-bold text-blue">${price}</span>
+        <span className="text-xs text-gray mb-1">{coin}</span>
+      </div>
+      <p className="text-xs text-gray mt-1">{programa.priceNote}</p>
+      {programa.featured && programa.id === "cosmica" && (
+        <span className="inline-block mt-2 rounded-full bg-green/20 text-green text-xs font-semibold px-2 py-0.5">
+          Más accesible
+        </span>
+      )}
+      {programa.promoInscripcionIncluida && (
+        <span className="inline-block mt-2 rounded-full bg-green/25 text-green text-xs font-semibold px-2 py-0.5">
+          Inscripción incluida
+        </span>
+      )}
+      {programa.featured && programa.id !== "cosmica" && !programa.promoInscripcionIncluida && (
+        <span className="inline-block mt-2 rounded-full bg-yellow/30 text-black text-xs font-semibold px-2 py-0.5">
+          Popular
+        </span>
+      )}
+    </>
+  )
+
+  const className =
+    "snap-start shrink-0 w-[min(76vw,272px)] sm:w-[248px] rounded-2xl border border-white/40 bg-white/95 backdrop-blur-sm p-4 shadow-lg hover:shadow-xl hover:border-blue/40 transition-shadow"
+
+  if (isExternal) {
+    return (
+      <a href={programa.cta} className={className} target="_blank" rel="noopener noreferrer">
+        {inner}
+      </a>
+    )
+  }
+
+  return (
+    <Link to={programa.cta} className={className}>
+      {inner}
+    </Link>
+  )
+}
+
 const HomeMarketingHero = () => {
   const [geo, setGeo] = useState({ countryCode: "MX", countryName: "Mexico" })
-  const bgParallax = useHeroParallax(0.45)
-  const titleParallax = useHeroParallax(-0.18)
-  const contentParallax = useHeroParallax(-0.08)
 
   useEffect(() => {
     axios
@@ -46,28 +101,23 @@ const HomeMarketingHero = () => {
     : INSCRIPCION_MARKETING.anchorPriceUsd
 
   return (
-    <section id="home" className="relative min-h-[92vh] flex items-end sm:items-center overflow-hidden">
-      <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none" aria-hidden="true">
-        <img
-          src={imagen}
-          alt=""
-          width="4160"
-          height="6240"
-          className="h-[115%] w-full object-cover will-change-transform"
-          style={{ transform: `translate3d(0, ${bgParallax}px, 0)` }}
-        />
-      </div>
+    <section id="home" className="relative min-h-[92vh] flex items-end sm:items-center">
       <div
         aria-hidden="true"
-        className="absolute inset-0 z-[1] bg-gradient-to-b from-black/20 via-black/50 to-black/85"
+        className="absolute inset-0 z-0 bg-gradient-to-b from-black/30 via-black/50 to-black/75"
+      />
+      <img
+        src={imagen}
+        className="absolute inset-0 h-full w-full object-cover"
+        alt="Formación Montessori en línea"
+        width="4160"
+        height="6240"
       />
 
       <div className="relative z-10 mx-auto w-full max-w-7xl px-4 pb-10 pt-24 sm:px-6 sm:pb-16 lg:px-12 lg:pt-28">
         <div className="grid gap-8 lg:grid-cols-2 lg:gap-10 lg:items-start">
-          <div
-            className="space-y-5 will-change-transform"
-            style={{ transform: `translate3d(0, ${titleParallax}px, 0)` }}
-          >
+          {/* Columna principal — mensaje de marketing */}
+          <div className="space-y-5">
             <p className="text-xs sm:text-sm uppercase tracking-widest text-green font-semibold">
               Certificación internacional • Guía Montessori
             </p>
@@ -126,10 +176,8 @@ const HomeMarketingHero = () => {
             </Link>
           </div>
 
-          <div
-            className="space-y-4 will-change-transform"
-            style={{ transform: `translate3d(0, ${contentParallax}px, 0)` }}
-          >
+          {/* Columna oferta + countdown */}
+          <div className="space-y-4">
             <article className="rounded-3xl border-2 border-white/30 bg-black/45 backdrop-blur-lg p-5 sm:p-6 shadow-2xl">
               <p className="text-xs font-semibold uppercase tracking-wide text-yellow mb-1">
                 {INSCRIPCION_MARKETING.badge}
@@ -171,24 +219,34 @@ const HomeMarketingHero = () => {
           </div>
         </div>
 
-        <div className="mt-10 lg:mt-14">
-          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 mb-4 px-0.5">
+        {/* Carrusel de programas — mobile-first */}
+        <div className="mt-10 lg:mt-12">
+          <div className="flex items-end justify-between gap-4 mb-3 px-1">
             <div>
-              <h2 className="text-lg sm:text-2xl font-bold text-white">
-                Nuestros programas
+              <h2 className="text-lg sm:text-xl font-bold text-white">
+                Programas disponibles
               </h2>
-              <p className="text-xs sm:text-sm text-white/75 mt-1 max-w-md">
-                Explora la oferta en tarjetas — precios según tu país
+              <p className="text-xs sm:text-sm text-white/75">
+                Desliza para ver los 6 programas — precio de programa e inscripción aclarados
               </p>
             </div>
             <Link
               to="/diplomados/#certificacion_internacional"
-              className="shrink-0 min-h-[44px] inline-flex items-center justify-center rounded-full border border-white/35 bg-white/10 px-4 text-sm font-semibold text-white hover:bg-white/20 transition-colors"
+              className="shrink-0 text-xs sm:text-sm font-semibold text-white underline"
             >
-              Comparar todos
+              Comparar
             </Link>
           </div>
-          <ProgramasAlbumGrid coin={coin} useMxn={useMxn} />
+          <div className="flex gap-3 overflow-x-auto pb-3 snap-x snap-mandatory scroll-pl-4 -mx-1 px-4 scrollbar-hide">
+            {PROGRAMAS_DESTACADOS.map((programa) => (
+              <ProgramCard
+                key={programa.id}
+                programa={programa}
+                coin={coin}
+                useMxn={useMxn}
+              />
+            ))}
+          </div>
         </div>
       </div>
     </section>
