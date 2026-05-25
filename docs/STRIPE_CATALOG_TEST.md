@@ -15,17 +15,13 @@ Generado con `npm run stripe:setup-catalog`. **No usar en producción (Live).**
 | `colegiatura_casa` | `price_1Tai24D6IQ4doPMoXCZ2MosN` | $3,500 MXN/mes |
 | `colegiatura_taller` | `price_1Tai25D6IQ4doPMoodDJeu3g` | $3,500 MXN/mes |
 | `certificado_fisico` | `price_1Tai25D6IQ4doPMo6Ohuwmk5` | $2,700 MXN |
+| `diplomado_neuroeducacion` | `price_1TamCfD6IQ4doPMo1J5MYRJa` | $4,500 MXN |
+| `diplomado_educacion_cosmica` | `price_1TamCgD6IQ4doPMoepWngY71` | $2,800 MXN |
+| `colegiatura_nido_inicio` | `price_1TamCgD6IQ4doPMofxhHCvUs` | $3,100 MXN |
+| `colegiatura_casa_inicio` | `price_1TamChD6IQ4doPMoO5Q0nE72` | $3,500 MXN |
+| `colegiatura_taller_inicio` | `price_1TamCiD6IQ4doPMo5zfqDDuZ` | $3,900 MXN |
 
-### SKUs nuevos (inicio completo) — ejecutar de nuevo
-
-Tras actualizar el script, volver a correr:
-
-```bash
-cd alumnos-app
-STRIPE_SECRET_KEY=sk_test_... node scripts/stripe-setup-catalog.js
-```
-
-SKUs a registrar: `diplomado_neuroeducacion`, `diplomado_educacion_cosmica`, `colegiatura_nido_inicio`, `colegiatura_casa_inicio`, `colegiatura_taller_inicio`. Añadir sus `price_...` a la tabla y a los params siguientes.
+Nota: `colegiatura_taller` recurrente actualizado a $3,900 → `price_1TamCkD6IQ4doPMol56y6TGF`.
 
 ## Firebase params (test)
 
@@ -40,10 +36,10 @@ firebase functions:params:set STRIPE_PRICE_COLEGIATURA_NIDO=price_1Tai23D6IQ4doP
 firebase functions:params:set STRIPE_PRICE_COLEGIATURA_CASA=price_1Tai24D6IQ4doPMoXCZ2MosN
 firebase functions:params:set STRIPE_PRICE_COLEGIATURA_TALLER=price_1Tai25D6IQ4doPMoodDJeu3g
 firebase functions:params:set STRIPE_PRICE_CERTIFICADO=price_1Tai25D6IQ4doPMo6Ohuwmk5
-# Tras stripe-setup-catalog (inicio completo):
-# firebase functions:params:set STRIPE_PRICE_DIPLOMADO_NEURO=price_xxx
-# firebase functions:params:set STRIPE_PRICE_DIPLOMADO_COSMICA=price_xxx
-# firebase functions:params:set STRIPE_PRICE_COLEGIATURA_NIDO_INICIO=price_xxx
-# firebase functions:params:set STRIPE_PRICE_COLEGIATURA_CASA_INICIO=price_xxx
-# firebase functions:params:set STRIPE_PRICE_COLEGIATURA_TALLER_INICIO=price_xxx
+firebase functions:params:set STRIPE_PRICE_DIPLOMADO_NEURO=price_1TamCfD6IQ4doPMo1J5MYRJa
+firebase functions:params:set STRIPE_PRICE_DIPLOMADO_COSMICA=price_1TamCgD6IQ4doPMoepWngY71
+firebase functions:params:set STRIPE_PRICE_COLEGIATURA_NIDO_INICIO=price_1TamCgD6IQ4doPMofxhHCvUs
+firebase functions:params:set STRIPE_PRICE_COLEGIATURA_CASA_INICIO=price_1TamChD6IQ4doPMoO5Q0nE72
+firebase functions:params:set STRIPE_PRICE_COLEGIATURA_TALLER_INICIO=price_1TamCiD6IQ4doPMo5zfqDDuZ
+firebase functions:params:set STRIPE_PRICE_COLEGIATURA_TALLER=price_1TamCkD6IQ4doPMol56y6TGF
 ```
