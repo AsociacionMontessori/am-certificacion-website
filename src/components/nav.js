@@ -19,19 +19,9 @@ function classNames(...classes) {
     return classes.filter(Boolean).join(' ')
 }
 
-export default function Nav({ textColor, transparent = false }) {
+export default function Nav({ textColor }) {
 
     const [largeBanner, setLargeBanner] = React.useState(true);
-
-    const navSurface = transparent
-        ? "bg-transparent mb-0"
-        : "bg-white-400 mb-10"
-    const mobileMenuBtn = transparent
-        ? "bg-white/15 backdrop-blur-sm text-white hover:bg-white/25"
-        : "bg-white dark:bg-red"
-    const mobilePanel = transparent
-        ? "bg-black/85 backdrop-blur-md"
-        : ""
 
     useEffect(() => {
         // const scrollContainer = scrollContainerRef.current;
@@ -53,13 +43,13 @@ export default function Nav({ textColor, transparent = false }) {
     }, []);
 
     return (
-        <Disclosure as="nav" className={`${navSurface} relative z-50`}>
+        <Disclosure as="nav" className="bg-white-400 mb-10 relative z-20">
             {({ open }) => (
                 <>
                     <div className="mx-auto max-w-7x1 px-3 sm:px-4 lg:px-6 min-w-fit dark:text-white pt-5" >
                         <div className="relative flex h-16 items-center justify-between sm:justify-center">
                             <div className="absolute inset-y-0 left-0 flex items-center lg:hidden">
-                                <Disclosure.Button className={`${mobileMenuBtn} inline-flex items-center justify-center rounded-md p-2 min-h-[44px] min-w-[44px] hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white/60`}>
+                                <Disclosure.Button className="bg-white dark:bg-red inline-flex items-center justify-center rounded-md p-2 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
                                     <span className="sr-only">Abrir Menu</span>
                                     {open ? (
                                         <XMarkIcon className="dark:bg-red block h-6 w-6" aria-hidden="true" />
@@ -102,7 +92,7 @@ export default function Nav({ textColor, transparent = false }) {
                         </div>
                     </div>
 
-                    <Disclosure.Panel className={`lg:hidden ${mobilePanel}`}>
+                    <Disclosure.Panel className="lg:hidden">
                         <div className="space-y-1 y-10 px-2 pb-3 pt-2">
                             {navigation.map((item) => (
                                 <Disclosure.Button
@@ -110,10 +100,8 @@ export default function Nav({ textColor, transparent = false }) {
                                     as="a"
                                     href={item.href}
                                     className={classNames(
-                                        item.current ? `bg-red ${textColor}` : transparent
-                                            ? "text-white hover:bg-white/15"
-                                            : "text-black hover:bg-red hover:text-white",
-                                        `${textColor} block rounded-md px-3 py-2 text-base font-medium min-h-[44px]`
+                                        item.current ? `bg-red ${textColor}` : ' text-black hover:bg-red hover:text-white ',
+                                        `${textColor} block rounded-md px-3 py-2 text-base font-medium`
                                     )}
                                     aria-current={item.current ? 'page' : undefined}
                                 >
