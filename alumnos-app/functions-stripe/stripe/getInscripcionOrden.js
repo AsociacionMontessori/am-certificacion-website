@@ -4,6 +4,7 @@ const {handleCors, rejectIfOriginNotAllowed} = require("./cors");
 const {enforceRateLimit} = require("./rateLimit");
 const {getReglamentoUrl} = require("./inscripcionCatalog");
 const {isOrdenFlujoInscripcion} = require("./programasCheckout");
+const {requireAccessToken} = require("./accessToken");
 
 /**
  * Consulta estado de una orden de inscripción (público, sin datos sensibles).
@@ -32,6 +33,7 @@ exports.getInscripcionOrdenHandler = onRequest(
         })) return;
 
         const ordenId = String(req.body?.ordenId || "").trim();
+        const accessToken = String(req.body?.accessToken || req.body?.t || "").trim();
         if (!ordenId) {
           res.status(400).json({error: "Referencia de orden requerida"});
           return;
@@ -48,6 +50,10 @@ exports.getInscripcionOrdenHandler = onRequest(
           res.status(400).json({error: "Esta referencia no corresponde a una inscripción"});
           return;
         }
+
+        // F-02: si la orden tiene accessTokenHash, el token es obligatorio.
+        // Para órdenes pre-existentes sin hash, se acepta sin token (legacy).
+        if (!requireAccessToken(orden, accessToken, res)) return;
 
         const inscripcionesSnap = await db.collection("inscripciones")
             .where("ordenId", "==", ordenId)

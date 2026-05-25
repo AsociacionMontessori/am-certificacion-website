@@ -20,6 +20,7 @@ const {provisionGoogleWorkspaceAlumno} = require("./googleWorkspaceProvision");
 const {GOOGLE_SERVICE_ACCOUNT_JSON} = require("./googleWorkspaceClient");
 const {escapeHtml} = require("./escape");
 const {credentialsEncryptionKey} = require("./credenciales");
+const {requireAccessToken} = require("./accessToken");
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -64,6 +65,7 @@ exports.completeInscripcionParte1Handler = onRequest(
 
         const body = req.body || {};
         const ordenId = String(body.ordenId || "").trim();
+        const accessToken = String(body.accessToken || body.t || "").trim();
         const nombre = String(body.nombreCompleto || "").trim();
         const emailContacto = String(body.emailContacto || body.email || "").trim().toLowerCase();
         const telefono = String(body.telefonoMovil || body.telefono || "").trim();
@@ -111,6 +113,22 @@ exports.completeInscripcionParte1Handler = onRequest(
           return;
         }
         const orden = ordenSnap.data();
+
+        // F-02: validar accessToken (con backward-compat para órdenes legacy).
+        if (!requireAccessToken(orden, accessToken, res)) return;
+
+        // F-05: detectar (sin bloquear) emailContacto distinto al email que
+        // el comprador usó en Stripe. Si ya tenemos accessToken, el riesgo
+        // de impersonación es bajo; el log permite auditoría a posteriori.
+        const ordenClienteEmail = String(orden.cliente?.email || "").trim().toLowerCase();
+        if (ordenClienteEmail && emailContacto && ordenClienteEmail !== emailContacto) {
+          console.warn("completeInscripcionParte1:email_distinto_al_de_pago", {
+            ordenId,
+            stripeEmail: ordenClienteEmail,
+            emailContacto,
+          });
+        }
+
         const {password, passwordClassroom, generada: passwordGenerada} =
           resolvePasswordInscripcion();
 

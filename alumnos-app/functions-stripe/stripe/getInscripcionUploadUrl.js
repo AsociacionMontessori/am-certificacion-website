@@ -7,6 +7,7 @@ const {
   MAX_FILE_BYTES,
   ALLOWED_MIME,
 } = require("./inscripcionCatalog");
+const {requireAccessToken} = require("./accessToken");
 
 function sanitizeFileName(name) {
   return String(name || "archivo")
@@ -37,6 +38,7 @@ exports.getInscripcionUploadUrlHandler = onRequest(
 
         const body = req.body || {};
         const ordenId = String(body.ordenId || "").trim();
+        const accessToken = String(body.accessToken || body.t || "").trim();
         const docType = String(body.docType || "").trim();
         const fileName = sanitizeFileName(body.fileName);
         const contentType = String(body.contentType || "").trim().toLowerCase();
@@ -54,6 +56,14 @@ exports.getInscripcionUploadUrlHandler = onRequest(
           res.status(400).json({error: "El archivo debe ser menor a 10 MB"});
           return;
         }
+
+        // F-02: validar accessToken contra la orden antes de emitir signed URL.
+        const ordenSnap = await db.collection("ordenes").doc(ordenId).get();
+        if (!ordenSnap.exists) {
+          res.status(404).json({error: "Orden no encontrada"});
+          return;
+        }
+        if (!requireAccessToken(ordenSnap.data(), accessToken, res)) return;
 
         const inscripcionesSnap = await db.collection("inscripciones")
             .where("ordenId", "==", ordenId)

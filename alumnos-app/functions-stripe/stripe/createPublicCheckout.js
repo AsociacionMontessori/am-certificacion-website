@@ -6,6 +6,7 @@ const Stripe = require("stripe");
 const {handleCors, rejectIfOriginNotAllowed} = require("./cors");
 const {enforceRateLimit} = require("./rateLimit");
 const {resolveSku, SITE_URL, CATALOG_META} = require("./catalog");
+const {generateAccessToken, hashAccessToken, ACCESS_TOKEN_TTL_MS} = require("./accessToken");
 const {
   buildCheckoutItemsFromRequest,
   resolveOrdenTipo,
@@ -190,11 +191,22 @@ exports.createPublicCheckoutHandler = onRequest(
         const montoEstimadoMxn = estimateTotalMxn(items, CATALOG_META);
         const siteUrl = SITE_URL.value().replace(/\/$/, "");
         const ordenRef = db.collection("ordenes").doc();
+
+        // F-02: token de acceso por orden. Se entrega solo en `success_url`
+        // y los endpoints de inscripción lo exigirán para autorizar acceso
+        // a PII / completar el expediente.
+        const accessToken = generateAccessToken();
+        const accessTokenHash = hashAccessToken(accessToken);
+        const accessTokenExpiresAt = admin.firestore.Timestamp.fromDate(
+            new Date(Date.now() + ACCESS_TOKEN_TTL_MS),
+        );
+        const accessTokenQuery = `&t=${encodeURIComponent(accessToken)}`;
+
         const session = await stripe.checkout.sessions.create({
           mode: "payment",
           customer_email: email,
           line_items: lineItems,
-          success_url: `${siteUrl}/checkout/success?orden=${ordenRef.id}&tipo=${tipo}${promoQuery}${digitalQuery}`,
+          success_url: `${siteUrl}/checkout/success?orden=${ordenRef.id}&tipo=${tipo}${promoQuery}${digitalQuery}${accessTokenQuery}`,
           cancel_url: `${siteUrl}/checkout/cancel?orden=${ordenRef.id}`,
           metadata: {
             ordenId: ordenRef.id,
@@ -229,6 +241,8 @@ exports.createPublicCheckoutHandler = onRequest(
           moneda: "mxn",
           monto: null,
           origen: "sitio_publico",
+          accessTokenHash,
+          accessTokenExpiresAt,
           ...(digitalDelivery ? {digitalDelivery} : {}),
           createdAt: admin.firestore.FieldValue.serverTimestamp(),
         });

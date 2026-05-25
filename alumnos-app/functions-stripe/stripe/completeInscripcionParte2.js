@@ -3,6 +3,7 @@ const admin = require("firebase-admin");
 const {handleCors, rejectIfOriginNotAllowed} = require("./cors");
 const {enforceRateLimit} = require("./rateLimit");
 const {ESCOLARIDAD, DOCUMENTOS_PARTE2_REQUERIDOS, DOCUMENTOS_PARTE2_OPCIONALES} = require("./inscripcionCatalog");
+const {requireAccessToken} = require("./accessToken");
 
 async function fileExists(bucket, path) {
   try {
@@ -36,6 +37,7 @@ exports.completeInscripcionParte2Handler = onRequest(
 
         const body = req.body || {};
         const ordenId = String(body.ordenId || "").trim();
+        const accessToken = String(body.accessToken || body.t || "").trim();
         const escolaridad = String(body.escolaridad || "").trim();
         const domicilio = String(body.domicilio || "").trim();
         const curpPasaporte = String(body.curpPasaporte || "").trim();
@@ -71,6 +73,10 @@ exports.completeInscripcionParte2Handler = onRequest(
           return;
         }
         const orden = ordenSnap.data();
+
+        // F-02: validar accessToken (legacy permitido para órdenes pre-existentes).
+        if (!requireAccessToken(orden, accessToken, res)) return;
+
         if (orden.estado !== "pagado") {
           res.status(402).json({error: "Pago no confirmado"});
           return;
