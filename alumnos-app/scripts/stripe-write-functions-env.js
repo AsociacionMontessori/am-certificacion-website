@@ -31,7 +31,7 @@ const CATALOG = {
 const lines = [
   '# Generado para deploy test — NO commitear',
   '# Proyecto: certificacionmontessori',
-  'SITE_URL=https://certificacionmontessori.web.app',
+  'SITE_URL=https://certificacionmontessori--stripe-test-sl45bkl4.web.app',
   'ALUMNOS_SITE_URL=https://alumnos-certificacionmontessori.web.app',
   ...Object.entries(CATALOG).map(([k, v]) => `${k}=${v}`),
   '',

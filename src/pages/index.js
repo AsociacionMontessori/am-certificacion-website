@@ -1,5 +1,7 @@
 import * as React from 'react';
+import { useEffect } from 'react';
 import '../styles/global.css';
+import { redirectStripeCheckoutReturn } from '../utils/stripeCheckoutReturn';
 import Layout from '../components/layout';
 import Seo from '../components/seo';
 import ImgMap from '../images/banners/map.png';
@@ -59,7 +61,12 @@ const phrases2 = [
   "Lo que la mano hace, la mente lo recuerda",
 ];
 
-const IndexPage = () => (
+const IndexPage = ({ location }) => {
+  useEffect(() => {
+    redirectStripeCheckoutReturn(location)
+  }, [location?.search])
+
+  return (
     <Layout>
       <Nav textColor="text-white" />
       <main>
@@ -121,7 +128,8 @@ const IndexPage = () => (
         </section>
       </main>
     </Layout>
-);
+  )
+}
 
 export const Head = () => (
   <Seo
