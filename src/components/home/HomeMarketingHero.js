@@ -1,5 +1,5 @@
 import * as React from "react"
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { Link } from "gatsby"
 import axios from "axios"
 import imagen from "../../images/banners/home.png"
@@ -13,49 +13,121 @@ import {
 import { WHATSAPP_INSCRIPCION_URL } from "../../data/contactoWhatsApp"
 import { getLocalizedPrice, isMexico } from "../../utils/localizedPrice"
 
-const ProgramCard = ({ programa, coin, useMxn }) => {
+const PROGRAM_VISUALS = {
+  inscripcion: {
+    eyebrow: "Inicio",
+    coverClass: "from-blue via-green to-yellow",
+    panelClass: "bg-blue/90",
+  },
+  cosmica: {
+    eyebrow: "Grandes Lecciones",
+    coverClass: "from-red via-yellow to-green",
+    panelClass: "bg-red/90",
+  },
+  neuro: {
+    eyebrow: "Cerebro y aprendizaje",
+    coverClass: "from-green via-blue to-white",
+    panelClass: "bg-green/90",
+  },
+  taller: {
+    eyebrow: "6 a 12 años",
+    coverClass: "from-gray via-blue to-green",
+    panelClass: "bg-gray/90",
+  },
+  casa: {
+    eyebrow: "3 a 6 años",
+    coverClass: "from-yellow via-orange to-red",
+    panelClass: "bg-orange/90",
+  },
+  nido: {
+    eyebrow: "0 a 3 años",
+    coverClass: "from-green via-yellow to-white",
+    panelClass: "bg-green/90",
+  },
+}
+
+const getProgramVisual = (programa) =>
+  PROGRAM_VISUALS[programa.id] || PROGRAM_VISUALS.inscripcion
+
+const getProgramCtaText = (programa) =>
+  programa.id === "inscripcion" ? "Pagar inscripción" : "Inscríbete y paga"
+
+const PROGRAMAS_ALBUM = [
+  ...PROGRAMAS_DESTACADOS.filter(({ id }) => id !== "neuro"),
+  ...PROGRAMAS_DESTACADOS.filter(({ id }) => id === "neuro"),
+]
+
+const ProgramAlbumCard = ({ programa, coin, useMxn }) => {
   const price = useMxn ? programa.priceMx : programa.priceUsd
   const anchor = useMxn ? programa.anchorPriceMx : programa.anchorPriceUsd
   const isExternal = programa.cta.startsWith("http")
+  const visual = getProgramVisual(programa)
+  const ctaText = getProgramCtaText(programa)
 
   const inner = (
-    <>
-      <span className="inline-block text-xs font-bold uppercase tracking-wide text-blue mb-1">
-        {programa.tipo}
-      </span>
-      <h3 className="text-base font-bold text-black leading-snug">{programa.title}</h3>
-      <p className="text-xs text-gray mt-1 leading-relaxed">{programa.subtitle}</p>
-      {programa.duration && (
-        <p className="text-xs text-gray/80 mt-1">Duración: {programa.duration}</p>
-      )}
-      <div className="mt-3 flex items-end gap-2 flex-wrap">
-        {anchor && (
-          <span className="text-sm text-gray line-through">${anchor}</span>
-        )}
-        <span className="text-2xl font-bold text-blue">${price}</span>
-        <span className="text-xs text-gray mb-1">{coin}</span>
+    <div className="program-album-card grid h-full grid-rows-[auto_1fr] overflow-hidden rounded-lg bg-white text-black shadow-2xl shadow-black/30 ring-1 ring-white/30 transition duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-yellow">
+      <div className={`program-album-cover relative min-h-[176px] bg-gradient-to-br ${visual.coverClass} p-4 transition duration-200`}>
+        <div className="absolute inset-y-0 left-0 w-8 bg-black/20" aria-hidden="true" />
+        <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/60 to-transparent" aria-hidden="true" />
+        <div className="relative flex h-full flex-col justify-between">
+          <div className="flex items-start">
+            <span className="rounded-md bg-white/90 px-2.5 py-1 text-[11px] font-bold uppercase text-gray">
+              {programa.tipo}
+            </span>
+          </div>
+          <div>
+            <p className="text-xs font-semibold text-white/90">{visual.eyebrow}</p>
+            <h3 className="mt-1 max-w-[13rem] text-2xl font-bold leading-tight text-white drop-shadow-md">
+              {programa.title}
+            </h3>
+          </div>
+        </div>
       </div>
-      <p className="text-xs text-gray mt-1">{programa.priceNote}</p>
-      {programa.featured && programa.id === "cosmica" && (
-        <span className="inline-block mt-2 rounded-full bg-green/20 text-green text-xs font-semibold px-2 py-0.5">
-          Más accesible
-        </span>
-      )}
-      {programa.promoInscripcionIncluida && (
-        <span className="inline-block mt-2 rounded-full bg-green/25 text-green text-xs font-semibold px-2 py-0.5">
-          Inscripción incluida
-        </span>
-      )}
-      {programa.featured && programa.id !== "cosmica" && !programa.promoInscripcionIncluida && (
-        <span className="inline-block mt-2 rounded-full bg-yellow/30 text-black text-xs font-semibold px-2 py-0.5">
-          Popular
-        </span>
-      )}
-    </>
+
+      <div className="flex min-h-[250px] flex-col p-4">
+        <div className="flex flex-col gap-2 text-xs font-semibold text-gray">
+          {programa.duration && (
+            <span className="inline-flex w-fit shrink-0 whitespace-nowrap rounded-md bg-blue/10 px-2.5 py-1 text-blue">
+              {programa.duration}
+            </span>
+          )}
+          <span className="leading-relaxed">{programa.subtitle}</span>
+        </div>
+        <div className="mt-4 flex items-end gap-2">
+          {anchor && <span className="text-sm text-gray line-through">${anchor}</span>}
+          <span className="text-3xl font-bold text-blue">${price}</span>
+          <span className="mb-1 text-xs font-semibold text-gray">{coin}</span>
+        </div>
+        <p className="mt-2 text-xs leading-relaxed text-gray">{programa.priceNote}</p>
+        <div className="mt-3 flex flex-wrap gap-2">
+          {programa.featured && programa.id === "cosmica" && (
+            <span className="rounded-md bg-green/20 px-2 py-1 text-xs font-semibold text-green">
+              Más accesible
+            </span>
+          )}
+          {programa.promoInscripcionIncluida && (
+            <span className="rounded-md bg-green/20 px-2 py-1 text-xs font-semibold text-green">
+              Inscripción incluida
+            </span>
+          )}
+          {programa.featured && programa.id !== "cosmica" && !programa.promoInscripcionIncluida && (
+            <span className="rounded-md bg-yellow/30 px-2 py-1 text-xs font-semibold text-black">
+              Popular
+            </span>
+          )}
+        </div>
+        <div className="mt-auto pt-4">
+          <span className={`inline-flex min-h-[40px] w-full items-center justify-between rounded-lg px-3 py-2 text-sm font-bold text-white ${visual.panelClass}`}>
+            {ctaText}
+            <span aria-hidden="true">→</span>
+          </span>
+        </div>
+      </div>
+    </div>
   )
 
   const className =
-    "snap-start shrink-0 w-[min(76vw,272px)] sm:w-[248px] rounded-2xl border border-white/40 bg-white/95 backdrop-blur-sm p-4 shadow-lg hover:shadow-xl hover:border-blue/40 transition-shadow"
+    "program-album-link snap-start shrink-0 w-[min(82vw,310px)] sm:w-[296px]"
 
   if (isExternal) {
     return (
@@ -71,6 +143,75 @@ const ProgramCard = ({ programa, coin, useMxn }) => {
     </Link>
   )
 }
+
+const ProgramAlbumDeck = ({ coin, useMxn }) => {
+  const railRef = useRef(null)
+
+  const scrollPrograms = (direction) => {
+    const rail = railRef.current
+    if (!rail) return
+    const card = rail.querySelector(".program-album-link")
+    const amount = card ? card.getBoundingClientRect().width + 16 : 320
+    rail.scrollBy({ left: direction * amount, behavior: "smooth" })
+  }
+
+  return (
+    <div className="mt-10 lg:mt-12">
+      <div className="mb-4 flex flex-col gap-3 px-1 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <p className="text-xs font-semibold uppercase text-green">
+            Catálogo de formación
+          </p>
+          <h2 className="mt-1 text-xl font-bold text-white sm:text-2xl">
+            Programas disponibles
+          </h2>
+          <p className="mt-1 max-w-2xl text-sm leading-relaxed text-white/75">
+            Recorre las portadas y compara el inicio de cada programa.
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => scrollPrograms(-1)}
+            className="min-h-[40px] rounded-lg border border-white/30 bg-white/10 px-3 text-sm font-semibold text-white transition hover:bg-white/20"
+            aria-label="Ver programas anteriores"
+          >
+            ←
+          </button>
+          <button
+            type="button"
+            onClick={() => scrollPrograms(1)}
+            className="min-h-[40px] rounded-lg border border-white/30 bg-white/10 px-3 text-sm font-semibold text-white transition hover:bg-white/20"
+            aria-label="Ver programas siguientes"
+          >
+            →
+          </button>
+          <Link
+            to="/diplomados/#certificacion_internacional"
+            className="min-h-[40px] rounded-lg bg-white px-3 py-2 text-sm font-bold text-blue transition hover:bg-white/90"
+          >
+            Comparar
+          </Link>
+        </div>
+      </div>
+      <div
+        ref={railRef}
+        className="program-album-rail -mx-4 flex gap-4 overflow-x-auto px-4 pb-5 pt-1 snap-x snap-mandatory scroll-smooth sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8"
+        aria-label="Programas disponibles"
+      >
+        {PROGRAMAS_ALBUM.map((programa) => (
+          <ProgramAlbumCard
+            key={programa.id}
+            programa={programa}
+            coin={coin}
+            useMxn={useMxn}
+          />
+        ))}
+      </div>
+    </div>
+  )
+}
+
 
 const HomeMarketingHero = () => {
   const [geo, setGeo] = useState({ countryCode: "MX", countryName: "Mexico" })
@@ -219,35 +360,7 @@ const HomeMarketingHero = () => {
           </div>
         </div>
 
-        {/* Carrusel de programas — mobile-first */}
-        <div className="mt-10 lg:mt-12">
-          <div className="flex items-end justify-between gap-4 mb-3 px-1">
-            <div>
-              <h2 className="text-lg sm:text-xl font-bold text-white">
-                Programas disponibles
-              </h2>
-              <p className="text-xs sm:text-sm text-white/75">
-                Desliza para ver los 6 programas — precio de programa e inscripción aclarados
-              </p>
-            </div>
-            <Link
-              to="/diplomados/#certificacion_internacional"
-              className="shrink-0 text-xs sm:text-sm font-semibold text-white underline"
-            >
-              Comparar
-            </Link>
-          </div>
-          <div className="flex gap-3 overflow-x-auto pb-3 snap-x snap-mandatory scroll-pl-4 -mx-1 px-4 scrollbar-hide">
-            {PROGRAMAS_DESTACADOS.map((programa) => (
-              <ProgramCard
-                key={programa.id}
-                programa={programa}
-                coin={coin}
-                useMxn={useMxn}
-              />
-            ))}
-          </div>
-        </div>
+        <ProgramAlbumDeck coin={coin} useMxn={useMxn} />
       </div>
     </section>
   )
