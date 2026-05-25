@@ -281,6 +281,35 @@ export const obtenerCertificado = async (alumnoId, nivelId) => {
   }
 };
 
+const VERIFICAR_CERTIFICADO_URL =
+  import.meta.env.VITE_VERIFICAR_CERTIFICADO_URL ||
+  'https://us-central1-certificacionmontessori.cloudfunctions.net/verificarCertificadoPublico';
+
+/**
+ * F-01 — Verificación pública vía Cloud Function. Se usa por defecto.
+ * Si la Function no responde (red caída, 404 mientras está desplegándose,
+ * 5xx), `verificarCertificado` cae al método legacy de getDocs/Firestore
+ * para no romper la verificación durante la transición.
+ */
+const verificarCertificadoViaFunction = async (folio, codigo) => {
+  const response = await fetch(VERIFICAR_CERTIFICADO_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ folio, codigoVerificacion: codigo }),
+  });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    if (response.status === 429) {
+      return { valido: false, error: 'Demasiadas verificaciones. Intenta en unos minutos.' };
+    }
+    // 5xx o estructura inesperada: caemos al legacy
+    const err = new Error(data?.error || `Function devolvió ${response.status}`);
+    err.fallbackEligible = response.status >= 500 || response.status === 404;
+    throw err;
+  }
+  return data;
+};
+
 /**
  * Verifica un certificado usando el folio y código
  */
@@ -295,7 +324,25 @@ export const verificarCertificado = async (folio, codigoVerificacion) => {
       return { valido: false, error: 'Folio o código de verificación inválido' };
     }
 
-    // Primero buscar por folio
+    // Intento 1: Cloud Function pública (F-01).
+    try {
+      const result = await verificarCertificadoViaFunction(folioNormalizado, codigoNormalizado);
+      if (result && (result.valido === true || result.valido === false)) {
+        return result;
+      }
+    } catch (fnErr) {
+      // Solo cae al legacy si el error sugiere indisponibilidad temporal de la Function.
+      // Errores de validación (folio/código inválido) ya vinieron como respuesta válida.
+      if (!fnErr.fallbackEligible && fnErr.name !== 'TypeError') {
+        console.warn('verificarCertificado: Function devolvió error no-fallback:', fnErr.message);
+        return { valido: false, error: fnErr.message || 'Error al verificar el certificado' };
+      }
+      console.warn('verificarCertificado: cae a legacy por:', fnErr.message);
+    }
+
+    // Intento 2 (legacy): consulta directa Firestore. Funciona mientras
+    // `firestore.rules` siga teniendo `allow list: if true` en `alumnos`.
+    // Se eliminará cuando F-01 quede cerrado en producción.
     const alumnosQuery = query(
       collection(db, 'alumnos'),
       where('folioCertificado', '==', folioNormalizado)
