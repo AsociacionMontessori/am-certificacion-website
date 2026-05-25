@@ -10,7 +10,7 @@ import {
   PROGRAMAS_DESTACADOS,
   TRUST_BADGES,
 } from "../../data/marketingPrograms"
-import { WHATSAPP_INSCRIPCION_URL } from "../../data/contactoWhatsApp"
+import { WHATSAPP_DUDAS_URL } from "../../data/contactoWhatsApp"
 import { getLocalizedPrice, isMexico } from "../../utils/localizedPrice"
 
 const PROGRAM_VISUALS = {
@@ -335,19 +335,19 @@ const HomeMarketingHero = () => {
                 Inscríbete ahora
               </Link>
               <a
-                href={WHATSAPP_INSCRIPCION_URL}
+                href={WHATSAPP_DUDAS_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="min-h-[48px] inline-flex items-center justify-center px-6 py-3 rounded-full font-semibold text-white border-2 border-green/70 bg-green/25 backdrop-blur-sm hover:bg-green/40 transition-colors text-center gap-2"
-                aria-label="Habla con nosotros por WhatsApp; te guiamos paso a paso en tu inscripción"
+                className="min-h-[48px] inline-flex items-center justify-center px-6 py-3 rounded-full font-semibold text-white border-2 border-white/40 bg-white/10 backdrop-blur-sm hover:bg-white/20 transition-colors text-center gap-2"
+                aria-label="Resolver dudas por WhatsApp antes de inscribirte"
               >
                 <span aria-hidden="true" className="text-lg leading-none">
                   💬
                 </span>
                 <span className="flex flex-col items-start text-left leading-tight sm:items-center sm:text-center">
-                  <span className="text-sm sm:text-base">WhatsApp: te guiamos</span>
+                  <span className="text-sm sm:text-base">Resolver dudas</span>
                   <span className="text-xs font-normal text-white/85">
-                    Paso a paso en tu inscripción
+                    Por WhatsApp antes de pagar
                   </span>
                 </span>
               </a>
