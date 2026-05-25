@@ -1,92 +1,85 @@
-# Paso 2 de inscripción — qué hace el sistema y qué hace una persona
+# Paso 2 de inscripción - guía operativa
 
-## Qué ya tienes (no repetir)
+## Qué hace el sistema
 
-- Repositorio **classroom-mcp** / **workspace-directory-admin** con service account y delegación OK.
-- **Unidades organizativas** ya creadas en Admin Console.
-- Cursos de Classroom identificables (IDs).
+Cuando el alumno termina el pago Stripe y completa el paso 2:
 
-El sitio **no reemplaza** esas herramientas para trabajo manual; las usa por API en el momento del paso 2.
+1. Crea su cuenta del portal con `usuario@certificacionmontessori.com`.
+2. Genera una contraseña única para portal y Google Workspace.
+3. Crea o actualiza el usuario en Google Workspace.
+4. Lo mueve a la UO de su programa bajo `/Diplomados`.
+5. Lo inscribe automáticamente en **Portal Montessori**.
+6. Lo inscribe en cursos extra si están en `GOOGLE_CLASSROOM_COURSE_MAP`.
+7. Encola el correo de bienvenida con usuario y contraseña.
 
-## Qué hace el sistema al enviar el paso 2
+## Checklist para activar Google Workspace
 
-1. Crea cuenta en **portal de alumnos** (Firebase) con `usuario@certificacionmontessori.com`.
-2. Genera una **contraseña única** (16 caracteres) — **la misma** para portal y Google.
-3. Crea/actualiza el usuario en **Google Admin** y lo mueve a la **OU** de su nivel.
-4. Lo inscribe en los **cursos Classroom** del mapa de configuración.
-5. Envía correo al alumno con usuario y contraseña (cola `emails_pendientes`).
-6. Guarda en Firestore `alumnos.passwordTemporal` y `googleWorkspace` por si hay que revisar.
-
-El alumno **no** elige contraseña ni cambia el programa en el formulario (viene del pago).
-
----
-
-## Lo que debe hacer una persona (checklist corto)
-
-### 1. Una vez: secretos en Firebase
+### 1. Secret de service account
 
 ```bash
 cd alumnos-app
 firebase functions:secrets:set GOOGLE_SERVICE_ACCOUNT_JSON
 ```
 
-Pega el mismo JSON de service account que usas en **classroom-mcp** (perfil `asociacion`).
+Pega el JSON completo de la service account con Domain-Wide Delegation. No lo guardes en el repo.
 
-No hace falta secret de contraseña fija: **cada alumno recibe una generada automáticamente**.
+### 2. Parámetros obligatorios
 
-### 2. Una vez: parámetros
+En `alumnos-app/functions-stripe/.env.certificacionmontessori`:
 
-En Firebase (codebase `stripe`) o `.env.certificacionmontessori`:
-
-| Parámetro | Qué poner |
-|-----------|-----------|
-| `GOOGLE_WORKSPACE_PROVISION_ENABLED` | `true` cuando quieras activar Google en paso 2 |
-| `GOOGLE_ADMIN_EMAIL` | Ej. `admin@asociacionmontessori.com.mx` |
-| `GOOGLE_STUDENTS_OU_BASE` | Ruta base que ya usan (ej. `/Students/Certificacion`) |
-| `GOOGLE_CLASSROOM_COURSE_MAP` | JSON con IDs de curso por nivel (ver abajo) |
-
-Ejemplo de mapa (ajusta IDs reales):
-
-```json
-{
-  "Nido & Comunidad infantil": ["123456789"],
-  "Casa de Niños": ["987654321"],
-  "Taller": ["111222333"],
-  "Diplomado en Neuroeducación": ["444555666"]
-}
+```dotenv
+GOOGLE_WORKSPACE_PROVISION_ENABLED=true
+GOOGLE_ADMIN_EMAIL=admin@asociacionmontessori.com.mx
+GOOGLE_STUDENTS_OU_BASE=/Diplomados
 ```
 
-Sacar IDs con classroom-mcp (`classroom_list_courses`) o la URL del curso.
+Para pruebas sin tocar Google, usa:
 
-### 3. Desplegar
+```dotenv
+GOOGLE_WORKSPACE_PROVISION_ENABLED=false
+```
+
+### 3. Portal Montessori
+
+No necesitas configurar nada adicional para Portal Montessori. El código lo agrega siempre:
+
+```text
+Portal Montessori: 765463029199
+```
+
+### 4. Cursos extra por programa
+
+Solo configura este parámetro cuando quieras agregar clases además de Portal Montessori:
+
+```dotenv
+GOOGLE_CLASSROOM_COURSE_MAP={"Nido & Comunidad infantil":["COURSE_ID_NIDO"],"Casa de Niños":["COURSE_ID_CASA"],"Taller":["COURSE_ID_TALLER"],"Diplomado en Neuroeducación":["COURSE_ID_NEURO"],"Propedéutico":[]}
+```
+
+### 5. Desplegar funciones Stripe
 
 ```bash
+cd alumnos-app
 npm run sync:stripe-functions
 npm run deploy:stripe
 ```
 
-### 4. Probar
+## UO esperada
 
-1. Inscripción de prueba con Stripe test (`4242…`).
-2. Paso 2 con usuario institucional **nuevo** (ej. `maria.prueba01`).
-3. Revisar:
-   - Correo al alumno con contraseña.
-   - Admin Console → usuario en OU correcta.
-   - Classroom → alumno en cursos.
-   - Login en https://alumnos.certificacionmontessori.com con esa contraseña.
+| Programa portal | UO |
+|-----------------|----|
+| Propedéutico | `/Diplomados` |
+| Nido & Comunidad infantil | `/Diplomados/Nido & Comunidad` |
+| Casa de Niños | `/Diplomados/Casa de Niños` |
+| Taller | `/Diplomados/Taller` |
+| Diplomado en Neuroeducación | `/Diplomados/Neuroeducación` |
 
-### 5. Si algo falla
+## Verificación rápida
 
-- Firestore → `alumnos/{uid}.googleWorkspace` (estado y errores).
-- Completar manualmente con **workspace-directory-admin** / **classroom-mcp** (como ya hacen).
-- El portal del alumno puede existir aunque Google haya fallado parcialmente.
+1. Hacer una inscripción Stripe de prueba.
+2. Completar paso 2 con un usuario nuevo.
+3. Ver en Firestore `alumnos/{uid}.googleWorkspace.status`.
+4. Confirmar que `courses` incluye `765463029199`.
+5. Confirmar en Admin Console que el usuario está en la UO correcta.
+6. Confirmar en Classroom que aparece en Portal Montessori.
 
----
-
-## Cuándo usar las herramientas MCP a mano
-
-- Primeras pruebas con `GOOGLE_WORKSPACE_PROVISION_ENABLED=false` (solo portal).
-- Corrección de un alumno que quedó en `partial` / `error`.
-- Alta masiva o casos especiales fuera del flujo web.
-
-Detalle técnico: `docs/GOOGLE_WORKSPACE_INSCRIPCION.md`.
+Detalle técnico completo: `docs/GOOGLE_WORKSPACE_INSCRIPCION.md`.

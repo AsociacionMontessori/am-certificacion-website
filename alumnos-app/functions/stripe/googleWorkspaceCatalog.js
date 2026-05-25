@@ -1,36 +1,39 @@
 /**
  * Catálogo OU + cursos Classroom por nivel del portal.
- * Sobrescribir con GOOGLE_CLASSROOM_COURSE_MAP (JSON) en secretos Firebase.
+ * GOOGLE_CLASSROOM_COURSE_MAP agrega cursos por programa; Portal Montessori
+ * queda como curso base para todos los niveles.
  */
 
 const {defineString} = require("firebase-functions/params");
 
 const GOOGLE_STUDENTS_OU_BASE = defineString("GOOGLE_STUDENTS_OU_BASE", {
-  default: "/Students/Certificacion",
+  default: "/Diplomados",
 });
 
 const GOOGLE_CLASSROOM_COURSE_MAP = defineString("GOOGLE_CLASSROOM_COURSE_MAP", {
   default: "{}",
 });
 
-/** Slug de OU bajo GOOGLE_STUDENTS_OU_BASE */
-const NIVEL_OU_SLUG = {
-  "Propedéutico": "Propedeutico",
-  "Nido & Comunidad infantil": "Nido",
-  "Casa de Niños": "Casa",
+const PORTAL_MONTESSORI_COURSE_ID = "765463029199";
+
+/** Ruta relativa de OU bajo GOOGLE_STUDENTS_OU_BASE. */
+const NIVEL_OU_RELATIVE_PATH = {
+  "Propedéutico": "",
+  "Nido & Comunidad infantil": "Nido & Comunidad",
+  "Casa de Niños": "Casa de Niños",
   Taller: "Taller",
-  Neuroeducación: "Neuroeducacion",
-  "Diplomado en Neuroeducación": "Neuroeducacion",
+  Neuroeducación: "Neuroeducación",
+  "Diplomado en Neuroeducación": "Neuroeducación",
 };
 
-/** Cursos por defecto (vacío hasta configurar en Firebase). */
+/** Cursos base: Portal Montessori para todos los niveles. */
 const DEFAULT_CLASSROOM_COURSES = {
-  "Propedéutico": [],
-  "Nido & Comunidad infantil": [],
-  "Casa de Niños": [],
-  Taller: [],
-  Neuroeducación: [],
-  "Diplomado en Neuroeducación": [],
+  "Propedéutico": [PORTAL_MONTESSORI_COURSE_ID],
+  "Nido & Comunidad infantil": [PORTAL_MONTESSORI_COURSE_ID],
+  "Casa de Niños": [PORTAL_MONTESSORI_COURSE_ID],
+  Taller: [PORTAL_MONTESSORI_COURSE_ID],
+  Neuroeducación: [PORTAL_MONTESSORI_COURSE_ID],
+  "Diplomado en Neuroeducación": [PORTAL_MONTESSORI_COURSE_ID],
 };
 
 function parseCourseMapJson(raw) {
@@ -44,22 +47,38 @@ function parseCourseMapJson(raw) {
   }
 }
 
+function normalizeBasePath(path) {
+  const normalized = String(path || "/Diplomados").trim().replace(/\/+$/, "");
+  return normalized || "/";
+}
+
+function normalizeRelativePath(path) {
+  return String(path || "").trim().replace(/^\/+|\/+$/g, "");
+}
+
+function normalizeCourseIds(value) {
+  const raw = Array.isArray(value) ? value : String(value || "").split(",");
+  return raw.map((id) => String(id).trim()).filter(Boolean);
+}
+
 function getOrgUnitPathForNivel(nivelPortal) {
-  const base = String(GOOGLE_STUDENTS_OU_BASE.value() || "/Students/Certificacion")
-      .replace(/\/+$/, "");
-  const slug = NIVEL_OU_SLUG[nivelPortal] || "General";
-  return `${base}/${slug}`;
+  const base = normalizeBasePath(GOOGLE_STUDENTS_OU_BASE.value());
+  const relative = normalizeRelativePath(NIVEL_OU_RELATIVE_PATH[nivelPortal]);
+  if (!relative) return base;
+  return `${base}/${relative}`.replace(/\/{2,}/g, "/");
 }
 
 function getClassroomCourseIdsForNivel(nivelPortal) {
   const fromEnv = parseCourseMapJson(GOOGLE_CLASSROOM_COURSE_MAP.value());
-  const ids = fromEnv[nivelPortal] || DEFAULT_CLASSROOM_COURSES[nivelPortal] || [];
-  return [...new Set(ids.map((id) => String(id).trim()).filter(Boolean))];
+  const defaults = DEFAULT_CLASSROOM_COURSES[nivelPortal] || [];
+  const configured = normalizeCourseIds(fromEnv[nivelPortal]);
+  return [...new Set([...defaults, ...configured])];
 }
 
 module.exports = {
   GOOGLE_STUDENTS_OU_BASE,
   GOOGLE_CLASSROOM_COURSE_MAP,
+  PORTAL_MONTESSORI_COURSE_ID,
   getOrgUnitPathForNivel,
   getClassroomCourseIdsForNivel,
 };

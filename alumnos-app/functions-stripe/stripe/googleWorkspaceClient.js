@@ -15,7 +15,7 @@ function parseServiceAccountJson() {
   if (!raw) return null;
   try {
     return JSON.parse(raw);
-  } catch (err) {
+  } catch {
     console.error("GOOGLE_SERVICE_ACCOUNT_JSON no es JSON válido");
     return null;
   }

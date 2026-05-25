@@ -1,5 +1,4 @@
 const admin = require("firebase-admin");
-const {getNivelPortal} = require("./inscripcionCatalog");
 const {getMateriasPorNivel} = require("./materiasPorNivel");
 
 function buildNivelEntry(nombre, fechaInicio) {
