@@ -12,6 +12,7 @@ const {
 } = require("./inscripcionCatalog");
 const {crearAlumnoDesdeInscripcion} = require("./inscripcionAlumno");
 const {notifyAlumnoCuentaCreada} = require("./notifications");
+const {isOrdenFlujoInscripcion} = require("./programasCheckout");
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -102,7 +103,7 @@ exports.completeInscripcionParte1Handler = onRequest(
           return;
         }
         const orden = ordenSnap.data();
-        if (orden.tipo !== "inscripcion") {
+        if (!isOrdenFlujoInscripcion(orden.tipo)) {
           res.status(400).json({error: "Esta referencia no corresponde a una inscripción"});
           return;
         }

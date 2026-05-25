@@ -120,18 +120,40 @@ export const PROGRAMAS_CHECKOUT_OPCIONES = PROGRAMAS_OFERTA.filter(
 export const getProgramaByCheckoutLabel = (label) =>
   PROGRAMAS_OFERTA.find((p) => p.checkoutLabel === label) || null
 
-/** Texto bajo el selector de programa en el pago de inscripción. */
-export const getResumenPagoInscripcion = (checkoutLabel, coin = "MXN") => {
+const parsePrecioMx = (priceMx) =>
+  Number(String(priceMx || "").replace(/,/g, "")) || 0
+
+const formatPrecioMx = (n) =>
+  Number(n).toLocaleString("es-MX", { maximumFractionDigits: 0 })
+
+/** Total estimado en checkout público (inscripción + programa o solo inscripción). */
+export const getTotalPagoCheckout = (checkoutLabel, soloInscripcion = false) => {
+  const ins = parsePrecioMx(INSCRIPCION_PRECIO.priceMx)
+  const programa = getProgramaByCheckoutLabel(checkoutLabel)
+  if (soloInscripcion || !programa) return ins
+  return ins + parsePrecioMx(programa.priceMx)
+}
+
+/** Texto bajo el selector de programa en el checkout. */
+export const getResumenPagoInscripcion = (
+  checkoutLabel,
+  coin = "MXN",
+  soloInscripcion = false
+) => {
   const programa = getProgramaByCheckoutLabel(checkoutLabel)
   const ins = INSCRIPCION_PRECIO.priceMx
   if (!programa) {
     return `Hoy pagas la inscripción (${coin} ${ins}). Después definimos el plan de tu programa.`
   }
+  if (soloInscripcion) {
+    return `Hoy pagas solo la inscripción (${coin} ${ins}). El programa (${programa.cardTitle}) se liquida después en el portal o por transferencia. La inscripción no se vuelve a cobrar en otros programas.`
+  }
+  const total = formatPrecioMx(getTotalPagoCheckout(checkoutLabel, false))
   if (programa.tipo === "guia") {
-    return `Hoy en Stripe pagas la inscripción (${coin} ${ins}). Después, colegiatura mensual de ${coin} ${programa.priceMx} durante ${programa.duration}. La inscripción no se vuelve a cobrar si tomas otro programa.`
+    return `Inicio completo en un solo pago: inscripción (${coin} ${ins}) + primera colegiatura (${coin} ${programa.priceMx}) = ${coin} $${total}. Las colegiaturas siguientes son mensuales en el portal. La inscripción solo se paga una vez.`
   }
   if (programa.tipo === "diplomado") {
-    return `Hoy en Stripe pagas la inscripción (${coin} ${ins}). El diplomado (${programa.cardTitle}) tiene un costo de programa de ${coin} ${programa.priceMx} (${programa.duration}), con plan de pago posterior. La inscripción solo se paga una vez.`
+    return `Inicio completo: inscripción (${coin} ${ins}) + programa ${programa.cardTitle} (${coin} ${programa.priceMx}, ${programa.duration}) = ${coin} $${total} hoy en Stripe. La inscripción no se repite en otros diplomados.`
   }
   return `Hoy pagas la inscripción (${coin} ${ins}).`
 }

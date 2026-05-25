@@ -4,6 +4,12 @@ const admin = require("firebase-admin");
 const Stripe = require("stripe");
 const {handleCors, rejectIfOriginNotAllowed} = require("./cors");
 const {resolveSku, SITE_URL, CATALOG_META} = require("./catalog");
+const {
+  buildCheckoutItemsFromRequest,
+  resolveOrdenTipo,
+  estimateTotalMxn,
+  getProgramaCheckout,
+} = require("./programasCheckout");
 
 const stripeSecretKey = defineSecret("STRIPE_SECRET_KEY");
 
@@ -11,15 +17,29 @@ const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 /**
  * @param {object} body
- * @return {{lineItems: Array, tipo: string, requiresShipping: boolean, skus: string[]}}
+ * @return {{items: Array<{sku: string, quantity: number}>, tipo: string, requiresShipping: boolean, skus: string[], modoPago: string|null}}
  */
-function parseLineItemsFromBody(body) {
-  const items = [];
+function resolveCheckoutFromBody(body) {
+  const hasExplicitItems = Boolean(body.sku) || (Array.isArray(body.items) && body.items.length > 0);
+  const programa = String(body.programa || "").trim();
 
+  if (programa && !hasExplicitItems) {
+    const built = buildCheckoutItemsFromRequest({
+      programa,
+      soloInscripcion: Boolean(body.soloInscripcion),
+    });
+    const parsed = parseLineItems({items: built.items});
+    return {
+      ...parsed,
+      modoPago: built.modo,
+      programaLabel: built.programaLabel,
+    };
+  }
+
+  const items = [];
   if (body.sku) {
     items.push({sku: body.sku, quantity: body.quantity || 1});
   }
-
   if (Array.isArray(body.items)) {
     body.items.forEach((item) => {
       if (item?.sku) {
@@ -27,12 +47,24 @@ function parseLineItemsFromBody(body) {
       }
     });
   }
-
   if (items.length === 0) {
-    throw new Error("Debes indicar al menos un producto (sku)");
+    throw new Error("Debes indicar al menos un producto (programa o sku)");
   }
 
-  let tipo = "libro";
+  const parsed = parseLineItems({items});
+  return {...parsed, modoPago: null, programaLabel: programa || null};
+}
+
+/**
+ * @param {object} input
+ * @return {{items: Array, tipo: string, requiresShipping: boolean, skus: string[]}}
+ */
+function parseLineItems(input) {
+  const items = input.items || [];
+  if (items.length === 0) {
+    throw new Error("Debes indicar al menos un producto");
+  }
+
   let requiresShipping = false;
   const skus = [];
 
@@ -40,11 +72,11 @@ function parseLineItemsFromBody(body) {
     const meta = CATALOG_META[sku];
     if (!meta) throw new Error(`Producto no válido: ${sku}`);
     skus.push(sku);
-    if (meta.tipo === "inscripcion") tipo = "inscripcion";
     if (meta.requiresShipping) requiresShipping = true;
     if (quantity < 1 || quantity > 10) throw new Error("Cantidad no válida");
   });
 
+  const tipo = resolveOrdenTipo(skus);
   return {items, tipo, requiresShipping, skus};
 }
 
@@ -83,7 +115,18 @@ exports.createPublicCheckoutHandler = onRequest(
           return;
         }
 
-        const {items, tipo, requiresShipping, skus} = parseLineItemsFromBody(body);
+        const {
+          items,
+          tipo,
+          requiresShipping,
+          skus,
+          modoPago,
+          programaLabel,
+        } = resolveCheckoutFromBody(body);
+
+        const progConfig = programaLabel ? getProgramaCheckout(programaLabel) : null;
+        const nivelFormulario = progConfig?.nivelFormulario || "";
+
         const db = admin.firestore();
         const stripe = new Stripe(stripeSecretKey.value());
 
@@ -108,6 +151,7 @@ exports.createPublicCheckoutHandler = onRequest(
           });
         }
 
+        const montoEstimadoMxn = estimateTotalMxn(items, CATALOG_META);
         const siteUrl = SITE_URL.value().replace(/\/$/, "");
         const ordenRef = db.collection("ordenes").doc();
         const session = await stripe.checkout.sessions.create({
@@ -121,7 +165,9 @@ exports.createPublicCheckoutHandler = onRequest(
             tipo,
             origen: "sitio_publico",
             skus: skus.join(","),
-            programa: programa.slice(0, 200),
+            programa: (programaLabel || programa).slice(0, 200),
+            modoPago: (modoPago || "").slice(0, 40),
+            nivelFormulario: nivelFormulario.slice(0, 200),
             requiereFacturaFiscal: requiereFacturaFiscal ? "1" : "0",
             cuentaContable: cuentaContable.slice(0, 32),
           },
@@ -136,7 +182,10 @@ exports.createPublicCheckoutHandler = onRequest(
           stripeCheckoutSessionId: session.id,
           cliente: {nombre, email, telefono: telefono || null},
           lineItems: ordenLineItems,
-          programa: programa || null,
+          programa: programaLabel || programa || null,
+          nivelFormulario: nivelFormulario || null,
+          modoPago: modoPago || null,
+          montoEstimadoMxn,
           requiereFacturaFiscal,
           cuentaContable,
           moneda: "mxn",

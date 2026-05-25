@@ -3,6 +3,7 @@ const {defineSecret} = require("firebase-functions/params");
 const admin = require("firebase-admin");
 const Stripe = require("stripe");
 const {notifyAdminOrdenPagada, notifyAdminPago} = require("./notifications");
+const {isOrdenFlujoInscripcion, getProgramaCheckout} = require("./programasCheckout");
 
 const stripeSecretKey = defineSecret("STRIPE_SECRET_KEY");
 const stripeWebhookSecret = defineSecret("STRIPE_WEBHOOK_SECRET");
@@ -50,13 +51,23 @@ async function handleOrdenPublicaPagada(db, ordenId, session) {
   const orden = {id: ordenId, ...ordenSnap.data(), monto: amountTotal, moneda};
   await notifyAdminOrdenPagada(db, orden);
 
-  if (orden.tipo === "inscripcion") {
+  if (isOrdenFlujoInscripcion(orden.tipo)) {
     const cliente = orden.cliente || {};
+    const programaLabel = orden.programa || session.metadata?.programa || "";
+    const prog = getProgramaCheckout(programaLabel);
+    const nivel =
+      orden.nivelFormulario ||
+      session.metadata?.nivelFormulario ||
+      prog?.nivelFormulario ||
+      programaLabel;
+
     const inscripcionRef = await db.collection("inscripciones").add({
       nombre: cliente.nombre || session.customer_details?.name || "",
       email: cliente.email || session.customer_email || "",
       telefono: cliente.telefono || null,
-      nivel: orden.programa || session.metadata?.programa || "",
+      nivel,
+      nivelEspecializacion: nivel,
+      programa: programaLabel,
       estadoInscripcion: "Pagado",
       metodoPago: "stripe",
       ordenId,
@@ -64,6 +75,8 @@ async function handleOrdenPublicaPagada(db, ordenId, session) {
       fechaInscripcion: admin.firestore.FieldValue.serverTimestamp(),
       origen: "sitio_publico_stripe",
       formularioCompleto: false,
+      inicioCompleto: orden.tipo === "inicio_programa",
+      lineItemsPagados: orden.lineItems || [],
     });
     await ordenRef.update({inscripcionId: inscripcionRef.id});
   }

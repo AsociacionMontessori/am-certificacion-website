@@ -23,18 +23,28 @@ const Stripe = require('stripe');
 
 const CATALOG = [
   { sku: 'inscripcion_diplomado', name: 'Inscripción diplomado', amountMxn: 4900, recurring: false },
+  { sku: 'diplomado_neuroeducacion', name: 'Diplomado en Neuroeducación', amountMxn: 4500, recurring: false },
+  { sku: 'diplomado_educacion_cosmica', name: 'Educación Cósmica y Grandes Lecciones', amountMxn: 2800, recurring: false },
+  { sku: 'colegiatura_nido_inicio', name: 'Primera colegiatura - Nido', amountMxn: 3100, recurring: false },
+  { sku: 'colegiatura_casa_inicio', name: 'Primera colegiatura - Casa de Niños', amountMxn: 3500, recurring: false },
+  { sku: 'colegiatura_taller_inicio', name: 'Primera colegiatura - Taller I y II', amountMxn: 3900, recurring: false },
   { sku: 'libro_ammac_1', name: 'Libro 1 - Pedagogía científica', amountMxn: 450, recurring: false },
   { sku: 'libro_ammac_2', name: 'Libro 2 - Secreto de la infancia', amountMxn: 450, recurring: false },
   { sku: 'libro_ammac_3', name: 'Libro 3 - Educación cósmica', amountMxn: 450, recurring: false },
   { sku: 'libro_ammac_4', name: 'Libro 4 - Guiones cósmicos', amountMxn: 450, recurring: false },
   { sku: 'colegiatura_nido', name: 'Colegiatura mensual - Nido', amountMxn: 3100, recurring: true },
   { sku: 'colegiatura_casa', name: 'Colegiatura mensual - Casa de Niños', amountMxn: 3500, recurring: true },
-  { sku: 'colegiatura_taller', name: 'Colegiatura mensual - Taller', amountMxn: 3500, recurring: true },
+  { sku: 'colegiatura_taller', name: 'Colegiatura mensual - Taller', amountMxn: 3900, recurring: true },
   { sku: 'certificado_fisico', name: 'Certificado físico', amountMxn: 2700, recurring: false },
 ];
 
 const PARAM_NAMES = {
   inscripcion_diplomado: 'STRIPE_PRICE_INSCRIPCION',
+  diplomado_neuroeducacion: 'STRIPE_PRICE_DIPLOMADO_NEURO',
+  diplomado_educacion_cosmica: 'STRIPE_PRICE_DIPLOMADO_COSMICA',
+  colegiatura_nido_inicio: 'STRIPE_PRICE_COLEGIATURA_NIDO_INICIO',
+  colegiatura_casa_inicio: 'STRIPE_PRICE_COLEGIATURA_CASA_INICIO',
+  colegiatura_taller_inicio: 'STRIPE_PRICE_COLEGIATURA_TALLER_INICIO',
   libro_ammac_1: 'STRIPE_PRICE_LIBRO_1',
   libro_ammac_2: 'STRIPE_PRICE_LIBRO_2',
   libro_ammac_3: 'STRIPE_PRICE_LIBRO_3',

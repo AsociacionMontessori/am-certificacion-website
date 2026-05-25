@@ -5,6 +5,7 @@ import {
   PROGRAMAS_CHECKOUT_OPCIONES,
   mapProgramaCheckoutANivel,
   getResumenPagoInscripcion,
+  getTotalPagoCheckout,
   getProgramaByCheckoutLabel,
 } from "./programasOferta"
 
@@ -16,4 +17,9 @@ export const INSCRIPCION_PUBLIC = {
 
 export const PROGRAMAS_INSCRIPCION = PROGRAMAS_CHECKOUT_OPCIONES
 
-export { mapProgramaCheckoutANivel, getResumenPagoInscripcion, getProgramaByCheckoutLabel }
+export {
+  mapProgramaCheckoutANivel,
+  getResumenPagoInscripcion,
+  getTotalPagoCheckout,
+  getProgramaByCheckoutLabel,
+}

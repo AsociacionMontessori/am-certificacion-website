@@ -9,27 +9,63 @@ const priceColegiaturaNido = defineString("STRIPE_PRICE_COLEGIATURA_NIDO", {defa
 const priceColegiaturaCasa = defineString("STRIPE_PRICE_COLEGIATURA_CASA", {default: ""});
 const priceColegiaturaTaller = defineString("STRIPE_PRICE_COLEGIATURA_TALLER", {default: ""});
 const priceCertificado = defineString("STRIPE_PRICE_CERTIFICADO", {default: ""});
+const priceDiplomadoNeuro = defineString("STRIPE_PRICE_DIPLOMADO_NEURO", {default: ""});
+const priceDiplomadoCosmica = defineString("STRIPE_PRICE_DIPLOMADO_COSMICA", {default: ""});
+const priceColegiaturaNidoInicio = defineString("STRIPE_PRICE_COLEGIATURA_NIDO_INICIO", {default: ""});
+const priceColegiaturaCasaInicio = defineString("STRIPE_PRICE_COLEGIATURA_CASA_INICIO", {default: ""});
+const priceColegiaturaTallerInicio = defineString("STRIPE_PRICE_COLEGIATURA_TALLER_INICIO", {default: ""});
 
 const SITE_URL = defineString("SITE_URL", {default: "https://certificacionmontessori.com"});
 const ALUMNOS_SITE_URL = defineString("ALUMNOS_SITE_URL", {
   default: "https://alumnos.certificacionmontessori.com",
 });
 
-/** Catálogo estático: SKU → metadatos de negocio */
+/** Catálogo estático: SKU → metadatos de negocio (amountMxn para validación interna) */
 const CATALOG_META = {
   inscripcion_diplomado: {
     tipo: "inscripcion",
     descripcion: "Inscripción diplomado Certificación Montessori",
     requiresShipping: false,
+    amountMxn: 4900,
   },
-  libro_ammac_1: {tipo: "libro", descripcion: "Libro 1 - Pedagogía científica", requiresShipping: true},
-  libro_ammac_2: {tipo: "libro", descripcion: "Libro 2 - Secreto de la infancia", requiresShipping: true},
-  libro_ammac_3: {tipo: "libro", descripcion: "Libro 3 - Educación cósmica", requiresShipping: true},
-  libro_ammac_4: {tipo: "libro", descripcion: "Libro 4 - Guiones cósmicos", requiresShipping: true},
-  colegiatura_nido: {tipo: "colegiatura", descripcion: "Colegiatura mensual - Nido", requiresShipping: false},
-  colegiatura_casa: {tipo: "colegiatura", descripcion: "Colegiatura mensual - Casa de Niños", requiresShipping: false},
-  colegiatura_taller: {tipo: "colegiatura", descripcion: "Colegiatura mensual - Taller", requiresShipping: false},
-  certificado_fisico: {tipo: "certificado", descripcion: "Certificado físico", requiresShipping: true},
+  diplomado_neuroeducacion: {
+    tipo: "programa",
+    descripcion: "Diplomado en Neuroeducación",
+    requiresShipping: false,
+    amountMxn: 4500,
+  },
+  diplomado_educacion_cosmica: {
+    tipo: "programa",
+    descripcion: "Educación Cósmica y Grandes Lecciones",
+    requiresShipping: false,
+    amountMxn: 2800,
+  },
+  colegiatura_nido_inicio: {
+    tipo: "programa",
+    descripcion: "Primera colegiatura - Nido y Comunidad Infantil",
+    requiresShipping: false,
+    amountMxn: 3100,
+  },
+  colegiatura_casa_inicio: {
+    tipo: "programa",
+    descripcion: "Primera colegiatura - Casa de Niños",
+    requiresShipping: false,
+    amountMxn: 3500,
+  },
+  colegiatura_taller_inicio: {
+    tipo: "programa",
+    descripcion: "Primera colegiatura - Taller I y II",
+    requiresShipping: false,
+    amountMxn: 3900,
+  },
+  libro_ammac_1: {tipo: "libro", descripcion: "Libro 1 - Pedagogía científica", requiresShipping: true, amountMxn: 450},
+  libro_ammac_2: {tipo: "libro", descripcion: "Libro 2 - Secreto de la infancia", requiresShipping: true, amountMxn: 450},
+  libro_ammac_3: {tipo: "libro", descripcion: "Libro 3 - Educación cósmica", requiresShipping: true, amountMxn: 450},
+  libro_ammac_4: {tipo: "libro", descripcion: "Libro 4 - Guiones cósmicos", requiresShipping: true, amountMxn: 450},
+  colegiatura_nido: {tipo: "colegiatura", descripcion: "Colegiatura mensual - Nido", requiresShipping: false, amountMxn: 3100},
+  colegiatura_casa: {tipo: "colegiatura", descripcion: "Colegiatura mensual - Casa de Niños", requiresShipping: false, amountMxn: 3500},
+  colegiatura_taller: {tipo: "colegiatura", descripcion: "Colegiatura mensual - Taller", requiresShipping: false, amountMxn: 3900},
+  certificado_fisico: {tipo: "certificado", descripcion: "Certificado físico", requiresShipping: true, amountMxn: 2700},
 };
 
 const PARAM_PRICE_MAP = {
@@ -42,6 +78,11 @@ const PARAM_PRICE_MAP = {
   colegiatura_casa: priceColegiaturaCasa,
   colegiatura_taller: priceColegiaturaTaller,
   certificado_fisico: priceCertificado,
+  diplomado_neuroeducacion: priceDiplomadoNeuro,
+  diplomado_educacion_cosmica: priceDiplomadoCosmica,
+  colegiatura_nido_inicio: priceColegiaturaNidoInicio,
+  colegiatura_casa_inicio: priceColegiaturaCasaInicio,
+  colegiatura_taller_inicio: priceColegiaturaTallerInicio,
 };
 
 const NIVEL_TO_COLEGIATURA_SKU = [

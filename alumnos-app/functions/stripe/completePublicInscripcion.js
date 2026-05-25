@@ -1,6 +1,7 @@
 const {onRequest} = require("firebase-functions/v2/https");
 const admin = require("firebase-admin");
 const {handleCors, rejectIfOriginNotAllowed} = require("./cors");
+const {isOrdenFlujoInscripcion} = require("./programasCheckout");
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const NIVELES_VALIDOS = new Set([
@@ -87,7 +88,7 @@ exports.completePublicInscripcionHandler = onRequest(
         }
 
         const orden = ordenSnap.data();
-        if (orden.tipo !== "inscripcion") {
+        if (!isOrdenFlujoInscripcion(orden.tipo)) {
           res.status(400).json({error: "Esta referencia no corresponde a una inscripción"});
           return;
         }

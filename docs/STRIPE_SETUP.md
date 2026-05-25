@@ -16,11 +16,18 @@ Crear en Stripe → **Product catalog** un producto por concepto y al menos un *
 | SKU (código interno) | Concepto | Monto referencia |
 |----------------------|----------|------------------|
 | `inscripcion_diplomado` | Inscripción diplomado | $4,900 MXN |
+| `diplomado_neuroeducacion` | Diplomado Neuroeducación (checkout inicio) | $4,500 MXN |
+| `diplomado_educacion_cosmica` | Educación Cósmica (checkout inicio) | $2,800 MXN |
+| `colegiatura_nido_inicio` | Primera colegiatura Nido (checkout inicio) | $3,100 MXN |
+| `colegiatura_casa_inicio` | Primera colegiatura Casa (checkout inicio) | $3,500 MXN |
+| `colegiatura_taller_inicio` | Primera colegiatura Taller (checkout inicio) | $3,900 MXN |
 | `libro_ammac_1` … `libro_ammac_4` | Libros serie Roxana | Definir con la asociación |
-| `colegiatura_nido` | Colegiatura mensual Nido | $3,100 MXN |
-| `colegiatura_casa` | Colegiatura Casa de Niños | $3,500 MXN |
-| `colegiatura_taller` | Colegiatura Taller | $3,500 MXN |
+| `colegiatura_nido` | Colegiatura mensual Nido (portal) | $3,100 MXN |
+| `colegiatura_casa` | Colegiatura Casa de Niños (portal) | $3,500 MXN |
+| `colegiatura_taller` | Colegiatura Taller (portal) | $3,900 MXN |
 | `certificado_fisico` | Certificado físico | $2,700 MXN |
+
+El checkout público arma el carrito en el servidor según `programa` + `soloInscripcion`. Ver `docs/STRIPE_COMPLIANCE.md`.
 
 Copiar cada `price_...` al configurar secretos (paso 3).
 
@@ -35,6 +42,11 @@ firebase functions:secrets:set STRIPE_WEBHOOK_SECRET
 
 # Parámetros de precio (recomendado: uno por SKU)
 firebase functions:params:set STRIPE_PRICE_INSCRIPCION=price_xxx
+firebase functions:params:set STRIPE_PRICE_DIPLOMADO_NEURO=price_xxx
+firebase functions:params:set STRIPE_PRICE_DIPLOMADO_COSMICA=price_xxx
+firebase functions:params:set STRIPE_PRICE_COLEGIATURA_NIDO_INICIO=price_xxx
+firebase functions:params:set STRIPE_PRICE_COLEGIATURA_CASA_INICIO=price_xxx
+firebase functions:params:set STRIPE_PRICE_COLEGIATURA_TALLER_INICIO=price_xxx
 firebase functions:params:set STRIPE_PRICE_LIBRO_1=price_xxx
 firebase functions:params:set STRIPE_PRICE_LIBRO_2=price_xxx
 firebase functions:params:set STRIPE_PRICE_LIBRO_3=price_xxx

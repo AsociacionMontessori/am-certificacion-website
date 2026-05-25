@@ -16,6 +16,17 @@ Generado con `npm run stripe:setup-catalog`. **No usar en producción (Live).**
 | `colegiatura_taller` | `price_1Tai25D6IQ4doPMoodDJeu3g` | $3,500 MXN/mes |
 | `certificado_fisico` | `price_1Tai25D6IQ4doPMo6Ohuwmk5` | $2,700 MXN |
 
+### SKUs nuevos (inicio completo) — ejecutar de nuevo
+
+Tras actualizar el script, volver a correr:
+
+```bash
+cd alumnos-app
+STRIPE_SECRET_KEY=sk_test_... node scripts/stripe-setup-catalog.js
+```
+
+SKUs a registrar: `diplomado_neuroeducacion`, `diplomado_educacion_cosmica`, `colegiatura_nido_inicio`, `colegiatura_casa_inicio`, `colegiatura_taller_inicio`. Añadir sus `price_...` a la tabla y a los params siguientes.
+
 ## Firebase params (test)
 
 ```bash
@@ -29,4 +40,10 @@ firebase functions:params:set STRIPE_PRICE_COLEGIATURA_NIDO=price_1Tai23D6IQ4doP
 firebase functions:params:set STRIPE_PRICE_COLEGIATURA_CASA=price_1Tai24D6IQ4doPMoXCZ2MosN
 firebase functions:params:set STRIPE_PRICE_COLEGIATURA_TALLER=price_1Tai25D6IQ4doPMoodDJeu3g
 firebase functions:params:set STRIPE_PRICE_CERTIFICADO=price_1Tai25D6IQ4doPMo6Ohuwmk5
+# Tras stripe-setup-catalog (inicio completo):
+# firebase functions:params:set STRIPE_PRICE_DIPLOMADO_NEURO=price_xxx
+# firebase functions:params:set STRIPE_PRICE_DIPLOMADO_COSMICA=price_xxx
+# firebase functions:params:set STRIPE_PRICE_COLEGIATURA_NIDO_INICIO=price_xxx
+# firebase functions:params:set STRIPE_PRICE_COLEGIATURA_CASA_INICIO=price_xxx
+# firebase functions:params:set STRIPE_PRICE_COLEGIATURA_TALLER_INICIO=price_xxx
 ```
