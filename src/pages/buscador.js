@@ -119,10 +119,11 @@ const Buscador = () => {
                                     
                                     searchDataAutomcomplete={[
                                         ...estados.map((estado) => ({
-                                            key: estado.id,
+                                            key: estado.estado,
                                             value: estado.nombreEstado,
                                         }))
                                     ]}
+                                    onSelect={(estado) => changeActive(estado)}
 
                                 />
                                 {/* <div className="absolute top-3 left-3 opacity-0 group-hover:opacity-100 transition duration-300 ease-in-out transistion-all">
