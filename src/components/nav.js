@@ -9,7 +9,6 @@ import { useEffect } from 'react';
 const navigation = [
     { name: 'DIPLOMADOS', href: '/diplomados', current: false },
     { name: 'PUBLICACIONES', href: '../publicaciones', current: false },
-    { name: 'BLOG', href: 'https://montessorimexico.org/', current: false, external: true },
     { name: 'ESCUELA PARA NIÑOS', href: 'https://kalpilli.com/', current: false, external: true },
     { name: 'CONTACTO', href: '../contact', current: false },
 ]
