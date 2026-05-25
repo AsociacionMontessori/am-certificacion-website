@@ -3,6 +3,7 @@ import { useState, useMemo, useEffect } from "react"
 import { Link } from "gatsby"
 import { createPublicCheckoutSession } from "../../utils/stripeCheckout"
 import {
+  INSCRIPCION_PUBLIC,
   PROGRAMAS_INSCRIPCION,
   getResumenPagoInscripcion,
   getTotalPagoCheckout,
@@ -25,6 +26,15 @@ const readProgramaIdFromUrl = () => {
   return new URLSearchParams(window.location.search).get("programa")
 }
 
+const resolveInitialPrograma = (initialProgramaId) => {
+  const fromProp = initialProgramaId
+    ? getCheckoutLabelFromProgramaId(initialProgramaId)
+    : null
+  const fromUrl = getCheckoutLabelFromProgramaId(readProgramaIdFromUrl())
+  const label = fromProp || fromUrl
+  return label && PROGRAMAS_INSCRIPCION.includes(label) ? label : ""
+}
+
 const InscriptionCheckoutForm = ({
   coin,
   price,
@@ -34,24 +44,20 @@ const InscriptionCheckoutForm = ({
   const [nombre, setNombre] = useState("")
   const [email, setEmail] = useState("")
   const [telefono, setTelefono] = useState("")
-  const [programa, setPrograma] = useState(() => {
-    const fromProp = initialProgramaId
-      ? getCheckoutLabelFromProgramaId(initialProgramaId)
-      : null
-    const fromUrl = getCheckoutLabelFromProgramaId(readProgramaIdFromUrl())
-    const label = fromProp || fromUrl
-    if (label && PROGRAMAS_INSCRIPCION.includes(label)) {
-      return label
-    }
-    return PROGRAMAS_INSCRIPCION[0]
-  })
-  const [soloInscripcion, setSoloInscripcion] = useState(false)
+  const [programa, setPrograma] = useState(() =>
+    resolveInitialPrograma(initialProgramaId)
+  )
+  const [soloInscripcion, setSoloInscripcion] = useState(() =>
+    !programaTienePromoInscripcionIncluida(resolveInitialPrograma(initialProgramaId))
+  )
   const [requiereFacturaFiscal, setRequiereFacturaFiscal] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const { esMexico: visitanteEnMexico } = useVisitorGeo()
 
+  const programaSeleccionado = Boolean(programa)
   const esPromoNeuro = programaTienePromoInscripcionIncluida(programa)
+  const pagarSoloInscripcion = !programaSeleccionado || (!esPromoNeuro && soloInscripcion)
 
   useEffect(() => {
     if (!visitanteEnMexico) {
@@ -64,6 +70,7 @@ const InscriptionCheckoutForm = ({
     const label = getCheckoutLabelFromProgramaId(initialProgramaId)
     if (label && PROGRAMAS_INSCRIPCION.includes(label)) {
       setPrograma(label)
+      setSoloInscripcion(!programaTienePromoInscripcionIncluida(label))
     }
   }, [initialProgramaId])
 
@@ -73,6 +80,7 @@ const InscriptionCheckoutForm = ({
     const label = getCheckoutLabelFromProgramaId(id)
     if (label && PROGRAMAS_INSCRIPCION.includes(label)) {
       setPrograma(label)
+      setSoloInscripcion(!programaTienePromoInscripcionIncluida(label))
     }
   }, [])
 
@@ -83,16 +91,16 @@ const InscriptionCheckoutForm = ({
   }, [esPromoNeuro, soloInscripcion])
 
   const resumenPrograma = useMemo(
-    () => getResumenPagoInscripcion(programa, coin, soloInscripcion),
-    [programa, coin, soloInscripcion]
+    () => getResumenPagoInscripcion(programa, coin, pagarSoloInscripcion),
+    [programa, coin, pagarSoloInscripcion]
   )
 
   const montoHoy = useMemo(
     () =>
-      soloInscripcion
+      pagarSoloInscripcion
         ? INSCRIPCION_PRECIO.priceMx
         : formatMonto(getTotalPagoCheckout(programa, false)),
-    [programa, soloInscripcion]
+    [programa, pagarSoloInscripcion]
   )
 
   const handleSubmit = async (e) => {
@@ -101,13 +109,21 @@ const InscriptionCheckoutForm = ({
     setLoading(true)
 
     try {
-      const { url } = await createPublicCheckoutSession({
-        programa,
-        soloInscripcion: esPromoNeuro ? false : soloInscripcion,
+      const payload = {
+        soloInscripcion: pagarSoloInscripcion,
         requiereFacturaFiscal,
         cuentaContable: getCuentaContableId(requiereFacturaFiscal),
         cliente: { nombre: nombre.trim(), email: email.trim(), telefono: telefono.trim() },
-      })
+      }
+
+      if (programaSeleccionado) {
+        payload.programa = programa
+      } else {
+        payload.sku = INSCRIPCION_PUBLIC.sku
+        payload.quantity = 1
+      }
+
+      const { url } = await createPublicCheckoutSession(payload)
       if (typeof window !== "undefined") {
         window.location.href = url
       }
@@ -120,7 +136,7 @@ const InscriptionCheckoutForm = ({
   let botonLabel = `Pagar inicio completo (${coin} $${montoHoy})`
   if (esPromoNeuro) {
     botonLabel = `Pagar diplomado (${coin} $${montoHoy})`
-  } else if (soloInscripcion) {
+  } else if (pagarSoloInscripcion) {
     botonLabel = `Pagar inscripción (${coin} ${price})`
   }
 
@@ -136,8 +152,8 @@ const InscriptionCheckoutForm = ({
       ) : (
         <div className="rounded-xl border border-blue/25 bg-blue/5 px-4 py-4 space-y-2">
           <p className="text-sm text-gray leading-relaxed">
-            <strong className="text-blue">Recomendado:</strong> paga inscripción y tu
-            programa en un solo checkout para activar tu lugar de inmediato.
+            <strong className="text-blue">Opción flexible:</strong> puedes pagar solo la
+            inscripción hoy y elegir tu formación en el siguiente paso.
           </p>
           <p className="text-xs font-semibold text-green">
             La inscripción se paga una sola vez; otros diplomados o cursos posteriores no la
@@ -149,33 +165,36 @@ const InscriptionCheckoutForm = ({
       {!esPromoNeuro && (
         <fieldset className="space-y-2 rounded-xl border border-gray/20 bg-white px-4 py-4">
           <legend className="text-sm font-medium text-black px-1">¿Qué pagas hoy?</legend>
-          <label className="flex items-start gap-3 min-h-[44px] cursor-pointer">
+          <label
+            className={`flex min-h-[44px] items-start gap-3 ${programaSeleccionado ? "cursor-pointer" : "cursor-not-allowed opacity-60"}`}
+          >
             <input
               type="radio"
               name="modoPago"
-              checked={!soloInscripcion}
+              checked={!pagarSoloInscripcion}
               onChange={() => setSoloInscripcion(false)}
+              disabled={!programaSeleccionado}
               className="mt-1"
             />
             <span className="text-sm text-black">
               <span className="font-medium">Inicio completo</span>
               <span className="block text-xs text-gray">
-                Inscripción + primer pago del programa (Stripe)
+                Inscripción + primer pago del programa
               </span>
             </span>
           </label>
-          <label className="flex items-start gap-3 min-h-[44px] cursor-pointer">
+          <label className="flex min-h-[44px] cursor-pointer items-start gap-3">
             <input
               type="radio"
               name="modoPago"
-              checked={soloInscripcion}
+              checked={pagarSoloInscripcion}
               onChange={() => setSoloInscripcion(true)}
               className="mt-1"
             />
             <span className="text-sm text-black">
               <span className="font-medium">Solo inscripción hoy</span>
               <span className="block text-xs text-gray">
-                El programa se liquida después (portal o transferencia)
+                Eliges o confirmas tu formación después
               </span>
             </span>
           </label>
@@ -247,9 +266,14 @@ const InscriptionCheckoutForm = ({
           <select
             id="insc-programa"
             value={programa}
-            onChange={(e) => setPrograma(e.target.value)}
+            onChange={(e) => {
+              const nextPrograma = e.target.value
+              setPrograma(nextPrograma)
+              setSoloInscripcion(!programaTienePromoInscripcionIncluida(nextPrograma))
+            }}
             className="w-full min-h-[48px] px-4 py-2.5 rounded-xl border border-gray/25 text-black text-base bg-white"
           >
+            <option value="">Definiré mi programa después</option>
             {PROGRAMAS_INSCRIPCION.map((p) => (
               <option key={p} value={p}>
                 {p}

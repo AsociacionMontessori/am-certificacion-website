@@ -126,14 +126,14 @@ export const DOCUMENTOS_PARTE2 = [
     id: "comprobantePagoTransferencia",
     label: "Comprobante de pago por transferencia (solo si no pagaste en línea)",
     required: false,
-    hint: "PDF o imagen. No aplica si pagaste con Stripe.",
+    hint: "PDF o imagen. No aplica si pagaste en línea.",
   },
 ]
 
 export const PORTAL_ALUMNOS_URL =
   process.env.GATSBY_PORTAL_ALUMNOS_URL || "https://alumnos.certificacionmontessori.com"
 
-/** Mapeo programa de pago Stripe → nivel sugerido */
+/** Mapeo programa de pago en línea → nivel sugerido */
 export const mapProgramaCheckoutANivel = (programa) => {
   const fromOferta = mapFromOferta(programa)
   if (fromOferta) return fromOferta

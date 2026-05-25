@@ -93,7 +93,7 @@ const RoxanaBooksSection = () => {
 
         <p className="mx-auto mt-8 max-w-2xl text-center text-xs text-white/80 sm:text-sm">
           Los precios en sitio son referencia; el monto final se confirma en la pasarela
-          Stripe al crear el pedido.
+          de pago al crear el pedido.
         </p>
       </div>
     </section>

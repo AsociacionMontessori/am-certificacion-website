@@ -197,7 +197,7 @@ export const getResumenPagoInscripcion = (
     if (soloInscripcion) {
       return `Este diplomado tiene la inscripción incluida en la promoción. Elige «Inicio completo» y paga solo ${coin} ${programa.priceMx}.`
     }
-    return `${PROMO_NEURO_INSCRIPCION_INCLUIDA.detalle} Total hoy en Stripe: ${coin} $${programa.priceMx}.`
+    return `${PROMO_NEURO_INSCRIPCION_INCLUIDA.detalle} Total a pagar hoy: ${coin} $${programa.priceMx}.`
   }
   if (soloInscripcion) {
     return `Hoy pagas solo la inscripción (${coin} ${ins}). El programa (${programa.cardTitle}) se liquida después en el portal o por transferencia. La inscripción no se vuelve a cobrar en otros programas.`
@@ -207,7 +207,7 @@ export const getResumenPagoInscripcion = (
     return `Inicio completo en un solo pago: inscripción (${coin} ${ins}) + primera colegiatura (${coin} ${programa.priceMx}) = ${coin} $${total}. Las colegiaturas siguientes son mensuales en el portal. La inscripción solo se paga una vez.`
   }
   if (programa.tipo === "diplomado") {
-    return `Inicio completo: inscripción (${coin} ${ins}) + programa ${programa.cardTitle} (${coin} ${programa.priceMx}, ${programa.duration}) = ${coin} $${total} hoy en Stripe. La inscripción no se repite en otros diplomados.`
+    return `Inicio completo: inscripción (${coin} ${ins}) + programa ${programa.cardTitle} (${coin} ${programa.priceMx}, ${programa.duration}) = ${coin} $${total} hoy. La inscripción no se repite en otros diplomados.`
   }
   return `Hoy pagas la inscripción (${coin} ${ins}).`
 }

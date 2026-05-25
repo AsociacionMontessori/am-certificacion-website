@@ -16,11 +16,6 @@ const canonicalSources = [
     description: "Información pública sobre diplomados, estructura del programa, profesores y proceso de inscripción.",
   },
   {
-    title: "Certifícate",
-    url: "https://certificacionmontessori.com/certificate/",
-    description: "Resumen público de certificaciones y formación como Guía Montessori con validez internacional.",
-  },
-  {
     title: "Roxana Muñoz",
     url: "https://certificacionmontessori.com/roxana/",
     description: "Perfil institucional y académico de Roxana Muñoz Guevara.",

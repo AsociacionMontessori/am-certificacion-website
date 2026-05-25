@@ -82,7 +82,7 @@ const PaymentClarity = ({ coin, inscripcionPrice, useMxn }) => {
             Inscripción única de {" "}
             <strong className="text-white">${inscripcionPrice} {coin}</strong>. Si
             eliges inicio completo, también cubres el primer pago del programa en
-            Stripe.
+            este mismo paso.
           </p>
         </div>
         <div className="space-y-1">

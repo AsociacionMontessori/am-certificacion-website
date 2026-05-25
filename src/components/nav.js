@@ -7,8 +7,7 @@ import { useEffect } from 'react';
 
 
 const navigation = [
-    // { name: 'CERTIFÍCATE', href: '../certificate', current: false },
-    { name: 'DIPLOMADOS', href: '../certificate', current: false },
+    { name: 'DIPLOMADOS', href: '/diplomados', current: false },
     { name: 'PUBLICACIONES', href: '../publicaciones', current: false },
     { name: 'ESCUELA PARA NIÑOS', href: 'https://kalpilli.com/', current: false, external: true },
     { name: 'CONTACTO', href: '../contact', current: false },

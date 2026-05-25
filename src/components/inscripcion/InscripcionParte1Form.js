@@ -3,6 +3,7 @@ import { useState } from "react"
 import {
   DOMINIO_INSTITUCIONAL,
   MODALIDAD_INSCRIPCION,
+  NIVELES_ESPECIALIZACION,
 } from "../../data/inscripcionForm"
 import { submitInscripcionParte1 } from "../../utils/inscripcionApi"
 
@@ -23,11 +24,11 @@ const InscripcionParte1Form = ({
   programaPagadoLabel = "",
   onSuccess,
 }) => {
-  const nivelFijo = nivelEspecializacionFijo || initialValues.nivelEspecializacion || ""
+  const nivelFijo = nivelEspecializacionFijo || ""
   const [form, setForm] = useState({
     ...emptyForm,
     ...initialValues,
-    nivelEspecializacion: nivelFijo,
+    nivelEspecializacion: nivelFijo || initialValues.nivelEspecializacion || "",
   })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
@@ -43,8 +44,9 @@ const InscripcionParte1Form = ({
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError("")
-    if (!nivelFijo) {
-      setError("No se encontró el programa de tu pago. Contacta a soporte.")
+    const nivelElegido = nivelFijo || form.nivelEspecializacion
+    if (!nivelElegido) {
+      setError("Elige la formación que quieres tomar para continuar.")
       return
     }
     setLoading(true)
@@ -54,7 +56,7 @@ const InscripcionParte1Form = ({
         fechaNacimiento: form.fechaNacimiento,
         nacionalidad: form.nacionalidad.trim(),
         modalidad: MODALIDAD_INSCRIPCION,
-        nivelEspecializacion: nivelFijo,
+        nivelEspecializacion: nivelElegido,
         telefonoMovil: form.telefonoMovil.trim(),
         emailContacto: form.emailContacto.trim(),
         usuarioInstitucional: form.usuarioInstitucional.trim().toLowerCase(),
@@ -80,16 +82,43 @@ const InscripcionParte1Form = ({
 
       <div className="rounded-xl border-2 border-green/30 bg-green/5 px-4 py-4">
         <p className="text-xs font-semibold uppercase tracking-wide text-green mb-1">
-          Programa pagado (no modificable)
+          {nivelFijo ? "Formación seleccionada" : "Elige tu formación"}
         </p>
-        <p className="text-sm font-semibold text-black leading-snug">
-          {nivelFijo}
-        </p>
-        {programaPagadoLabel && (
-          <p className="text-xs text-gray mt-2">
-            Checkout: {programaPagadoLabel}. Cada programa tiene un costo distinto; por eso no
-            se puede cambiar después del pago.
-          </p>
+        {nivelFijo ? (
+          <>
+            <p className="text-sm font-semibold text-black leading-snug">
+              {nivelFijo}
+            </p>
+            {programaPagadoLabel && (
+              <p className="text-xs text-gray mt-2">
+                Pago seleccionado: {programaPagadoLabel}. Cada programa tiene un costo distinto;
+                por eso no se puede cambiar después del pago inicial.
+              </p>
+            )}
+          </>
+        ) : (
+          <>
+            <label className="sr-only" htmlFor="p1-nivel">Formación que quieres tomar</label>
+            <select
+              id="p1-nivel"
+              name="nivelEspecializacion"
+              required
+              value={form.nivelEspecializacion}
+              onChange={handleChange}
+              className={inputClass}
+            >
+              <option value="">Selecciona una formación</option>
+              {NIVELES_ESPECIALIZACION.filter((nivel) => nivel.tipoPrograma !== "otro").map((nivel) => (
+                <option key={nivel.id} value={nivel.label}>
+                  {nivel.label}
+                </option>
+              ))}
+            </select>
+            <p className="text-xs text-gray mt-2">
+              Como pagaste solo la inscripción, puedes elegir aquí la formación que quieres
+              tomar antes de crear tu cuenta.
+            </p>
+          </>
         )}
       </div>
 
