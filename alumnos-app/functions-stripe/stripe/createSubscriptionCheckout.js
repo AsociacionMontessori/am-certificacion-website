@@ -4,6 +4,7 @@ const admin = require("firebase-admin");
 const Stripe = require("stripe");
 const {handleCors, rejectIfOriginNotAllowed} = require("./cors");
 const {resolveSku, resolveColegiaturaSkuByNivel, ALUMNOS_SITE_URL} = require("./catalog");
+const {rejectIfCheckoutDisabled} = require("./featureFlags");
 
 const stripeSecretKey = defineSecret("STRIPE_SECRET_KEY");
 
@@ -22,6 +23,7 @@ exports.createSubscriptionCheckoutHandler = onRequest(
         res.status(405).json({error: "Método no permitido"});
         return;
       }
+      if (rejectIfCheckoutDisabled(res)) return;
 
       try {
         const authHeader = req.get("Authorization") || "";

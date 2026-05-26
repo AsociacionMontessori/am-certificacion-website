@@ -24,6 +24,7 @@ import {
   redirectToSubscriptionCheckout,
   redirectToCustomerPortal,
 } from '../services/stripeService';
+import { stripeCheckoutEnabled } from '../utils/featureFlags';
 import { 
   CurrencyDollarIcon, 
   ClockIcon, 
@@ -334,36 +335,57 @@ const Pagos = () => {
           Pagos y Estado de Cuenta
         </h1>
         <p className="mt-2 text-gray-600 dark:text-gray-400">
-          Consulta tus pagos, paga con tarjeta o sube comprobantes
+          {stripeCheckoutEnabled
+            ? 'Consulta tus pagos, paga con tarjeta o sube comprobantes'
+            : 'Consulta tus pagos y sube comprobantes de transferencia bancaria'}
         </p>
       </div>
 
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-5 border border-blue/20">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-          Colegiatura automática
-        </h2>
-        <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-          Activa el cobro mensual con tarjeta. También puedes pagar cada colegiatura de forma individual.
-        </p>
-        <div className="flex flex-col sm:flex-row gap-2">
-          <button
-            type="button"
-            onClick={handleActivarSuscripcion}
-            disabled={subscriptionLoading}
-            className="min-h-[44px] flex-1 px-4 py-2 rounded-lg bg-green text-white font-semibold text-sm disabled:opacity-60"
-          >
-            {subscriptionLoading ? 'Cargando…' : 'Activar suscripción mensual'}
-          </button>
-          <button
-            type="button"
-            onClick={handlePortalSuscripcion}
-            disabled={subscriptionLoading}
-            className="min-h-[44px] flex-1 px-4 py-2 rounded-lg border border-blue text-blue font-medium text-sm disabled:opacity-60"
-          >
-            Administrar suscripción
-          </button>
+      {!stripeCheckoutEnabled && (
+        <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-300 dark:border-yellow-700 rounded-xl p-4">
+          <h2 className="text-sm font-semibold text-gray-900 dark:text-yellow-100 mb-1">
+            Pagos con tarjeta en mantenimiento
+          </h2>
+          <p className="text-sm text-gray-700 dark:text-yellow-200">
+            Mientras finalizamos la verificación con nuestro procesador de pagos,
+            las colegiaturas y otros pagos se realizan por <strong>transferencia
+            bancaria</strong>. Sube tu comprobante usando el botón correspondiente
+            en cada pago pendiente. Si necesitas ayuda, escribe a{' '}
+            <a href="mailto:admin@certificacionmontessori.com" className="underline">
+              admin@certificacionmontessori.com
+            </a>.
+          </p>
         </div>
-      </div>
+      )}
+
+      {stripeCheckoutEnabled && (
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-5 border border-blue/20">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+            Colegiatura automática
+          </h2>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+            Activa el cobro mensual con tarjeta. También puedes pagar cada colegiatura de forma individual.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-2">
+            <button
+              type="button"
+              onClick={handleActivarSuscripcion}
+              disabled={subscriptionLoading}
+              className="min-h-[44px] flex-1 px-4 py-2 rounded-lg bg-green text-white font-semibold text-sm disabled:opacity-60"
+            >
+              {subscriptionLoading ? 'Cargando…' : 'Activar suscripción mensual'}
+            </button>
+            <button
+              type="button"
+              onClick={handlePortalSuscripcion}
+              disabled={subscriptionLoading}
+              className="min-h-[44px] flex-1 px-4 py-2 rounded-lg border border-blue text-blue font-medium text-sm disabled:opacity-60"
+            >
+              Administrar suscripción
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Estado de Cuenta - Resumen Principal */}
       {pagosPendientesDetalle.length > 0 && (

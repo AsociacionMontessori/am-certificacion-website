@@ -5,6 +5,7 @@ const Stripe = require("stripe");
 const {handleCors, rejectIfOriginNotAllowed} = require("./cors");
 const {resolveSku, ALUMNOS_SITE_URL} = require("./catalog");
 const {aplicarBecasServidor, calcularMontoConRecargo} = require("./applyBecas");
+const {rejectIfCheckoutDisabled} = require("./featureFlags");
 
 const stripeSecretKey = defineSecret("STRIPE_SECRET_KEY");
 
@@ -28,6 +29,7 @@ exports.createAlumnoCheckoutHandler = onRequest(
         res.status(405).json({error: "Método no permitido"});
         return;
       }
+      if (rejectIfCheckoutDisabled(res)) return;
 
       try {
         const authHeader = req.get("Authorization") || "";
