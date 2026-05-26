@@ -9,16 +9,11 @@ import Seo from "../../components/seo"
 
 const LibroCheckoutPage = () => {
   return (
-    <CheckoutPageShell title="Compra de libros en mantenimiento" backTo="/roxana">
-      <div className="rounded-2xl border-2 border-yellow/40 bg-yellow/10 px-5 py-5 mb-6">
-        <p className="text-sm font-semibold text-black mb-2">
-          Compras en línea temporalmente pausadas
-        </p>
-        <p className="text-sm text-gray leading-relaxed">
-          Estamos finalizando la verificación con nuestro procesador de pagos.
-          Mientras tanto, escríbenos para ayudarte con tu pedido.
-        </p>
-      </div>
+    <CheckoutPageShell title="Compra de libros" backTo="/roxana">
+      <p className="text-sm text-gray leading-relaxed mb-6">
+        Para adquirir un libro o un paquete digital, escríbenos y te ayudamos
+        a procesar tu pedido.
+      </p>
 
       <div className="space-y-3">
         <a
@@ -48,8 +43,8 @@ const LibroCheckoutPage = () => {
 
 export const Head = () => (
   <Seo
-    title="Compra de libro"
-    description="Compra segura de publicaciones Montessori."
+    title="Compra de libros"
+    description="Adquiere los libros de la serie Roxana de Asociación Montessori de México A.C."
     pathname="/checkout/libro"
   />
 )
