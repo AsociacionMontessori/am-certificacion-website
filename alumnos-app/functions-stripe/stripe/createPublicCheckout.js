@@ -112,6 +112,20 @@ exports.createPublicCheckoutHandler = onRequest(
         return;
       }
 
+      // Hot-fix temporal mientras Stripe Live se prepara (KYC + cuenta bancaria).
+      // Cuando el equipo termine la verificación con Stripe, eliminar la
+      // variable de entorno o cambiarla a "true" para reactivar el checkout.
+      const checkoutEnabled = String(process.env.STRIPE_PUBLIC_CHECKOUT_ENABLED || "true").toLowerCase() === "true";
+      if (!checkoutEnabled) {
+        res.status(503).json({
+          error: "Los pagos en línea están temporalmente en mantenimiento. " +
+                 "Por favor inscríbete por transferencia bancaria en " +
+                 "/inscripcion/transferencia o escríbenos a " +
+                 "admin@certificacionmontessori.com.",
+        });
+        return;
+      }
+
       try {
         const db = admin.firestore();
         if (await enforceRateLimit(db, req, res, {

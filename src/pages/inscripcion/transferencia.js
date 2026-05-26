@@ -34,7 +34,7 @@ const InscripcionTransferenciaPage = () => {
   return (
   <CheckoutPageShell
     title="Pago por transferencia bancaria"
-    description="Alternativa para quienes no desean pagar con tarjeta en línea."
+    description="Inscripciones por transferencia bancaria a Asociación Montessori de México A.C."
     backTo="/inscripcion/pagar"
   >
     <DatosBancariosCard esMexico={esMexico} />
@@ -53,14 +53,8 @@ const InscripcionTransferenciaPage = () => {
 
     <div className="mt-8 flex flex-col gap-3">
       <Link
-        to="/inscripcion/pagar"
-        className="min-h-[48px] w-full inline-flex items-center justify-center px-6 py-3 rounded-full font-semibold text-white bg-gradient-to-r from-blue to-green"
-      >
-        Pagar en línea con tarjeta
-      </Link>
-      <Link
         to="/inscripcion/completar"
-        className="min-h-[48px] w-full inline-flex items-center justify-center px-6 py-3 rounded-full font-semibold text-blue border-2 border-blue"
+        className="min-h-[48px] w-full inline-flex items-center justify-center px-6 py-3 rounded-full font-semibold text-white bg-blue"
       >
         Ya tengo referencia de pago confirmada
       </Link>
@@ -72,7 +66,7 @@ const InscripcionTransferenciaPage = () => {
 export const Head = () => (
   <Seo
     title="Pago por transferencia bancaria"
-    description="Alternativa para quienes no desean pagar con tarjeta en línea."
+    description="Inscripciones por transferencia bancaria a Asociación Montessori de México A.C."
     pathname="/inscripcion/transferencia"
   />
 )
