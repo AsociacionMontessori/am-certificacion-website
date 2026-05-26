@@ -113,11 +113,13 @@ service cloud.firestore {
       
       allow write: if isOwnAlumno(alumnoId) || isAdmin();
       
-      // Permitir consultas (list) para verificación de certificados
-      // Esto es necesario para la función verificarCertificado que usa where()
-      // Permite tanto usuarios autenticados como no autenticados
-      // La seguridad está en que necesitas el folio Y el código para verificar
-      allow list: if true; // Permitir consultas para verificación (seguro porque necesitas folio + código)
+      // F-01 cerrado el 2026-05-25.
+      // La verificación pública de certificados se movió a la Cloud Function
+      // `verificarCertificadoPublico` (Admin SDK, rate-limited, timingSafeEqual).
+      // Aquí solo admins/directivos/catedráticos pueden listar el padrón.
+      // El `read` rule arriba sigue permitiendo `get` anónimo por id si el
+      // alumno tiene folioCertificado + codigoVerificacion (ej. PublicProfile).
+      allow list: if canReadAdmin();
     }
     
     // Colección: materias

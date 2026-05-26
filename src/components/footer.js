@@ -47,6 +47,8 @@ export default function Footer() {
                         <h3 className="text-lg font-semibold mb-2">Legal</h3>
                         <a className="hover:underline decoration-red" href="../privacy" target="_blank" rel="noopener noreferrer">Aviso de Privacidad</a>
                         <br />
+                        <a className="hover:underline decoration-red" href="../reembolsos" target="_blank" rel="noopener noreferrer">Política de reembolsos</a>
+                        <br />
                         <a className="hover:underline decoration-red" href="https://drive.google.com/file/d/1XaVbYjwltjMJjcjvCuqdhKIAFvxjecOJ/view" target="_blank" rel="noopener noreferrer">Constacia de Seguridad Estructural</a>
                         <br />
                         <a className="hover:underline decoration-red" href='https://drive.google.com/file/d/1mE54tJUcoFfaX4mJQjaD7slE_ESlPY-r/view' target='_blank' rel="noopener noreferrer">Visto Bueno de Seguridad Estructural</a>
