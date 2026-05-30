@@ -75,3 +75,4 @@ yarn-error.log
 # Root-owned build artifacts (Podman)
 .cache.root-owned/
 public.root-owned/
+.playwright-cli/
