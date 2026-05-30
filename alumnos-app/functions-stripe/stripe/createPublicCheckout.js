@@ -7,7 +7,7 @@ const {handleCors, rejectIfOriginNotAllowed} = require("./cors");
 const {enforceRateLimit} = require("./rateLimit");
 const {resolveSku, SITE_URL, CATALOG_META} = require("./catalog");
 const {generateAccessToken, hashAccessToken, ACCESS_TOKEN_TTL_MS} = require("./accessToken");
-const {rejectIfCheckoutDisabled} = require("./featureFlags");
+const {rejectIfFlowDisabled} = require("./featureFlags");
 const {
   buildCheckoutItemsFromRequest,
   resolveOrdenTipo,
@@ -113,11 +113,6 @@ exports.createPublicCheckoutHandler = onRequest(
         return;
       }
 
-      // Hot-fix temporal mientras Stripe Live se prepara (KYC + cuenta bancaria).
-      // Ver alumnos-app/functions-stripe/stripe/featureFlags.js. Para reactivar:
-      // STRIPE_CHECKOUT_ENABLED=true en el .env y re-deploy stripe.
-      if (rejectIfCheckoutDisabled(res)) return;
-
       try {
         const db = admin.firestore();
         if (await enforceRateLimit(db, req, res, {
@@ -153,6 +148,11 @@ exports.createPublicCheckoutHandler = onRequest(
           programaLabel,
           promoInscripcionIncluida,
         } = resolveCheckoutFromBody(body);
+
+        const requestedTipos = skus
+            .map((sku) => CATALOG_META[sku]?.tipo)
+            .filter(Boolean);
+        if (rejectIfFlowDisabled(res, requestedTipos)) return;
 
         const progConfig = programaLabel ? getProgramaCheckout(programaLabel) : null;
         const nivelFormulario = progConfig?.nivelFormulario || "";

@@ -1,18 +1,26 @@
 /**
  * Banderas de funcionalidad para Cloud Functions de Stripe.
  *
- * Por ahora hay una sola: `STRIPE_CHECKOUT_ENABLED`. Cuando vale "false"
- * (string), TODOS los endpoints de checkout (público + portal alumnos)
- * devuelven 503 con un mensaje claro al usuario. Esto se usa mientras la
- * cuenta Stripe Live no está activada — los pagos reales fallarían si se
- * intentaran procesar con `sk_test_`.
+ * - `STRIPE_CHECKOUT_ENABLED` (default "true"): kill-switch global. Cuando es
+ *   "false", todos los handlers que llaman `rejectIfCheckoutDisabled` devuelven
+ *   503 (alumnos portal, subscription, customer portal). Sigue siendo el
+ *   freno duro mientras no toda la oferta esté en Stripe Live.
  *
- * Reactivación: cambiar STRIPE_CHECKOUT_ENABLED=true en el .env y re-deploy.
+ * - `STRIPE_CHECKOUT_BOOKS_ENABLED` (default "true"): override granular para
+ *   libros/ebooks en el checkout público. Se evalúa SOLO con
+ *   `rejectIfFlowDisabled(res, tipos)` después de resolver los SKUs. Permite
+ *   cobrar libros en live aunque el flag global siga apagado para
+ *   inscripciones/colegiaturas.
  */
 
+const BOOK_TIPOS = new Set(["libro", "ebook"]);
+
 function isCheckoutEnabled() {
-  // Default: enabled. Solo se desactiva con un valor explícito "false".
   return String(process.env.STRIPE_CHECKOUT_ENABLED || "true").toLowerCase() !== "false";
+}
+
+function isBookCheckoutEnabled() {
+  return String(process.env.STRIPE_CHECKOUT_BOOKS_ENABLED || "true").toLowerCase() !== "false";
 }
 
 /**
@@ -31,8 +39,9 @@ function respondCheckoutDisabled(res) {
 }
 
 /**
- * Helper para handlers HTTP: si el checkout está deshabilitado, escribe
- * 503 y devuelve `true` (caller debe `return`).
+ * Kill-switch global: usado por handlers que no manejan SKUs (alumnos portal,
+ * suscripciones, customer portal). Si el flag global está en "false", responde
+ * 503 sin considerar el override de libros.
  * @param {import('firebase-functions/v2/https').Response} res
  * @return {boolean}
  */
@@ -44,4 +53,33 @@ function rejectIfCheckoutDisabled(res) {
   return false;
 }
 
-module.exports = {isCheckoutEnabled, respondCheckoutDisabled, rejectIfCheckoutDisabled};
+/**
+ * Check granular para el checkout público. Permite el flujo si:
+ *  - el flag global está prendido, o
+ *  - el flag global está apagado pero TODOS los `tipos` solicitados son
+ *    libro/ebook y el flag de libros está prendido.
+ * @param {import('firebase-functions/v2/https').Response} res
+ * @param {string[]} tipos  Valores de `CATALOG_META[sku].tipo` ya resueltos.
+ * @return {boolean} `true` si se respondió 503 (caller debe `return`).
+ */
+function rejectIfFlowDisabled(res, tipos) {
+  if (isCheckoutEnabled()) return false;
+  const safeTipos = Array.isArray(tipos) ? tipos.filter(Boolean) : [];
+  if (
+    safeTipos.length > 0 &&
+    safeTipos.every((t) => BOOK_TIPOS.has(t)) &&
+    isBookCheckoutEnabled()
+  ) {
+    return false;
+  }
+  respondCheckoutDisabled(res);
+  return true;
+}
+
+module.exports = {
+  isCheckoutEnabled,
+  isBookCheckoutEnabled,
+  respondCheckoutDisabled,
+  rejectIfCheckoutDisabled,
+  rejectIfFlowDisabled,
+};
