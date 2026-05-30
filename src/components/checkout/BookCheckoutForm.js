@@ -51,8 +51,8 @@ const BookCheckoutForm = ({ book, purchase = "physical", cancelHref, onCancel })
           ${selectedPrice} MXN
           <span className="block text-xs font-normal text-gray mt-1">
             {isDigital
-              ? `Incluye ${digitalFormats}; descarga disponible después del pago. Precio final con comisión de pago.`
-              : "Envío dentro de México (se solicitará en el pago)"}
+              ? `Incluye ${digitalFormats}; descarga disponible después del pago.`
+              : "Más gastos de envío (se solicitarán en el pago)"}
           </span>
         </p>
       )}

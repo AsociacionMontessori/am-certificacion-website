@@ -39,7 +39,7 @@ function BookCard({ book }) {
             <p className="rounded-md bg-blue/5 px-3 py-2 font-semibold">
               Impreso: ${book.priceMx} MXN
               <span className="block text-xs font-normal text-gray">
-                Envío dentro de México
+                Más gastos de envío
               </span>
             </p>
           )}
@@ -47,7 +47,7 @@ function BookCard({ book }) {
             <p className="rounded-md bg-green/10 px-3 py-2 font-semibold">
               Ebook: ${book.digital.priceMx} MXN
               <span className="block text-xs font-normal text-gray">
-                {digitalFormats} descargable; precio final con comisión de pago
+                {digitalFormats} descargable
               </span>
             </p>
           )}
@@ -103,7 +103,7 @@ function BundleCard() {
           <p className="mt-3 text-base font-semibold text-blue">
             ${roxanaBookBundle.priceMx} MXN
             <span className="block text-xs font-normal text-gray">
-              Precio final con comisión de pago; incluye PDF + EPUB de los 4 libros
+              Incluye PDF + EPUB de los 4 libros
             </span>
           </p>
         </div>
