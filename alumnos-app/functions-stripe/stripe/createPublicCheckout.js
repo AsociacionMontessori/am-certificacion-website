@@ -129,6 +129,7 @@ exports.createPublicCheckoutHandler = onRequest(
         const programa = String(body.programa || "").trim();
         const requiereFacturaFiscal = Boolean(body.requiereFacturaFiscal);
         const cuentaContable = String(body.cuentaContable || (requiereFacturaFiscal ? "banorte" : "hsbc")).trim();
+        const codigo = String(body.codigo || "").trim();
 
         if (!nombre || nombre.length < 2) {
           res.status(400).json({error: "Nombre requerido"});
@@ -180,6 +181,25 @@ exports.createPublicCheckoutHandler = onRequest(
 
         const stripe = new Stripe(stripeSecretKey.value());
 
+        // Código de regalo/promo capturado en NUESTRO formulario: lo validamos
+        // aquí y lo pre-aplicamos en la sesión (mejor UX que el campo escondido
+        // de Stripe; el cliente llega al pago ya con el descuento puesto). Solo
+        // aplica a órdenes 100% digitales (mismo criterio que allowPromotionCodes).
+        let promotionCodeId = null;
+        if (codigo) {
+          if (!allowPromotionCodes) {
+            res.status(400).json({error: "Este código solo aplica a la compra de ebooks."});
+            return;
+          }
+          const promos = await stripe.promotionCodes.list({code: codigo, active: true, limit: 1});
+          const promo = promos.data[0];
+          if (!promo) {
+            res.status(400).json({error: "El código no es válido o ya expiró."});
+            return;
+          }
+          promotionCodeId = promo.id;
+        }
+
         const lineItems = [];
         const ordenLineItems = [];
 
@@ -219,7 +239,9 @@ exports.createPublicCheckoutHandler = onRequest(
           mode: "payment",
           customer_email: email,
           line_items: lineItems,
-          ...(allowPromotionCodes ? {allow_promotion_codes: true} : {}),
+          ...(promotionCodeId ?
+            {discounts: [{promotion_code: promotionCodeId}]} :
+            allowPromotionCodes ? {allow_promotion_codes: true} : {}),
           success_url: `${siteUrl}/checkout/success?orden=${ordenRef.id}&tipo=${tipo}${promoQuery}${digitalQuery}${accessTokenQuery}`,
           cancel_url: `${siteUrl}/checkout/cancel?orden=${ordenRef.id}`,
           metadata: {
@@ -249,6 +271,7 @@ exports.createPublicCheckoutHandler = onRequest(
           nivelFormulario: nivelFormulario || null,
           modoPago: modoPago || null,
           promoInscripcionIncluida: promoInscripcionIncluida || false,
+          codigoPromocional: codigo || null,
           montoEstimadoMxn,
           requiereFacturaFiscal,
           cuentaContable,

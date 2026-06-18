@@ -6,6 +6,7 @@ import { createPublicCheckoutSession } from "../../utils/stripeCheckout"
 const BookCheckoutForm = ({ book, purchase = "physical", cancelHref, onCancel }) => {
   const [nombre, setNombre] = useState("")
   const [email, setEmail] = useState("")
+  const [codigo, setCodigo] = useState("")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
 
@@ -27,6 +28,7 @@ const BookCheckoutForm = ({ book, purchase = "physical", cancelHref, onCancel })
           nombre: nombre.trim(),
           email: email.trim(),
         },
+        ...(isDigital && codigo.trim() ? { codigo: codigo.trim() } : {}),
       })
       if (typeof window !== "undefined") {
         window.location.href = url
@@ -86,6 +88,27 @@ const BookCheckoutForm = ({ book, purchase = "physical", cancelHref, onCancel })
             autoComplete="email"
           />
         </div>
+        {isDigital && (
+          <div>
+            <label className="block text-sm font-medium text-black mb-1.5" htmlFor={`book-codigo-${book.id}`}>
+              ¿Tienes un código de regalo? <span className="font-normal text-gray">(opcional)</span>
+            </label>
+            <input
+              id={`book-codigo-${book.id}`}
+              type="text"
+              value={codigo}
+              onChange={(e) => setCodigo(e.target.value)}
+              placeholder="Escríbelo aquí"
+              className="w-full min-h-[48px] px-4 py-2.5 rounded-xl border border-gray/25 text-black text-base bg-white uppercase placeholder:normal-case placeholder:text-gray/60"
+              autoComplete="off"
+              autoCapitalize="characters"
+              spellCheck={false}
+            />
+            <span className="block text-xs text-gray mt-1">
+              Aplica el descuento antes de pagar; lo verás reflejado en el pago seguro.
+            </span>
+          </div>
+        )}
       </div>
 
       {error && (
