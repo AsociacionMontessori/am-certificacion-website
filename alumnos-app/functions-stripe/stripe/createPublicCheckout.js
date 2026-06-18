@@ -154,6 +154,13 @@ exports.createPublicCheckoutHandler = onRequest(
             .filter(Boolean);
         if (rejectIfFlowDisabled(res, requestedTipos)) return;
 
+        // Códigos promocionales (incl. cupones 100% «descarga gratis») solo en
+        // órdenes 100% digitales (ebooks). Así un cupón nunca puede regalar un
+        // libro físico + envío. El alcance real del cupón se acota además a los
+        // productos ebook en Stripe; este flag solo muestra el campo de código.
+        const allowPromotionCodes = requestedTipos.length > 0 &&
+            requestedTipos.every((tipo) => tipo === "ebook");
+
         const progConfig = programaLabel ? getProgramaCheckout(programaLabel) : null;
         const nivelFormulario = progConfig?.nivelFormulario || "";
         const promoQuery = promoInscripcionIncluida ? "&promo=1" : "";
@@ -212,6 +219,7 @@ exports.createPublicCheckoutHandler = onRequest(
           mode: "payment",
           customer_email: email,
           line_items: lineItems,
+          ...(allowPromotionCodes ? {allow_promotion_codes: true} : {}),
           success_url: `${siteUrl}/checkout/success?orden=${ordenRef.id}&tipo=${tipo}${promoQuery}${digitalQuery}${accessTokenQuery}`,
           cancel_url: `${siteUrl}/checkout/cancel?orden=${ordenRef.id}`,
           metadata: {
