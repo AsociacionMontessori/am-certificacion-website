@@ -32,9 +32,8 @@ const KDP_ROOT = "/home/carlos/Documentos/KDP_Roxana";
 const DRY_RUN = process.argv.includes("--dry-run");
 
 // origen local (relativo a KDP_ROOT) → ruta destino en Storage.
-// Nota: libros 1 y 2 usan el interior de tapa blanda como PDF legible
-// (no existe variante interactiva en su build); 3 y 4 usan *_digital.pdf;
-// 5 («La mente absorbente») usa la variante interactiva (_interactivo.pdf).
+// Nota: libros 1, 2 y 5 usan la variante interactiva (_interactivo.pdf), que
+// incluye portada; 3 y 4 usan *_digital.pdf.
 const MANIFEST = [
   {
     src: "libro1_pedagogia_cientifica/build/libro1_pedagogia_cientifica.epub",
@@ -42,7 +41,7 @@ const MANIFEST = [
     contentType: "application/epub+zip",
   },
   {
-    src: "libro1_pedagogia_cientifica/build/libro1_pedagogia_cientifica_paperback_interior.pdf",
+    src: "libro1_pedagogia_cientifica/build/libro1_pedagogia_cientifica_interactivo.pdf",
     dest: "ebooks/ammac-libro-1/montessori-pedagogia-cientifica-roxana-munoz.pdf",
     contentType: "application/pdf",
   },
@@ -52,7 +51,7 @@ const MANIFEST = [
     contentType: "application/epub+zip",
   },
   {
-    src: "libro2_secreto_infancia/build/libro2_secreto_infancia_paperback_interior.pdf",
+    src: "libro2_secreto_infancia/build/libro2_secreto_infancia_interactivo.pdf",
     dest: "ebooks/ammac-libro-2/montessori-secreto-infancia-roxana-munoz.pdf",
     contentType: "application/pdf",
   },
