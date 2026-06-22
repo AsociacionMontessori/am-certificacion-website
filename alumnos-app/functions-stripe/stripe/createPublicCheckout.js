@@ -8,6 +8,7 @@ const {enforceRateLimit} = require("./rateLimit");
 const {resolveSku, SITE_URL, CATALOG_META} = require("./catalog");
 const {generateAccessToken, hashAccessToken, ACCESS_TOKEN_TTL_MS} = require("./accessToken");
 const {rejectIfFlowDisabled} = require("./featureFlags");
+const {resolveGiftSkus, getDigitalBook} = require("./digitalBooks");
 const {
   buildCheckoutItemsFromRequest,
   resolveOrdenTipo,
@@ -166,14 +167,27 @@ exports.createPublicCheckoutHandler = onRequest(
         const nivelFormulario = progConfig?.nivelFormulario || "";
         const promoQuery = promoInscripcionIncluida ? "&promo=1" : "";
         const ebookSkus = skus.filter((sku) => sku.startsWith("ebook_"));
-        const digitalDownloadToken = ebookSkus.length ? crypto.randomBytes(32).toString("base64url") : "";
-        const digitalQuery = digitalDownloadToken ?
-          `&download=${encodeURIComponent(digitalDownloadToken)}&sku=${encodeURIComponent(ebookSkus[0])}` :
-          "";
+        // Regalos según la orden: libro/ebook → «La mente absorbente»;
+        // inscripción → Paquete Cósmico (ebooks 3+4).
+        const giftSkus = resolveGiftSkus(items);
+        const giftBookIds = giftSkus
+            .map((sku) => getDigitalBook(sku)?.bookId)
+            .filter(Boolean);
+        // SKUs descargables de esta orden (comprados + regalo, sin duplicar).
+        const deliverySkus = [...new Set([...ebookSkus, ...giftSkus])];
+        const digitalDownloadToken = deliverySkus.length ? crypto.randomBytes(32).toString("base64url") : "";
+        const downloadParam = digitalDownloadToken ?
+          `&download=${encodeURIComponent(digitalDownloadToken)}` : "";
+        const ebookSkuParam = ebookSkus.length ?
+          `&sku=${encodeURIComponent(ebookSkus[0])}` : "";
+        const giftParam = (giftBookIds.length && digitalDownloadToken) ?
+          `&gift=${encodeURIComponent(giftBookIds.join(","))}` : "";
+        const digitalQuery = `${downloadParam}${ebookSkuParam}${giftParam}`;
         const digitalDelivery = digitalDownloadToken ? {
           tokenHash: hashDownloadToken(digitalDownloadToken),
           tokenVersion: 1,
-          skus: ebookSkus,
+          skus: deliverySkus,
+          giftSkus,
           maxDownloads: ebookSkus.includes("ebook_pack_ammac_4") ? 40 : 20,
           expiresAt: admin.firestore.Timestamp.fromDate(new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)),
           createdAt: admin.firestore.FieldValue.serverTimestamp(),

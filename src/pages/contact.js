@@ -16,10 +16,14 @@ const contact = () => {
     return (
         <>
             <Layout>
-                <Nav textColor="text-white" />
                 <main>
-                    <section className="bg-gradient-to-r from-blue via-purple to-green text-white">
-                        <div className="container px-6 py-12 mx-auto">
+                    <section
+                        className="relative overflow-hidden bg-cover bg-center text-white"
+                        style={{ backgroundImage: "url('/backgrounds/contacto.webp')" }}
+                    >
+                        <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-r from-blue/90 via-purple/85 to-green/90" />
+                        <Nav textColor="text-white" />
+                        <div className="container relative z-10 px-6 py-12 mx-auto">
                             <div className="selection:text-white selection:bg-green selection:bg-opacity-20">
                                 <h1 className="mt-2 text-4xl font-semibold text-gray-800 md:text-8xl dark:text-white">Envíanos un mensaje</h1>
                                 <p className="mt-3 ">Nuestro equipo estará encantado de atenderte. La comunicación siempre es la clave.</p>

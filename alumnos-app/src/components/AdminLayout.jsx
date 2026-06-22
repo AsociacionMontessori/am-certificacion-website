@@ -29,7 +29,8 @@ const AdminLayout = ({ children }) => {
     ...(canEdit ? [{ name: 'Crear Usuario', href: '/admin/crear-usuario', icon: UserGroupIcon }] : []),
     { name: 'Inscripciones', href: '/admin/inscripciones', icon: DocumentTextIcon },
     ...(userData?.rol !== 'catedratico' ? [
-      { name: 'Pagos', href: '/admin/pagos', icon: CurrencyDollarIcon },
+      // TEMPORAL: Sección de Pagos oculta mientras no está lista
+      // { name: 'Pagos', href: '/admin/pagos', icon: CurrencyDollarIcon },
       ...(userData?.rol === 'admin' || userData?.rol === 'directivo' ?
         [{ name: 'Órdenes web', href: '/admin/ordenes', icon: CurrencyDollarIcon }] :
         []),

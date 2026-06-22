@@ -24,6 +24,26 @@ function isBookCheckoutEnabled() {
 }
 
 /**
+ * Override granular para apartar la inscripción ($inscripcion_diplomado) con
+ * tarjeta aunque el flag global esté apagado. Solo aplica al tipo "inscripcion"
+ * (el apartado); NO habilita programas/colegiaturas (que siguen en test).
+ */
+function isInscripcionCheckoutEnabled() {
+  return String(process.env.STRIPE_CHECKOUT_INSCRIPCION_ENABLED || "false").toLowerCase() === "true";
+}
+
+/**
+ * ¿Está permitido este `tipo` por algún override granular?
+ * @param {string} tipo
+ * @return {boolean}
+ */
+function tipoAllowedGranular(tipo) {
+  if (BOOK_TIPOS.has(tipo)) return isBookCheckoutEnabled();
+  if (tipo === "inscripcion") return isInscripcionCheckoutEnabled();
+  return false;
+}
+
+/**
  * Responde 503 con mensaje uniforme cuando el checkout está pausado.
  * @param {import('firebase-functions/v2/https').Response} res
  * @return {boolean} `true` si se respondió (caller debe `return`).
@@ -65,11 +85,7 @@ function rejectIfCheckoutDisabled(res) {
 function rejectIfFlowDisabled(res, tipos) {
   if (isCheckoutEnabled()) return false;
   const safeTipos = Array.isArray(tipos) ? tipos.filter(Boolean) : [];
-  if (
-    safeTipos.length > 0 &&
-    safeTipos.every((t) => BOOK_TIPOS.has(t)) &&
-    isBookCheckoutEnabled()
-  ) {
+  if (safeTipos.length > 0 && safeTipos.every((t) => tipoAllowedGranular(t))) {
     return false;
   }
   respondCheckoutDisabled(res);
@@ -79,6 +95,7 @@ function rejectIfFlowDisabled(res, tipos) {
 module.exports = {
   isCheckoutEnabled,
   isBookCheckoutEnabled,
+  isInscripcionCheckoutEnabled,
   respondCheckoutDisabled,
   rejectIfCheckoutDisabled,
   rejectIfFlowDisabled,

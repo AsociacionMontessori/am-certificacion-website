@@ -4,7 +4,7 @@ import Seo from "../../components/seo"
 import Nav from "../../components/nav"
 import { Link } from "gatsby"
 import { roxanaBooks } from "../../data/roxanaBooks"
-import { roxanaBookBundle } from "../../data/roxanaBookOffers"
+import { roxanaBookBundles, roxanaGiftEbook } from "../../data/roxanaBookOffers"
 import { downloadDigitalBookFile } from "../../utils/stripeCheckout"
 
 const CheckoutSuccessPage = () => {
@@ -14,6 +14,7 @@ const CheckoutSuccessPage = () => {
     promoNeuro: false,
     downloadToken: "",
     sku: "",
+    gift: "",
   })
   const [downloadState, setDownloadState] = React.useState({})
 
@@ -26,17 +27,33 @@ const CheckoutSuccessPage = () => {
       promoNeuro: params.get("promo") === "1",
       downloadToken: params.get("download") || "",
       sku: params.get("sku") || "",
+      gift: params.get("gift") || "",
     })
   }, [])
 
-  const { ordenId, tipo, promoNeuro, downloadToken, sku } = checkoutParams
+  const { ordenId, tipo, promoNeuro, downloadToken, sku, gift } = checkoutParams
   const esEbook = tipo === "ebook"
-  const esPaquete = sku === roxanaBookBundle.stripeSku
+  const bundle = roxanaBookBundles.find((b) => b.stripeSku === sku)
+  const esPaquete = Boolean(bundle)
   const esInscripcion =
     tipo === "inscripcion" || tipo === "inicio_programa" || (!tipo && !esEbook)
   const inicioCompleto = tipo === "inicio_programa"
   const ebookBook = roxanaBooks.find((book) => book.digital?.stripeSku === sku)
-  const downloadBooks = esPaquete ? roxanaBooks : ebookBook ? [ebookBook] : []
+  const bundleTitle = bundle?.title
+  const downloadBooks = esPaquete
+    ? bundle.bookIds
+        .map((id) => roxanaBooks.find((b) => b.id === id))
+        .filter(Boolean)
+    : ebookBook
+      ? [ebookBook]
+      : []
+  // Regalos: el backend pasa en `gift` los IDs de libros regalados (coma).
+  // Compat: "1" = «La mente absorbente» (esquema anterior).
+  const giftBookIds = gift === "1" ? [roxanaGiftEbook.bookId] : gift.split(",").filter(Boolean)
+  const giftBooks = giftBookIds
+    .map((id) => roxanaBooks.find((b) => b.id === id))
+    .filter(Boolean)
+  const mostrarRegalo = Boolean(downloadToken) && giftBooks.length > 0
 
   const completarUrl = ordenId
     ? `/inscripcion/completar?orden=${encodeURIComponent(ordenId)}`
@@ -76,6 +93,13 @@ const CheckoutSuccessPage = () => {
 
   return (
     <Layout>
+      <div
+        className="bg-cover bg-center bg-fixed"
+        style={{
+          backgroundImage:
+            "linear-gradient(to right, rgba(0,151,178,0.92), rgba(0,151,178,0.80), rgba(126,217,87,0.92)), url('/backgrounds/home.webp')",
+        }}
+      >
       <Nav textColor="text-white" />
       <section className="min-h-[60vh] flex items-center justify-center px-6 py-24">
         <article className="max-w-lg w-full bg-white rounded-3xl shadow-xl p-8 text-center">
@@ -107,7 +131,7 @@ const CheckoutSuccessPage = () => {
                   Descarga digital
                 </p>
                 <p className="text-sm text-gray leading-relaxed">
-                  {esPaquete ? roxanaBookBundle.title : ebookBook?.title || "Tu libro digital"}.
+                  {esPaquete ? bundleTitle : ebookBook?.title || "Tu libro digital"}.
                 </p>
                 <p className="mt-2 text-xs text-gray leading-relaxed">
                   Cada enlace se genera por seguridad y expira después de abrirlo.
@@ -135,6 +159,57 @@ const CheckoutSuccessPage = () => {
                                 onClick={() => handleDownload(book.digital.stripeSku, format)}
                                 disabled={state.loading}
                                 className="min-h-[44px] w-full rounded-full bg-green px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
+                              >
+                                {state.loading ? "Preparando..." : `Descargar ${format}`}
+                              </button>
+                              {state.error && (
+                                <p className="mt-2 text-xs text-red rounded-lg bg-red/5 px-3 py-2" role="alert">
+                                  {state.error}
+                                </p>
+                              )}
+                            </div>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {mostrarRegalo && (
+            <div className="text-left rounded-2xl border border-yellow/50 bg-yellow/10 px-5 py-4 mb-6 space-y-4">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wide text-blue mb-1">
+                  🎁 {giftBooks.length > 1 ? "Tus regalos" : "Tu regalo"}
+                </p>
+                <p className="text-sm text-gray leading-relaxed">
+                  Incluido{giftBooks.length > 1 ? "s" : ""} sin costo con tu compra. Descarga en PDF + EPUB.
+                </p>
+              </div>
+              {!downloadToken ? (
+                <p className="text-sm text-red rounded-lg bg-red/5 px-3 py-2">
+                  Falta el token de descarga. Escríbenos con tu referencia para ayudarte.
+                </p>
+              ) : (
+                <div className="grid gap-4">
+                  {giftBooks.map((book) => (
+                    <div key={book.id} className="rounded-lg border border-yellow/30 bg-white p-3">
+                      <p className="mb-2 text-sm font-semibold text-blue">
+                        {book.title}
+                      </p>
+                      <div className="grid gap-2 sm:grid-cols-2">
+                        {(book.digital?.formats || ["PDF", "EPUB"]).map((format) => {
+                          const key = `${book.digital.stripeSku}_${format.toLowerCase()}`
+                          const state = downloadState[key] || {}
+                          return (
+                            <div key={format}>
+                              <button
+                                type="button"
+                                onClick={() => handleDownload(book.digital.stripeSku, format)}
+                                disabled={state.loading}
+                                className="min-h-[44px] w-full rounded-full bg-blue px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
                               >
                                 {state.loading ? "Preparando..." : `Descargar ${format}`}
                               </button>
@@ -185,6 +260,7 @@ const CheckoutSuccessPage = () => {
           </Link>
         </article>
       </section>
+      </div>
     </Layout>
   )
 }

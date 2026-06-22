@@ -10,8 +10,14 @@ const BLOG_URL = "https://montessorimexico.org/"
 const PublicacionesPage = () => {
   return (
     <Layout>
-      <Nav textColor="text-white" />
-      <section className="bg-gradient-to-r from-blue via-purple to-green pt-16 w-full overflow-x-hidden">
+      <section
+        className="w-full overflow-x-hidden bg-cover bg-center bg-fixed"
+        style={{
+          backgroundImage:
+            "linear-gradient(to right, rgba(0,151,178,0.92), rgba(0,151,178,0.80), rgba(126,217,87,0.92)), url('/backgrounds/publicaciones.webp')",
+        }}
+      >
+        <Nav textColor="text-white" />
         <div className="mx-auto max-w-6xl px-6 pb-10 pt-6 text-white lg:px-12 lg:pb-14">
           <p className="text-xs font-semibold uppercase tracking-wide text-yellow">
             Biblioteca Montessori

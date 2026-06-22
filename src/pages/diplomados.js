@@ -37,7 +37,7 @@ export default function Landing() {
               <div className="fixed inset-0 w-full min-w-0 max-w-full h-full object-cover"
                 style={{
                   backgroundSize: "cover",
-                  backgroundImage: "url('https://images.unsplash.com/photo-1557804506-669a67965ba0?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1267&q=80')"
+                  backgroundImage: "url('/backgrounds/diplomados.webp')"
                 }}>
                 <span id="blackOverlay" className="w-full h-full absolute opacity-75 bg-black"></span>
               </div>

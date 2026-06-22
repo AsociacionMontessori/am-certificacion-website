@@ -9,6 +9,7 @@ const BookCheckoutForm = ({ book, purchase = "physical", cancelHref, onCancel })
   const [codigo, setCodigo] = useState("")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
+  const [checkoutUrl, setCheckoutUrl] = useState("")
 
   const isDigital = purchase === "digital"
   const selectedSku = isDigital ? book.digital?.stripeSku : book.stripeSku
@@ -19,7 +20,11 @@ const BookCheckoutForm = ({ book, purchase = "physical", cancelHref, onCancel })
   const handleBuy = async (e) => {
     e.preventDefault()
     setError("")
+    setCheckoutUrl("")
     setLoading(true)
+    // Abrimos la pestaña ya, dentro del gesto de clic, para que el navegador
+    // no la bloquee tras el await. El sitio se queda en esta pestaña.
+    const stripeTab = typeof window !== "undefined" ? window.open("", "_blank") : null
     try {
       const { url } = await createPublicCheckoutSession({
         sku: selectedSku,
@@ -30,10 +35,16 @@ const BookCheckoutForm = ({ book, purchase = "physical", cancelHref, onCancel })
         },
         ...(isDigital && codigo.trim() ? { codigo: codigo.trim() } : {}),
       })
-      if (typeof window !== "undefined") {
+      if (stripeTab && !stripeTab.closed) {
+        stripeTab.location = url
+        setCheckoutUrl(url)
+        setLoading(false)
+      } else if (typeof window !== "undefined") {
+        // Popup bloqueado: redirige en esta misma pestaña como respaldo.
         window.location.href = url
       }
     } catch (err) {
+      if (stripeTab && !stripeTab.closed) stripeTab.close()
       setError(err.message || "No se pudo iniciar el pago")
       setLoading(false)
     }
@@ -114,6 +125,16 @@ const BookCheckoutForm = ({ book, purchase = "physical", cancelHref, onCancel })
       {error && (
         <p className="text-sm text-red rounded-lg bg-red/5 px-3 py-2" role="alert">
           {error}
+        </p>
+      )}
+
+      {checkoutUrl && (
+        <p className="text-sm text-blue rounded-lg bg-blue/5 px-3 py-2 leading-relaxed">
+          Abrimos el pago seguro en una pestaña nueva. ¿No la ves?{" "}
+          <a href={checkoutUrl} target="_blank" rel="noopener noreferrer" className="font-semibold underline">
+            Ábrela aquí
+          </a>
+          .
         </p>
       )}
 

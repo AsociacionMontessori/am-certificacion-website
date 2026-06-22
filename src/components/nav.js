@@ -74,7 +74,7 @@ export default function Nav({ textColor }) {
                                                 href={item.href}
                                                 className={classNames(
                                                     item.current ? 'text-yellow-400' : 'text-white-300',
-                                                    `${textColor} group rounded-md px-4 md:px-6 text-sm xl:text-base py-`
+                                                    `${textColor} group rounded-md px-4 md:px-6 text-sm xl:text-base py- font-semibold [text-shadow:0_1px_4px_rgba(0,0,0,0.9)]`
                                                 )}
                                                 aria-current={item.current ? 'page' : undefined}
                                                 target={item.external ? '_blank' : undefined}

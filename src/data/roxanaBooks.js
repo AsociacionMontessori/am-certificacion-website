@@ -4,6 +4,26 @@
  */
 export const roxanaBooks = [
   {
+    id: "ammac-libro-5",
+    volume: 5,
+    // Regalo: no se vende por separado. Se entrega gratis (PDF + EPUB) con la
+    // compra de cualquier libro o paquete. Ver roxanaBookOffers.js (giftEbook)
+    // y functions-stripe/stripe/digitalBooks.js (orderQualifiesForGift).
+    // Va primero en el catálogo por su gancho publicitario (gratis).
+    gift: true,
+    digital: {
+      enabled: true,
+      // SKU usado solo para cablear la descarga del regalo; nunca es line item.
+      stripeSku: "ebook_ammac_5",
+      formats: ["PDF", "EPUB"],
+    },
+    title: "La mente absorbente: Montessori a la luz de la neuroeducación y la psicomotricidad actuales",
+    description:
+      "La síntesis más madura de María Montessori (1949) puesta a dialogar, capítulo a capítulo, con la neurociencia del desarrollo, la neuroeducación y la psicomotricidad: plasticidad cerebral, períodos sensibles, la unidad entre movimiento e inteligencia y la emoción como motor del aprendizaje. Con honestidad sobre convergencias, tensiones y neuromitos.",
+    coverImage: "/books/mente-absorbente.jpg",
+    amazonUrl: "https://www.amazon.com/author/montessori.mx",
+  },
+  {
     id: "ammac-libro-1",
     volume: 1,
     stripeSku: "libro_ammac_1",

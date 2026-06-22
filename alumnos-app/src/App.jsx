@@ -32,9 +32,11 @@ const GeneradorQR = lazy(() => import('./pages/Admin/GeneradorQR'));
 const DiagnosticoCodigos = lazy(() => import('./pages/Admin/DiagnosticoCodigos'));
 const GestionGrupos = lazy(() => import('./pages/Admin/GestionGrupos'));
 const GestionNiveles = lazy(() => import('./pages/Admin/GestionNiveles'));
-const GestionPagos = lazy(() => import('./pages/Admin/GestionPagos'));
+// TEMPORAL: Sección de Pagos oculta mientras no está lista
+// const GestionPagos = lazy(() => import('./pages/Admin/GestionPagos'));
 const OrdenesPublicas = lazy(() => import('./pages/Admin/OrdenesPublicas'));
-const Pagos = lazy(() => import('./pages/Pagos'));
+// TEMPORAL: Sección de Pagos oculta mientras no está lista
+// const Pagos = lazy(() => import('./pages/Pagos'));
 const UsuariosAdministrativos = lazy(() => import('./pages/Admin/UsuariosAdministrativos'));
 
 // Componente para redirigir según el rol
@@ -287,6 +289,7 @@ function App() {
               </AdminRoute>
             }
           />
+          {/* TEMPORAL: Sección de Pagos oculta mientras no está lista
           <Route
             path="/admin/pagos"
             element={
@@ -299,6 +302,7 @@ function App() {
               </AdminRoute>
             }
           />
+          */}
           <Route
             path="/admin/ordenes"
             element={
@@ -371,6 +375,7 @@ function App() {
               </ProtectedRoute>
             }
           />
+          {/* TEMPORAL: Sección de Pagos oculta mientras no está lista
           <Route
             path="/pagos"
             element={
@@ -383,7 +388,8 @@ function App() {
               </ProtectedRoute>
             }
           />
-          
+          */}
+
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
         </Router>

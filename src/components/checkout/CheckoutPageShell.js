@@ -6,7 +6,13 @@ import InscripcionAyudaWhatsApp from "../inscripcion/InscripcionAyudaWhatsApp"
 
 const CheckoutPageShell = ({ title, description, backTo = "/", children }) => (
   <Layout>
-    <div className="bg-gradient-to-r from-blue via-purple to-green">
+    <div
+      className="bg-cover bg-center bg-fixed"
+      style={{
+        backgroundImage:
+          "linear-gradient(to right, rgba(0,151,178,0.92), rgba(0,151,178,0.80), rgba(126,217,87,0.92)), url('/backgrounds/home.webp')",
+      }}
+    >
     <Nav textColor="text-white" />
     <section className="min-h-screen px-4 py-20 sm:py-24 pb-12">
       <div className="max-w-lg mx-auto">

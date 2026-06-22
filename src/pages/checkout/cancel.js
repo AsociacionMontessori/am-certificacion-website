@@ -6,6 +6,13 @@ import { Link } from "gatsby"
 
 const CheckoutCancelPage = () => (
   <Layout>
+    <div
+      className="bg-cover bg-center bg-fixed"
+      style={{
+        backgroundImage:
+          "linear-gradient(to right, rgba(0,151,178,0.92), rgba(0,151,178,0.80), rgba(126,217,87,0.92)), url('/backgrounds/home.webp')",
+      }}
+    >
     <Nav textColor="text-white" />
     <section className="min-h-[60vh] flex items-center justify-center px-6 py-24">
       <article className="max-w-lg w-full bg-white rounded-3xl shadow-xl p-8 text-center">
@@ -30,6 +37,7 @@ const CheckoutCancelPage = () => (
         </div>
       </article>
     </section>
+    </div>
   </Layout>
 )
 

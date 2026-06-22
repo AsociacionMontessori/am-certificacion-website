@@ -1,7 +1,7 @@
 import * as React from "react"
 import { Link } from "gatsby"
 import { roxanaBooks } from "../data/roxanaBooks"
-import { roxanaBookBundle } from "../data/roxanaBookOffers"
+import { roxanaBookBundles } from "../data/roxanaBookOffers"
 
 const DEFAULT_DESCRIPTION = (
   <>
@@ -12,9 +12,14 @@ const DEFAULT_DESCRIPTION = (
 
 function BookCard({ book }) {
   const digitalFormats = book.digital?.formats?.join(" + ")
+  const isGift = Boolean(book.gift)
 
   return (
-    <article className="flex h-full flex-col overflow-hidden rounded-lg border border-white/30 bg-white/95 shadow-xl backdrop-blur-sm">
+    <article
+      className={`flex h-full flex-col overflow-hidden rounded-lg border bg-white/95 shadow-xl backdrop-blur-sm ${
+        isGift ? "border-yellow/70 ring-2 ring-yellow/40" : "border-white/30"
+      }`}
+    >
       <div className="flex justify-center bg-blue/5 px-5 pt-5 sm:px-6 sm:pt-6">
         <div className="aspect-[2/3] w-full max-w-[160px] overflow-hidden sm:max-w-[200px] md:max-w-[220px]">
           <img
@@ -28,48 +33,67 @@ function BookCard({ book }) {
         </div>
       </div>
       <div className="flex flex-grow flex-col p-5 sm:p-6">
-        <p className="inline-flex self-start rounded-md bg-yellow/20 px-3 py-1 text-xs font-semibold text-blue">
-          Libro {book.volume}
+        <p
+          className={`inline-flex self-start rounded-md px-3 py-1 text-xs font-semibold ${
+            isGift ? "bg-yellow/40 text-blue" : "bg-yellow/20 text-blue"
+          }`}
+        >
+          {isGift ? "🎁 Regalo gratis" : `Libro ${book.volume}`}
         </p>
         <h3 className="mt-3 text-lg font-bold leading-snug text-blue sm:text-xl">
           {book.title}
         </h3>
-        <div className="mt-3 grid gap-2 text-sm text-blue">
-          {book.priceMx && (
-            <p className="rounded-md bg-blue/5 px-3 py-2 font-semibold">
-              Impreso: ${book.priceMx} MXN
+        {isGift ? (
+          <div className="mt-3 text-sm text-blue">
+            <p className="rounded-md bg-yellow/15 px-3 py-2 font-semibold">
+              Gratis con cualquier compra
               <span className="block text-xs font-normal text-gray">
-                Más gastos de envío
+                Recibes {digitalFormats} al comprar cualquier libro o paquete
               </span>
             </p>
-          )}
-          {book.digital?.enabled && (
-            <p className="rounded-md bg-green/10 px-3 py-2 font-semibold">
-              Ebook: ${book.digital.priceMx} MXN
-              <span className="block text-xs font-normal text-gray">
-                {digitalFormats} descargable
-              </span>
-            </p>
-          )}
-        </div>
+          </div>
+        ) : (
+          <div className="mt-3 grid gap-2 text-sm text-blue">
+            {book.priceMx && (
+              <p className="rounded-md bg-blue/5 px-3 py-2 font-semibold">
+                Impreso: ${book.priceMx} MXN
+                <span className="block text-xs font-normal text-gray">
+                  Más gastos de envío
+                </span>
+              </p>
+            )}
+            {book.digital?.enabled && (
+              <p className="rounded-md bg-green/10 px-3 py-2 font-semibold">
+                Ebook: ${book.digital.priceMx} MXN
+                <span className="block text-xs font-normal text-gray">
+                  {digitalFormats} descargable
+                </span>
+              </p>
+            )}
+          </div>
+        )}
         <p className="mt-3 flex-grow text-sm leading-relaxed text-gray sm:text-base">
           {book.description}
         </p>
 
         <div className="mt-5 flex flex-col gap-2">
-          <Link
-            to={`/checkout/libro?sku=${book.stripeSku}`}
-            className="inline-flex min-h-[48px] w-full items-center justify-center rounded-lg bg-green px-5 py-3 text-center text-sm font-semibold text-white transition duration-150 ease-in-out hover:bg-green/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow focus-visible:ring-offset-2"
-          >
-            Comprar impreso
-          </Link>
-          {book.digital?.enabled && (
-            <Link
-              to={`/checkout/libro?sku=${book.digital.stripeSku}`}
-              className="inline-flex min-h-[48px] w-full items-center justify-center rounded-lg border border-green/50 bg-white px-5 py-3 text-center text-sm font-semibold text-green transition hover:bg-green/5 focus:outline-none focus-visible:ring-2 focus-visible:ring-green"
-            >
-              Comprar ebook
-            </Link>
+          {!isGift && (
+            <>
+              <Link
+                to={`/checkout/libro?sku=${book.stripeSku}`}
+                className="inline-flex min-h-[48px] w-full items-center justify-center rounded-lg bg-green px-5 py-3 text-center text-sm font-semibold text-white transition duration-150 ease-in-out hover:bg-green/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow focus-visible:ring-offset-2"
+              >
+                Comprar impreso
+              </Link>
+              {book.digital?.enabled && (
+                <Link
+                  to={`/checkout/libro?sku=${book.digital.stripeSku}`}
+                  className="inline-flex min-h-[48px] w-full items-center justify-center rounded-lg border border-green/50 bg-white px-5 py-3 text-center text-sm font-semibold text-green transition hover:bg-green/5 focus:outline-none focus-visible:ring-2 focus-visible:ring-green"
+                >
+                  Comprar ebook
+                </Link>
+              )}
+            </>
           )}
           <a
             href={book.amazonUrl}
@@ -86,29 +110,32 @@ function BookCard({ book }) {
   )
 }
 
-function BundleCard() {
+function BundleCard({ bundle }) {
+  const formats = bundle.formats?.join(" + ") || "PDF + EPUB"
+  const count = bundle.bookIds?.length || 0
+
   return (
-    <div className="mt-8 overflow-hidden rounded-lg border border-yellow/40 bg-white/95 p-5 text-left shadow-xl sm:p-6">
+    <div className="overflow-hidden rounded-lg border border-yellow/40 bg-white/95 p-5 text-left shadow-xl sm:p-6">
       <div className="grid gap-5 md:grid-cols-[1fr_auto] md:items-center">
         <div>
           <p className="inline-flex rounded-md bg-yellow/20 px-3 py-1 text-xs font-semibold text-blue">
             Paquete digital
           </p>
           <h3 className="mt-3 text-xl font-bold text-blue">
-            {roxanaBookBundle.title}
+            {bundle.title}
           </h3>
           <p className="mt-2 text-sm leading-relaxed text-gray sm:text-base">
-            {roxanaBookBundle.description}
+            {bundle.description}
           </p>
           <p className="mt-3 text-base font-semibold text-blue">
-            ${roxanaBookBundle.priceMx} MXN
+            ${bundle.priceMx} MXN
             <span className="block text-xs font-normal text-gray">
-              Incluye PDF + EPUB de los 4 libros
+              {bundle.note || `Incluye ${formats} de los ${count} libros`}
             </span>
           </p>
         </div>
         <Link
-          to={`/checkout/libro?sku=${roxanaBookBundle.stripeSku}`}
+          to={`/checkout/libro?sku=${bundle.stripeSku}`}
           className="inline-flex min-h-[48px] items-center justify-center rounded-lg bg-green px-6 py-3 text-center text-sm font-semibold text-white transition hover:bg-green/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow focus-visible:ring-offset-2"
         >
           Comprar paquete
@@ -152,7 +179,11 @@ const RoxanaBooksSection = ({
           )}
         </div>
 
-        <BundleCard />
+        <div className="mt-8 grid gap-4 sm:gap-6">
+          {roxanaBookBundles.map((bundle) => (
+            <BundleCard key={bundle.id} bundle={bundle} />
+          ))}
+        </div>
 
         <ul className="mt-8 grid list-none grid-cols-1 gap-4 p-0 sm:gap-6 md:grid-cols-2">
           {roxanaBooks.map((book) => (

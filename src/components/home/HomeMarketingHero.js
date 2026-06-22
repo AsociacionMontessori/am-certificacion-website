@@ -2,7 +2,6 @@ import * as React from "react"
 import { useEffect, useRef, useState } from "react"
 import { Link } from "gatsby"
 import axios from "axios"
-import imagen from "../../images/banners/home.png"
 import { StaticImage } from "gatsby-plugin-image"
 import DiplomadoCountdown from "./DiplomadoCountdown"
 import {
@@ -13,6 +12,9 @@ import {
 } from "../../data/marketingPrograms"
 import { WHATSAPP_DUDAS_URL } from "../../data/contactoWhatsApp"
 import { getLocalizedPrice, isMexico } from "../../utils/localizedPrice"
+
+// Fondo del hero (servido desde static/). Reemplaza la imagen anterior.
+const imagen = "/backgrounds/home.webp"
 
 const PROGRAM_VISUALS = {
   inscripcion: {
@@ -68,7 +70,8 @@ const getLowestProgramPrice = (tipo, useMxn) =>
     .sort((a, b) => parsePriceAmount(a) - parsePriceAmount(b))[0] || null
 
 const PaymentClarity = ({ coin, inscripcionPrice, useMxn }) => {
-  const guiaDesde = getLowestProgramPrice("Guía", useMxn)
+  // PROGRAMAS_DESTACADOS remapea tipo: guia→"Certificación", diplomado→"Diplomado".
+  const guiaDesde = getLowestProgramPrice("Certificación", useMxn)
   const diplomadoDesde = getLowestProgramPrice("Diplomado", useMxn)
 
   return (
@@ -326,12 +329,12 @@ const HomeMarketingHero = () => {
         src={imagen}
         className="fixed inset-0 h-full w-full object-cover"
         alt="Formación Montessori en línea"
-        width="4160"
-        height="6240"
+        width="1672"
+        height="941"
       />
       <div
         aria-hidden="true"
-        className="absolute inset-0 z-[1] bg-gradient-to-b from-black/30 via-black/50 to-black/75"
+        className="absolute inset-0 z-[1] bg-gradient-to-b from-black/65 via-black/70 to-black/85"
       />
       <div
         aria-hidden="true"
@@ -405,6 +408,12 @@ const HomeMarketingHero = () => {
                 </span>
               </a>
             </div>
+            <p className="inline-flex items-center gap-2 rounded-full bg-yellow/20 border border-yellow/40 px-4 py-2 text-sm text-white">
+              <span aria-hidden="true">🎁</span>
+              <span>
+                Al inscribirte recibes el <strong>Paquete Cósmico</strong> (Educación Cósmica + Guiones) de regalo.
+              </span>
+            </p>
             <Link
               to="/diplomados"
               className="inline-block text-sm text-white/90 underline underline-offset-4 hover:text-white"

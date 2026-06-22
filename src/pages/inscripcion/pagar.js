@@ -3,21 +3,32 @@ import { Link } from "gatsby"
 import CheckoutPageShell from "../../components/checkout/CheckoutPageShell"
 import Seo from "../../components/seo"
 import DatosBancariosCard from "../../components/inscripcion/DatosBancariosCard"
-
-// NOTA: El flujo de pago con tarjeta vía Stripe está temporalmente
-// deshabilitado mientras se completa la activación de Stripe Live.
-// Para reactivarlo, restaurar `InscriptionCheckoutForm` y la lógica de
-// geolocalización desde git history (commit anterior a "hotfix(stripe):
-// pausar checkout público").
+import ApartarInscripcionForm from "../../components/checkout/ApartarInscripcionForm"
+import { useVisitorGeo } from "../../hooks/useVisitorGeo"
+import { INSCRIPCION_PRECIO } from "../../data/programasOferta"
 
 const InscripcionPagarPage = () => {
+  const { esMexico } = useVisitorGeo()
+  const coin = esMexico ? "MXN" : "USD"
+  const price = esMexico ? `$${INSCRIPCION_PRECIO.priceMx}` : `$${INSCRIPCION_PRECIO.priceUsd}`
+
   return (
     <CheckoutPageShell
-      title="Paso 1 · Inscripción por transferencia"
-      description="Realiza tu pago de inscripción mediante transferencia bancaria."
+      title="Aparta tu lugar"
+      description="Paga tu inscripción con tarjeta y recibe el Paquete Cósmico de regalo, o hazlo por transferencia."
       backTo="/diplomados"
     >
-      <DatosBancariosCard compact />
+      <ApartarInscripcionForm coin={coin} price={price} cancelHref="/diplomados" />
+
+      <div className="my-6 flex items-center gap-3" aria-hidden="true">
+        <span className="h-px flex-1 bg-gray/20" />
+        <span className="text-xs font-medium uppercase tracking-wide text-gray">
+          o paga por transferencia
+        </span>
+        <span className="h-px flex-1 bg-gray/20" />
+      </div>
+
+      <DatosBancariosCard compact esMexico={esMexico} />
 
       <div className="mt-4 space-y-3">
         <Link
@@ -47,8 +58,8 @@ const InscripcionPagarPage = () => {
 
 export const Head = () => (
   <Seo
-    title="Paso 1 · Inscripción por transferencia"
-    description="Inscríbete a los diplomados Montessori por transferencia bancaria."
+    title="Aparta tu lugar"
+    description="Aparta tu lugar en los diplomados Montessori con tarjeta (y recibe el Paquete Cósmico de regalo) o por transferencia bancaria."
     pathname="/inscripcion/pagar"
   />
 )

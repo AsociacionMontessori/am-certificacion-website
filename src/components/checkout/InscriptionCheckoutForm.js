@@ -53,6 +53,7 @@ const InscriptionCheckoutForm = ({
   const [requiereFacturaFiscal, setRequiereFacturaFiscal] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
+  const [checkoutUrl, setCheckoutUrl] = useState("")
   const { esMexico: visitanteEnMexico } = useVisitorGeo()
 
   const programaSeleccionado = Boolean(programa)
@@ -106,7 +107,10 @@ const InscriptionCheckoutForm = ({
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError("")
+    setCheckoutUrl("")
     setLoading(true)
+    // Abrimos la pestaña dentro del gesto de clic (evita el bloqueo de popups).
+    const stripeTab = typeof window !== "undefined" ? window.open("", "_blank") : null
 
     try {
       const payload = {
@@ -124,10 +128,15 @@ const InscriptionCheckoutForm = ({
       }
 
       const { url } = await createPublicCheckoutSession(payload)
-      if (typeof window !== "undefined") {
+      if (stripeTab && !stripeTab.closed) {
+        stripeTab.location = url
+        setCheckoutUrl(url)
+        setLoading(false)
+      } else if (typeof window !== "undefined") {
         window.location.href = url
       }
     } catch (err) {
+      if (stripeTab && !stripeTab.closed) stripeTab.close()
       setError(err.message || "Error al iniciar el pago")
       setLoading(false)
     }
@@ -292,6 +301,16 @@ const InscriptionCheckoutForm = ({
       {error && (
         <p className="text-sm text-red rounded-lg bg-red/5 px-3 py-2" role="alert">
           {error}
+        </p>
+      )}
+
+      {checkoutUrl && (
+        <p className="text-sm text-blue rounded-lg bg-blue/5 px-3 py-2 leading-relaxed">
+          Abrimos el pago seguro en una pestaña nueva. ¿No la ves?{" "}
+          <a href={checkoutUrl} target="_blank" rel="noopener noreferrer" className="font-semibold underline">
+            Ábrela aquí
+          </a>
+          .
         </p>
       )}
 

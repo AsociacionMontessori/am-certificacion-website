@@ -4,18 +4,20 @@ import CheckoutPageShell from "../../components/checkout/CheckoutPageShell"
 import Seo from "../../components/seo"
 import BookCheckoutForm from "../../components/checkout/BookCheckoutForm"
 import { roxanaBooks } from "../../data/roxanaBooks"
-import { roxanaBookBundle } from "../../data/roxanaBookOffers"
+import { roxanaBookBundles } from "../../data/roxanaBookOffers"
 
-const bundleBook = {
-  id: roxanaBookBundle.id,
-  title: roxanaBookBundle.title,
-  description: roxanaBookBundle.description,
-  digital: {
-    enabled: true,
-    stripeSku: roxanaBookBundle.stripeSku,
-    priceMx: roxanaBookBundle.priceMx,
-    formats: roxanaBookBundle.formats,
-  },
+function bundleToBook(bundle) {
+  return {
+    id: bundle.id,
+    title: bundle.title,
+    description: bundle.description,
+    digital: {
+      enabled: true,
+      stripeSku: bundle.stripeSku,
+      priceMx: bundle.priceMx,
+      formats: bundle.formats,
+    },
+  }
 }
 
 const LibroCheckoutPage = () => {
@@ -26,10 +28,13 @@ const LibroCheckoutPage = () => {
     setSku(params.get("sku") || "")
   }, [])
 
-  const isBundle = sku === roxanaBookBundle.stripeSku
+  const bundle = roxanaBookBundles.find((b) => b.stripeSku === sku)
+  const isBundle = Boolean(bundle)
   const book = isBundle
-    ? bundleBook
-    : roxanaBooks.find((b) => b.stripeSku === sku || b.digital?.stripeSku === sku)
+    ? bundleToBook(bundle)
+    : roxanaBooks.find(
+        (b) => !b.gift && (b.stripeSku === sku || b.digital?.stripeSku === sku)
+      )
   const isDigital = isBundle || Boolean(book?.digital?.stripeSku === sku)
 
   if (!book) {
