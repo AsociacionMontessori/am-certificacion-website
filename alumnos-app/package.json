@@ -20,8 +20,7 @@
     "verify:pagos": "node scripts/verificar-config-pagos.js",
     "migrate:pagos": "node scripts/migrar-pagos-numerados.js",
     "deploy:rules": "cd .. && npx firebase deploy --only firestore:rules",
-    "sync:stripe-functions": "node scripts/sync-stripe-functions.js",
-    "deploy:stripe": "npm run sync:stripe-functions && npx firebase deploy --only functions:stripe",
+    "deploy:stripe": "npx firebase deploy --only functions:stripe",
     "stripe:setup-catalog": "node scripts/stripe-setup-catalog.js"
   },
   "dependencies": {
