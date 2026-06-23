@@ -6,7 +6,7 @@ import React, { useEffect, useMemo, useState } from 'react'
 
 const TODOS = 'Todos'
 
-const Buscador = () => {
+const Directorio = () => {
   const [schools, setSchools] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
@@ -45,7 +45,7 @@ const Buscador = () => {
         <div className="max-w-screen-xl px-6 md:px-20 pb-16 mx-auto pt-28 md:pt-36">
           <div className="text-white max-w-3xl">
             <p className="text-sm uppercase tracking-[0.2em] text-green-200">Directorio Montessori</p>
-            <h1 className="text-3xl md:text-5xl font-bold mt-3">Buscador de Escuelas Montessori</h1>
+            <h1 className="text-3xl md:text-5xl font-bold mt-3">Directorio de Escuelas Montessori</h1>
             <p className="text-lg md:text-xl pt-4 text-white/90">
               Encuentra escuelas Montessori en México y el resto del mundo. Las marcadas con el
               distintivo <span className="font-semibold text-green-200">★ Certificación AMMAC</span> cuentan
@@ -122,9 +122,29 @@ const Buscador = () => {
           </div>
 
           {!loading && !error && filtered.length === 0 && (
-            <p className="mt-10 text-white/90">
-              No hay escuelas que coincidan con tu búsqueda. Prueba con otra ciudad o quita los filtros.
-            </p>
+            <div className="mt-10 text-white/90">
+              <p>No tenemos escuelas registradas para esa búsqueda.</p>
+            </div>
+          )}
+
+          {/* Cobertura: si tu país/ciudad no está en nuestro directorio, buscamos en Google Maps */}
+          {!loading && !error && (
+            <div className="mt-12 rounded-2xl bg-white/10 border border-white/20 p-6 text-white">
+              <p className="text-base md:text-lg">
+                ¿No encuentras una escuela Montessori en tu ciudad o país? Nuestro directorio crece
+                poco a poco. Mientras tanto, puedes buscarla directamente en Google Maps:
+              </p>
+              <a
+                href={`https://www.google.com/maps/search/${encodeURIComponent(
+                  `escuela Montessori ${query || (country !== TODOS ? country : '')}`.trim()
+                )}`}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-block mt-4 rounded-full bg-green-400 text-blue-900 font-semibold px-6 py-2 hover:bg-green-300 transition"
+              >
+                Buscar {query ? `"${query}"` : 'escuelas Montessori'} en Google Maps →
+              </a>
+            </div>
           )}
         </div>
       </main>
@@ -134,10 +154,10 @@ const Buscador = () => {
 
 export const Head = () => (
   <Seo
-    title="Buscador de Escuelas Montessori"
-    pathname="/buscador/"
+    title="Directorio de Escuelas Montessori"
+    pathname="/directorio/"
     description="Directorio público de escuelas Montessori en México y el mundo. Identifica las escuelas con certificación de la Asociación Montessori de México A.C. (AMMAC)."
   />
 )
 
-export default Buscador
+export default Directorio

@@ -10,7 +10,7 @@ const navigation = [
     { name: 'DIPLOMADOS', href: '/diplomados', current: false },
     { name: 'PUBLICACIONES', href: '../publicaciones', current: false },
     { name: 'ESCUELA PARA NIÑOS', href: 'https://kalpilli.com/', current: false, external: true },
-    { name: 'ESCUELAS', href: '/buscador', current: false },
+    { name: 'DIRECTORIO DE ESCUELAS', href: '/directorio', current: false },
     { name: 'CONTACTO', href: '../contact', current: false },
 ]
 
