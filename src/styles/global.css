@@ -97,3 +97,53 @@ h6 {
 .delay-18s {
   animation-delay: 18s;
 }
+
+.program-album-rail {
+  scroll-padding-left: 1rem;
+  scrollbar-color: rgba(126, 217, 87, 0.85) rgba(255, 255, 255, 0.24);
+  scrollbar-width: thin;
+}
+
+.program-album-rail::-webkit-scrollbar {
+  height: 0.75rem;
+}
+
+.program-album-rail::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 0.5rem;
+}
+
+.program-album-rail::-webkit-scrollbar-thumb {
+  background: linear-gradient(90deg, #7ED957, #0097B2, #FBD116);
+  border: 0.2rem solid rgba(255, 255, 255, 0.2);
+  border-radius: 0.5rem;
+}
+
+.program-album-card {
+  transform-origin: center bottom;
+}
+
+.program-album-link:nth-child(odd) .program-album-card {
+  transform: rotate(-0.45deg);
+}
+
+.program-album-link:nth-child(even) .program-album-card {
+  transform: rotate(0.45deg);
+}
+
+.program-album-link:hover .program-album-card,
+.program-album-link:focus-visible .program-album-card {
+  transform: translateY(-0.25rem) rotate(0deg);
+}
+
+.program-album-link:hover .program-album-cover,
+.program-album-link:focus-visible .program-album-cover {
+  filter: saturate(1.08) contrast(1.04);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .program-album-card,
+  .program-album-cover {
+    transition: none;
+  }
+}

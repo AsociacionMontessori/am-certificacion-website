@@ -12,6 +12,28 @@
       "**/.*",
       "**/node_modules/**"
     ],
+    "redirects": [
+      {
+        "source": "/certificate",
+        "destination": "/diplomados/#certificacion_internacional",
+        "type": 301
+      },
+      {
+        "source": "/certificate/**",
+        "destination": "/diplomados/#certificacion_internacional",
+        "type": 301
+      },
+      {
+        "source": "/masterclasses",
+        "destination": "/diplomados",
+        "type": 301
+      },
+      {
+        "source": "/masterclasses/**",
+        "destination": "/diplomados",
+        "type": 301
+      }
+    ],
     "rewrites": [
       {
         "source": "**",

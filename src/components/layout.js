@@ -3,16 +3,13 @@ import Footer from "./footer"
 import "./../styles/wa.css"
 import { Transition } from "@headlessui/react"
 import "../styles/fonts.css"
-import { StaticImage } from "gatsby-plugin-image"
 
 const Layout = ({ children }) => {
   const [showWABtn, setShowWABtn] = React.useState(false)
-  const [showAMBtn, setShowAMBtn] = React.useState(false)
-  const [readed, setReaded] = React.useState(false)
 
   return (
     <>
-      <div className="bg-gradient-to-r from-blue via-purple to-green">
+      <div className="min-h-screen">
         <div
           style={{
             margin: `0 auto`,
@@ -54,73 +51,11 @@ const Layout = ({ children }) => {
                     , 4000)
                 }} onMouseOver={() => {
                   setShowWABtn(true)
-                  setShowAMBtn(false)
                 }} style={{ background: 'rgb(45, 183, 66)' }}>
                 </div>
               </div>
 
             </a>
-
-              <div className="wa__btn_popup am__btn_popup_container" style={{ left: 'unset', right: '20px', bottom: '100px' }}>
-                <Transition
-                  show={showAMBtn}
-                  enter="transition-opacity duration-75"
-                  enterFrom="opacity-0"
-                  enterTo="opacity-100"
-                  leave="transition-opacity duration-150"
-                  leaveFrom="opacity-100"
-                  leaveTo="opacity-0"
-                >
-                  <div className="hidden md:block">
-                    <FadeIn delay="delay-[0ms]">
-                      <div className="am__popup_card">
-                        <div className="am__popup_header">
-                          <StaticImage src="../images/notf.png" alt="AM" placeholder="none" className="am__popup_image" />
-                        </div>
-                        <div className="am__popup_content">
-                          <iframe 
-                            className="am__popup_iframe" 
-                            title="Eventos" 
-                            src="https://montessorimexico.org/massterclass/" 
-                            name="myiFrame" 
-                            scrolling="no" 
-                            frameBorder="0" 
-                            marginHeight="0" 
-                            marginWidth="0" 
-                            allowFullScreen
-                          ></iframe>
-                        </div>
-                      </div>
-                    </FadeIn>
-                  </div>
-                </Transition>
-                <div className="am__btn_popup_icon" onMouseOut={() => {
-                  setTimeout(() => {
-                    setShowAMBtn(false)
-                  }
-                    , 10000)
-                }} 
-                 onClick={() => {
-                  setShowAMBtn(true)
-                  setShowWABtn(false)
-                  setReaded(true)
-                  setTimeout(() => {
-                    setShowAMBtn(false)
-                  }, 6000)
-                 }}
-                >
-                  {!readed ? <div>
-                    <div
-                      className="absolute bottom-auto left-auto right-0 top-0 z-10 inline-block -translate-y-1/2 translate-x-2/4 rotate-0 skew-x-0 skew-y-0 scale-x-100 scale-y-100 whitespace-nowrap rounded-full bg-red px-2.5 py-1 text-center align-baseline text-xs font-bold leading-none text-white">
-                      1
-                    </div>
-                  </div> : ""
-
-                  }
-                  <StaticImage src="../images/lasc.png" alt="AM" placeholder="none" className="w-full p-[0.7rem]" />
-                </div>
-              </div>
-
           </div>
 
         </div>

@@ -12,7 +12,7 @@ export const FAQ_ITEMS = [
     },
     {
         question: "¿Qué certificación obtengo al terminar?",
-        answer: "La oferta pública del sitio comunica que los programas cuentan con certificación internacional y están orientados a formarte como Guía Montessori. Los detalles específicos del programa se encuentran en las páginas de Diplomados y Certifícate."
+        answer: "La oferta pública del sitio comunica que los programas cuentan con certificación internacional y están orientados a formarte como Guía Montessori. Los detalles específicos se concentran en la página de Diplomados."
     },
     {
         question: "¿Quiénes forman parte del equipo docente?",

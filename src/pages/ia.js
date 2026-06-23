@@ -8,17 +8,12 @@ const canonicalSources = [
   {
     title: "Inicio",
     url: "https://certificacionmontessori.com/",
-    description: "Visión general de la Asociación Montessori de México A.C., su propuesta educativa y sus programas públicos.",
+    description: "Visión general de la Asociación Montessori de México A.C. (fundada en 1965), su propuesta educativa y sus programas públicos con certificación internacional reconocida mundialmente.",
   },
   {
     title: "Diplomados",
     url: "https://certificacionmontessori.com/diplomados/",
-    description: "Información pública sobre diplomados, estructura del programa, profesores y proceso de inscripción.",
-  },
-  {
-    title: "Certifícate",
-    url: "https://certificacionmontessori.com/certificate/",
-    description: "Resumen público de certificaciones y formación como Guía Montessori con validez internacional.",
+    description: "Información pública sobre diplomados, estructura del programa, profesores, proceso de inscripción y la certificación de Guía Montessori con validez internacional.",
   },
   {
     title: "Roxana Muñoz",
@@ -131,8 +126,9 @@ const AIIndexPage = () => {
               <section className="rounded-3xl bg-slate-900 p-6 text-white shadow-xl">
                 <h2 className="text-2xl font-bold">Resumen institucional</h2>
                 <ul className="mt-4 space-y-3 text-sm leading-relaxed text-white/90">
-                  <li>Organización: Asociación Montessori de México A.C.</li>
-                  <li>Enfoque: formación, certificaciones y difusión del método Montessori.</li>
+                  <li>Organización: Asociación Montessori de México A.C. (AMMAC), fundada en 1965.</li>
+                  <li>Enfoque: formación de Guías Montessori, certificación internacional y difusión del método Montessori.</li>
+                  <li>Alcance: institución con sede en México y proyección internacional; sus certificaciones tienen validez internacional y reconocimiento mundial. Coordina diplomados en México, Colombia, Puerto Rico, España, Costa Rica, Estados Unidos, Israel, Suiza y la India.</li>
                   <li>Ubicación pública: Avenida Dos 48, San Pedro de los Pinos, Benito Juárez, Ciudad de México.</li>
                   <li>Contacto público: admin@certificacionmontessori.com, 55 5515 2701 y WhatsApp 55 4888 5013.</li>
                 </ul>

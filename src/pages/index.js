@@ -1,17 +1,15 @@
 import * as React from 'react';
+import { useEffect } from 'react';
 import '../styles/global.css';
+import { redirectStripeCheckoutReturn } from '../utils/stripeCheckoutReturn';
 import Layout from '../components/layout';
 import Seo from '../components/seo';
-import imagen from '../images/banners/home.png';
 import ImgMap from '../images/banners/map.png';
 import ImgMapDark from '../images/banners/dark_map.png';
 import { StaticImage } from 'gatsby-plugin-image';
 import Timeline from '../components/timeline/timeline';
 import Nav from '../components/nav';
-import NextCourse from '../components/nextCourse';
-import { useState } from 'react';
-import { useRef } from 'react';
-import { useEffect } from 'react';
+import HomeMarketingHero from '../components/home/HomeMarketingHero';
 
 function CustomParagraph1({ text }) {
   return (
@@ -63,55 +61,16 @@ const phrases2 = [
   "Lo que la mano hace, la mente lo recuerda",
 ];
 
-const IndexPage = () => {
-  const [rectPosY, setRectPosY] = useState(0);
-  const [rectPosX, setRectPosX] = useState(0);
-  const areaRef = useRef(null);
-
+const IndexPage = ({ location }) => {
   useEffect(() => {
-    const handleMouseMove = (e) => {
-      setRectPosY(rectPosY - e.pageY / 40);
-      setRectPosX(rectPosX - e.pageX / 40);
-    };
-
-    areaRef.current.addEventListener('mousemove', handleMouseMove);
-
-    return () => {
-      areaRef.current.removeEventListener('mousemove', handleMouseMove);
-    };
-  }, []);
+    redirectStripeCheckoutReturn(location)
+  }, [location?.search])
 
   return (
     <Layout>
       <Nav textColor="text-white" />
       <main>
-        <section id="home" className="relative flex items-center area" ref={areaRef}>
-          <div aria-hidden="true" className="absolute inset-0 z-[1] bg-gradient-to-b from-white/0 via-white/10 to-white/60  dark:bg-gradient-to-b dark:from-white/0 dark:via-gray/20 dark:to-gray" />
-          <div className='absolute inset-0 z-[1] opacity-80' style={{ top: rectPosY, left: rectPosX }}>
-            <div className='w-full'>
-            <StaticImage src='../images/elements/decorwall.png' placeholder="none" ></StaticImage>
-            </div>
-          </div>
-          <img src={imagen} className="fixed inset-0 h-full w-full object-cover" alt="woman in dark" width="4160" height="6240" />
-          <div className="relative z-10 mx-auto max-w-7xl px-6 pb-10 md:pb-20 lg:pb-40  md:pt-12 lg:pt-20 lg:px-12 xl:px-6 2xl:px-0 selection:text-white selection:bg-green selection:bg-opacity-20">
-            <div className="pb-6 media-h:md:pb-20 media-h:lg:pb-4 xl:pb-2">
-              <h1 data-rellax-speed="-3" data-rellax-xs-speed="0" data-rellax-mobile-speed="0" className="rellax text-3xl font-bold text-white sm:text-7xl md:text-8xl xl:leading-tight" >
-                Asociación Montessori <br />de México A.C.
-              </h1>
-            </div>
-            <div>
-              <div className="mr-auto md:w-3/5 md:pt-2 lg:w-2/3">
-                <p className="mb-2 sm:mb-2 xl:mb-5 text-sm md:text-lg font-light text-white sm:text-2xl xl:leading-normal">
-                  Únete a nosotros en este emocionante viaje de aprendizaje y exploración.
-                  <div className='hidden md:inline pl-1'>
-                    Descubre la filosofía y práctica de este gran método, con nuestras clases gratuitas, contenido y certificaciones con validez internacional.
-                  </div>
-                </p>
-                <NextCourse URLiframe={"https://montessorimexico.org/proxima-certificacion/"} URLButton={"/certificate/#certificacion_internacional"} />
-              </div>
-            </div>
-          </div>
-        </section>
+        <HomeMarketingHero />
         <section id="work" className="relative py-5 z-10 bg-white dark:bg-gray lg:pt-0">
           <div className="mx-auto max-w-7xl px-6 lg:px-12 xl:px-6 2xl:px-0 pt-10">
             <div data-rellax-speed="-3" data-rellax-xs-speed="0" data-rellax-mobile-speed="0" className="rellax flex flex-wrap items-center gap-6 selection:text-white selection:bg-red selection:bg-opacity-20">
@@ -169,14 +128,14 @@ const IndexPage = () => {
         </section>
       </main>
     </Layout>
-  );
+  )
 }
 
 export const Head = () => (
   <Seo
     title="Inicio"
     pathname="/"
-    description="Conoce la Asociación Montessori de México A.C., sus diplomados, certificaciones y recursos públicos sobre formación Montessori."
+    description="Inscríbete a diplomados Guía Montessori 100% en línea. Certificación internacional, próximo ciclo con cupo limitado. Aparta tu lugar desde $4,900 MXN."
   />
 )
 export default IndexPage

@@ -14,8 +14,6 @@ import {
   ArrowsUpDownIcon
 } from '@heroicons/react/24/outline';
 import { Link } from 'react-router-dom';
-import AlertasMateriasProximas from '../../components/AlertasMateriasProximas';
-import AlertasCalificacionesPendientes from '../../components/AlertasCalificacionesPendientes';
 import useCanEdit from '../../hooks/useCanEdit';
 import { useAuth } from '../../contexts/AuthContext';
 import { obtenerNiveles } from '../../services/nivelesService';
@@ -227,10 +225,6 @@ const AdminDashboard = () => {
 
   return (
     <div className="space-y-6 sm:space-y-8 animate-fade-in">
-      {/* Alertas de Materias Pendientes y Próximas */}
-      <AlertasCalificacionesPendientes />
-      <AlertasMateriasProximas />
-
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>

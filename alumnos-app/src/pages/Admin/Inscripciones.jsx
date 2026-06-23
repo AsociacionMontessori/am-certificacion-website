@@ -47,6 +47,13 @@ const Inscripciones = () => {
     switch (estado) {
       case 'Pendiente':
         return 'bg-yellow text-gray-900 dark:text-gray-900';
+      case 'Pagado':
+        return 'bg-blue text-white';
+      case 'Cuenta creada':
+        return 'bg-blue text-white';
+      case 'Expediente completo':
+      case 'Datos completos':
+        return 'bg-green text-white';
       case 'Aprobada':
         return 'bg-green text-gray-900 dark:text-gray-900';
       case 'Rechazada':

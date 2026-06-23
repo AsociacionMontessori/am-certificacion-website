@@ -7,11 +7,9 @@ import { useEffect } from 'react';
 
 
 const navigation = [
-    // { name: 'CERTIFÍCATE', href: '../certificate', current: false },
-    { name: 'DIPLOMADOS', href: '../certificate', current: false },
-    { name: 'MASSTERCLASSES', href: '../masterclasses', current: false },
+    { name: 'DIPLOMADOS', href: '/diplomados', current: false },
     { name: 'PUBLICACIONES', href: '../publicaciones', current: false },
-    { name: 'KALPILLI', href: 'https://kalpilli.com/', current: false },
+    { name: 'ESCUELA PARA NIÑOS', href: 'https://kalpilli.com/', current: false, external: true },
     { name: 'CONTACTO', href: '../contact', current: false },
 ]
 
@@ -64,7 +62,7 @@ export default function Nav({ textColor }) {
                                         <img
                                             className="block h-12 w-auto lg:h-20 md:h-15 sm:h-10 mx-auto"
                                             src={kalpilliLight}
-                                            alt="Kalpilli Logo (Light Mode)"
+                                            alt="Asociación Montessori de México"
                                         />
                                     </a>
                                 </div>
@@ -76,9 +74,11 @@ export default function Nav({ textColor }) {
                                                 href={item.href}
                                                 className={classNames(
                                                     item.current ? 'text-yellow-400' : 'text-white-300',
-                                                    `${textColor} group rounded-md px-4 md:px-6 text-sm xl:text-base py-`
+                                                    `${textColor} group rounded-md px-4 md:px-6 text-sm xl:text-base py- font-semibold [text-shadow:0_1px_4px_rgba(0,0,0,0.9)]`
                                                 )}
                                                 aria-current={item.current ? 'page' : undefined}
+                                                target={item.external ? '_blank' : undefined}
+                                                rel={item.external ? 'noopener noreferrer' : undefined}
                                             >
                                                 {item.name}
                                                 <div className="inline relative opacity-0 group-hover:opacity-100 transition duration-300 ease-in-out transistion-all">
@@ -104,6 +104,8 @@ export default function Nav({ textColor }) {
                                         `${textColor} block rounded-md px-3 py-2 text-base font-medium`
                                     )}
                                     aria-current={item.current ? 'page' : undefined}
+                                    target={item.external ? '_blank' : undefined}
+                                    rel={item.external ? 'noopener noreferrer' : undefined}
                                 >
                                     {item.name}
                                 </Disclosure.Button>

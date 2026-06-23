@@ -9,7 +9,6 @@ import {
   CalendarIcon,
   ChartBarIcon,
   DocumentTextIcon,
-  CurrencyDollarIcon,
   ArrowRightOnRectangleIcon,
   SunIcon,
   MoonIcon
@@ -26,7 +25,7 @@ const Layout = ({ children }) => {
     { name: 'Mi Expediente', href: '/expediente', icon: DocumentTextIcon },
     { name: 'Calendario', href: '/calendario', icon: CalendarIcon },
     { name: 'Calificaciones', href: '/calificaciones', icon: ChartBarIcon },
-    // TEMPORAL: Ocultado en producción mientras se arreglan cosas
+    // TEMPORAL: Sección de Pagos oculta mientras no está lista
     // { name: 'Pagos', href: '/pagos', icon: CurrencyDollarIcon },
     { name: 'Graduación', href: '/graduacion', icon: AcademicCapIcon },
   ];

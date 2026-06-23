@@ -6,7 +6,7 @@ import CertificationPrice from "../components/certificationPrice";
 import ProfessorsSection from "../components/professorsSection";
 import Scholarship from "../components/scholarship";
 import Seo from "../components/seo";
-import { DIPLOMADOS_EN_LINEA, getNextItem } from "../components/nextCourse";
+import { DIPLOMADOS_EN_LINEA, getNextItem } from "../data/diplomadosCalendario";
 
 const FORM_INSCRIPCION = "https://forms.gle/pQKbTjGKCMYtnjuY6";
 
@@ -37,7 +37,7 @@ export default function Landing() {
               <div className="fixed inset-0 w-full min-w-0 max-w-full h-full object-cover"
                 style={{
                   backgroundSize: "cover",
-                  backgroundImage: "url('https://images.unsplash.com/photo-1557804506-669a67965ba0?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1267&q=80')"
+                  backgroundImage: "url('/backgrounds/diplomados.webp')"
                 }}>
                 <span id="blackOverlay" className="w-full h-full absolute opacity-75 bg-black"></span>
               </div>
@@ -389,15 +389,6 @@ export default function Landing() {
                         <div>
                           <strong className="text-white block">Guía personalizada</strong>
                           <span className="text-white/90">Solicita videollamada con tu profesor cuando lo necesites.</span>
-                        </div>
-                      </li>
-                      <li className="flex items-start gap-3">
-                        <span className="flex-shrink-0 w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
-                        </span>
-                        <div>
-                          <strong className="text-white block">Masterclass en vivo</strong>
-                          <span className="text-white/90">Cada 15 días, sábados 10:00 — en vivo o en grabación.</span>
                         </div>
                       </li>
                     </ul>

@@ -113,11 +113,13 @@ service cloud.firestore {
       
       allow write: if isOwnAlumno(alumnoId) || isAdmin();
       
-      // Permitir consultas (list) para verificación de certificados
-      // Esto es necesario para la función verificarCertificado que usa where()
-      // Permite tanto usuarios autenticados como no autenticados
-      // La seguridad está en que necesitas el folio Y el código para verificar
-      allow list: if true; // Permitir consultas para verificación (seguro porque necesitas folio + código)
+      // F-01 cerrado el 2026-05-25.
+      // La verificación pública de certificados se movió a la Cloud Function
+      // `verificarCertificadoPublico` (Admin SDK, rate-limited, timingSafeEqual).
+      // Aquí solo admins/directivos/catedráticos pueden listar el padrón.
+      // El `read` rule arriba sigue permitiendo `get` anónimo por id si el
+      // alumno tiene folioCertificado + codigoVerificacion (ej. PublicProfile).
+      allow list: if canReadAdmin();
     }
     
     // Colección: materias
@@ -188,9 +190,11 @@ service cloud.firestore {
       allow create: if request.auth != null && 
                       request.resource.data.alumnoId == request.auth.uid &&
                       request.resource.data.estado == 'Pendiente';
-      // El alumno puede actualizar sus pagos pendientes (subir comprobantes, etc.)
+      // El alumno puede actualizar sus pagos pendientes (comprobante, ids Stripe)
+      // No puede cambiar estado a Validado (solo webhook/admin)
       allow update: if isOwnAlumno(resource.data.alumnoId) && 
-                      resource.data.estado == 'Pendiente';
+                      resource.data.estado == 'Pendiente' &&
+                      request.resource.data.estado == 'Pendiente';
       // Solo admin puede validar/rechazar pagos y crear/actualizar pagos validados
       allow write: if isAdmin();
     }
@@ -203,6 +207,40 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
     
+    // Colección: ordenes (pagos sitio público — solo Functions escriben)
+    match /ordenes/{ordenId} {
+      allow read: if canReadAdmin();
+      allow write: if false;
+    }
+
+    // Eventos Stripe procesados (idempotencia webhook)
+    match /stripe_events/{eventId} {
+      allow read, write: if false;
+    }
+
+    // Contadores de rate limiting para Functions públicas
+    match /rate_limits/{limitId} {
+      allow read, write: if false;
+    }
+
+    // Catálogo Stripe (price IDs por SKU)
+    match /stripeCatalog/{docId} {
+      allow read: if canReadAdmin();
+      allow write: if isAdmin();
+    }
+
+    // Colección: alumnoCredenciales (F-03 — credenciales cifradas).
+    // Solo el propio alumno o un admin/directivo pueden leer su documento.
+    // Catedráticos y grupos no acceden a credenciales aunque puedan ver al alumno.
+    // Listado nunca permitido; escritura solo desde Admin SDK (Cloud Functions).
+    match /alumnoCredenciales/{alumnoId} {
+      allow get: if (request.auth != null && request.auth.uid == alumnoId)
+                    || isAdmin()
+                    || isDirectivo();
+      allow list: if false;
+      allow write: if false;
+    }
+
     // Colección: becas
     match /becas/{becaId} {
       // El alumno puede leer sus propias becas

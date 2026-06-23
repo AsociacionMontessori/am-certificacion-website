@@ -1112,10 +1112,15 @@ const GestionPagos = () => {
                 ? `Colegiatura ${pago.numeroColegiatura}${pago.totalColegiaturas ? `/${pago.totalColegiaturas}` : ''}`
                 : (pago.tipo || 'Colegiatura')}
             </h3>
-            <span className={`px-2 py-1 rounded-full text-xs font-medium ${estado.bg} ${estado.color} flex items-center gap-1`}>
-              <EstadoIcon className="w-3 h-3" />
-              {estado.texto}
-            </span>
+            <div className="flex flex-col items-end gap-1">
+              <span className={`px-2 py-1 rounded-full text-xs font-medium ${estado.bg} ${estado.color} flex items-center gap-1`}>
+                <EstadoIcon className="w-3 h-3" />
+                {estado.texto}
+              </span>
+              {pago.metodoPago === 'stripe' && (
+                <span className="text-xs font-medium text-blue">Stripe</span>
+              )}
+            </div>
           </div>
           
           <div className="space-y-2 text-sm flex-1">

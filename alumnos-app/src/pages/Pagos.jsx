@@ -18,6 +18,13 @@ import {
   aplicarBeca
 } from '../utils/calculosPagos';
 import LoadingSpinner from '../components/LoadingSpinner';
+import PagoStripeActions from '../components/PagoStripeActions';
+import {
+  redirectToAlumnoCheckout,
+  redirectToSubscriptionCheckout,
+  redirectToCustomerPortal,
+} from '../services/stripeService';
+import { stripeCheckoutEnabled } from '../utils/featureFlags';
 import { 
   CurrencyDollarIcon, 
   ClockIcon, 
@@ -44,7 +51,25 @@ const Pagos = () => {
   const [mostrarProximosPagos, setMostrarProximosPagos] = useState(false);
   const [mostrarHistorial, setMostrarHistorial] = useState(false);
   const [filtroHistorial, setFiltroHistorial] = useState('todos'); // 'todos', 'validados', 'pendientes', 'rechazados'
+  const [stripeLoadingId, setStripeLoadingId] = useState(null);
+  const [subscriptionLoading, setSubscriptionLoading] = useState(false);
   const debeRedirigir = userData?.rol && userData.rol !== 'alumno';
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const params = new URLSearchParams(window.location.search);
+    const stripeResult = params.get('stripe');
+    if (stripeResult === 'success') {
+      success('Pago recibido. Tu estado se actualizará en breve.');
+    } else if (stripeResult === 'subscription_success') {
+      success('Suscripción activada correctamente.');
+    } else if (stripeResult === 'cancel' || stripeResult === 'subscription_cancel') {
+      showError('El pago en línea fue cancelado.');
+    }
+    if (stripeResult) {
+      window.history.replaceState({}, '', '/pagos');
+    }
+  }, [success, showError]);
 
   useEffect(() => {
     const loadData = async () => {
@@ -73,6 +98,40 @@ const Pagos = () => {
 
     loadData();
   }, [currentUser, showError]);
+
+  const handlePagarConStripe = async (pago) => {
+    if (!pago?.id) {
+      showError('Guarda el pago antes de pagar en línea');
+      return;
+    }
+    setStripeLoadingId(pago.id);
+    try {
+      await redirectToAlumnoCheckout(pago.id);
+    } catch (err) {
+      showError(err.message || 'Error al iniciar el pago');
+      setStripeLoadingId(null);
+    }
+  };
+
+  const handleActivarSuscripcion = async () => {
+    setSubscriptionLoading(true);
+    try {
+      await redirectToSubscriptionCheckout();
+    } catch (err) {
+      showError(err.message || 'No se pudo activar la suscripción');
+      setSubscriptionLoading(false);
+    }
+  };
+
+  const handlePortalSuscripcion = async () => {
+    setSubscriptionLoading(true);
+    try {
+      await redirectToCustomerPortal();
+    } catch (err) {
+      showError(err.message || 'No se pudo abrir el portal');
+      setSubscriptionLoading(false);
+    }
+  };
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -276,9 +335,40 @@ const Pagos = () => {
           Pagos y Estado de Cuenta
         </h1>
         <p className="mt-2 text-gray-600 dark:text-gray-400">
-          Consulta tus pagos, sube comprobantes y revisa tu estado de cuenta
+          {stripeCheckoutEnabled
+            ? 'Consulta tus pagos, paga con tarjeta o sube comprobantes'
+            : 'Consulta tus pagos y sube comprobantes'}
         </p>
       </div>
+
+      {stripeCheckoutEnabled && (
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-5 border border-blue/20">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+            Colegiatura automática
+          </h2>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+            Activa el cobro mensual con tarjeta. También puedes pagar cada colegiatura de forma individual.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-2">
+            <button
+              type="button"
+              onClick={handleActivarSuscripcion}
+              disabled={subscriptionLoading}
+              className="min-h-[44px] flex-1 px-4 py-2 rounded-lg bg-green text-white font-semibold text-sm disabled:opacity-60"
+            >
+              {subscriptionLoading ? 'Cargando…' : 'Activar suscripción mensual'}
+            </button>
+            <button
+              type="button"
+              onClick={handlePortalSuscripcion}
+              disabled={subscriptionLoading}
+              className="min-h-[44px] flex-1 px-4 py-2 rounded-lg border border-blue text-blue font-medium text-sm disabled:opacity-60"
+            >
+              Administrar suscripción
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Estado de Cuenta - Resumen Principal */}
       {pagosPendientesDetalle.length > 0 && (
@@ -407,15 +497,13 @@ const Pagos = () => {
                       </p>
                     </div>
                     
-                    {!pago.comprobanteUrl && (
-                      <button
-                        onClick={() => abrirModalComprobante(pago)}
-                        className="mt-3 w-full inline-flex items-center justify-center px-4 py-2 bg-red text-white rounded-lg hover:bg-red/90 transition-colors font-semibold text-sm"
-                      >
-                        <DocumentArrowUpIcon className="w-4 h-4 mr-2" />
-                        Subir Comprobante
-                      </button>
-                    )}
+                    <PagoStripeActions
+                      pago={pago}
+                      stripeLoadingId={stripeLoadingId}
+                      onPagarStripe={handlePagarConStripe}
+                      onSubirComprobante={abrirModalComprobante}
+                      primaryClass="bg-red"
+                    />
                   </div>
                 </div>
               );
@@ -564,15 +652,12 @@ const Pagos = () => {
                       </p>
                     </div>
                     
-                    {!proximoPagoInmediato.comprobanteUrl && (
-                      <button
-                        onClick={() => abrirModalComprobante(proximoPagoInmediato)}
-                        className="mt-3 w-full inline-flex items-center justify-center px-4 py-2 bg-blue text-white rounded-lg hover:bg-blue/90 transition-colors font-semibold text-sm"
-                      >
-                        <DocumentArrowUpIcon className="w-4 h-4 mr-2" />
-                        Subir Comprobante
-                      </button>
-                    )}
+                    <PagoStripeActions
+                      pago={proximoPagoInmediato}
+                      stripeLoadingId={stripeLoadingId}
+                      onPagarStripe={handlePagarConStripe}
+                      onSubirComprobante={abrirModalComprobante}
+                    />
                   </div>
                 </div>
               );
@@ -659,14 +744,13 @@ const Pagos = () => {
                         </p>
                       </div>
                       
-                      {!pago.comprobanteUrl && (
-                        <button
-                          onClick={() => abrirModalComprobante(pago)}
-                          className="mt-3 w-full inline-flex items-center justify-center px-4 py-2 bg-blue text-white rounded-lg hover:bg-blue/90 transition-colors font-semibold text-sm"
-                        >
-                          <DocumentArrowUpIcon className="w-4 h-4 mr-2" />
-                          Subir Comprobante
-                        </button>
+                      {(pago.estado === 'Pendiente' || pago.estado === 'Vencido') && (
+                        <PagoStripeActions
+                          pago={pago}
+                          stripeLoadingId={stripeLoadingId}
+                          onPagarStripe={handlePagarConStripe}
+                          onSubirComprobante={abrirModalComprobante}
+                        />
                       )}
                     </div>
                   </div>
@@ -856,14 +940,13 @@ const Pagos = () => {
                           Ver Comprobante
                         </a>
                       )}
-                      {(!pago.comprobanteUrl && (pago.estado === 'Pendiente' || pago.estado === 'Vencido')) && (
-                        <button
-                          onClick={() => abrirModalComprobante(pago)}
-                          className="w-full inline-flex items-center justify-center px-4 py-2 bg-blue text-white rounded-lg hover:bg-blue/90 transition-colors font-semibold text-sm"
-                        >
-                          <DocumentArrowUpIcon className="w-4 h-4 mr-2" />
-                          Subir Comprobante
-                        </button>
+                      {(pago.estado === 'Pendiente' || pago.estado === 'Vencido') && (
+                        <PagoStripeActions
+                          pago={pago}
+                          stripeLoadingId={stripeLoadingId}
+                          onPagarStripe={handlePagarConStripe}
+                          onSubirComprobante={abrirModalComprobante}
+                        />
                       )}
                     </div>
                   </div>

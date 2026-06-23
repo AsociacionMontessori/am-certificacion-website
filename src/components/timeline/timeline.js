@@ -103,9 +103,27 @@ const Timeline = () => {
         },
         {
             title: 'Aportaciones de la AMMAC a investigaciones educativas con motivo de la contingencia epidemiológica mundial por el COVID-19',
-            content: 'A raíz de la contingencia epidemiológica mundial, la AMMAC participa en una red de escuelas de diferentes partes del mundo para de manera conjunta realizar una investigación en torno a los procesos de aprendizaje en momentos de la crisis sanitaria, los recursos de adaptabilidad de las escuelas, el desarrollo de estrategias pedagógicas para el trabajo con niños a distancia y el registro y análisis de indicadores de afectación en el desarrollo educativo de los niños por las transformaciones a los modelos educativos y sus secuelas. En la Asociación Montessori de México nos enorgullece ser una asociación que construye y genera conocimiento, que día con día se posiciona en el mundo, mostrando que, desde México, desde la realidad latinoamericana contemporánea, hay mucho que aportar al desarrollo educativo internacional, que somos una asociación que se ha comprometido como agente activo en la educación humanista, a la vanguardia y de evolución constante. Y todo ello, no sería posible si no gracias a todos los que forman parte de esta gran comunidad, una comunidad global maravillosa que crece y se fortalece cada vez más.',
+            content: 'A raíz de la contingencia epidemiológica mundial, la AMMAC participa en una red de escuelas de diferentes partes del mundo para de manera conjunta realizar una investigación en torno a los procesos de aprendizaje en momentos de la crisis sanitaria, los recursos de adaptabilidad de las escuelas, el desarrollo de estrategias pedagógicas para el trabajo con niños a distancia y el registro y análisis de indicadores de afectación en el desarrollo educativo de los niños por las transformaciones a los modelos educativos y sus secuelas.',
             year: '2020',
             color: "red"
+        },
+        {
+            title: 'Alineación a estándares internacionales y fundamentos AMI',
+            content: 'El programa de formación se alinea por completo a los estándares internacionales oficiales y se hace compatible con los fundamentos AMI: aborda sus bases esenciales e incorpora contenidos complementarios nuevos que enriquecen la formación — observación, psicología educativa, neuroeducación, educación inclusiva, psicomotricidad, musicoterapia e inteligencia creativa — contextualizados a la realidad educativa de México.',
+            year: '2023',
+            color: "blue"
+        },
+        {
+            title: '60 años de la Asociación Montessori de México',
+            content: 'En 2025 la AMMAC cumple 60 años promoviendo la pedagogía y la filosofía Montessori en México: seis décadas de formación de guías, apertura de escuelas, investigación y comunidad educativa comprometida con una educación humanista e innovadora.',
+            year: '2025',
+            color: "red"
+        },
+        {
+            title: 'RVOE en trámite y validez oficial en México',
+            content: 'En 2026 estamos finalizando los trámites ante la autoridad educativa (RVOE) para ofrecer, además del reconocimiento internacional de nuestras certificaciones, validez oficial en México que respalde la formación de nuestras y nuestros egresados.',
+            year: '2026',
+            color: "blue"
         },
 
     ];

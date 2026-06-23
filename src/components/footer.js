@@ -24,8 +24,8 @@ export default function Footer() {
                 <div className="mx-1 md:mx-10  sm:py-0 md:py-2 lg:py-4 px-1 md:px-6 grid grid-cols-1 md:grid-cols-4 gap-1 md:gap-0">
                     <div className="lg:pl-16 pl-0 text-center md:text-left m-4 md:m-0">
                         <h3 className="text-lg font-semibold mb-2">Asociación</h3>
-                        <a target="_blank" className="hover:underline decoration-red" href="/certificate">
-                            <p>Certificaciones</p>
+                        <a target="_blank" className="hover:underline decoration-red" href="/diplomados/#certificacion_internacional">
+                            <p>Diplomados</p>
                         </a>
                         <a target="_blank" className="hover:underline decoration-red" href="/#sobrenosotros">
                             <p>Sobre nosotros</p>
@@ -46,6 +46,8 @@ export default function Footer() {
                     <div className="text-center md:text-left m-4 md:m-0">
                         <h3 className="text-lg font-semibold mb-2">Legal</h3>
                         <a className="hover:underline decoration-red" href="../privacy" target="_blank" rel="noopener noreferrer">Aviso de Privacidad</a>
+                        <br />
+                        <a className="hover:underline decoration-red" href="../reembolsos" target="_blank" rel="noopener noreferrer">Política de reembolsos</a>
                         <br />
                         <a className="hover:underline decoration-red" href="https://drive.google.com/file/d/1XaVbYjwltjMJjcjvCuqdhKIAFvxjecOJ/view" target="_blank" rel="noopener noreferrer">Constacia de Seguridad Estructural</a>
                         <br />

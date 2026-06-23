@@ -49,6 +49,13 @@ service firebase.storage {
       allow delete: if isAdmin();
     }
     
+    // Expediente de inscripción (sitio público)
+    match /expediente/{alumnoId}/{docType}/{archivo} {
+      allow read: if isAdmin() || isDirectivo() ||
+                     (request.auth != null && request.auth.uid == alumnoId);
+      allow write: if false;
+    }
+
     // Denegar acceso a todo lo demás
     match /{allPaths=**} {
       allow read, write: if false;

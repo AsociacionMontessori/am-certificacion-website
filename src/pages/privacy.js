@@ -47,7 +47,7 @@ const Privacy = () => (
                     Entidades pertenecientes a la Asociación Montessori de México A.C. (AMMAC): La información recopilada puede ser compartida con entidades pertenecientes a la AMMAC, con el fin de proporcionar servicios y mejorar la experiencia de usuario.
 
                     La Asociación Montessori solo comparte información con terceros en las siguientes circunstancias:
-                    Con nuestros proveedores de servicios: Podemos compartir la información con terceros que nos proporcionan servicios, como procesadores de pagos y proveedores de servicios de análisis.
+                    Con nuestros proveedores de servicios: Podemos compartir la información con terceros que nos proporcionan servicios, como procesadores de pagos (por ejemplo <strong>Stripe</strong>, para pagos en línea de inscripciones y publicaciones) y proveedores de servicios de análisis.
                     <p className="italic text-sm">
                         Nota: Todos los terceros con los que compartimos información están obligados a cumplir con las leyes de privacidad y seguridad de datos aplicables. No permitimos que nuestros proveedores de servicios utilicen su información personal para sus propios fines y solo permitimos que procesen su información personal para fines específicos y de acuerdo con nuestras instrucciones.
                     </p>

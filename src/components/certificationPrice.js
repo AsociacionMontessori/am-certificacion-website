@@ -4,6 +4,11 @@ import Card from "./cards/card"
 import CardInscription from "./cards/inscriptionCard"
 import CardCertification from "./cards/cardCertification"
 import axios from "axios"
+import ProgramCheckoutLink from "./checkout/ProgramCheckoutLink"
+import {
+    INSCRIPCION_MARKETING_COPY,
+    PROGRAMAS_OFERTA,
+} from "../data/programasOferta"
 
 const CertificationPrice = () => {
     const [state, setState] = useState({
@@ -40,8 +45,7 @@ const CertificationPrice = () => {
                     city: data.city,
                 }))
             })
-            .catch(error => {
-                console.error(error)
+            .catch(() => {
                 setState(prevState => ({
                     ...prevState,
                     countryCode: "MX",
@@ -54,58 +58,9 @@ const CertificationPrice = () => {
         getGeoInfo()
     }, [])
 
-    // Orden: Nido, Casa de Niños, Taller, Neuroeducación, Grandes Lecciones, Certificado (filas de 3 en pantallas anchas)
-    const prices = [
-        {
-            cardType: "monthly",
-            title: "Nido y Comunidad Infantil",
-            subtitle: "Certifícate como guía Montessori",
-            priceMx: "3,100",
-            priceUsd: "170",
-            text: "Colegiatura mensual",
-            duration: "16 meses",
-        },
-        {
-            cardType: "monthly",
-            title: "Casa de Niños",
-            subtitle: "Certifícate como guía Montessori",
-            priceMx: "3,500",
-            priceUsd: "195",
-            text: "Colegiatura mensual",
-            duration: "17 meses",
-        },
-        {
-            cardType: "monthly",
-            title: "Taller",
-            subtitle: "Certifícate como guía Montessori",
-            priceMx: "3,900",
-            priceUsd: "220",
-            text: "Colegiatura mensual",
-            duration: "20 meses",
-        },
-    ]
-
-    const neuroeducacion = {
-        cardType: "certification",
-        title: "Neuroeducación",
-        subtitle: "Diplomado en línea. A tu ritmo.",
-        priceMx: "4,500",
-        priceUsd: "250",
-        text: "",
-        time: "3 meses",
-        footer: null,
-    }
-
-    const grandesLecciones = {
-        cardType: "certification",
-        title: "Grandes Lecciones",
-        subtitle: "Curso en línea. Las cinco grandes lecciones Montessori para enriquecer tu práctica.",
-        priceMx: "2,800",
-        priceUsd: "155",
-        text: "",
-        time: "2 meses",
-        footer: "100% en línea",
-    }
+    const guias = PROGRAMAS_OFERTA.filter((p) => p.tipo === "guia")
+    const neuro = PROGRAMAS_OFERTA.find((p) => p.id === "neuro")
+    const cosmica = PROGRAMAS_OFERTA.find((p) => p.id === "cosmica")
 
     const certificado = {
         cardType: "certification",
@@ -115,117 +70,191 @@ const CertificationPrice = () => {
         priceUsd: "150",
         text: "",
         time: null,
+        paymentNote: "pago único",
         footer: "+ gastos de envío",
     }
 
-    const allCards = [...prices, neuroeducacion, grandesLecciones, certificado]
-
-    const inscripcion = [
+    const allCards = [
+        ...guias.map((p) => ({
+            cardType: "monthly",
+            programaId: p.id,
+            title: p.cardTitle,
+            subtitle: p.cardSubtitle,
+            priceMx: p.priceMx,
+            priceUsd: p.priceUsd,
+            text: "Colegiatura mensual",
+            duration: p.duration,
+            footnote: p.priceNote,
+        })),
         {
-            title: "Inscripción",
-            subtitle: "Da el primer paso. Después, colegiaturas mensuales según el programa que elijas.",
-            priceMx: "4,900",
-            priceUsd: "270",
-            text: "Monto inicial",
+            cardType: "certification",
+            programaId: neuro.id,
+            title: neuro.cardTitle,
+            subtitle: neuro.cardSubtitle,
+            priceMx: neuro.priceMx,
+            priceUsd: neuro.priceUsd,
+            text: "",
+            time: neuro.duration,
+            paymentNote: neuro.paymentNote,
+            footer: neuro.promoInscripcionIncluida
+                ? "Inscripción incluida (promoción)"
+                : `Inscripción aparte (${INSCRIPCION_MARKETING_COPY.textoMonto})`,
         },
+        {
+            cardType: "certification",
+            programaId: cosmica.id,
+            title: cosmica.cardTitle,
+            subtitle: cosmica.cardSubtitle,
+            priceMx: cosmica.priceMx,
+            priceUsd: cosmica.priceUsd,
+            text: "",
+            time: cosmica.duration,
+            paymentNote: cosmica.paymentNote,
+            footer: `Inscripción aparte (${INSCRIPCION_MARKETING_COPY.textoMonto})`,
+        },
+        { ...certificado, programaId: null },
     ]
+
+    const inscripcion = {
+        title: INSCRIPCION_MARKETING_COPY.titulo,
+        subtitle: INSCRIPCION_MARKETING_COPY.subtitulo,
+        priceMx: PROGRAMAS_OFERTA.find((p) => p.id === "inscripcion").priceMx,
+        priceUsd: PROGRAMAS_OFERTA.find((p) => p.id === "inscripcion").priceUsd,
+        text: INSCRIPCION_MARKETING_COPY.textoMonto,
+        badge: INSCRIPCION_MARKETING_COPY.beneficio,
+    }
+
     return (
         <>
             <section
                 id="certificacion_internacional"
-                className="relative py-5 z-10  bg-gradient-to-r from-blue to-green"
+                className="relative py-5 z-10 bg-gradient-to-r from-blue to-green"
             >
                 <h2 className="mx-auto max-w-7xl px-6 pb-10 pt-10 lg:px-12 xl:px-6 2xl:px-0">
                     <span className="text-white text-2xl md:text-6xl font-bold">
                         Certificación Montessori
                     </span>
                 </h2>
-                <div className="bg-white rounded-3xl">
-                    <div className="sm:flex sm:mx-auto max-w-7xl px-6 pb-10 pt-10 lg:px-12 xl:px-6 2xl:px-0">
-                        <div className="w-full md:2/4 w-3/4 md:relative md:block md:flex sm:flex-col ">
-                            <h3>
-                                <span className="text-red md:text-2xl text-xl selection:text-white selection:bg-red selection:bg-opacity-40">
-                                    Certificación internacional
-                                </span>
-                            </h3>
-                            <h2 className="mt-5">
-                                <span className="font-medium text-black md:text-6xl text-3xl selection:text-white selection:bg-red selection:bg-opacity-40">
-                                    Guía Montessori
-                                </span>
-                            </h2>
-                            <div className="w-full sm:w-3/4 sm:pt-10 md:pr-24 text-lg text-black selection:text-white selection:bg-red selection:bg-opacity-40">
-                                <p>
-                                    Ofrecemos programas de certificación con reconocimiento internacional, diseñados para proporcionar una sólida base en el método y la filosofía Montessori.
-                                    <br />
-                                    <br />
-                                    Ya sea que busques una introducción a Montessori o desees profundizar tu conocimiento y práctica, <a className="text-red" href="../diplomados/">tenemos el programa adecuado para ti.</a>
-                                    <br />
-                                    <br />
-                                    <br />
-                                    <span className="text-gray text-sm">Aplican términos y condiciones *</span>
+                <section
+                    id="prices"
+                    className="relative z-10 mb-10 px-4 sm:mx-auto max-w-7xl sm:px-6 lg:px-12 xl:px-6 2xl:px-0 mt-6 lg:mt-8"
+                >
+                    <div className="flex flex-col-reverse gap-8 lg:grid lg:grid-cols-[minmax(0,1fr)_auto] lg:gap-x-8 xl:gap-x-10 lg:items-start">
+                        <div className="min-w-0 space-y-8 lg:col-start-1">
+                            <div className="bg-white rounded-3xl px-6 py-8 sm:px-8 max-w-3xl">
+                                <h3>
+                                    <span className="text-red md:text-2xl text-xl">
+                                        Certificación internacional
+                                    </span>
+                                </h3>
+                                <h2 className="mt-5">
+                                    <span className="font-medium text-black md:text-6xl text-3xl">
+                                        Guía Montessori
+                                    </span>
+                                </h2>
+                                <p className="mt-6 text-base sm:text-lg text-black leading-relaxed">
+                                    Programas con reconocimiento internacional. Los precios de
+                                    programa (colegiatura o diplomado) son independientes de la
+                                    inscripción, que solo se paga una vez.
                                 </p>
                             </div>
-                        </div>
-                        <div className="pb-5 my-10 sm:my-0 max-h-128 outline outline-offset-2 outline-blue sm:outline-none sm:flex sm:flex-end items-center justify-center bg-white rounded-3xl sm:absolute sm:left-1/2 sm:translate-x-52 lg:translate-x-52 xl:translate-x-80 transform 2xl:translate-x-96 md:translate-y-[-5rem] lg:translate-y-[-4rem] md:h-[36rem] lg:h-[32rem]">
-                            {inscripcion.map((price, index) => {
-                                const { title, subtitle, text } = price;
-                                const { coin, priceToShow } = getLocalizedPrice(state, price);
-                                return (
-                                    <CardInscription
-                                        key={index}
-                                        title={title}
-                                        subtitle={subtitle}
-                                        coin={coin}
-                                        price={priceToShow}
-                                        text={text}
-                                    />
-                                );
-                            })}
-                        </div>
-                    </div>
-                </div>
-                <section id="prices" className="mt-24 mb-10 px-4 sm:mx-auto max-w-7xl px-6 lg:px-12 xl:px-6 2xl:px-0">
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 justify-items-center selection:bg-blue selection:text-black">
-                        {allCards.map((item, index) => {
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 gap-y-10 justify-items-center">
+                        {allCards.map((item) => {
                             const { coin, priceToShow } = getLocalizedPrice(state, item)
-                            const wrapperClass = "py-3 sm:pt-0 xl:m-10 lg:m-5 md:m-2 sm:m-1"
+                            const wrapperClass = "w-full flex justify-center"
+                            const cardKey = item.programaId || item.title
+
                             if (item.cardType === "certification") {
                                 return (
-                                    <div className={wrapperClass} key={index}>
-                                        <CardCertification
+                                    <div className={wrapperClass} key={cardKey}>
+                                        <ProgramCheckoutLink
+                                            programaId={item.programaId}
                                             title={item.title}
-                                            subtitle={item.subtitle}
-                                            coin={coin}
-                                            price={priceToShow}
-                                            text={item.text}
-                                            time={item.time}
-                                            footer={item.footer}
-                                        />
+                                            className="w-full max-w-[14rem]"
+                                            disabled={!item.programaId}
+                                        >
+                                            <CardCertification
+                                                title={item.title}
+                                                subtitle={item.subtitle}
+                                                coin={coin}
+                                                price={priceToShow}
+                                                text={item.text}
+                                                time={item.time}
+                                                footer={item.footer}
+                                                paymentNote={item.paymentNote}
+                                            />
+                                        </ProgramCheckoutLink>
                                     </div>
                                 )
                             }
                             return (
-                                <div className={wrapperClass} key={index}>
-                                    <Card
-                                        title={item.title}
-                                        subtitle={item.subtitle}
-                                        coin={coin}
-                                        price={priceToShow}
-                                        text={item.text}
-                                        time={item.duration}
-                                    />
+                                <div className={wrapperClass} key={cardKey}>
+                                    <div className="space-y-2 flex flex-col items-center w-full max-w-[14rem]">
+                                        <ProgramCheckoutLink
+                                            programaId={item.programaId}
+                                            title={item.title}
+                                            className="w-full"
+                                        >
+                                            <Card
+                                                title={item.title}
+                                                subtitle={item.subtitle}
+                                                coin={coin}
+                                                price={priceToShow}
+                                                text={item.text}
+                                                time={item.duration}
+                                            />
+                                        </ProgramCheckoutLink>
+                                        {item.footnote && (
+                                            <p className="text-xs text-white/90 text-center max-w-[14rem] leading-relaxed px-2">
+                                                {item.footnote}
+                                            </p>
+                                        )}
+                                    </div>
                                 </div>
                             )
                         })}
-                    </div>
-                    <div className="mt-10 mx-auto max-w-3xl rounded-2xl border-2 border-white/40 bg-white/10 px-6 py-5 backdrop-blur-sm">
+                            </div>
+
+                            <div className="mx-auto max-w-3xl rounded-2xl border-2 border-white/40 bg-white/10 px-6 py-5 backdrop-blur-sm">
                         <p className="text-center text-white text-sm leading-relaxed md:text-base">
-                            <span className="font-semibold">¿Vas por más de un nivel?</span> Si ya cursaste Nido y Comunidad Infantil o Casa de Niños, puedes revalidar el tronco común: el siguiente diplomado se reduce aproximadamente 11 meses (por ejemplo, Casa de Niños pasa de 17 a 6 meses). Además, no volvemos a cobrarte inscripción cuando ya terminaste un nivel con nosotros.
+                            <span className="font-semibold">¿Vas por más de un nivel?</span> Si ya
+                            cursaste Nido y Comunidad Infantil o Casa de Niños, puedes revalidar el
+                            tronco común: el siguiente diplomado se reduce aproximadamente 11 meses.
+                            Además,{" "}
+                            <span className="font-semibold">
+                                no volvemos a cobrarte inscripción
+                            </span>{" "}
+                            cuando ya terminaste un nivel con nosotros o si tomas otro programa
+                            después.
                         </p>
+                            </div>
+                            <p className="text-white md:text-sm text-xs text-center sm:text-left">
+                                Precios sujetos a disponibilidad. Aplican Términos y Condiciones.
+                            </p>
+                        </div>
+
+                        <div className="flex justify-center lg:col-start-2 lg:row-start-1 lg:justify-end lg:sticky lg:top-24 z-20 shrink-0">
+                            <div className="w-full max-w-sm shadow-2xl rounded-3xl ring-2 ring-white/50 lg:w-72 xl:w-80">
+                                {(() => {
+                                    const { coin, priceToShow } = getLocalizedPrice(
+                                        state,
+                                        inscripcion
+                                    )
+                                    return (
+                                        <CardInscription
+                                            title={inscripcion.title}
+                                            subtitle={inscripcion.subtitle}
+                                            coin={coin}
+                                            price={priceToShow}
+                                            text={inscripcion.text}
+                                            badge={inscripcion.badge}
+                                        />
+                                    )
+                                })()}
+                            </div>
+                        </div>
                     </div>
-                    <p className="mt-6 text-white md:text-sm text-xs md:text-left xl:ml-12 lg:ml-10 md:ml-6 sm:ml-2">
-                        Precios sujetos a disponibilidad. Aplican Términos y Condiciones.
-                    </p>
                 </section>
             </section>
         </>

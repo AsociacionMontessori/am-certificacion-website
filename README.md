@@ -1,10 +1,10 @@
 # 🏫 Sitio Web de Certificaciones Montessori
 
-Sitio web oficial de la **Asociación Montessori de México A.C.** para la promoción y gestión de certificaciones, diplomados y masterclasses en el método Montessori con validez internacional.
+Sitio web oficial de la **Asociación Montessori de México A.C.** para la promoción y gestión de diplomados, certificaciones y publicaciones Montessori con validez internacional.
 
 ## 📋 Descripción
 
-Esta plataforma web está diseñada para facilitar el acceso a información sobre certificaciones Montessori, diplomados y programas educativos. El sitio ofrece una experiencia de usuario moderna, responsive y accesible, permitiendo a los usuarios explorar cursos, consultar precios, encontrar escuelas certificadas y acceder a masterclasses.
+Esta plataforma web está diseñada para facilitar el acceso a información sobre diplomados Montessori, certificaciones y programas educativos. El sitio ofrece una experiencia de usuario moderna, responsive y accesible, permitiendo a los usuarios explorar cursos, consultar precios, encontrar escuelas certificadas y acceder a publicaciones.
 
 ## ✨ Características Principales
 
@@ -13,10 +13,6 @@ Esta plataforma web está diseñada para facilitar el acceso a información sobr
 - **Diplomados Guía Montessori**: Programas completos de formación en el método Montessori
 - **Precios y Planes**: Información transparente sobre costos y opciones de pago
 - **Becas y Ayudas**: Información sobre programas de becas disponibles
-
-### 📚 Masterclasses
-- **Catálogo de Masterclasses**: Acceso a clases magistrales de referentes en el método Montessori
-- **Grabaciones Disponibles**: Acceso 24/7 a contenido grabado
 
 ### 🔍 Buscador de Escuelas
 - **Búsqueda por Ubicación**: Encuentra escuelas Montessori certificadas por región
@@ -78,9 +74,9 @@ certificacionMontessori/
 │   │   └── ...
 │   ├── pages/              # Páginas del sitio
 │   │   ├── index.js        # Página principal
-│   │   ├── certificate.js  # Certificaciones
+│   │   ├── certificate.js  # Redirección legacy a diplomados
 │   │   ├── diplomados.js   # Diplomados
-│   │   ├── masterclasses.js # Masterclasses
+│   │   ├── masterclasses.js # Redirección legacy a diplomados
 │   │   ├── buscador.js     # Buscador de escuelas
 │   │   └── ...
 │   ├── images/             # Imágenes y assets
@@ -167,13 +163,13 @@ El sitio utiliza los colores institucionales de Montessori:
 ## 📱 Páginas Principales
 
 1. **Inicio** (`/`) - Landing page con información general
-2. **Certificaciones** (`/certificate`) - Información sobre certificaciones
-3. **Diplomados** (`/diplomados`) - Programas de diplomados
-4. **Masterclasses** (`/masterclasses`) - Catálogo de masterclasses
-5. **Buscador** (`/buscador`) - Buscador de escuelas certificadas
-6. **Contacto** (`/contact`) - Información de contacto
-7. **Publicaciones** (`/publicaciones`) - Publicaciones y recursos
-8. **Aviso de Privacidad** (`/privacy`) - Política de privacidad
+2. **Diplomados** (`/diplomados`) - Programas, precios y certificación internacional
+3. **Buscador** (`/buscador`) - Buscador de escuelas certificadas
+4. **Contacto** (`/contact`) - Información de contacto
+5. **Publicaciones** (`/publicaciones`) - Publicaciones y recursos
+6. **Aviso de Privacidad** (`/privacy`) - Política de privacidad
+
+Rutas legacy: `/certificate` redirige a `/diplomados/#certificacion_internacional` y `/masterclasses` redirige a `/diplomados`.
 
 ## 🔧 Configuración de Desarrollo
 
