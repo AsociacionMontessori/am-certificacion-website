@@ -54,8 +54,8 @@ const PublicacionesPage = () => {
           title="Libros disponibles"
           description={
             <>
-              Elige el título que quieres recibir en casa o consulta la versión
-              disponible en Amazon México.
+              Compra el ebook al instante o consigue la edición impresa en
+              Amazon México.
             </>
           }
           className="pt-4"

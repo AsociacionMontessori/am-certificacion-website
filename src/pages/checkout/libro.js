@@ -30,12 +30,11 @@ const LibroCheckoutPage = () => {
 
   const bundle = roxanaBookBundles.find((b) => b.stripeSku === sku)
   const isBundle = Boolean(bundle)
+  // Solo se venden ebooks/paquetes digitales por Stripe; la edición impresa
+  // se compra en Amazon. Un SKU físico no resuelve aquí (cae en "no encontrado").
   const book = isBundle
     ? bundleToBook(bundle)
-    : roxanaBooks.find(
-        (b) => !b.gift && (b.stripeSku === sku || b.digital?.stripeSku === sku)
-      )
-  const isDigital = isBundle || Boolean(book?.digital?.stripeSku === sku)
+    : roxanaBooks.find((b) => b.digital?.stripeSku === sku && b.digital?.priceMx)
 
   if (!book) {
     return (
@@ -58,16 +57,14 @@ const LibroCheckoutPage = () => {
       title={
         isBundle
           ? "Comprar paquete digital"
-          : isDigital
-            ? `Comprar ebook · Libro ${book.volume}`
-            : `Comprar impreso · Libro ${book.volume}`
+          : `Comprar ebook · Libro ${book.volume}`
       }
       description={book.title}
       backTo="/publicaciones"
     >
       <BookCheckoutForm
         book={book}
-        purchase={isDigital ? "digital" : "physical"}
+        purchase="digital"
         cancelHref="/publicaciones"
       />
     </CheckoutPageShell>

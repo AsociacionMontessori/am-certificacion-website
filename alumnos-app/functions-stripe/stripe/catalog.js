@@ -9,6 +9,7 @@ const priceEbook1 = defineString("STRIPE_PRICE_EBOOK_1", {default: ""});
 const priceEbook2 = defineString("STRIPE_PRICE_EBOOK_2", {default: ""});
 const priceEbook3 = defineString("STRIPE_PRICE_EBOOK_3", {default: ""});
 const priceEbook4 = defineString("STRIPE_PRICE_EBOOK_4", {default: ""});
+const priceEbook5 = defineString("STRIPE_PRICE_EBOOK_5", {default: ""});
 const priceEbookPack4 = defineString("STRIPE_PRICE_EBOOK_PACK_4", {default: ""});
 const priceEbookPackCosmica = defineString("STRIPE_PRICE_EBOOK_PACK_COSMICA", {default: ""});
 const priceColegiaturaNido = defineString("STRIPE_PRICE_COLEGIATURA_NIDO", {default: ""});
@@ -72,6 +73,7 @@ const CATALOG_META = {
   ebook_ammac_2: {tipo: "ebook", descripcion: "Ebook 2 - Secreto de la infancia", requiresShipping: false, amountMxn: 213},
   ebook_ammac_3: {tipo: "ebook", descripcion: "Ebook 3 - Educación cósmica", requiresShipping: false, amountMxn: 317},
   ebook_ammac_4: {tipo: "ebook", descripcion: "Ebook 4 - Guiones cósmicos", requiresShipping: false, amountMxn: 317},
+  ebook_ammac_5: {tipo: "ebook", descripcion: "Ebook 5 - La mente absorbente", requiresShipping: false, amountMxn: 213},
   ebook_pack_ammac_4: {tipo: "ebook", descripcion: "Paquete digital - 4 ebooks Roxana Muñoz", requiresShipping: false, amountMxn: 839},
   ebook_pack_cosmica_2: {tipo: "ebook", descripcion: "Paquete Cósmico - Educación Cósmica + Guiones Cósmicos", requiresShipping: false, amountMxn: 400},
   colegiatura_nido: {tipo: "colegiatura", descripcion: "Colegiatura mensual - Nido", requiresShipping: false, amountMxn: 3100},
@@ -90,6 +92,7 @@ const PARAM_PRICE_MAP = {
   ebook_ammac_2: priceEbook2,
   ebook_ammac_3: priceEbook3,
   ebook_ammac_4: priceEbook4,
+  ebook_ammac_5: priceEbook5,
   ebook_pack_ammac_4: priceEbookPack4,
   ebook_pack_cosmica_2: priceEbookPackCosmica,
   colegiatura_nido: priceColegiaturaNido,
