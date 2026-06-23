@@ -81,6 +81,9 @@ function Seo({
             postalCode
             addressCountry
             sameAs
+            foundingDate
+            slogan
+            areaServedCountries
           }
         }
       }
@@ -97,6 +100,13 @@ function Seo({
   const fullTitle = defaultTitle ? `${title} | ${defaultTitle}` : title
   const shouldIndex = !robots.includes("noindex")
 
+  const areaServed = [
+    { "@type": "Country", name: "México" },
+    ...(metadata?.areaServedCountries || [])
+      .filter(country => country && country !== "México")
+      .map(country => ({ "@type": "Country", name: country })),
+  ]
+
   const organizationSchema = {
     "@context": "https://schema.org",
     "@type": "EducationalOrganization",
@@ -104,10 +114,28 @@ function Seo({
     legalName: metadata?.legalName || metadata?.organizationName || defaultTitle,
     url: siteUrl,
     description: metadata?.description,
+    slogan: metadata?.slogan,
+    foundingDate: metadata?.foundingDate,
     email: metadata?.email,
     telephone: metadata?.telephone,
     logo: imageUrl,
     sameAs: metadata?.sameAs || [],
+    areaServed,
+    knowsLanguage: ["es", "en"],
+    knowsAbout: [
+      "Método Montessori",
+      "Formación de Guías Montessori",
+      "Certificación Montessori internacional",
+      "Pedagogía científica de María Montessori",
+      "Estándares internacionales AMI",
+    ],
+    hasCredential: {
+      "@type": "EducationalOccupationalCredential",
+      name: "Certificación Montessori con validez internacional",
+      credentialCategory: "certification",
+      description:
+        "Certificación profesional para Guías Montessori con reconocimiento internacional, alineada a los estándares internacionales y a los fundamentos AMI.",
+    },
     contactPoint: [
       {
         "@type": "ContactPoint",
