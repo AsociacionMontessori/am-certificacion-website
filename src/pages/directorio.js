@@ -38,6 +38,9 @@ const Directorio = () => {
     })
   }, [schools, query, country, soloAmmac])
 
+  const LIMIT = 120
+  const visibles = filtered.slice(0, LIMIT)
+
   return (
     <Layout>
       <Nav textColor="text-white" />
@@ -84,7 +87,11 @@ const Directorio = () => {
 
           {/* Resultados */}
           <div className="mt-6 text-white/80 text-sm">
-            {loading ? 'Cargando escuelas…' : `${filtered.length} escuela(s) encontradas`}
+            {loading
+              ? 'Cargando escuelas…'
+              : filtered.length > LIMIT
+                ? `${filtered.length} escuelas encontradas — mostrando las primeras ${LIMIT}. Afina con el buscador o el filtro de país.`
+                : `${filtered.length} escuela(s) encontradas`}
           </div>
 
           {error && (
@@ -92,7 +99,7 @@ const Directorio = () => {
           )}
 
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 mt-6">
-            {filtered.map((s, i) => {
+            {visibles.map((s, i) => {
               const Card = s.website ? 'a' : 'div'
               const props = s.website ? { href: s.website, target: '_blank', rel: 'noreferrer' } : {}
               return (

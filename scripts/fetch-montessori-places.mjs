@@ -24,7 +24,7 @@ const DRY_RUN = process.env.DRY_RUN === "1";
 // Tope duro de llamadas por corrida (evita sorpresas en el recibo). Una corrida
 // completa usa ~82. Override con MAX_CALLS=n. La cuota diaria en Google Cloud es
 // el candado real; esto es un seguro adicional del lado del script.
-const MAX_CALLS = Number(process.env.MAX_CALLS || 250);
+const MAX_CALLS = Number(process.env.MAX_CALLS || 500);
 
 // Zonas a consultar. Cada entrada es una búsqueda de texto.
 const MEXICO = [
@@ -37,14 +37,46 @@ const MEXICO = [
   "Durango", "Zacatecas", "Campeche", "Chetumal, Quintana Roo", "La Paz, Baja California Sur",
   "Tlaxcala", "Acapulco, Guerrero",
 ];
-const INTERNACIONAL = [
-  "Bogotá, Colombia", "Medellín, Colombia", "San Juan, Puerto Rico",
-  "Madrid, España", "Barcelona, España", "San José, Costa Rica",
-  "Miami, Estados Unidos", "Los Ángeles, Estados Unidos", "Houston, Estados Unidos",
-  "Tel Aviv, Israel", "Jerusalén, Israel", "Zúrich, Suiza", "Ginebra, Suiza",
-  "Nueva Delhi, India", "Bombay, India",
+// Latinoamérica — foco principal (audiencia hispanohablante de la AMMAC).
+const LATAM = [
+  "Bogotá, Colombia", "Medellín, Colombia", "Cali, Colombia", "Barranquilla, Colombia",
+  "Buenos Aires, Argentina", "Córdoba, Argentina", "Rosario, Argentina", "Mendoza, Argentina",
+  "Santiago, Chile", "Valparaíso, Chile", "Concepción, Chile",
+  "Lima, Perú", "Arequipa, Perú",
+  "Quito, Ecuador", "Guayaquil, Ecuador", "Cuenca, Ecuador",
+  "Montevideo, Uruguay", "Asunción, Paraguay",
+  "La Paz, Bolivia", "Santa Cruz de la Sierra, Bolivia", "Cochabamba, Bolivia",
+  "Caracas, Venezuela", "Maracaibo, Venezuela",
+  "Ciudad de Panamá, Panamá", "Ciudad de Guatemala, Guatemala",
+  "San Salvador, El Salvador", "Tegucigalpa, Honduras", "San Pedro Sula, Honduras",
+  "Managua, Nicaragua", "Santo Domingo, República Dominicana", "Santiago de los Caballeros, República Dominicana",
+  "San José, Costa Rica", "San Juan, Puerto Rico",
 ];
-const REGIONS = [...MEXICO, ...INTERNACIONAL];
+// Europa, Norteamérica y otros hubs Montessori.
+const RESTO_MUNDO = [
+  "Madrid, España", "Barcelona, España", "Valencia, España", "Sevilla, España",
+  "Miami, Estados Unidos", "Los Ángeles, Estados Unidos", "Houston, Estados Unidos",
+  "Nueva York, Estados Unidos", "Chicago, Estados Unidos",
+  "Toronto, Canadá", "Vancouver, Canadá",
+  "Roma, Italia", "Milán, Italia", "Londres, Reino Unido", "Dublín, Irlanda",
+  "París, Francia", "Berlín, Alemania", "Múnich, Alemania", "Ámsterdam, Países Bajos",
+  "Lisboa, Portugal", "Bruselas, Bélgica", "Viena, Austria",
+  "Zúrich, Suiza", "Ginebra, Suiza", "Tel Aviv, Israel", "Jerusalén, Israel",
+  "Nueva Delhi, India", "Bombay, India",
+  "Sídney, Australia", "Melbourne, Australia", "Auckland, Nueva Zelanda", "Manila, Filipinas",
+];
+const REGIONS = [...MEXICO, ...LATAM, ...RESTO_MUNDO];
+
+// Países que mostramos en el directorio (nombre en español, como los devuelve
+// Places con languageCode=es). Filtra resultados transfronterizos sueltos.
+const TARGET_COUNTRIES = new Set([
+  "México", "Colombia", "Argentina", "Chile", "Perú", "Ecuador", "Uruguay",
+  "Paraguay", "Bolivia", "Venezuela", "Panamá", "Guatemala", "El Salvador",
+  "Honduras", "Nicaragua", "República Dominicana", "Costa Rica", "Puerto Rico",
+  "España", "Estados Unidos", "Canadá", "Italia", "Reino Unido", "Irlanda",
+  "Francia", "Alemania", "Países Bajos", "Portugal", "Bélgica", "Austria",
+  "Suiza", "Israel", "India", "Australia", "Nueva Zelanda", "Filipinas",
+]);
 
 const FIELD_MASK = [
   "places.id", "places.displayName", "places.formattedAddress",
@@ -137,7 +169,9 @@ async function main() {
     process.stdout.write(`  ${region}: ${(byKey.size)} acumuladas\r`);
   }
 
-  const schools = [...byKey.values()].sort(
+  const schools = [...byKey.values()]
+    .filter((s) => TARGET_COUNTRIES.has(s.country))
+    .sort(
     (a, b) => Number(b.ammacCertified) - Number(a.ammacCertified)
       || (a.country || "").localeCompare(b.country || "")
       || (a.state || "").localeCompare(b.state || "")
