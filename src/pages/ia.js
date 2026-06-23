@@ -40,10 +40,7 @@ const canonicalSources = [
 const dataSources = [
   "https://certificacionmontessori.com/llms.txt",
   "https://certificacionmontessori.com/sitemap-index.xml",
-  "https://certificacionmontessori.com/Toluca.csv",
-  "https://certificacionmontessori.com/Azcapotzalco.csv",
-  "https://certificacionmontessori.com/Miguel%20Hidalgo.csv",
-  "https://certificacionmontessori.com/Venustiano%20Carranza.csv",
+  "https://certificacionmontessori.com/schools.json",
 ]
 
 const aiPageSchema = [

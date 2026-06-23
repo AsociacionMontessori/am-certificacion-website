@@ -26,11 +26,8 @@ La AMMAC fue fundada en 1965 y, aunque tiene su sede en la Ciudad de México, NO
 
 - Sitemap: https://certificacionmontessori.com/sitemap-index.xml
 - Índice IA: https://certificacionmontessori.com/ia/
-- Datos públicos del buscador de escuelas:
-  - https://certificacionmontessori.com/Toluca.csv
-  - https://certificacionmontessori.com/Azcapotzalco.csv
-  - https://certificacionmontessori.com/Miguel%20Hidalgo.csv
-  - https://certificacionmontessori.com/Venustiano%20Carranza.csv
+- Directorio público de escuelas Montessori (México e internacional), en JSON; incluye distintivo de certificación AMMAC:
+  - https://certificacionmontessori.com/schools.json
 
 ## Reconocimiento internacional
 

@@ -2,204 +2,144 @@ import '../styles/global.css'
 import Layout from "../components/layout"
 import Seo from "../components/seo"
 import Nav from "../components/nav"
-import InputSearch from '../components/buttons/InputSearch'
-import React, { useEffect, useState } from 'react';
-import { csv } from 'd3-fetch';
-import { StaticImage } from 'gatsby-plugin-image';
+import React, { useEffect, useMemo, useState } from 'react'
 
+const TODOS = 'Todos'
 
 const Buscador = () => {
-    const [activeData, setActiveData] = useState([]);
-    const [loading, setLoading] = useState(false);
+  const [schools, setSchools] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(false)
+  const [query, setQuery] = useState('')
+  const [country, setCountry] = useState(TODOS)
+  const [soloAmmac, setSoloAmmac] = useState(false)
 
-    const [data, setData] = useState([]);
+  useEffect(() => {
+    fetch('/schools.json')
+      .then(r => { if (!r.ok) throw new Error('fetch'); return r.json() })
+      .then(d => setSchools(Array.isArray(d.schools) ? d.schools : []))
+      .catch(() => setError(true))
+      .finally(() => setLoading(false))
+  }, [])
 
-    const estados = [
-        {
-            id: 1,
-            estado: "Toluca",
-            nombreEstado: "Toluca"
-        },
-        { id: 2, estado: "Azc", nombreEstado: "Azcapotzalco" },
-        { id: 3, estado: "MH", nombreEstado: "Miguel Hidalgo" },
-        { id: 4, estado: "VC", nombreEstado: "Venustiano Carranza" }
-    ];
+  const countries = useMemo(() => {
+    const set = new Set(schools.map(s => s.country).filter(Boolean))
+    return [TODOS, ...[...set].sort((a, b) => a.localeCompare(b))]
+  }, [schools])
 
-    const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase()
+    return schools.filter(s => {
+      if (country !== TODOS && s.country !== country) return false
+      if (soloAmmac && !s.ammacCertified) return false
+      if (!q) return true
+      return [s.name, s.address, s.city, s.state, s.country]
+        .filter(Boolean).join(' ').toLowerCase().includes(q)
+    })
+  }, [schools, query, country, soloAmmac])
 
-    const changeActive = async (param) => {
-        setLoading(true);
-        // wait for 1/2 second
-        await wait(500); // Espera 500 milisegundos (medio segundo)
+  const ammacCount = useMemo(() => schools.filter(s => s.ammacCertified).length, [schools])
 
+  return (
+    <Layout>
+      <Nav textColor="text-white" />
+      <main className="bg-gradient-to-r from-blue via-purple to-green min-h-screen">
+        <div className="max-w-screen-xl px-6 md:px-20 pb-16 mx-auto pt-28 md:pt-36">
+          <div className="text-white max-w-3xl">
+            <p className="text-sm uppercase tracking-[0.2em] text-green-200">Directorio Montessori</p>
+            <h1 className="text-3xl md:text-5xl font-bold mt-3">Buscador de Escuelas Montessori</h1>
+            <p className="text-lg md:text-xl pt-4 text-white/90">
+              Encuentra escuelas Montessori en México y el resto del mundo. Las marcadas con el
+              distintivo <span className="font-semibold text-green-200">★ Certificación AMMAC</span> cuentan
+              con el aval de la Asociación Montessori de México A.C.
+            </p>
+          </div>
 
+          {/* Controles */}
+          <div className="mt-8 flex flex-col gap-4">
+            <input
+              type="search"
+              value={query}
+              onChange={e => setQuery(e.target.value)}
+              placeholder="Buscar por nombre, ciudad o estado…"
+              className="w-full md:w-2/3 rounded-full px-6 py-3 text-black placeholder-black/50 shadow-lg focus:outline-none focus:ring-2 focus:ring-green-300"
+              aria-label="Buscar escuela Montessori"
+            />
+            <div className="flex flex-wrap items-center gap-2">
+              {countries.map(c => (
+                <button
+                  key={c}
+                  onClick={() => setCountry(c)}
+                  className={`rounded-full px-5 py-1.5 text-sm font-medium transition ${
+                    country === c ? 'bg-white text-blue shadow' : 'bg-white/15 text-white hover:bg-white/25'
+                  }`}
+                >
+                  {c}
+                </button>
+              ))}
+              <label className="ml-2 flex items-center gap-2 text-sm text-white/90 cursor-pointer select-none">
+                <input type="checkbox" checked={soloAmmac} onChange={e => setSoloAmmac(e.target.checked)} className="accent-green-400" />
+                Solo certificadas AMMAC ({ammacCount})
+              </label>
+            </div>
+          </div>
 
-        try {
-            if (param === "Toluca") {
-                console.log('Fetching data...');
-                const ruta = '/Toluca.csv';
-                const result = await csv(ruta); // La ruta es relativa a la raíz del sitio
-                console.log('ruta', ruta);
-                console.log('Data fetched:', result);
-                setData(result);
-                setActiveData(result)
-            } else if (param === "Azc") {
-                console.log('Fetching data...');
-                const ruta = '/Azcapotzalco.csv';
-                const result = await csv(ruta); // La ruta es relativa a la raíz del sitio
-                console.log('ruta', ruta);
-                console.log('Data fetched:', result);
-                setData(result);
-                setActiveData(result)
-            } else if (param === "MH") {
-                console.log('Fetching data...');
-                const ruta = '/Miguel Hidalgo.csv';
-                const result = await csv(ruta); // La ruta es relativa a la raíz del sitio
-                console.log('ruta', ruta);
-                console.log('Data fetched:', result);
-                setData(result);
-                setActiveData(result)
-            } else if (param === "VC") {
-                console.log('Fetching data...');
-                const ruta = '/Venustiano Carranza.csv';
-                const result = await csv(ruta); // La ruta es relativa a la raíz del sitio
-                console.log('ruta', ruta);
-                console.log('Data fetched:', result);
-                setData(result);
-                setActiveData(result)
-            }
-        } catch (error) {
+          {/* Resultados */}
+          <div className="mt-6 text-white/80 text-sm">
+            {loading ? 'Cargando escuelas…' : `${filtered.length} escuela(s) encontradas`}
+          </div>
 
-        } finally {
-            setLoading(false);
-        }
+          {error && (
+            <p className="mt-10 text-white">No se pudo cargar el directorio. Intenta de nuevo más tarde.</p>
+          )}
 
-    };
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 mt-6">
+            {filtered.map((s, i) => {
+              const Card = s.website ? 'a' : 'div'
+              const props = s.website ? { href: s.website, target: '_blank', rel: 'noreferrer' } : {}
+              return (
+                <Card
+                  key={s.placeId || `${s.name}-${i}`}
+                  {...props}
+                  className={`flex flex-col gap-2 rounded-2xl p-5 text-white backdrop-blur-lg border ${
+                    s.ammacCertified
+                      ? 'bg-green/20 border-green-300 shadow-xl ring-1 ring-green-300/60'
+                      : 'bg-white/15 border-white/20 hover:bg-white/25'
+                  } transition`}
+                >
+                  {s.ammacCertified && (
+                    <span className="self-start rounded-full bg-green-400 text-blue-900 text-xs font-bold px-3 py-0.5">
+                      ★ Certificación AMMAC
+                    </span>
+                  )}
+                  <div className="font-semibold text-lg leading-tight">{s.name}</div>
+                  {s.address && <div className="text-sm text-white/85">{s.address}</div>}
+                  <div className="mt-auto pt-2 text-sm text-white/70">
+                    {[s.city, s.state, s.country].filter(Boolean).join(' · ')}
+                  </div>
+                  {s.phone && <div className="text-sm text-white/80">Tel: {s.phone}</div>}
+                </Card>
+              )
+            })}
+          </div>
 
-
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                console.log('Fetching data...');
-                const ruta = '/Toluca.csv';
-                const result = await csv(ruta); // La ruta es relativa a la raíz del sitio
-                console.log('ruta', ruta);
-                console.log('Data fetched:', result);
-                setData(result);
-                setActiveData(result)
-            } catch (error) {
-                console.error('Error fetching the CSV file:', error);
-            }
-        };
-
-        fetchData();
-    }, []);
-
-    return (
-        <Layout>
-
-            <Nav textColor="text-white" />
-            <main>
-                <div className="max-w-screen-xl px-10 md:px-20 pb-8 mx-auto my-0 md:my-20">
-                    <div className="text-white max-w-auto mx-auto mt-20 mb-10">
-                        <h2 className="text-2xl md:text-4xl xl:text-5xl font-bold ">
-                            Buscador de Escuelas Montessori
-                        </h2>
-                        <p className="text-lg md:text-xl pt-3">
-                            Encuentra la escuela Montessori más cercana a ti.
-                        </p>
-                        <div className='py-4'>
-                            <div className='relative group justify-left self-start'>
-                                {/* <input
-                                    className="text-left mt-3 sm:mt-0 btn btn-outline hover:text-white hover:bg-blue bg-gradient-to-r from-blue/50 hover:from-blue hover:bg-opacity-70 rounded-full px-10 mr-4 bg-green text-white bg-opacity-10 w-1/3 placeholder-teal-100"
-                                    placeholder='Buscar Escuela Montessori' /> */}
-
-                                <InputSearch
-                                
-                                    
-                                    searchDataAutomcomplete={[
-                                        ...estados.map((estado) => ({
-                                            key: estado.estado,
-                                            value: estado.nombreEstado,
-                                        }))
-                                    ]}
-                                    onSelect={(estado) => changeActive(estado)}
-
-                                />
-                                {/* <div className="absolute top-3 left-3 opacity-0 group-hover:opacity-100 transition duration-300 ease-in-out transistion-all">
-                                    <StaticImage className='w-6 h-6' src="../images/elements/decor2.png" alt="decoration" placeholder='none' />
-                                </div> */}
-                            </div>
-                        </div>
-                        <div className="flex flex-col md:flex-row gap-4">
-                            <button onClick={() => changeActive("Toluca")} className="group mt-3 sm:mt-0 btn btn-outline hover:text-white hover:bg-blue bg-gradient-to-r from-blue/50 hover:from-blue hover:bg-opacity-70 rounded-full px-10 mr-4 bg-green text-white bg-opacity-10 w-full md:w-auto">
-                                Toluca
-                                <div className="inline opacity-0 group-hover:opacity-100 transition duration-300 ease-in-out transistion-all">
-                                    <StaticImage className='w-6 h-6' src="../images/elements/decor2.png" alt="decoration" />
-                                </div>
-                            </button>
-                            <button onClick={() => changeActive("Azc")} className="group mt-3 sm:mt-0 btn btn-outline hover:text-white hover:bg-blue bg-gradient-to-r from-blue/50 hover:from-blue hover:bg-opacity-70 rounded-full px-10 bg-green text-white bg-opacity-10 w-full md:w-auto">
-                                Azcapotzalco
-                                <div className="inline opacity-0 group-hover:opacity-100 transition duration-300 ease-in-out transistion-all">
-                                    <StaticImage className='w-6 h-6' src="../images/elements/decor2.png" alt="decoration" />
-                                </div>
-                            </button>
-                            <button onClick={() => changeActive("MH")} className="group mt-3 sm:mt-0 btn btn-outline hover:text-white hover:bg-blue bg-gradient-to-r from-blue/50 hover:from-blue hover:bg-opacity-70 rounded-full px-10 bg-green text-white bg-opacity-10 w-full md:w-auto">
-                                Miguel Hidalgo
-                                <div className="inline opacity-0 group-hover:opacity-100 transition duration-300 ease-in-out transistion-all">
-                                    <StaticImage className='w-6 h-6' src="../images/elements/decor2.png" alt="decoration" />
-                                </div>
-                            </button>
-                            <button onClick={() => changeActive("VC")} className="group mt-3 sm:mt-0 btn btn-outline hover:text-white hover:bg-blue bg-gradient-to-r from-blue/50 hover:from-blue hover:bg-opacity-70 rounded-full px-10 bg-green text-white bg-opacity-10 w-full md:w-auto">
-                                Venustiano Carranza
-                                <div className="inline opacity-0 group-hover:opacity-100 transition duration-300 ease-in-out transistion-all">
-                                    <StaticImage className='w-6 h-6' src="../images/elements/decor2.png" alt="decoration" />
-                                </div>
-                            </button>
-                        </div>
-
-
-                    </div>
-
-
-                    <div class="flex flex-wrap gap-4 justify-center pt-20">
-                        {
-                            !loading && (
-                                <a href="https://kalpilli.com" target="_blank" aria-label="Kalpilli Montessori"
-                                    class="bg-white bg-opacity-20 flex flex-col gap-2 h-60 text-white rounded-xl shadow-md p-6 max-w-[340px] bg-gray-200 backdrop-filter backdrop-blur-lg border-2 border-white">
-                                    <div class="font-semibold text-lg">Kalpilli Montessori</div>
-                                    <div class="font-semibold text-md tracking-tight">Avenida Dos, N.º 48, Col. San Pedro de los Pinos, en la alcaldía Benito Juárez, en la Ciudad de México</div>
-                                    <div class="pt-10 font-normal">CERTIFICACIÓN AMMAC</div>
-                                </a>
-                            )
-                        }
-                        {activeData.map((item, index) => (
-                            <div key={index}
-                                class="flex flex-col gap-2 h-60 text-white rounded-xl shadow-md p-6 max-w-[340px] bg-gray-200 bg-opacity-30 backdrop-filter backdrop-blur-lg ">
-                                <div class="font-semibold text-lg">{item.name}</div>
-                                <div class="text-md font-light">{item.address}</div>
-                                {
-                                    item.phone != "campo no disponible" && <div class="font-normal">Teléfono: {item.phone}</div>
-                                }
-                            </div>
-
-                        ))}
-                    </div>
-
-                </div>
-            </main>
-        </Layout>
-    )
-
-
+          {!loading && !error && filtered.length === 0 && (
+            <p className="mt-10 text-white/90">
+              No hay escuelas que coincidan con tu búsqueda. Prueba con otra ciudad o quita los filtros.
+            </p>
+          )}
+        </div>
+      </main>
+    </Layout>
+  )
 }
 
 export const Head = () => (
-    <Seo
-        title="Buscador de Escuelas Montessori"
-        pathname="/buscador/"
-        description="Consulta el buscador público de escuelas Montessori y los recursos abiertos de la Asociación Montessori de México A.C."
-    />
+  <Seo
+    title="Buscador de Escuelas Montessori"
+    pathname="/buscador/"
+    description="Directorio público de escuelas Montessori en México y el mundo. Identifica las escuelas con certificación de la Asociación Montessori de México A.C. (AMMAC)."
+  />
 )
 
 export default Buscador
