@@ -21,6 +21,10 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const OUT = path.join(__dirname, "..", "static", "schools.json");
 const API_KEY = process.env.GOOGLE_PLACES_API_KEY;
 const DRY_RUN = process.env.DRY_RUN === "1";
+// Tope duro de llamadas por corrida (evita sorpresas en el recibo). Una corrida
+// completa usa ~82. Override con MAX_CALLS=n. La cuota diaria en Google Cloud es
+// el candado real; esto es un seguro adicional del lado del script.
+const MAX_CALLS = Number(process.env.MAX_CALLS || 250);
 
 // Zonas a consultar. Cada entrada es una búsqueda de texto.
 const MEXICO = [
@@ -93,10 +97,12 @@ async function main() {
     process.exit(1);
   }
 
-  let added = 0, calls = 0;
+  let added = 0, calls = 0, capped = false;
   for (const region of REGIONS) {
+    if (calls >= MAX_CALLS) { capped = true; break; }
     let token = null, page = 0;
     do {
+      if (calls >= MAX_CALLS) { capped = true; break; }
       const data = await searchText(region, token);
       calls++;
       for (const p of data.places || []) {
@@ -138,6 +144,7 @@ async function main() {
       || (a.name || "").localeCompare(b.name || "")
   );
   fs.writeFileSync(OUT, JSON.stringify({ generatedAt: null, count: schools.length, schools }, null, 1));
+  if (capped) console.log(`\n⚠️  Corte por tope MAX_CALLS=${MAX_CALLS}: no se consultaron todas las zonas. Sube MAX_CALLS si lo necesitas.`);
   console.log(`\nListo: ${schools.length} escuelas (${added} nuevas) en ${calls} llamadas. AMMAC: ${schools.filter((s) => s.ammacCertified).length}`);
 }
 
