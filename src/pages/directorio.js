@@ -6,6 +6,21 @@ import React, { useEffect, useMemo, useState } from 'react'
 
 const TODOS = 'Todos'
 
+// País (en español, como lo devuelve Places) -> emoji de bandera.
+const FLAGS = {
+  'México': '🇲🇽', 'Colombia': '🇨🇴', 'Argentina': '🇦🇷', 'Chile': '🇨🇱',
+  'Perú': '🇵🇪', 'Ecuador': '🇪🇨', 'Uruguay': '🇺🇾', 'Paraguay': '🇵🇾',
+  'Bolivia': '🇧🇴', 'Venezuela': '🇻🇪', 'Panamá': '🇵🇦', 'Guatemala': '🇬🇹',
+  'El Salvador': '🇸🇻', 'Honduras': '🇭🇳', 'Nicaragua': '🇳🇮',
+  'República Dominicana': '🇩🇴', 'Costa Rica': '🇨🇷', 'Puerto Rico': '🇵🇷',
+  'España': '🇪🇸', 'Estados Unidos': '🇺🇸', 'Canadá': '🇨🇦', 'Italia': '🇮🇹',
+  'Reino Unido': '🇬🇧', 'Irlanda': '🇮🇪', 'Francia': '🇫🇷', 'Alemania': '🇩🇪',
+  'Países Bajos': '🇳🇱', 'Portugal': '🇵🇹', 'Bélgica': '🇧🇪', 'Austria': '🇦🇹',
+  'Suiza': '🇨🇭', 'Israel': '🇮🇱', 'India': '🇮🇳', 'Australia': '🇦🇺',
+  'Nueva Zelanda': '🇳🇿', 'Filipinas': '🇵🇭',
+}
+const flagOf = (country) => FLAGS[country] || ''
+
 const Directorio = () => {
   const [schools, setSchools] = useState([])
   const [loading, setLoading] = useState(true)
@@ -75,7 +90,7 @@ const Directorio = () => {
                     country === c ? 'bg-white text-blue shadow' : 'bg-white/15 text-white hover:bg-white/25'
                   }`}
                 >
-                  {c}
+                  {c === TODOS ? '🌎 Todos' : `${flagOf(c)} ${c}`}
                 </button>
               ))}
               <label className="ml-2 flex items-center gap-2 text-sm text-white/90 cursor-pointer select-none">
@@ -120,6 +135,7 @@ const Directorio = () => {
                   <div className="font-semibold text-lg leading-tight">{s.name}</div>
                   {s.address && <div className="text-sm text-white/85">{s.address}</div>}
                   <div className="mt-auto pt-2 text-sm text-white/70">
+                    {flagOf(s.country) && <span className="mr-1">{flagOf(s.country)}</span>}
                     {[s.city, s.state, s.country].filter(Boolean).join(' · ')}
                   </div>
                   {s.phone && <div className="text-sm text-white/80">Tel: {s.phone}</div>}
