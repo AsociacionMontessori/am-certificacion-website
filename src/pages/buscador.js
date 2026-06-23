@@ -38,8 +38,6 @@ const Buscador = () => {
     })
   }, [schools, query, country, soloAmmac])
 
-  const ammacCount = useMemo(() => schools.filter(s => s.ammacCertified).length, [schools])
-
   return (
     <Layout>
       <Nav textColor="text-white" />
@@ -79,7 +77,7 @@ const Buscador = () => {
               ))}
               <label className="ml-2 flex items-center gap-2 text-sm text-white/90 cursor-pointer select-none">
                 <input type="checkbox" checked={soloAmmac} onChange={e => setSoloAmmac(e.target.checked)} className="accent-green-400" />
-                Solo certificadas AMMAC ({ammacCount})
+                Solo certificadas AMMAC
               </label>
             </div>
           </div>
