@@ -141,6 +141,13 @@ function orderHasInscripcion(lineItems) {
  * @return {string[]}
  */
 function resolveGiftSkus(lineItems) {
+  // ⚠️ REGALO DE EBOOKS DESACTIVADO (2026-06-25): los títulos están en Amazon
+  // KDP Select, cuya exclusividad prohíbe distribuir la versión digital fuera
+  // de Amazon AUN GRATIS (solo se permite una muestra del 10%). Por eso no se
+  // entrega ningún ebook de regalo. Para reactivar (tras salir de Select),
+  // borrar este early-return.
+  return [];
+  // eslint-disable-next-line no-unreachable
   const gifts = new Set();
   if (orderQualifiesForGift(lineItems)) gifts.add(GIFT_EBOOK_SKU);
   if (orderHasInscripcion(lineItems)) {

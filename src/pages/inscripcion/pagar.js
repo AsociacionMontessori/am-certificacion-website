@@ -15,7 +15,7 @@ const InscripcionPagarPage = () => {
   return (
     <CheckoutPageShell
       title="Aparta tu lugar"
-      description="Paga tu inscripción con tarjeta y recibe el Paquete Cósmico de regalo, o hazlo por transferencia."
+      description="Paga tu inscripción con tarjeta o hazlo por transferencia bancaria."
       backTo="/diplomados"
     >
       <ApartarInscripcionForm coin={coin} price={price} cancelHref="/diplomados" />
@@ -59,7 +59,7 @@ const InscripcionPagarPage = () => {
 export const Head = () => (
   <Seo
     title="Aparta tu lugar"
-    description="Aparta tu lugar en los diplomados Montessori con tarjeta (y recibe el Paquete Cósmico de regalo) o por transferencia bancaria."
+    description="Aparta tu lugar en los diplomados Montessori con tarjeta o por transferencia bancaria."
     pathname="/inscripcion/pagar"
   />
 )

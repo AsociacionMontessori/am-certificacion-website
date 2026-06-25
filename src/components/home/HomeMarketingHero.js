@@ -408,12 +408,6 @@ const HomeMarketingHero = () => {
                 </span>
               </a>
             </div>
-            <p className="inline-flex items-center gap-2 rounded-full bg-yellow/20 border border-yellow/40 px-4 py-2 text-sm text-white">
-              <span aria-hidden="true">🎁</span>
-              <span>
-                Al inscribirte recibes el <strong>Paquete Cósmico</strong> (Educación Cósmica + Guiones) de regalo.
-              </span>
-            </p>
             <Link
               to="/diplomados"
               className="inline-block text-sm text-white/90 underline underline-offset-4 hover:text-white"

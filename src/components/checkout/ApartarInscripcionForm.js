@@ -10,7 +10,8 @@ import { useVisitorGeo } from "../../hooks/useVisitorGeo"
 /**
  * Formulario para apartar el lugar pagando solo la inscripción con tarjeta.
  * Siempre cobra `inscripcion_diplomado` (no expone programas/colegiaturas, que
- * aún no tienen precio live). Al apartar, el backend regala el Paquete Cósmico.
+ * aún no tienen precio live). (El regalo de ebooks se retiró por exclusividad
+ * KDP Select; ver roxanaBooks.js / digitalBooks.js.)
  */
 const ApartarInscripcionForm = ({ coin = "MXN", price, cancelHref = "/" }) => {
   const [nombre, setNombre] = useState("")
@@ -64,14 +65,6 @@ const ApartarInscripcionForm = ({ coin = "MXN", price, cancelHref = "/" }) => {
           <strong className="text-blue">Apartas tu lugar</strong> pagando la inscripción
           {price ? <> ({coin} {price})</> : null}. Es un pago único: no se repite en
           otros diplomados o cursos posteriores.
-        </p>
-      </div>
-
-      <div className="rounded-xl border-2 border-yellow/50 bg-yellow/10 px-4 py-3">
-        <p className="text-sm font-semibold text-blue">🎁 De regalo al inscribirte</p>
-        <p className="text-xs text-gray leading-relaxed mt-1">
-          Recibes el <strong>Paquete Cósmico</strong> (Educación Cósmica + Guiones Cósmicos)
-          en PDF y EPUB, sin costo. Lo descargas al terminar tu pago.
         </p>
       </div>
 
