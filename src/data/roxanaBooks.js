@@ -1,6 +1,13 @@
 /**
  * Serie editorial de Roxana Muñoz Guevara (Asociación Montessori de México A.C.)
  * stripeSku: identificador en catálogo Stripe (ver docs/STRIPE_SETUP.md)
+ *
+ * ⚠️ VENTA DIGITAL DESACTIVADA (2026-06-25): los títulos están inscritos en
+ * Amazon KDP Select, que exige exclusividad digital. Vender el ebook/PDF/EPUB
+ * fuera de Amazon viola los términos (riesgo de cierre de cuenta KDP). Por eso
+ * todos los `digital.enabled` están en false y se quitó el regalo. Solo se
+ * promueve la edición IMPRESA vía Amazon (la impresión no tiene exclusividad).
+ * Para reactivar: salir de KDP Select y poner `enabled: true`.
  */
 export const roxanaBooks = [
   {
@@ -10,9 +17,9 @@ export const roxanaBooks = [
     // compra de cualquier OTRO libro o paquete. Ver functions-stripe/stripe/
     // digitalBooks.js (orderQualifiesForGift, excluye su propio SKU). Mantiene
     // gift:true para conservar la insignia; va primero por su gancho publicitario.
-    gift: true,
+    gift: false,
     digital: {
-      enabled: true,
+      enabled: false,
       stripeSku: "ebook_ammac_5",
       priceMx: "213",
       netMx: "200",
@@ -30,7 +37,7 @@ export const roxanaBooks = [
     stripeSku: "libro_ammac_1",
     priceMx: "450",
     digital: {
-      enabled: true,
+      enabled: false,
       stripeSku: "ebook_ammac_1",
       priceMx: "213",
       netMx: "200",
@@ -48,7 +55,7 @@ export const roxanaBooks = [
     stripeSku: "libro_ammac_2",
     priceMx: "450",
     digital: {
-      enabled: true,
+      enabled: false,
       stripeSku: "ebook_ammac_2",
       priceMx: "213",
       netMx: "200",
@@ -66,7 +73,7 @@ export const roxanaBooks = [
     stripeSku: "libro_ammac_3",
     priceMx: "450",
     digital: {
-      enabled: true,
+      enabled: false,
       stripeSku: "ebook_ammac_3",
       priceMx: "317",
       netMx: "300",
@@ -84,7 +91,7 @@ export const roxanaBooks = [
     stripeSku: "libro_ammac_4",
     priceMx: "450",
     digital: {
-      enabled: true,
+      enabled: false,
       stripeSku: "ebook_ammac_4",
       priceMx: "317",
       netMx: "300",

@@ -4,7 +4,13 @@
  * `bookIds`. El backend resuelve qué libros incluye cada SKU en
  * functions-stripe/stripe/digitalBooks.js (DIGITAL_BOOK_PACKS).
  */
-export const roxanaBookBundles = [
+// ⚠️ PAQUETES DIGITALES DESACTIVADOS (2026-06-25) por exclusividad KDP Select
+// (igual que en roxanaBooks.js). No se vende ningún ebook/paquete fuera de
+// Amazon mientras los títulos sigan en Select. Para reactivar: restaurar el
+// contenido de `_roxanaBookBundlesDisabled` en `roxanaBookBundles`.
+export const roxanaBookBundles = []
+
+const _roxanaBookBundlesDisabled = [
   {
     id: "ammac-ebook-pack-4",
     stripeSku: "ebook_pack_ammac_4",
@@ -44,4 +50,5 @@ export const roxanaGiftEbook = {
 }
 
 // Compatibilidad: primer paquete (el de 4 libros) como export individual.
-export const roxanaBookBundle = roxanaBookBundles[0]
+// (Sin uso actual; referencia el set desactivado para no exportar undefined.)
+export const roxanaBookBundle = _roxanaBookBundlesDisabled[0]

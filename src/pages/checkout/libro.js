@@ -30,11 +30,12 @@ const LibroCheckoutPage = () => {
 
   const bundle = roxanaBookBundles.find((b) => b.stripeSku === sku)
   const isBundle = Boolean(bundle)
-  // Solo se venden ebooks/paquetes digitales por Stripe; la edición impresa
-  // se compra en Amazon. Un SKU físico no resuelve aquí (cae en "no encontrado").
+  // Venta digital desactivada por exclusividad KDP Select: solo resuelve si el
+  // libro tiene `digital.enabled`. Hoy ninguno lo tiene, así que cualquier SKU
+  // digital cae en "no encontrado". La edición impresa se compra en Amazon.
   const book = isBundle
     ? bundleToBook(bundle)
-    : roxanaBooks.find((b) => b.digital?.stripeSku === sku && b.digital?.priceMx)
+    : roxanaBooks.find((b) => b.digital?.enabled && b.digital?.stripeSku === sku && b.digital?.priceMx)
 
   if (!book) {
     return (

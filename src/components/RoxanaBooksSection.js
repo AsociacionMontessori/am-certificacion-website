@@ -5,8 +5,8 @@ import { roxanaBookBundles } from "../data/roxanaBookOffers"
 
 const DEFAULT_DESCRIPTION = (
   <>
-    Serie en español basada en las obras de María Montessori. Compra el ebook
-    al instante o consigue la edición impresa en <strong className="font-semibold text-yellow">Amazon México</strong>.
+    Serie en español basada en las obras de María Montessori. Consigue cada título
+    en su edición impresa y digital en <strong className="font-semibold text-yellow">Amazon México</strong>.
   </>
 )
 
