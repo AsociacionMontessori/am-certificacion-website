@@ -29,7 +29,7 @@ const emailPass = defineSecret("EMAIL_PASS");
 const googleServiceAccountJson = defineSecret("GOOGLE_SERVICE_ACCOUNT_JSON");
 const GOOGLE_ADMIN_EMAIL =
   process.env.GOOGLE_ADMIN_EMAIL || "admin@asociacionmontessori.com.mx";
-const REMITENTE_NOMBRE = "Certificación Montessori";
+const REMITENTE_NOMBRE = "Montessori Admin";
 const GMAIL_SEND_SCOPE = "https://www.googleapis.com/auth/gmail.send";
 
 /**
