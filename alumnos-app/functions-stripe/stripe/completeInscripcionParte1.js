@@ -300,6 +300,7 @@ exports.completeInscripcionParte1Handler = onRequest(
             emailInstitucional,
             portalUrl: "https://alumnos.certificacionmontessori.com",
             nivelEspecializacion,
+            nivelPortal,
             passwordGenerada,
             passwordAcceso: passwordGenerada ? password : null,
           });
