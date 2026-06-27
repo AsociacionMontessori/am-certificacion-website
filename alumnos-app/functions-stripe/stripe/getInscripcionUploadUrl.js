@@ -80,7 +80,11 @@ exports.getInscripcionUploadUrlHandler = onRequest(
         }
 
         const alumnoId = inscripcion.alumnoId;
-        const storagePath = `expediente/${alumnoId}/${docType}/${Date.now()}-${fileName}`;
+        // Ruta estable por tipo de documento: volver a subir el mismo docType
+        // SOBRESCRIBE el archivo anterior (evita duplicados en el expediente).
+        const extMatch = fileName.match(/\.([a-zA-Z0-9]+)$/);
+        const ext = extMatch ? extMatch[1].toLowerCase() : "bin";
+        const storagePath = `expediente/${alumnoId}/${docType}/${docType}.${ext}`;
         const bucket = admin.storage().bucket();
         const file = bucket.file(storagePath);
 
