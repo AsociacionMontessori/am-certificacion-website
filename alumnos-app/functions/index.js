@@ -15,26 +15,47 @@ const {onDocumentCreated} = require("firebase-functions/v2/firestore");
 const {onSchedule} = require("firebase-functions/v2/scheduler");
 const {defineSecret} = require("firebase-functions/params");
 const admin = require("firebase-admin");
-const nodemailer = require("nodemailer");
+const {google} = require("googleapis");
 
 admin.initializeApp();
 
-// Definir secretos de Firebase (más seguro que config)
-// Estos se configuran con: firebase functions:secrets:set EMAIL_USER
+// Secretos heredados (la cola los referencia, pero el envío ya NO usa SMTP).
 const emailUser = defineSecret("EMAIL_USER");
 const emailPass = defineSecret("EMAIL_PASS");
 
-// Configurar transporter de email
-// Puedes usar Gmail, SendGrid, o cualquier otro servicio SMTP
-const getTransporter = (user, pass) => {
-  return nodemailer.createTransport({
-    service: "gmail", // o 'sendgrid', etc.
-    auth: {
-      user: user,
-      pass: pass,
-    },
-  });
-};
+// Envío vía Gmail API con cuenta de servicio + delegación de dominio
+// (mismo método que workspace-directory-admin). Impersona un buzón real
+// del dominio para mandar; no requiere App Password.
+const googleServiceAccountJson = defineSecret("GOOGLE_SERVICE_ACCOUNT_JSON");
+const GOOGLE_ADMIN_EMAIL =
+  process.env.GOOGLE_ADMIN_EMAIL || "admin@asociacionmontessori.com.mx";
+const REMITENTE_NOMBRE = "Certificación Montessori";
+const GMAIL_SEND_SCOPE = "https://www.googleapis.com/auth/gmail.send";
+
+/**
+ * Construye el mensaje RFC822 en base64url para Gmail API.
+ * @param {object} m
+ * @return {string}
+ */
+function buildRawMessage(m) {
+  const lines = [];
+  // El nombre del remitente se codifica en UTF-8 (encoded-word) para que
+  // rendericen bien los acentos/ñ.
+  const fromNameB64 = Buffer.from(String(m.fromName || ""), "utf8").toString("base64");
+  lines.push(`From: =?UTF-8?B?${fromNameB64}?= <${m.fromEmail}>`);
+  lines.push(`To: ${m.to}`);
+  if (m.cc) lines.push(`Cc: ${m.cc}`);
+  if (m.bcc) lines.push(`Bcc: ${m.bcc}`);
+  const subjectB64 = Buffer.from(String(m.subject || ""), "utf8").toString("base64");
+  lines.push(`Subject: =?UTF-8?B?${subjectB64}?=`);
+  lines.push("MIME-Version: 1.0");
+  lines.push("Content-Type: text/html; charset=\"UTF-8\"");
+  lines.push("Content-Transfer-Encoding: base64");
+  lines.push("");
+  lines.push(Buffer.from(String(m.html || ""), "utf8").toString("base64"));
+  return Buffer.from(lines.join("\r\n"), "utf8").toString("base64")
+      .replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
 
 /**
  * Cloud Function que escucha nuevos documentos en 'emails_pendientes'
@@ -44,7 +65,7 @@ exports.enviarEmailNotificacion = onDocumentCreated(
     {
       document: "emails_pendientes/{emailId}",
       region: "us-central1",
-      secrets: [emailUser, emailPass],
+      secrets: [googleServiceAccountJson],
     },
     async (event) => {
       const snap = event.data;
@@ -60,22 +81,31 @@ exports.enviarEmailNotificacion = onDocumentCreated(
         return null;
       }
 
-      const user = emailUser.value();
-      const pass = emailPass.value();
-      const transporter = getTransporter(user, pass);
-
       try {
-      // Configurar opciones del email
-        const mailOptions = {
-          from: user,
+        const sa = JSON.parse(googleServiceAccountJson.value() || "{}");
+        const adminEmail = String(GOOGLE_ADMIN_EMAIL || "").trim();
+        if (!sa.client_email || !sa.private_key || !adminEmail) {
+          throw new Error("GOOGLE_SERVICE_ACCOUNT_JSON o GOOGLE_ADMIN_EMAIL no configurados");
+        }
+        const auth = new google.auth.JWT({
+          email: sa.client_email,
+          key: sa.private_key,
+          scopes: [GMAIL_SEND_SCOPE],
+          subject: adminEmail,
+        });
+        const gmail = google.gmail({version: "v1", auth});
+        const raw = buildRawMessage({
+          fromName: REMITENTE_NOMBRE,
+          fromEmail: adminEmail,
           to: emailData.to,
+          cc: emailData.cc,
+          bcc: emailData.bcc,
           subject: emailData.subject,
-          html: emailData.html,
-          text: emailData.text,
-        };
+          html: emailData.html || emailData.text || "",
+        });
 
-        // Enviar email
-        await transporter.sendMail(mailOptions);
+        // Enviar email vía Gmail API (cuenta de servicio + DWD)
+        await gmail.users.messages.send({userId: "me", requestBody: {raw}});
 
         // Actualizar estado a 'enviado'
         await snap.ref.update({

@@ -17,11 +17,16 @@ const emptyForm = {
   telefonoEmpresa: "",
 }
 
-const InscripcionParte2Form = ({ ordenId, accessToken, nivelEspecializacion, initialValues = {}, onSuccess }) => {
+const InscripcionParte2Form = ({ ordenId, accessToken, nivelEspecializacion, requiereFactura = false, initialValues = {}, onSuccess }) => {
   const [form, setForm] = useState({ ...emptyForm, ...initialValues })
   const [documentos, setDocumentos] = useState(initialValues.documentos || {})
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
+
+  // La cédula de identificación fiscal solo aplica si el alumno pidió factura.
+  const documentosVisibles = DOCUMENTOS_PARTE2.filter(
+    (d) => d.id !== "cedulaFiscal" || requiereFactura
+  )
 
   const reglamentoUrl = getReglamentoUrl(nivelEspecializacion)
   const inputClass =
@@ -39,7 +44,7 @@ const InscripcionParte2Form = ({ ordenId, accessToken, nivelEspecializacion, ini
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError("")
-    const faltantes = DOCUMENTOS_PARTE2.filter((d) => d.required && !documentos[d.id]?.storagePath)
+    const faltantes = documentosVisibles.filter((d) => d.required && !documentos[d.id]?.storagePath)
     if (faltantes.length > 0) {
       setError(`Faltan documentos por subir: ${faltantes.map((d) => d.label).join(", ")}`)
       return
@@ -125,7 +130,7 @@ const InscripcionParte2Form = ({ ordenId, accessToken, nivelEspecializacion, ini
 
       <div className="space-y-3 pt-2">
         <p className="text-sm font-semibold text-black">Documentos *</p>
-        {DOCUMENTOS_PARTE2.map((doc) => (
+        {documentosVisibles.map((doc) => (
           <FileUploadField
             key={doc.id}
             ordenId={ordenId}

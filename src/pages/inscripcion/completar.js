@@ -4,7 +4,7 @@ import { Link, navigate } from "gatsby"
 import CheckoutPageShell from "../../components/checkout/CheckoutPageShell"
 import Seo from "../../components/seo"
 import InscripcionParte1Form from "../../components/inscripcion/InscripcionParte1Form"
-import { fetchInscripcionOrden } from "../../utils/inscripcionApi"
+import { fetchInscripcionOrden, canjearCodigoDirecto } from "../../utils/inscripcionApi"
 import { mapProgramaCheckoutANivel, PORTAL_ALUMNOS_URL } from "../../data/inscripcionForm"
 
 const InscripcionCompletarPage = () => {
@@ -26,8 +26,32 @@ const InscripcionCompletarPage = () => {
     setLoading(true)
     setError("")
     try {
-      const data = await fetchInscripcionOrden(trimmed, token)
-      setOrdenId(trimmed)
+      let effectiveId = trimmed
+      let effectiveToken = token
+      let data
+      try {
+        data = await fetchInscripcionOrden(effectiveId, effectiveToken)
+      } catch (firstErr) {
+        // Si la referencia no corresponde a una orden, puede ser el código
+        // compartido de inscripción directa (pago hecho con nosotros). Lo
+        // canjeamos por una orden pagada individual y seguimos el flujo normal.
+        if (!/no encontrada/i.test(firstErr.message || "")) throw firstErr
+        const canje = await canjearCodigoDirecto(trimmed)
+        effectiveId = canje.ordenId
+        effectiveToken = canje.accessToken
+        data = await fetchInscripcionOrden(effectiveId, effectiveToken)
+        // Reflejar la orden real en la URL para que un refresh la retome
+        // (y no vuelva a canjear el código creando otra orden).
+        if (typeof window !== "undefined") {
+          window.history.replaceState(
+            null,
+            "",
+            `/inscripcion/completar?orden=${encodeURIComponent(effectiveId)}&t=${encodeURIComponent(effectiveToken)}`,
+          )
+        }
+      }
+      setOrdenId(effectiveId)
+      setAccessToken(effectiveToken)
       setContext(data)
       if (data.parte1Completa) {
         setCuentaCreada({
@@ -168,7 +192,7 @@ const InscripcionCompletarPage = () => {
             <strong className="text-blue">{cuentaCreada.emailInstitucional}</strong>
           </p>
           <Link
-            to={`/inscripcion/documentos?orden=${encodeURIComponent(ordenId)}`}
+            to={`/inscripcion/documentos?orden=${encodeURIComponent(ordenId)}${accessToken ? `&t=${encodeURIComponent(accessToken)}` : ""}`}
             className="min-h-[48px] w-full inline-flex items-center justify-center px-6 py-3 rounded-full font-semibold text-white bg-gradient-to-r from-blue to-green"
           >
             Continuar al expediente (paso 3)

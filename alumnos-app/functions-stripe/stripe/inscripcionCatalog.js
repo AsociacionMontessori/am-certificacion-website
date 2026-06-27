@@ -116,6 +116,21 @@ function isUsuarioLocalValid(usuarioLocal) {
   return /^[a-z0-9][a-z0-9._-]{2,31}$/.test(String(usuarioLocal || "").trim().toLowerCase());
 }
 
+// Duración del programa en meses por nivel — para calcular la fecha estimada
+// de egreso (fechaIngreso + meses).
+const DURACION_MESES_POR_NIVEL = {
+  "Guía en Nido & Comunidad Infantil (Duración 16 meses)": 16,
+  "Guía en Casa de Niños (con duración 17 meses)": 17,
+  "Guía en Taller I y II (con duración 20 meses)": 20,
+  "Diplomado en Educación Cósmica y Grandes Lecciones (5 meses)": 5,
+  "Diplomado en Neuroeducación (3 meses)": 3,
+  "Curso de Filosofía Montessori y Psicología Educativa (3 meses)": 3,
+};
+
+function getDuracionMeses(nivelEspecializacion) {
+  return DURACION_MESES_POR_NIVEL[String(nivelEspecializacion || "").trim()] || null;
+}
+
 module.exports = {
   DOMINIO_INSTITUCIONAL,
   MODALIDAD_INSCRIPCION,
@@ -132,4 +147,6 @@ module.exports = {
   getNivelFromProgramaCheckout,
   buildEmailInstitucional,
   isUsuarioLocalValid,
+  DURACION_MESES_POR_NIVEL,
+  getDuracionMeses,
 };

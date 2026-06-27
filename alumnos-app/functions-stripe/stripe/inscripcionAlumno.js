@@ -1,6 +1,21 @@
 const admin = require("firebase-admin");
 const {getMateriasPorNivel} = require("./materiasPorNivel");
 const {encryptPassword, CREDENTIALS_SCHEMA_VERSION} = require("./credenciales");
+const {getDuracionMeses} = require("./inscripcionCatalog");
+
+/**
+ * Fecha estimada de egreso = ingreso + meses de duración del nivel.
+ * @param {Date} fechaIngreso
+ * @param {string} nivelEspecializacion
+ * @return {import('firebase-admin').firestore.Timestamp|null}
+ */
+function calcularFechaEgreso(fechaIngreso, nivelEspecializacion) {
+  const meses = getDuracionMeses(nivelEspecializacion);
+  if (!meses) return null;
+  const egreso = new Date(fechaIngreso.getTime());
+  egreso.setMonth(egreso.getMonth() + meses);
+  return admin.firestore.Timestamp.fromDate(egreso);
+}
 
 function buildNivelEntry(nombre, fechaInicio) {
   const id = `nivel-${Date.now()}-${Math.random().toString(16).slice(2, 10)}`;
@@ -13,7 +28,9 @@ function buildNivelEntry(nombre, fechaInicio) {
     fechaFin: null,
     certificadoUrl: null,
     observaciones: "",
-    creadoEn: admin.firestore.FieldValue.serverTimestamp(),
+    // serverTimestamp() no es válido dentro de un array en Firestore;
+    // usamos un Timestamp concreto para el elemento de `niveles`.
+    creadoEn: admin.firestore.Timestamp.now(),
   };
 }
 
@@ -62,7 +79,7 @@ async function crearAlumnoDesdeInscripcion(db, params) {
     fechaNacimiento: fechaNacimiento || null,
     usuarioInstitucional: usuarioInstitucional || null,
     fechaIngreso: admin.firestore.FieldValue.serverTimestamp(),
-    fechaEgresoEstimada: null,
+    fechaEgresoEstimada: calcularFechaEgreso(new Date(), nivelEspecializacion),
     estado: "Activo",
     origenInscripcion: "sitio_publico_stripe",
     fechaCreacion: admin.firestore.FieldValue.serverTimestamp(),

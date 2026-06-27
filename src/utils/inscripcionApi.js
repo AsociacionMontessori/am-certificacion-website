@@ -17,6 +17,10 @@ export const getUploadUrlEndpoint = () =>
   process.env.GATSBY_INSCRIPCION_UPLOAD_URL ||
   `${FUNCTIONS_BASE}/getInscripcionUploadUrl`
 
+export const getCanjearCodigoDirectoUrl = () =>
+  process.env.GATSBY_CANJEAR_CODIGO_DIRECTO_URL ||
+  `${FUNCTIONS_BASE}/canjearCodigoDirecto`
+
 async function postJson(url, body) {
   const response = await fetch(url, {
     method: "POST",
@@ -42,6 +46,12 @@ function withToken(body, accessToken) {
 
 export async function fetchInscripcionOrden(ordenId, accessToken) {
   return postJson(getInscripcionOrdenUrl(), withToken({ ordenId }, accessToken))
+}
+
+// Canjea el código compartido de inscripción directa (pago hecho con nosotros
+// fuera de línea) por una orden pagada individual. Devuelve { ordenId, accessToken }.
+export async function canjearCodigoDirecto(codigo) {
+  return postJson(getCanjearCodigoDirectoUrl(), { codigo })
 }
 
 export async function submitInscripcionParte1(ordenId, datos, accessToken) {

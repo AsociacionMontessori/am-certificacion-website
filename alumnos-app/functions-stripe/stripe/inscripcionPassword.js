@@ -3,18 +3,19 @@ const crypto = require("crypto");
 const LOWER = "abcdefghijklmnopqrstuvwxyz";
 const UPPER = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 const DIGITS = "0123456789";
-const SPECIAL = "!@#$%^&*()-_=+";
-const ALL = LOWER + UPPER + DIGITS + SPECIAL;
+// Solo letras y números: nada de = * u otros signos que rompen al pegar en
+// Excel/WhatsApp o al dictar la contraseña.
+const ALL = LOWER + UPPER + DIGITS;
 
 /**
  * Contraseña única por alumno (misma en Firebase Auth y Google Directory).
- * Estilo compatible con workspace-directory-admin (16 caracteres, mix de clases).
+ * 16 caracteres alfanuméricos, con al menos una minúscula, mayúscula y dígito.
  */
 function generatePasswordInscripcion(length = 16) {
   const minLen = Math.max(12, length);
   const pick = (charset) => charset[crypto.randomInt(0, charset.length)];
 
-  const chars = [pick(LOWER), pick(UPPER), pick(DIGITS), pick(SPECIAL)];
+  const chars = [pick(LOWER), pick(UPPER), pick(DIGITS)];
   while (chars.length < minLen) {
     chars.push(pick(ALL));
   }

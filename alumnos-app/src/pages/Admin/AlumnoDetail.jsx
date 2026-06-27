@@ -10,6 +10,7 @@ import useCanEdit from '../../hooks/useCanEdit';
 import { getNivelActivo, getHistorialNiveles, actualizarHistorialNiveles } from '../../utils/alumnos';
 import { obtenerNiveles } from '../../services/nivelesService';
 import { getEstadoBadgeClasses } from '../../utils/estadoBadgeClasses';
+import ExpedienteDocumentos from '../../components/ExpedienteDocumentos';
 
 const AlumnoDetail = () => {
   const { id } = useParams();
@@ -910,6 +911,8 @@ const AlumnoDetail = () => {
             </div>
           </dl>
         </div>
+
+        {canEdit && <ExpedienteDocumentos alumnoId={alumno?.id || id} />}
 
         {canEdit && (
           <div className="lg:col-span-2 bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">

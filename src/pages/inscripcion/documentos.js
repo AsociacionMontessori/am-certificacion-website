@@ -124,6 +124,7 @@ const InscripcionDocumentosPage = () => {
           ordenId={ordenId}
           accessToken={accessToken}
           nivelEspecializacion={nivelEsp}
+          requiereFactura={Boolean(context.requiereFacturaFiscal)}
           initialValues={context.datosParte2 || {}}
           onSuccess={() => setEnviado(true)}
         />

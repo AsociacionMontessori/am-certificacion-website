@@ -106,6 +106,7 @@ async function notifyAlumnoCuentaCreada(db, data) {
 
   await db.collection("emails_pendientes").add({
     to: emailContacto,
+    cc: "sociedadmontessori@gmail.com",
     subject: "Tu cuenta en Certificación Montessori está lista",
     html,
     text,

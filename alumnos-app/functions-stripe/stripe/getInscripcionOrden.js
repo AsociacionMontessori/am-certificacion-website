@@ -84,6 +84,7 @@ exports.getInscripcionOrdenHandler = onRequest(
           parte2Completa,
           formularioCompleto: parte1Completa,
           expedienteCompleto: parte2Completa,
+          requiereFacturaFiscal: Boolean(orden.requiereFacturaFiscal),
           ordenId,
           inscripcionId,
           alumnoId: inscripcion?.alumnoId || orden.alumnoId || null,
