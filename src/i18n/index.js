@@ -1,16 +1,36 @@
 import React from "react"
 import i18next from "i18next"
 import { initReactI18next } from "react-i18next"
-import { DEFAULT_LANGUAGE, localizePath } from "./config"
+import { DEFAULT_LANGUAGE, localizePath, parsePath } from "./config"
 
-import es from "./locales/es/common.json"
-import en from "./locales/en/common.json"
-import ptBr from "./locales/pt-br/common.json"
+// Un JSON por namespace e idioma (ver src/i18n/locales/<idioma>/)
+const NAMESPACES = [
+  "common",
+  "home",
+  "diplomados",
+  "faq",
+  "contact",
+  "publicaciones",
+  "roxana",
+  "directorio",
+  "ia",
+  "legal",
+  "footer",
+]
+
+const loadLocale = lang => {
+  const resources = {}
+  NAMESPACES.forEach(ns => {
+    // require estático por idioma para que webpack los empaquete
+    resources[ns] = require(`./locales/${lang}/${ns}.json`)
+  })
+  return resources
+}
 
 const resources = {
-  es: { common: es },
-  en: { common: en },
-  "pt-br": { common: ptBr },
+  es: loadLocale("es"),
+  en: loadLocale("en"),
+  "pt-br": loadLocale("pt-br"),
 }
 
 const instances = {}
@@ -23,6 +43,7 @@ export const getI18nInstance = language => {
       lng: lang,
       fallbackLng: DEFAULT_LANGUAGE,
       resources,
+      ns: NAMESPACES,
       defaultNS: "common",
       interpolation: { escapeValue: false }, // React ya escapa
       returnEmptyString: false, // string vacío en EN/PT cae al español
@@ -31,6 +52,21 @@ export const getI18nInstance = language => {
     instances[lang] = instance
   }
   return instances[lang]
+}
+
+/**
+ * t para los `export const Head` de las páginas: el Head de Gatsby se renderiza
+ * FUERA de wrapPageElement, así que no hay provider; se resuelve el idioma
+ * desde el pathname y se usa la instancia directamente.
+ *
+ *   export const Head = ({ location }) => {
+ *     const t = getT(location.pathname, "home")
+ *     return <Seo title={t("seo.title")} … />
+ *   }
+ */
+export const getT = (pathname, namespace = "common") => {
+  const { language } = parsePath(pathname)
+  return getI18nInstance(language).getFixedT(language, namespace)
 }
 
 export const PageLanguageContext = React.createContext({

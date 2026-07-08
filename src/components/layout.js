@@ -3,9 +3,11 @@ import Footer from "./footer"
 import "./../styles/wa.css"
 import { Transition } from "@headlessui/react"
 import "../styles/fonts.css"
+import { useTranslation } from "react-i18next"
 
 const Layout = ({ children }) => {
   const [showWABtn, setShowWABtn] = React.useState(false)
+  const { t } = useTranslation("footer")
 
   return (
     <>
@@ -39,7 +41,7 @@ const Layout = ({ children }) => {
                   <div className="hidden md:block">
                     <FadeIn delay="delay-[0ms]">
                       <div className="wa__btn_popup_txt" style={{ display: 'block', left: 'unset', right: '100%', marginRight: '7px', marginLeft: '0px', maxWidth: '228px', minWidth: '180px', whiteSpace: 'normal', wordWrap: 'break-word' }}>
-                        <span><strong>Solicita Informes</strong></span>
+                        <span><strong>{t("whatsapp.solicitaInformes")}</strong></span>
                       </div>
                     </FadeIn>
                   </div>

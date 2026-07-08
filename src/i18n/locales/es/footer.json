@@ -1,0 +1,49 @@
+{
+  "ammac": {
+    "logoAlt": "Logo Asociación Montessori",
+    "nombre": "Asociación Montessori de México A.C.",
+    "derechos": "Todos los derechos reservados 2026"
+  },
+  "sems": {
+    "logoAlt": "Logo Sociedad de Escuelas Montessori",
+    "nombre": "Sociedad de Escuelas Montessori S.C."
+  },
+  "leyenda": "Institución mexicana con proyección internacional: formamos Guías Montessori en línea para estudiantes de todo el mundo, con certificación de validez internacional.",
+  "asociacion": {
+    "titulo": "Asociación",
+    "diplomados": "Diplomados",
+    "sobreNosotros": "Sobre nosotros",
+    "publicaciones": "Publicaciones",
+    "contacto": "Contacto",
+    "indiceIa": "Índice IA",
+    "preguntasFrecuentes": "Preguntas Frecuentes"
+  },
+  "legal": {
+    "titulo": "Legal",
+    "avisoPrivacidad": "Aviso de Privacidad",
+    "politicaReembolsos": "Política de reembolsos",
+    "constanciaSeguridad": "Constancia de Seguridad Estructural",
+    "vistoBuenoSeguridad": "Visto Bueno de Seguridad Estructural"
+  },
+  "escuelas": {
+    "titulo": "Escuelas Montessori",
+    "kalpilli": "Kalpilli",
+    "verEnMapa": "ver en mapa",
+    "email": "admin@certificacionmontessori.com",
+    "telefono": "55 5515 2701",
+    "whatsapp": "WhatsApp: 55 4888 5013",
+    "atencionChat": "Atención por chat de 9am a 6pm",
+    "direccion": "Calle Av. Dos 48, San Pedro de los Pinos, Benito Juárez, 03800 Ciudad de México, CDMX"
+  },
+  "redes": {
+    "titulo": "Redes Sociales",
+    "instagramAlt": "Instragram",
+    "linkedinAlt": "LinkedIn",
+    "youtubeAlt": "YouTube",
+    "facebookAlt": "Facebook",
+    "tiktokAlt": "TikTok"
+  },
+  "whatsapp": {
+    "solicitaInformes": "Solicita Informes"
+  }
+}

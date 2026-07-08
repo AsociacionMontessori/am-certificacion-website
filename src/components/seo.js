@@ -9,6 +9,7 @@ import {
   localizePath,
   isLocalizedPath,
 } from "../i18n/config"
+import { getT } from "../i18n"
 
 const normalizePathname = pathname => {
   if (!pathname || pathname === "/") return "/"
@@ -20,7 +21,7 @@ const formatBreadcrumbName = segment =>
     .replace(/-/g, " ")
     .replace(/\b\w/g, char => char.toUpperCase())
 
-const buildBreadcrumbSchema = ({ pathname, canonicalUrl, title }) => {
+const buildBreadcrumbSchema = ({ pathname, canonicalUrl, title, homeName }) => {
   const normalizedPathname = normalizePathname(pathname)
   if (normalizedPathname === "/") return null
 
@@ -29,7 +30,7 @@ const buildBreadcrumbSchema = ({ pathname, canonicalUrl, title }) => {
     {
       "@type": "ListItem",
       position: 1,
-      name: "Inicio",
+      name: homeName || "Inicio",
       item: "https://certificacionmontessori.com/",
     },
   ]
@@ -208,6 +209,7 @@ function Seo({
     pathname: normalizedPathname,
     canonicalUrl: pageUrl,
     title,
+    homeName: getT(normalizedPathname, "common")("breadcrumb.inicio"),
   })
 
   const schemas = shouldIndex

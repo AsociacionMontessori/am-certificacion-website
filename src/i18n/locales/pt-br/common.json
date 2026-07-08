@@ -11,5 +11,8 @@
   "languageSelector": {
     "label": "Idioma",
     "ariaLabel": "Selecionar idioma"
+  },
+  "breadcrumb": {
+    "inicio": "Inicio"
   }
 }
