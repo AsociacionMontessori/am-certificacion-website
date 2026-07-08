@@ -543,10 +543,10 @@ const diplomadosSchema = [
   },
 ]
 
-export const Head = () => (
+export const Head = ({ location }) => (
   <Seo
     title="Diplomados Guía Montessori"
-    pathname="/diplomados/"
+    pathname={location.pathname}
     description="Conoce los diplomados en línea para formarte como Guía Montessori con certificación internacional, equipo docente y estructura del programa."
     schema={diplomadosSchema}
   />

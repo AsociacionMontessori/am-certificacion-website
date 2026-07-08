@@ -1,5 +1,14 @@
 import * as React from "react"
 import { useStaticQuery, graphql } from "gatsby"
+import {
+  LANGUAGES,
+  LANGUAGE_CODES,
+  DEFAULT_LANGUAGE,
+  INDEX_TRANSLATIONS,
+  parsePath,
+  localizePath,
+  isLocalizedPath,
+} from "../i18n/config"
 
 const normalizePathname = pathname => {
   if (!pathname || pathname === "/") return "/"
@@ -95,10 +104,19 @@ function Seo({
   const defaultTitle = metadata?.title
   const siteUrl = metadata?.siteUrl?.replace(/\/$/, "") || "https://certificacionmontessori.com"
   const normalizedPathname = normalizePathname(pathname)
+
+  // Idioma y ruta canónica en español derivados del pathname (/en/…, /pt-br/…)
+  const { language, originalPath } = parsePath(normalizedPathname)
+  const lang = LANGUAGES[language] || LANGUAGES[DEFAULT_LANGUAGE]
+  const hasTranslations = isLocalizedPath(originalPath)
+  // Las versiones EN/PT-BR quedan en noindex hasta que la traducción humana esté lista
+  const effectiveRobots =
+    language !== DEFAULT_LANGUAGE && !INDEX_TRANSLATIONS ? "noindex,follow" : robots
+
   const pageUrl = canonicalUrl || `${siteUrl}${normalizedPathname}`
   const imageUrl = image || `${siteUrl}${metadata?.defaultOgImage || "/og-default.svg"}`
   const fullTitle = defaultTitle ? `${title} | ${defaultTitle}` : title
-  const shouldIndex = !robots.includes("noindex")
+  const shouldIndex = !effectiveRobots.includes("noindex")
 
   const areaServed = [
     { "@type": "Country", name: "México" },
@@ -169,7 +187,7 @@ function Seo({
     name: metadata?.siteName || defaultTitle,
     alternateName: metadata?.organizationName || defaultTitle,
     url: siteUrl,
-    inLanguage: metadata?.language || "es-MX",
+    inLanguage: lang.htmlLang,
   }
 
   const webpageSchema = {
@@ -178,7 +196,7 @@ function Seo({
     name: title,
     description: metaDescription,
     url: pageUrl,
-    inLanguage: metadata?.language || "es-MX",
+    inLanguage: lang.htmlLang,
     isPartOf: {
       "@type": "WebSite",
       url: siteUrl,
@@ -198,20 +216,44 @@ function Seo({
 
   return (
     <>
-      <html lang={metadata?.language || "es-MX"} />
+      <html lang={lang.htmlLang} />
       <title>{fullTitle}</title>
       <meta name="description" content={metaDescription} />
-      <meta name="robots" content={robots} />
+      <meta name="robots" content={effectiveRobots} />
       <meta name="google-site-verification" content="qR4NlpCyKRj2wf5mCfzwaVhpjFHCaqBGwCgaSO8oans" />
-      <meta name="language" content={metadata?.language || "es-MX"} />
+      <meta name="language" content={lang.htmlLang} />
       <meta name="author" content={metadata?.organizationName || "Asociación Montessori"} />
       <link rel="canonical" href={pageUrl} />
+      {hasTranslations &&
+        LANGUAGE_CODES.map(code => (
+          <link
+            key={`alt-${code}`}
+            rel="alternate"
+            hrefLang={LANGUAGES[code].hreflang}
+            href={`${siteUrl}${localizePath(code, originalPath)}`}
+          />
+        ))}
+      {hasTranslations && (
+        <link
+          rel="alternate"
+          hrefLang="x-default"
+          href={`${siteUrl}${localizePath(DEFAULT_LANGUAGE, originalPath)}`}
+        />
+      )}
       <meta property="og:title" content={title} />
       <meta property="og:description" content={metaDescription} />
       <meta property="og:type" content={type} />
       <meta property="og:url" content={pageUrl} />
       <meta property="og:site_name" content={metadata?.siteName || defaultTitle} />
-      <meta property="og:locale" content="es_MX" />
+      <meta property="og:locale" content={lang.ogLocale} />
+      {hasTranslations &&
+        LANGUAGE_CODES.filter(code => code !== language).map(code => (
+          <meta
+            key={`og-alt-${code}`}
+            property="og:locale:alternate"
+            content={LANGUAGES[code].ogLocale}
+          />
+        ))}
       <meta property="og:image" content={imageUrl} />
       <meta property="og:image:alt" content={metadata?.organizationName || defaultTitle} />
       <meta name="twitter:card" content="summary_large_image" />

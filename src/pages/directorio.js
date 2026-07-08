@@ -175,10 +175,10 @@ const Directorio = () => {
   )
 }
 
-export const Head = () => (
+export const Head = ({ location }) => (
   <Seo
     title="Directorio de Escuelas Montessori"
-    pathname="/directorio/"
+    pathname={location.pathname}
     description="Directorio público de escuelas Montessori en México y el mundo. Identifica las escuelas con certificación de la Asociación Montessori de México A.C. (AMMAC)."
   />
 )

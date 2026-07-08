@@ -133,10 +133,10 @@ const IndexPage = ({ location }) => {
   )
 }
 
-export const Head = () => (
+export const Head = ({ location }) => (
   <Seo
     title="Inicio"
-    pathname="/"
+    pathname={location.pathname}
     description="Inscríbete a diplomados Guía Montessori 100% en línea. Certificación internacional, próximo ciclo con cupo limitado. Aparta tu lugar desde $4,900 MXN."
   />
 )

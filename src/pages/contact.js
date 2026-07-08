@@ -163,10 +163,10 @@ const contactSchema = [
     faqSchema,
 ]
 
-export const Head = () => (
+export const Head = ({ location }) => (
     <Seo
         title="Contacto"
-        pathname="/contact/"
+        pathname={location.pathname}
         description="Contacta a la Asociación Montessori de México A.C. por correo, teléfono, WhatsApp o visita presencial en Ciudad de México."
         schema={contactSchema}
     />

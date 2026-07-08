@@ -103,10 +103,10 @@ const PublicacionesPage = () => {
   )
 }
 
-export const Head = () => (
+export const Head = ({ location }) => (
   <Seo
     title="Publicaciones"
-    pathname="/publicaciones/"
+    pathname={location.pathname}
     description="Consulta publicaciones, libros y recursos públicos relacionados con la filosofía y el método Montessori."
   />
 )

@@ -116,11 +116,11 @@ const Reembolsos = () => (
     </Layout>
 )
 
-export const Head = () => (
+export const Head = ({ location }) => (
     <Seo
         title="Política de reembolsos"
         description="Condiciones para solicitar reembolsos de inscripciones, colegiaturas, libros y materiales formativos en Asociación Montessori de México A.C."
-        pathname="/reembolsos"
+        pathname={location.pathname}
     />
 )
 

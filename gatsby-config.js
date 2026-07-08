@@ -1,3 +1,5 @@
+const { INDEX_TRANSLATIONS } = require("./src/i18n/config")
+
 module.exports = {
   siteMetadata: {
     title: `Asociación Montessori de México A.C.`,
@@ -75,6 +77,9 @@ module.exports = {
           `/masterclasses/*`,
           `/alumnos-app`,
           `/alumnos-app/*`,
+          // EN/PT-BR fuera del sitemap mientras estén en noindex (pre-traducción);
+          // en la Fase 5 (SEO) INDEX_TRANSLATIONS pasa a true y entran solos.
+          ...(INDEX_TRANSLATIONS ? [] : [`/en/`, `/en/**`, `/pt-br/`, `/pt-br/**`]),
         ],
       },
     },

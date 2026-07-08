@@ -194,10 +194,10 @@ const AIIndexPage = () => {
   )
 }
 
-export const Head = () => (
+export const Head = ({ location }) => (
   <Seo
     title="Guía pública para IA"
-    pathname="/ia/"
+    pathname={location.pathname}
     description="Índice canónico de páginas y recursos públicos de certificacionmontessori.com para facilitar búsquedas y consultas de agentes de IA."
     schema={aiPageSchema}
   />

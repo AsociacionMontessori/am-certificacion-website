@@ -140,10 +140,10 @@ const roxanaSchema = [
     },
 ]
 
-export const Head = () => (
+export const Head = ({ location }) => (
     <Seo
         title="Roxana Muñoz"
-        pathname="/roxana/"
+        pathname={location.pathname}
         description="Perfil de Roxana Muñoz Guevara, presidenta de la Asociación Montessori de México A.C. y directora general del Centro Educativo Montessori Kalpilli."
         schema={roxanaSchema}
     />
