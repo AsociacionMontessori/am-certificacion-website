@@ -1,1 +1,37 @@
-{}
+{
+  "seo": {
+    "title": "Contacto",
+    "description": "Contacta a la Asociación Montessori de México A.C. por correo, teléfono, WhatsApp o visita presencial en Ciudad de México."
+  },
+  "hero": {
+    "title": "Envíanos un mensaje",
+    "description": "Nuestro equipo estará encantado de atenderte. La comunicación siempre es la clave."
+  },
+  "methods": {
+    "email": {
+      "title": "Email",
+      "description": "Envíanos un correo electrónico.\nadmin@certificacionmontessori.com"
+    },
+    "ubicacion": {
+      "title": "Encuéntranos en",
+      "description": "Calle Av. Dos 48, San Pedro de los Pinos, Benito Juárez, 03800 Ciudad de México, CDMX"
+    },
+    "telefono": {
+      "title": "Llámanos",
+      "description": "Llamadas en horario de 8am a 5pm.\nNúmero de teléfono: 55 5515 2701"
+    },
+    "whatsapp": {
+      "title": "WhatsApp",
+      "description": "Atención de 9am a 6pm.\nSolo por chat: 55 4888 5013"
+    }
+  },
+  "schema": {
+    "contactPage": {
+      "name": "Contacto",
+      "description": "Datos de contacto institucional de la Asociación Montessori de México A.C."
+    },
+    "whatsapp": {
+      "description": "Atención por WhatsApp de 9:00 a 18:00 horas, solo por chat."
+    }
+  }
+}

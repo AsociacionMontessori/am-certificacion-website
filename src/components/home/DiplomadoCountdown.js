@@ -1,5 +1,6 @@
 import * as React from "react"
 import { useEffect, useState } from "react"
+import { useTranslation } from "react-i18next"
 import {
   DIPLOMADOS_EN_LINEA,
   getNextItem,
@@ -7,6 +8,7 @@ import {
 } from "../../data/diplomadosCalendario"
 
 const DiplomadoCountdown = ({ variant = "dark" }) => {
+  const { t } = useTranslation("home")
   const [state, setState] = useState({
     status: "loading",
     next: null,
@@ -37,13 +39,13 @@ const DiplomadoCountdown = ({ variant = "dark" }) => {
   }, [])
 
   if (state.status === "loading") {
-    return <p className={`text-sm ${textMuted}`}>Calculando próxima fecha…</p>
+    return <p className={`text-sm ${textMuted}`}>{t("countdown.calculando")}</p>
   }
 
   if (state.status === "noMore") {
     return (
       <p className={`text-sm ${textMain}`}>
-        Mantente al tanto de nuevas fechas de inicio en nuestros diplomados.
+        {t("countdown.sinFechas")}
       </p>
     )
   }
@@ -51,14 +53,14 @@ const DiplomadoCountdown = ({ variant = "dark" }) => {
   if (state.status === "live") {
     return (
       <p className={`text-sm ${textMain}`}>
-        ¡Estamos en vivo!{" "}
+        {t("countdown.enVivo")}{" "}
         <a
           href="https://youtube.com/live/1LVgUc94Z2k?feature=share"
           target="_blank"
           rel="noopener noreferrer"
           className="underline font-semibold text-blue"
         >
-          Únete a la clase
+          {t("countdown.unete")}
         </a>
       </p>
     )
@@ -66,32 +68,36 @@ const DiplomadoCountdown = ({ variant = "dark" }) => {
 
   const { days, hours } = getTimeParts(state.diff)
   const isUrgent = days <= 7
+  // Clave por fecha (YYYY-MM-DD) para poder localizar la etiqueta visible.
+  const fechaKey = state.next?.date
+    ? state.next.date.toISOString().slice(0, 10)
+    : ""
 
   return (
     <div className="space-y-3">
       {isUrgent && (
         <span className="inline-flex items-center gap-2 rounded-full bg-red px-3 py-1 text-xs font-bold text-white animate-pulse">
-          ¡Últimos lugares!
+          {t("countdown.ultimosLugares")}
         </span>
       )}
       <p className={`text-sm ${textMain}`}>
-        <span className="font-semibold">Próximo inicio: </span>
+        <span className="font-semibold">{t("countdown.proximoInicio")}</span>
         <span className="inline-block rounded-lg bg-gradient-to-r from-blue to-green px-3 py-1 text-sm font-bold text-white">
-          {state.next?.label}
+          {t(`countdown.fechas.${fechaKey}`, { defaultValue: state.next?.label })}
         </span>
       </p>
       <div className="flex flex-wrap items-center gap-2">
-        <span className={`text-xs font-medium ${textMuted}`}>Faltan:</span>
+        <span className={`text-xs font-medium ${textMuted}`}>{t("countdown.faltan")}</span>
         {days > 0 && (
           <div className={`flex flex-col items-center rounded-lg ${boxBg} px-3 py-2 min-w-[56px]`}>
             <span className={`text-xl font-bold ${textMain}`}>{days}</span>
-            <span className={`text-xs ${textMuted}`}>días</span>
+            <span className={`text-xs ${textMuted}`}>{t("countdown.dias")}</span>
           </div>
         )}
         {hours > 0 && (
           <div className={`flex flex-col items-center rounded-lg ${boxBg} px-3 py-2 min-w-[56px]`}>
             <span className={`text-xl font-bold ${textMain}`}>{hours}</span>
-            <span className={`text-xs ${textMuted}`}>hrs</span>
+            <span className={`text-xs ${textMuted}`}>{t("countdown.horas")}</span>
           </div>
         )}
       </div>

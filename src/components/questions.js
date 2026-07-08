@@ -1,51 +1,37 @@
 import React, { useState } from "react"
 import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline'
+import { useTranslation } from "react-i18next"
+import { getI18nInstance } from "../i18n"
 
-export const FAQ_ITEMS = [
-    {
-        question: "¿Qué ofrece certificacionmontessori.com?",
-        answer: "El sitio público de la Asociación Montessori de México A.C. reúne información institucional sobre diplomados, certificaciones, publicaciones, perfiles docentes, contacto y recursos abiertos relacionados con la formación Montessori."
-    },
-    {
-        question: "¿Los diplomados son en línea o presenciales?",
-        answer: "Los diplomados mostrados en el sitio están planteados como programas en línea. El contenido público explica que puedes estudiar desde cualquier lugar con acompañamiento de catedráticos y acceso a plataforma digital."
-    },
-    {
-        question: "¿Qué certificación obtengo al terminar?",
-        answer: "La oferta pública del sitio comunica que los programas cuentan con certificación internacional y están orientados a formarte como Guía Montessori. Los detalles específicos se concentran en la página de Diplomados."
-    },
-    {
-        question: "¿Quiénes forman parte del equipo docente?",
-        answer: "En la sección de profesores del diplomado se presentan perfiles públicos como Roxana Muñoz, Iván López Carmona y Carlos Romero, con información sobre su trayectoria, formación y rol dentro del programa."
-    },
-    {
-        question: "¿Qué temas se estudian en los diplomados?",
-        answer: "El sitio menciona materias como Filosofía Montessori, Métodos de Observación, Neuroeducación, Psicología Educativa, Musicoterapia, Psicomotricidad, Educación Inclusiva e Inteligencia Creativa, además del trabajo con materiales y presentaciones Montessori y una estructura por bloques de trabajo."
-    },
-    {
-        question: "¿Cómo está estructurada pedagógicamente la formación?",
-        answer: "Toda la formación se organiza en siete dominios de competencia (D1 a D7), espejo de los dominios internacionales de la formación Montessori (MACTE / AMI) y compatibles con los fundamentos AMI: fundamentos filosóficos e históricos, desarrollo humano y planos del desarrollo, el ambiente preparado y los materiales, observación científica, rol y transformación del adulto (Guía), pedagogía de las áreas del currículo, y comunidad, familia y liderazgo. Cada dominio se trabaja en los seis niveles cognitivos de la Taxonomía de Bloom (recordar, comprender, aplicar, analizar, evaluar y crear)."
-    },
-    {
-        question: "¿El diplomado está alineado a estándares internacionales y a AMI?",
-        answer: "Sí. El programa se alinea a los estándares internacionales de la formación Montessori y es compatible con los fundamentos AMI (Association Montessori Internationale). Además, cada actividad tiene un objetivo de aprendizaje codificado «Dominio·Nivel» (por ejemplo, D1·Analizar): el dominio indica el área de competencia y el nivel de la Taxonomía de Bloom, la profundidad cognitiva que se espera desarrollar, de modo que cada tarea tiene un propósito formativo explícito y evaluable."
-    },
-    {
-        question: "¿Qué documentos se solicitan para el certificado?",
-        answer: "En la página de diplomados se informa que para el certificado con validez internacional se solicitan comprobante de domicilio, identificación oficial, acta de nacimiento y último certificado de estudios."
-    },
-    {
-        question: "¿Cómo puedo pedir informes o iniciar contacto?",
-        answer: "Puedes escribir a admin@certificacionmontessori.com, llamar al 55 5515 2701 o contactar por WhatsApp en el 55 4888 5013. El WhatsApp se atiende de 9am a 6pm y es solo por chat."
-    },
-    {
-        question: "¿Dónde se encuentra la Asociación Montessori de México?",
-        answer: "La dirección pública mostrada en el sitio es Avenida Dos 48, San Pedro de los Pinos, Benito Juárez, 03800 Ciudad de México, CDMX."
-    },
+export const FAQ_SLUGS = [
+    "queOfrece",
+    "modalidad",
+    "certificacion",
+    "equipoDocente",
+    "temas",
+    "estructuraPedagogica",
+    "estandaresAmi",
+    "documentos",
+    "informes",
+    "ubicacion",
 ]
 
+/** Preguntas/respuestas desde el namespace "faq": las mismas claves alimentan
+    el texto visible y el schema JSON-LD FAQPage. */
+export const getFaqItems = (t) =>
+    FAQ_SLUGS.map((slug) => ({
+        question: t(`items.${slug}.pregunta`),
+        answer: t(`items.${slug}.respuesta`),
+    }))
+
+/* Compatibilidad: contact.js construye su schema FAQPage a nivel de módulo a
+   partir de FAQ_ITEMS; los textos salen de las mismas claves del namespace "faq". */
+export const FAQ_ITEMS = getFaqItems(getI18nInstance("es").getFixedT("es", "faq"))
+
 const Questions = () => {
-    const [respuestasVisibles, setRespuestasVisibles] = useState(Array(FAQ_ITEMS.length).fill(false));
+    const { t } = useTranslation("faq")
+    const faqItems = getFaqItems(t)
+    const [respuestasVisibles, setRespuestasVisibles] = useState(Array(FAQ_SLUGS.length).fill(false));
 
     const toggleRespuesta = (index) => {
         const newRespuestasVisibles = [...respuestasVisibles];
@@ -56,13 +42,13 @@ const Questions = () => {
         <div className="bg-white w-10/12 md:w-8/12 m-10 rounded-tl-3xl rounded-br-3xl text-black selection:text-black selection:bg-green selection:bg-opacity-20">
             <div className="sm:p-10 p-2" id="Preguntas Frecuentes">
                 <div className="md:p-5 p-2">
-                    <h2  className="md:text-3xl lg:text-4xl text-xl font-medium text-red">Preguntas Frecuentes</h2>
+                    <h2  className="md:text-3xl lg:text-4xl text-xl font-medium text-red">{t("titulo")}</h2>
                     <p className="mt-4 max-w-4xl text-sm md:text-lg text-black/80">
-                        Reunimos aquí preguntas reales sobre diplomados, certificación, contacto y contenido institucional para que cualquier persona, buscador o agente de IA encuentre respuestas directas en una sola página.
+                        {t("intro")}
                     </p>
                 </div>
                 <div className="md:p-5 p-2">
-                    {FAQ_ITEMS.map((item, index) => (
+                    {faqItems.map((item, index) => (
                         <div key={index}>
                             <div className="flex items-center justify-between cursor-pointer sm:mt-10 mt-2" onClick={() => toggleRespuesta(index)}>
                                 <h3 className="md:text-2xl lg:text-3xl text-base md:m-2 m-1 md:font-medium font-normal flex-grow">{item.question}</h3>

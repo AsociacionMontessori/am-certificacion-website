@@ -1,11 +1,13 @@
 import React from "react";
 import { FacebookProvider, Page } from 'react-facebook';
 import { Helmet } from "react-helmet";
+import { useTranslation } from "react-i18next";
 
 import Layout from "../components/layout"
 import Seo from "../components/seo"
 import Nav from "../components/nav"
-import Questions, { FAQ_ITEMS } from "../components/questions"
+import Questions, { getFaqItems } from "../components/questions"
+import { getT } from "../i18n"
 
 import '../styles/publications.css'
 import '../styles/wordpress_publications.css'
@@ -13,6 +15,7 @@ import '../styles/wordpress_publications.css'
 const iconsSize = "w-20 h-20"
 
 const contact = () => {
+    const { t } = useTranslation("contact")
     return (
         <>
             <Layout>
@@ -25,13 +28,19 @@ const contact = () => {
                         <Nav textColor="text-white" />
                         <div className="container relative z-10 px-6 py-12 mx-auto">
                             <div className="selection:text-white selection:bg-green selection:bg-opacity-20">
-                                <h1 className="mt-2 text-4xl font-semibold text-gray-800 md:text-8xl dark:text-white">Envíanos un mensaje</h1>
-                                <p className="mt-3 ">Nuestro equipo estará encantado de atenderte. La comunicación siempre es la clave.</p>
+                                <h1 className="mt-2 text-4xl font-semibold text-gray-800 md:text-8xl dark:text-white">{t("hero.title")}</h1>
+                                <p className="mt-3 ">{t("hero.description")}</p>
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 text-xs md:text-lg text-left">
                                 {contactMethods.map((method, index) => (
-                                    <ContactMethod key={index} {...method} />
+                                    <ContactMethod
+                                        key={index}
+                                        icon={method.icon}
+                                        link={method.link}
+                                        title={t(`methods.${method.key}.title`)}
+                                        description={t(`methods.${method.key}.description`)}
+                                    />
                                 ))}
                             </div>
                         </div>
@@ -83,8 +92,7 @@ const contactMethods = [
                 <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
             </svg>
         ),
-        title: "Email",
-        description: "Envíanos un correo electrónico.\nadmin@certificacionmontessori.com",
+        key: "email",
         link: "mailto:admin@certificacionmontessori.com"
     },
     {
@@ -94,8 +102,7 @@ const contactMethods = [
                 <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
             </svg>
         ),
-        title: "Encuéntranos en",
-        description: "Calle Av. Dos 48, San Pedro de los Pinos, Benito Juárez, 03800 Ciudad de México, CDMX",
+        key: "ubicacion",
         link: "https://maps.app.goo.gl/9EqAmfUryR5RB65W8"
     },
     {
@@ -104,8 +111,7 @@ const contactMethods = [
                 <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" />
             </svg>
         ),
-        title: "Llámanos",
-        description: "Llamadas en horario de 8am a 5pm.\nNúmero de teléfono: 55 5515 2701",
+        key: "telefono",
         link: "tel:5555152701"
     },
     {
@@ -114,18 +120,17 @@ const contactMethods = [
                 <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 10.5h9m-9 3h5.25M6.75 3.75h10.5A2.25 2.25 0 0119.5 6v12a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 18V6a2.25 2.25 0 012.25-2.25z" />
             </svg>
         ),
-        title: "WhatsApp",
-        description: "Atención de 9am a 6pm.\nSolo por chat: 55 4888 5013",
+        key: "whatsapp",
         link: "https://api.whatsapp.com/send?phone=5215548885013&text=Hola,%20Me%20gustar%C3%ADa%20informaci%C3%B3n%20sobre%20la%20certificaci%C3%B3n%20Montessori."
     },
 ];
 
 
 
-const faqSchema = {
+const buildFaqSchema = tFaq => ({
     "@context": "https://schema.org",
     "@type": "FAQPage",
-    mainEntity: FAQ_ITEMS.map(item => ({
+    mainEntity: getFaqItems(tFaq).map(item => ({
         "@type": "Question",
         name: item.question,
         acceptedAnswer: {
@@ -133,14 +138,14 @@ const faqSchema = {
             text: item.answer,
         },
     })),
-}
+})
 
-const contactSchema = [
+const buildContactSchema = (t, tFaq) => [
     {
         "@context": "https://schema.org",
         "@type": "ContactPage",
-        name: "Contacto",
-        description: "Datos de contacto institucional de la Asociación Montessori de México A.C.",
+        name: t("schema.contactPage.name"),
+        description: t("schema.contactPage.description"),
         url: "https://certificacionmontessori.com/contact/",
     },
     {
@@ -157,20 +162,24 @@ const contactSchema = [
         contactType: "WhatsApp support",
         telephone: "+52 1 55 4888 5013",
         url: "https://api.whatsapp.com/send?phone=5215548885013&text=Hola,%20Me%20gustar%C3%ADa%20informaci%C3%B3n%20sobre%20la%20certificaci%C3%B3n%20Montessori.",
-        description: "Atención por WhatsApp de 9:00 a 18:00 horas, solo por chat.",
+        description: t("schema.whatsapp.description"),
         availableLanguage: ["es"],
     },
-    faqSchema,
+    buildFaqSchema(tFaq),
 ]
 
-export const Head = ({ location }) => (
-    <Seo
-        title="Contacto"
-        pathname={location.pathname}
-        description="Contacta a la Asociación Montessori de México A.C. por correo, teléfono, WhatsApp o visita presencial en Ciudad de México."
-        schema={contactSchema}
-    />
-)
+export const Head = ({ location }) => {
+    const t = getT(location.pathname, "contact")
+    const tFaq = getT(location.pathname, "faq")
+    return (
+        <Seo
+            title={t("seo.title")}
+            pathname={location.pathname}
+            description={t("seo.description")}
+            schema={buildContactSchema(t, tFaq)}
+        />
+    )
+}
 
 
 export default contact

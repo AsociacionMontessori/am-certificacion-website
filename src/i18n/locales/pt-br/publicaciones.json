@@ -1,1 +1,85 @@
-{}
+{
+  "seo": {
+    "title": "Publicaciones",
+    "description": "Consulta publicaciones, libros y recursos públicos relacionados con la filosofía y el método Montessori."
+  },
+  "hero": {
+    "eyebrow": "Biblioteca Montessori",
+    "title": "Publicaciones de la Asociación Montessori de México",
+    "description": "Una serie editorial para acercar la filosofía Montessori, sus fundamentos y sus grandes lecciones a familias, docentes y comunidades educativas.",
+    "ctaLibros": "Ver libros",
+    "ctaAmazon": "Página de autor en Amazon"
+  },
+  "catalogo": {
+    "eyebrow": "Catálogo editorial",
+    "title": "Libros disponibles",
+    "description": "Consigue cada título en su edición impresa y digital directamente en Amazon México."
+  },
+  "blog": {
+    "eyebrow": "Blog",
+    "title": "Entradas recientes",
+    "description": "Artículos, avisos y recursos publicados en Montessori México.",
+    "cta": "Abrir blog",
+    "iframeTitle": "Blog Montessori México"
+  },
+  "seccion": {
+    "eyebrow": "Publicaciones",
+    "title": "Sus libros",
+    "description": "Serie en español basada en las obras de María Montessori. Consigue cada título en su edición impresa y digital en <destacado>Amazon México</destacado>.",
+    "nota": "Los precios en sitio son referencia; el monto final se confirma en la pasarela de pago al crear el pedido."
+  },
+  "card": {
+    "portadaAlt": "Portada de «{{titulo}}»",
+    "regaloGratis": "🎁 Regalo gratis",
+    "libroVolumen": "Libro {{volumen}}",
+    "ebookPrecio": "Ebook: ${{precio}} MXN",
+    "formatosDescargable": "{{formatos}} descargable",
+    "regaloConCompra": "También gratis con cualquier otra compra",
+    "regaloDetalle": "Recibes {{formatos}} al comprar cualquier otro libro o paquete",
+    "edicionImpresa": "Edición impresa",
+    "disponibleAmazon": "Disponible en Amazon México",
+    "comprarEbook": "Comprar ebook",
+    "verEnAmazonTitle": "Ver «{{titulo}}» en Amazon",
+    "verEnAmazon": "Ver en Amazon"
+  },
+  "bundle": {
+    "etiqueta": "Paquete digital",
+    "precio": "${{precio}} MXN",
+    "incluye": "Incluye {{formatos}} de los {{cantidad}} libros",
+    "comprar": "Comprar paquete"
+  },
+  "libros": {
+    "ammac-libro-5": {
+      "titulo": "La mente absorbente: Montessori a la luz de la neuroeducación y la psicomotricidad actuales",
+      "descripcion": "La síntesis más madura de María Montessori (1949) puesta a dialogar, capítulo a capítulo, con la neurociencia del desarrollo, la neuroeducación y la psicomotricidad: plasticidad cerebral, períodos sensibles, la unidad entre movimiento e inteligencia y la emoción como motor del aprendizaje. Con honestidad sobre convergencias, tensiones y neuromitos."
+    },
+    "ammac-libro-1": {
+      "titulo": "Montessori: Una presentación del método de la pedagogía científica",
+      "descripcion": "Primer volumen de la serie AMMAC: Roxana Muñoz Guevara revisa, presenta y actualiza la pedagogía científica de María Montessori — fruto de años de estudio y práctica con niños. Un método adoptado en escuelas de todo el mundo que abre una nueva posibilidad de enseñanza y pone en entredicho los presupuestos de la educación tradicional."
+    },
+    "ammac-libro-2": {
+      "titulo": "Montessori: Una presentación del secreto de la infancia",
+      "descripcion": "Segundo volumen de la serie basada en las obras originales de María Montessori. Roxana Muñoz Guevara sintetiza las ideas de El niño, el secreto de la infancia: la etapa incipiente de la vida donde el niño guarda el secreto práctico de nuestra propia existencia. Introducción y herramienta de estudio para todo público interesado en el método."
+    },
+    "ammac-libro-3": {
+      "titulo": "Educación Cósmica: Una pedagogía para que el niño se sepa parte del universo",
+      "descripcion": "Alrededor de los seis años, el niño empieza a preguntar por la totalidad: cómo nació el universo, cómo apareció la vida, cómo el ser humano llegó a hablar. La Educación Cósmica de María Montessori toma esa pregunta en serio. Presentación accesible de las cinco grandes lecciones, las cascadas curriculares y la formación del adulto que acompaña al niño."
+    },
+    "ammac-libro-4": {
+      "titulo": "Guiones Cósmicos: Las cinco grandes lecciones y las lecciones complementarias",
+      "descripcion": "Las grandes lecciones de María Montessori se cuentan, no se leen. Colección completa de once guiones narrativos del Taller del segundo plano: las cinco grandes lecciones (Universo, Vida, Ser Humano, Escritura y Números) y siete lecciones complementarias, con indicaciones técnicas, materiales y notas de seguimiento. Complemento técnico de Educación Cósmica."
+    }
+  },
+  "paquetes": {
+    "ammac-ebook-pack-4": {
+      "titulo": "Paquete digital: la serie completa (5 libros)",
+      "descripcion": "Los cuatro ebooks de la serie en PDF y EPUB —pagas el equivalente de tres libros, el de menor precio va incluido— y además recibes «La mente absorbente» de regalo. 5 libros en total.",
+      "nota": "PDF + EPUB de 4 libros + «La mente absorbente» de regalo · 5 en total"
+    },
+    "ammac-ebook-pack-cosmica": {
+      "titulo": "Paquete Cósmico: Educación Cósmica + Guiones Cósmicos",
+      "descripcion": "Los dos libros del segundo plano juntos en PDF y EPUB: la pedagogía de la Educación Cósmica y la colección completa de guiones de las grandes lecciones. Llévate ambos por $400 en lugar de $634, con «La mente absorbente» de regalo.",
+      "nota": "PDF + EPUB de 2 libros + «La mente absorbente» de regalo"
+    }
+  }
+}

@@ -1,1 +1,33 @@
-{}
+{
+  "seo": {
+    "title": "Directorio de Escuelas Montessori",
+    "description": "Directorio público de escuelas Montessori en México y el mundo. Identifica las escuelas con certificación de la Asociación Montessori de México A.C. (AMMAC)."
+  },
+  "header": {
+    "eyebrow": "Directorio Montessori",
+    "title": "Directorio de Escuelas Montessori",
+    "description": "Encuentra escuelas Montessori en México y el resto del mundo. Las marcadas con el distintivo <distintivo>★ Certificación AMMAC</distintivo> cuentan con el aval de la Asociación Montessori de México A.C."
+  },
+  "filtros": {
+    "buscarPlaceholder": "Buscar por nombre, ciudad o estado…",
+    "buscarAriaLabel": "Buscar escuela Montessori",
+    "todos": "🌎 Todos",
+    "soloAmmac": "Solo certificadas AMMAC"
+  },
+  "resultados": {
+    "cargando": "Cargando escuelas…",
+    "muchas": "{{total}} escuelas encontradas — mostrando las primeras {{limite}}. Afina con el buscador o el filtro de país.",
+    "contador": "{{total}} escuela(s) encontradas",
+    "error": "No se pudo cargar el directorio. Intenta de nuevo más tarde.",
+    "vacio": "No tenemos escuelas registradas para esa búsqueda."
+  },
+  "tarjeta": {
+    "certificacion": "★ Certificación AMMAC",
+    "telefono": "Tel: {{telefono}}"
+  },
+  "cobertura": {
+    "descripcion": "¿No encuentras una escuela Montessori en tu ciudad o país? Nuestro directorio crece poco a poco. Mientras tanto, puedes buscarla directamente en Google Maps:",
+    "boton": "Buscar {{termino}} en Google Maps →",
+    "terminoPorDefecto": "escuelas Montessori"
+  }
+}

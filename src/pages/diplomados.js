@@ -7,16 +7,18 @@ import ProfessorsSection from "../components/professorsSection";
 import MarcoPedagogico from "../components/marcoPedagogico";
 import Scholarship from "../components/scholarship";
 import Seo from "../components/seo";
+import { useTranslation, Trans } from "react-i18next";
+import { getT } from "../i18n";
 import { DIPLOMADOS_EN_LINEA, getNextItem } from "../data/diplomadosCalendario";
 
 const FORM_INSCRIPCION = "https://forms.gle/pQKbTjGKCMYtnjuY6";
 
 export default function Landing() {
+  const { t } = useTranslation("diplomados");
   const [proximoInicio, setProximoInicio] = useState(null);
 
   useEffect(() => {
-    const next = getNextItem(DIPLOMADOS_EN_LINEA);
-    setProximoInicio(next ? next.label : null);
+    setProximoInicio(getNextItem(DIPLOMADOS_EN_LINEA));
   }, []);
 
   const gradientTextStyle = {
@@ -47,63 +49,60 @@ export default function Landing() {
                   <div className="w-full min-w-0 lg:w-6/12 lg:w-10/12 px-4 ml-auto mr-auto lg:text-center">
                     <div>
                       <p className="text-sm sm:text-base uppercase tracking-widest text-green-300/90 mb-2">
-                        Certificación internacional • 100% en línea • A tu ritmo
+                        {t("hero.kicker")}
                       </p>
                       <h1 data-rellax-speed="-3" data-rellax-xs-speed="0" data-rellax-mobile-speed="0" className="rellax text-4xl sm:text-5xl font-bold text-white sm:text-7xl md:text-8xl xl:leading-tight font-semibold">
-                        Diplomados: <span className="block">Guía Montessori</span>
+                        <Trans i18nKey="hero.title" ns="diplomados" components={{ linea: <span className="block" /> }} />
                       </h1>
                       <p className="mt-6 sm:mt-10 text-md sm:text-lg md:text-xl text-gray-300 max-w-2xl">
-                        Programas diseñados para un conocimiento práctico y profundo en educación y método Montessori. Termina como Guía Montessori con certificado de validez internacional.
+                        {t("hero.p1")}
                       </p>
                       <p className="mt-3 text-sm sm:text-base text-gray-300/90 max-w-2xl">
-                        Somos la Asociación Montessori de México, una institución mexicana con proyección internacional: formamos Guías Montessori en línea para estudiantes de todo el mundo.
+                        {t("hero.p2")}
                       </p>
                       <a
                         href="#certificacion_internacional"
                         className="inline-flex items-center gap-2 mt-6 sm:mt-8 px-6 py-3 rounded-full bg-white text-blue font-semibold hover:bg-green hover:text-white transition-all duration-300 shadow-lg"
                       >
-                        Ver programas y precios
+                        {t("ctaProgramasPrecios")}
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" /></svg>
                       </a>
                       <div className="relative overflow-hidden lg:mt-16 lg:p-10 mt-6 p-2 sm:p-4 border border-white/60 bg-black/40 backdrop-blur-sm lg:border-white/80 lg:hover:border-green transition duration-300 ease-in-out rounded-3xl">
                         <div className="absolute bottom-0 right-0 lg:-top-[40vh] lg:-left-60 w-20 lg:w-1/2 lg:opacity-50 pointer-events-none">
-                          <StaticImage src="../images/elements/decor1.png" placeholder="none" alt="decoración" className="w-20 lg:w-full pointer-events-none select-none" />
+                          <StaticImage src="../images/elements/decor1.png" placeholder="none" alt={t("hero.decorAlt")} className="w-20 lg:w-full pointer-events-none select-none" />
                         </div>
                         <p className="text-xs sm:text-sm md:text-xl text-gray-200">
-                          Al finalizar tus programas estarás listo para trabajar como Guía Montessori en cualquier escuela del mundo y marcar una diferencia real en la vida de tus alumnos.
-                          Estudia desde cualquier lugar con nuestra plataforma en línea.
+                          {t("hero.card.p1")}
                         </p>
                         <p className="text-xs sm:text-sm text-white/90 mt-3">
-                          Tu acceso incluye: <strong className="text-white">Google Workspace</strong> (Drive 1 TB, correo institucional y servicios de Google), además de estudio con apoyo de <strong className="text-white">IA de Google</strong> (Notebook LM, Gemini).
+                          <Trans i18nKey="hero.card.acceso" ns="diplomados" components={{ fuerte: <strong className="text-white" /> }} />
                         </p>
                         <div className="flex flex-wrap justify-center gap-2 mt-4 text-xs text-white/80">
-                          <span className="px-2 py-1 rounded bg-white/10">Compatible con MACTE / AMI</span>
-                          <span className="px-2 py-1 rounded bg-white/10">Estándar CONOCER (SEP)</span>
-                          <span className="px-2 py-1 rounded bg-white/10">RVOE en trámite</span>
-                          <span className="px-2 py-1 rounded bg-white/10">Google for Education</span>
-                          <span className="px-2 py-1 rounded bg-white/10">Gemini IA</span>
+                          {t("hero.card.badges", { returnObjects: true }).map((badge) => (
+                            <span key={badge} className="px-2 py-1 rounded bg-white/10">{badge}</span>
+                          ))}
                         </div>
                         <div className="flex flex-col items-center justify-center gap-4 mt-5 px-2 w-full">
                           <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 w-full max-w-2xl mx-auto">
                             <div className="h-16 w-56 flex items-center justify-center flex-shrink-0">
-                              <StaticImage src="../images/elements/google2.png" placeholder="none" alt="Google Classroom" className="h-full w-auto max-w-full object-contain object-center pointer-events-none select-none" />
+                              <StaticImage src="../images/elements/google2.png" placeholder="none" alt={t("hero.card.altClassroom")} className="h-full w-auto max-w-full object-contain object-center pointer-events-none select-none" />
                             </div>
                             <div className="h-20 w-64 flex items-center justify-center flex-shrink-0">
-                              <StaticImage src="../images/elements/google1.png" placeholder="none" alt="Google for Education" className="h-full w-auto max-w-full object-contain object-center pointer-events-none select-none" />
+                              <StaticImage src="../images/elements/google1.png" placeholder="none" alt={t("hero.card.altForEducation")} className="h-full w-auto max-w-full object-contain object-center pointer-events-none select-none" />
                             </div>
                           </div>
                           <div className="flex items-center justify-center gap-6 sm:gap-8">
                             <div className="h-7 w-20 flex items-center justify-center">
                               <img
                                 src="https://upload.wikimedia.org/wikipedia/commons/8/8a/Google_Gemini_logo.svg"
-                                alt="Gemini IA"
+                                alt={t("hero.card.altGemini")}
                                 className="h-full w-auto max-w-full object-contain object-center opacity-95"
                               />
                             </div>
                             <div className="h-7 w-24 flex items-center justify-center">
                               <img
                                 src="https://upload.wikimedia.org/wikipedia/commons/5/57/NotebookLM_logo.svg"
-                                alt="Notebook LM"
+                                alt={t("hero.card.altNotebookLm")}
                                 className="h-full w-auto max-w-full object-contain object-center opacity-95 invert"
                               />
                             </div>
@@ -190,15 +189,15 @@ export default function Landing() {
                   </div>
                 </div> */}
                 <div className="w-full px-4 mr-auto ml-auto mt-32">
-                  <p className="text-green-300/90 text-sm uppercase tracking-wider mb-2">Contenido del programa</p>
+                  <p className="text-green-300/90 text-sm uppercase tracking-wider mb-2">{t("contenido.kicker")}</p>
                   <h3 className="text-3xl sm:text-4xl lg:text-6xl mb-2 font-semibold leading-tight text-white">
-                    Todo lo que necesitas para ser Guía Montessori
+                    {t("contenido.titulo")}
                   </h3>
                   <p className="text-md md:text-xl font-light leading-relaxed mt-4 mb-4 text-white/90 max-w-4xl">
-                    Cada materia se trabaja en bloques de unas 9 sesiones (una por semana), con material, actividades y acompañamiento de tu catedrático para resolver dudas y profundizar.
+                    {t("contenido.descripcion")}
                   </p>
                   <div className="inline-block px-4 py-2 rounded-full bg-white/15 text-white font-semibold text-sm md:text-base mt-2">
-                    1. Tronco común
+                    {t("contenido.badge")}
                   </div>
                 </div>
 
@@ -207,9 +206,9 @@ export default function Landing() {
                 <div className="w-1/2 min-w-0 md:w-4/12 px-2">
                   <div className="relative flex flex-col min-w-0 break-words bg-white w-full mb-8 shadow-xl rounded-lg overflow-hidden">
                     <div className="hover:bg-red hover:bg-opacity-10 px-2 md:px-4 lg:px-6 py-5 flex-auto">
-                      <h6 className="text-sm md:text-xl font-semibold text-red">FILOSOFÍA MONTESSORI</h6>
+                      <h6 className="text-sm md:text-xl font-semibold text-red">{t("contenido.materias.filosofia.nombre")}</h6>
                       <p className="text-xs md:text-sm lg:text-base mt-2 mb-4 text-black">
-                        Conocerás la historia y principios detrás de la metodología Montessori.
+                        {t("contenido.materias.filosofia.descripcion")}
                       </p>
                     </div>
                   </div>
@@ -217,9 +216,9 @@ export default function Landing() {
                 <div className="w-1/2 min-w-0 md:w-4/12 px-2 ">
                   <div className="relative flex flex-col min-w-0 break-words bg-white w-full mb-8 shadow-xl rounded-lg overflow-hidden">
                     <div className="hover:bg-blue hover:bg-opacity-10 px-2 md:px-4 lg:px-6 py-5 flex-auto">
-                      <h6 className="text-sm md:text-xl font-semibold text-blue">MÉTODOS DE OBSERVACIÓN</h6>
+                      <h6 className="text-sm md:text-xl font-semibold text-blue">{t("contenido.materias.observacion.nombre")}</h6>
                       <p className="text-xs md:text-sm lg:text-base mt-2 mb-4 text-black">
-                        Desarrolla la capacidad de observar y entender las necesidades únicas de cada uno de tus alumnos.
+                        {t("contenido.materias.observacion.descripcion")}
                       </p>
                     </div>
                   </div>
@@ -227,9 +226,9 @@ export default function Landing() {
                 <div className="-mt-5 md:mt-0 w-1/2 min-w-0 md:w-4/12 px-2 ">
                   <div className="relative flex flex-col min-w-0 break-words bg-white w-full mb-8 shadow-xl rounded-lg overflow-hidden">
                     <div className="hover:bg-orange hover:bg-opacity-10 px-2 md:px-4 lg:px-6 py-5 flex-auto">
-                      <h6 className="text-sm md:text-xl font-semibold text-orange">NEURO - EDUCACIÓN</h6>
+                      <h6 className="text-sm md:text-xl font-semibold text-orange">{t("contenido.materias.neuroeducacion.nombre")}</h6>
                       <p className="text-xs md:text-sm lg:text-base mt-2 mb-4 text-black">
-                        Descubre cómo se desarrolla el cerebro humano en las primeras etapas de la vida
+                        {t("contenido.materias.neuroeducacion.descripcion")}
                       </p>
                     </div>
                   </div>
@@ -237,9 +236,9 @@ export default function Landing() {
                 <div className="w-1/2 min-w-0 md:w-4/12 px-2 ">
                   <div className="relative flex flex-col min-w-0 break-words bg-white w-full mb-8 shadow-xl rounded-lg overflow-hidden">
                     <div className="hover:bg-green hover:bg-opacity-10 px-2 md:px-4 lg:px-6 py-5 flex-auto">
-                      <h6 className="text-sm md:text-xl font-semibold text-green">PSICOLOGÍA EDUCATIVA</h6>
+                      <h6 className="text-sm md:text-xl font-semibold text-green">{t("contenido.materias.psicologia.nombre")}</h6>
                       <p className="text-xs md:text-sm lg:text-base mt-2 mb-4 text-black">
-                        Descubre de qué manera integra el alumno su entorno y cómo garantizar un aprendizaje significativo.
+                        {t("contenido.materias.psicologia.descripcion")}
                       </p>
                     </div>
                   </div>
@@ -247,9 +246,9 @@ export default function Landing() {
                 <div className="-mt-10 md:mt-0 w-1/2 min-w-0 md:w-4/12 px-2 ">
                   <div className="relative flex flex-col min-w-0 break-words bg-white w-full mb-8 shadow-xl rounded-lg overflow-hidden">
                     <div className="hover:bg-red hover:bg-opacity-10 px-2 md:px-4 lg:px-6 py-5 flex-auto">
-                      <h6 className="text-sm md:text-xl font-semibold text-red">MUSICOTERAPIA</h6>
+                      <h6 className="text-sm md:text-xl font-semibold text-red">{t("contenido.materias.musicoterapia.nombre")}</h6>
                       <p className="text-xs md:text-sm lg:text-base mt-2 mb-4 text-black">
-                        Conoce la importancia de la música en el aprendizaje con las campanas Montessori.
+                        {t("contenido.materias.musicoterapia.descripcion")}
                       </p>
                     </div>
                   </div>
@@ -257,9 +256,9 @@ export default function Landing() {
                 <div className="w-1/2 min-w-0 md:w-4/12 px-2 ">
                   <div className="relative flex flex-col min-w-0 break-words bg-white w-full mb-8 shadow-xl rounded-lg overflow-hidden">
                     <div className="hover:bg-blue hover:bg-opacity-10 px-2 md:px-4 lg:px-6 py-5 flex-auto">
-                      <h6 className="text-sm md:text-xl font-semibold text-blue">PSICO-MOTRICIDAD</h6>
+                      <h6 className="text-sm md:text-xl font-semibold text-blue">{t("contenido.materias.psicomotricidad.nombre")}</h6>
                       <p className="text-xs md:text-sm lg:text-base mt-2 mb-4 text-black">
-                        Explora cómo el movimiento es fundamental en el desarrollo y aprendizaje.
+                        {t("contenido.materias.psicomotricidad.descripcion")}
                       </p>
                     </div>
                   </div>
@@ -267,9 +266,9 @@ export default function Landing() {
                 <div className="-mt-5 lg:mt-0 md:w-2/3 w-1/2 min-w-0 px-2 ">
                   <div className="relative flex flex-col min-w-0 break-words bg-white w-full mb-8 shadow-xl rounded-lg overflow-hidden">
                     <div className="hover:bg-orange hover:bg-opacity-10 px-2 md:px-4 lg:px-6 py-5 flex-auto">
-                      <h6 className="text-sm md:text-xl font-semibold text-orange">EDUCACIÓN INCLUSIVA</h6>
+                      <h6 className="text-sm md:text-xl font-semibold text-orange">{t("contenido.materias.inclusiva.nombre")}</h6>
                       <p className="text-xs md:text-sm lg:text-base mt-2 mb-4 text-black">
-                        Conoce cómo se prepara el conocimiento, el ambiente y la pedagogía para todo tipo de aprendizajes y necesidades de los niños.
+                        {t("contenido.materias.inclusiva.descripcion")}
                       </p>
                     </div>
                   </div>
@@ -277,9 +276,9 @@ export default function Landing() {
                 <div className="w-1/2 min-w-0 md:w-1/3 px-2 ">
                   <div className="relative flex flex-col min-w-0 break-words bg-white w-full mb-8 shadow-xl rounded-lg overflow-hidden">
                     <div className="hover:bg-green hover:bg-opacity-10 px-2 md:px-4 lg:px-6 py-5 flex-auto">
-                      <h6 className="text-sm md:text-xl font-semibold text-green">INTELIGENCIA CREATIVA</h6>
+                      <h6 className="text-sm md:text-xl font-semibold text-green">{t("contenido.materias.creativa.nombre")}</h6>
                       <p className="text-xs md:text-sm lg:text-base mt-2 mb-4 text-black">
-                        Fomenta la creatividad y el pensamiento innovador en todos tus estudiantes.
+                        {t("contenido.materias.creativa.descripcion")}
                       </p>
                     </div>
                   </div>
@@ -289,13 +288,13 @@ export default function Landing() {
               <div className="flex flex-wrap items-center ">
                 <div className="w-full px-4 mr-auto ml-auto mt-12">
                   <h3 className="text-3xl lg:text-5xl mb-2 font-semibold leading-tight text-white">
-                    El método Montessori en la práctica
+                    {t("practica.titulo")}
                   </h3>
                   <p className="text-md md:text-xl font-light leading-relaxed mt-4 mb-4 text-white/90">
-                    Aprenderás el material científico de María Montessori y cómo presentarlo según cada etapa de desarrollo.
+                    {t("practica.descripcion")}
                   </p>
                   <div className="inline-block px-4 py-2 rounded-full bg-white/15 text-white font-semibold text-sm md:text-base">
-                    2. Materiales y presentaciones
+                    {t("practica.badge")}
                   </div>
                 </div>
               </div>
@@ -352,12 +351,12 @@ export default function Landing() {
 
 
                     </div>
-                    <p className="text-green-300/90 text-sm uppercase tracking-wider mb-2">Modalidad</p>
+                    <p className="text-green-300/90 text-sm uppercase tracking-wider mb-2">{t("modalidad.kicker")}</p>
                     <h3 className="pt-4 text-3xl font-semibold text-white">
-                      Clases accesibles y flexibles
+                      {t("modalidad.titulo")}
                     </h3>
                     <p className="mt-4 text-lg leading-relaxed text-white/90">
-                      Estudia a tu ritmo con contenido nuevo cada semana y acompañamiento constante:
+                      {t("modalidad.intro")}
                     </p>
                     <ul className="list-none mt-6 space-y-4 text-white">
                       <li className="flex items-start gap-3">
@@ -365,8 +364,8 @@ export default function Landing() {
                           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                         </span>
                         <div>
-                          <strong className="text-white block">Publicación semanal</strong>
-                          <span className="text-white/90">Cada sábado a las 8:00 se publica una clase nueva.</span>
+                          <strong className="text-white block">{t("modalidad.items.publicacion.titulo")}</strong>
+                          <span className="text-white/90">{t("modalidad.items.publicacion.texto")}</span>
                         </div>
                       </li>
                       <li className="flex items-start gap-3">
@@ -374,8 +373,8 @@ export default function Landing() {
                           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
                         </span>
                         <div>
-                          <strong className="text-white block">Actividades a tu ritmo</strong>
-                          <span className="text-white/90">Entrega cuando quieras mientras la materia esté activa (aprox. dos meses por materia).</span>
+                          <strong className="text-white block">{t("modalidad.items.actividades.titulo")}</strong>
+                          <span className="text-white/90">{t("modalidad.items.actividades.texto")}</span>
                         </div>
                       </li>
                       <li className="flex items-start gap-3">
@@ -383,8 +382,8 @@ export default function Landing() {
                           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" /></svg>
                         </span>
                         <div>
-                          <strong className="text-white block">Acceso 24/7</strong>
-                          <span className="text-white/90">Revisa las clases cuando y donde quieras.</span>
+                          <strong className="text-white block">{t("modalidad.items.acceso.titulo")}</strong>
+                          <span className="text-white/90">{t("modalidad.items.acceso.texto")}</span>
                         </div>
                       </li>
                       <li className="flex items-start gap-3">
@@ -392,13 +391,13 @@ export default function Landing() {
                           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
                         </span>
                         <div>
-                          <strong className="text-white block">Guía personalizada</strong>
-                          <span className="text-white/90">Solicita videollamada con tu profesor cuando lo necesites.</span>
+                          <strong className="text-white block">{t("modalidad.items.guia.titulo")}</strong>
+                          <span className="text-white/90">{t("modalidad.items.guia.texto")}</span>
                         </div>
                       </li>
                     </ul>
                     <a href="#certificacion_internacional" className="inline-flex items-center gap-2 mt-8 px-5 py-2.5 rounded-full bg-white/20 text-white font-medium hover:bg-white hover:text-blue transition-all duration-300 text-sm">
-                      Ver programas y precios
+                      {t("ctaProgramasPrecios")}
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" /></svg>
                     </a>
                   </div>
@@ -409,12 +408,12 @@ export default function Landing() {
 
           <section id="" className="relative overflow-hidden bg-gradient-to-r from-blue to-green pb-20 pt-6">
             <div className="container mx-auto w-full max-w-full px-4 text-center mb-8">
-              <p className="text-green-300/90 text-sm uppercase tracking-wider mb-2">Programas y precios</p>
+              <p className="text-green-300/90 text-sm uppercase tracking-wider mb-2">{t("programasSeccion.kicker")}</p>
               <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-3">
-                Elige tu programa y da el siguiente paso
+                {t("programasSeccion.titulo")}
               </h2>
               <p className="text-white/90 text-lg max-w-2xl mx-auto">
-                Certificación internacional, modalidad en línea y acompañamiento de guías certificadas.
+                {t("programasSeccion.descripcion")}
               </p>
             </div>
             <CertificationPrice />
@@ -448,17 +447,24 @@ export default function Landing() {
             <div className="container mx-auto w-full max-w-full px-4 lg:pt-24 lg:pb-32">
               <div className="flex flex-wrap min-w-0 text-center justify-center text-white">
                 <div className="w-full lg:w-6/12 px-4">
-                  <p className="text-green-300/90 text-sm uppercase tracking-wider mb-2">Inscripción</p>
+                  <p className="text-green-300/90 text-sm uppercase tracking-wider mb-2">{t("inscripcionSeccion.kicker")}</p>
                   <h2 className="text-4xl font-semibold text-white">
-                    3 pasos para empezar
+                    {t("inscripcionSeccion.titulo")}
                   </h2>
                   {proximoInicio && (
                     <p className="text-lg font-medium text-white mt-4">
-                      Próximo inicio: <span className="text-green-300">{proximoInicio}</span>
+                      <Trans
+                        i18nKey="inscripcionSeccion.proximoInicio"
+                        ns="diplomados"
+                        values={{
+                          fecha: t(`calendario.fechas.${proximoInicio.date.toISOString().slice(0, 10)}`, { defaultValue: proximoInicio.label }),
+                        }}
+                        components={{ verde: <span className="text-green-300" /> }}
+                      />
                     </p>
                   )}
                   <p className="text-md leading-relaxed mt-3 mb-4 text-white/80">
-                    Completa el formulario de inscripción y luego solo necesitas:
+                    {t("inscripcionSeccion.intro")}
                   </p>
                   <a
                     href={FORM_INSCRIPCION}
@@ -466,7 +472,7 @@ export default function Landing() {
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 mt-4 px-6 py-3 rounded-full bg-white text-blue font-semibold hover:bg-green hover:text-white transition-all duration-300"
                   >
-                    Inscribirme — Formulario de inscripción
+                    {t("inscripcionSeccion.ctaFormulario")}
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
                   </a>
                 </div>
@@ -477,11 +483,11 @@ export default function Landing() {
                     1
                   </div>
                   <h6 className="text-xl mt-5 font-semibold text-white">
-                    Inscripción
+                    {t("inscripcionSeccion.paso1.titulo")}
                   </h6>
                   <p className="mt-2 mb-4 text-white/90 text-sm">
-                    📄 Hoja de inscripción y formas de pago en el mismo formulario:
-                    <a className="text-green-300 hover:underline block mt-1" href={FORM_INSCRIPCION} target="_blank" rel="noopener noreferrer">Abrir formulario de inscripción</a>
+                    {t("inscripcionSeccion.paso1.texto")}
+                    <a className="text-green-300 hover:underline block mt-1" href={FORM_INSCRIPCION} target="_blank" rel="noopener noreferrer">{t("inscripcionSeccion.paso1.linkTexto")}</a>
                   </p>
                 </div>
                 <div className="w-full lg:w-3/12 px-4 text-center">
@@ -489,16 +495,16 @@ export default function Landing() {
                     2
                   </div>
                   <h5 className="text-xl mt-5 font-semibold text-white">
-                    👨‍🎓 Documentos Personales
+                    {t("inscripcionSeccion.paso2.titulo")}
                   </h5>
                   <p className="mt-2 text-sm mb-4 text-white/90">
-                    Para tu certificado con validez internacional:
-                    <span className="pt-3 block text-white">📍 Comprobante de domicilio</span>
-                    <span className="block text-white">🪪 Identificación oficial</span>
-                    <span className="block text-white">👶 Acta de nacimiento</span>
-                    <span className="block text-white">👨‍🎓 Último certificado de estudios</span>
+                    {t("inscripcionSeccion.paso2.intro")}
+                    <span className="pt-3 block text-white">{t("inscripcionSeccion.paso2.docs.domicilio")}</span>
+                    <span className="block text-white">{t("inscripcionSeccion.paso2.docs.identificacion")}</span>
+                    <span className="block text-white">{t("inscripcionSeccion.paso2.docs.acta")}</span>
+                    <span className="block text-white">{t("inscripcionSeccion.paso2.docs.certificado")}</span>
                     <span className="text-xs block mt-3 text-white/70">
-                      No hay requisito de nivel educativo para cursar; algunas escuelas exigen licenciatura para estar frente a grupo — depende de cada institución.
+                      {t("inscripcionSeccion.paso2.nota")}
                     </span>
                   </p>
                 </div>
@@ -507,10 +513,10 @@ export default function Landing() {
                     3
                   </div>
                   <h5 className="text-xl mt-5 font-semibold text-white">
-                    📜 Reglamento firmado
+                    {t("inscripcionSeccion.paso3.titulo")}
                   </h5>
                   <p className="mt-2 mb-4 text-white/90 text-sm">
-                    Nos comprometemos a una educación de <span className="text-white font-medium">calidad</span> en un ambiente de <span className="text-white font-medium">respeto</span>. Conoce y firma nuestro reglamento para iniciar tu diplomado.
+                    <Trans i18nKey="inscripcionSeccion.paso3.texto" ns="diplomados" components={{ destacado: <span className="text-white font-medium" /> }} />
                   </p>
                 </div>
               </div>
@@ -526,28 +532,31 @@ export default function Landing() {
   );
 }
 
-const diplomadosSchema = [
+const buildDiplomadosSchema = (t) => [
   {
     "@context": "https://schema.org",
     "@type": "EducationalOccupationalProgram",
-    name: "Diplomados Guía Montessori",
-    description: "Diplomados en línea para formarte como Guía Montessori con acompañamiento docente y certificación internacional.",
+    name: t("schema.nombre"),
+    description: t("schema.descripcion"),
     educationalProgramMode: "online",
-    occupationalCategory: "Guía Montessori",
+    occupationalCategory: t("schema.categoria"),
     provider: {
       "@type": "EducationalOrganization",
-      name: "Asociación Montessori de México A.C.",
+      name: t("schema.proveedor"),
       url: "https://certificacionmontessori.com/",
     },
     url: "https://certificacionmontessori.com/diplomados/",
   },
 ]
 
-export const Head = ({ location }) => (
-  <Seo
-    title="Diplomados Guía Montessori"
-    pathname={location.pathname}
-    description="Conoce los diplomados en línea para formarte como Guía Montessori con certificación internacional, equipo docente y estructura del programa."
-    schema={diplomadosSchema}
-  />
-)
+export const Head = ({ location }) => {
+  const t = getT(location.pathname, "diplomados")
+  return (
+    <Seo
+      title={t("seo.title")}
+      pathname={location.pathname}
+      description={t("seo.description")}
+      schema={buildDiplomadosSchema(t)}
+    />
+  )
+}

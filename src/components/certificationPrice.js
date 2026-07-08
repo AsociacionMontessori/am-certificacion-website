@@ -5,12 +5,14 @@ import CardInscription from "./cards/inscriptionCard"
 import CardCertification from "./cards/cardCertification"
 import axios from "axios"
 import ProgramCheckoutLink from "./checkout/ProgramCheckoutLink"
+import { useTranslation, Trans } from "react-i18next"
 import {
     INSCRIPCION_MARKETING_COPY,
     PROGRAMAS_OFERTA,
 } from "../data/programasOferta"
 
 const CertificationPrice = () => {
+    const { t } = useTranslation("diplomados")
     const [state, setState] = useState({
         ip: "",
         countryName: "",
@@ -64,64 +66,68 @@ const CertificationPrice = () => {
 
     const certificado = {
         cardType: "certification",
-        title: "Certificado",
-        subtitle: "Diploma físico con sellos y firmas oficiales, validado con código QR y folio único.",
+        title: t("precios.certificado.titulo"),
+        subtitle: t("precios.certificado.subtitulo"),
         priceMx: "2,700",
         priceUsd: "150",
         text: "",
         time: null,
-        paymentNote: "pago único",
-        footer: "+ gastos de envío",
+        paymentNote: t("precios.certificado.pagoUnico"),
+        footer: t("precios.certificado.footer"),
     }
+
+    const montoInscripcion = t("programas.inscripcion.textoMonto", {
+        defaultValue: INSCRIPCION_MARKETING_COPY.textoMonto,
+    })
 
     const allCards = [
         ...guias.map((p) => ({
             cardType: "monthly",
             programaId: p.id,
-            title: p.cardTitle,
-            subtitle: p.cardSubtitle,
+            title: t(`programas.${p.id}.cardTitle`, { defaultValue: p.cardTitle }),
+            subtitle: t(`programas.${p.id}.cardSubtitle`, { defaultValue: p.cardSubtitle }),
             priceMx: p.priceMx,
             priceUsd: p.priceUsd,
-            text: "Colegiatura mensual",
-            duration: p.duration,
-            footnote: p.priceNote,
+            text: t("precios.colegiaturaMensual"),
+            duration: t(`programas.${p.id}.duration`, { defaultValue: p.duration }),
+            footnote: t(`programas.${p.id}.priceNote`, { defaultValue: p.priceNote }),
         })),
         {
             cardType: "certification",
             programaId: neuro.id,
-            title: neuro.cardTitle,
-            subtitle: neuro.cardSubtitle,
+            title: t("programas.neuro.cardTitle", { defaultValue: neuro.cardTitle }),
+            subtitle: t("programas.neuro.cardSubtitle", { defaultValue: neuro.cardSubtitle }),
             priceMx: neuro.priceMx,
             priceUsd: neuro.priceUsd,
             text: "",
-            time: neuro.duration,
-            paymentNote: neuro.paymentNote,
+            time: t("programas.neuro.duration", { defaultValue: neuro.duration }),
+            paymentNote: t("programas.neuro.paymentNote", { defaultValue: neuro.paymentNote }),
             footer: neuro.promoInscripcionIncluida
-                ? "Inscripción incluida (promoción)"
-                : `Inscripción aparte (${INSCRIPCION_MARKETING_COPY.textoMonto})`,
+                ? t("precios.inscripcionIncluida")
+                : t("precios.inscripcionAparte", { monto: montoInscripcion }),
         },
         {
             cardType: "certification",
             programaId: cosmica.id,
-            title: cosmica.cardTitle,
-            subtitle: cosmica.cardSubtitle,
+            title: t("programas.cosmica.cardTitle", { defaultValue: cosmica.cardTitle }),
+            subtitle: t("programas.cosmica.cardSubtitle", { defaultValue: cosmica.cardSubtitle }),
             priceMx: cosmica.priceMx,
             priceUsd: cosmica.priceUsd,
             text: "",
-            time: cosmica.duration,
-            paymentNote: cosmica.paymentNote,
-            footer: `Inscripción aparte (${INSCRIPCION_MARKETING_COPY.textoMonto})`,
+            time: t("programas.cosmica.duration", { defaultValue: cosmica.duration }),
+            paymentNote: t("programas.cosmica.paymentNote", { defaultValue: cosmica.paymentNote }),
+            footer: t("precios.inscripcionAparte", { monto: montoInscripcion }),
         },
         { ...certificado, programaId: null },
     ]
 
     const inscripcion = {
-        title: INSCRIPCION_MARKETING_COPY.titulo,
-        subtitle: INSCRIPCION_MARKETING_COPY.subtitulo,
+        title: t("programas.inscripcion.titulo", { defaultValue: INSCRIPCION_MARKETING_COPY.titulo }),
+        subtitle: t("programas.inscripcion.subtitulo", { defaultValue: INSCRIPCION_MARKETING_COPY.subtitulo }),
         priceMx: PROGRAMAS_OFERTA.find((p) => p.id === "inscripcion").priceMx,
         priceUsd: PROGRAMAS_OFERTA.find((p) => p.id === "inscripcion").priceUsd,
-        text: INSCRIPCION_MARKETING_COPY.textoMonto,
-        badge: INSCRIPCION_MARKETING_COPY.beneficio,
+        text: montoInscripcion,
+        badge: t("programas.inscripcion.beneficio", { defaultValue: INSCRIPCION_MARKETING_COPY.beneficio }),
     }
 
     return (
@@ -132,7 +138,7 @@ const CertificationPrice = () => {
             >
                 <h2 className="mx-auto max-w-7xl px-6 pb-10 pt-10 lg:px-12 xl:px-6 2xl:px-0">
                     <span className="text-white text-2xl md:text-6xl font-bold">
-                        Certificación Montessori
+                        {t("precios.tituloSeccion")}
                     </span>
                 </h2>
                 <section
@@ -144,18 +150,16 @@ const CertificationPrice = () => {
                             <div className="bg-white rounded-3xl px-6 py-8 sm:px-8 max-w-3xl">
                                 <h3>
                                     <span className="text-red md:text-2xl text-xl">
-                                        Certificación internacional
+                                        {t("precios.kicker")}
                                     </span>
                                 </h3>
                                 <h2 className="mt-5">
                                     <span className="font-medium text-black md:text-6xl text-3xl">
-                                        Guía Montessori
+                                        {t("precios.titulo")}
                                     </span>
                                 </h2>
                                 <p className="mt-6 text-base sm:text-lg text-black leading-relaxed">
-                                    Programas con reconocimiento internacional. Los precios de
-                                    programa (colegiatura o diplomado) son independientes de la
-                                    inscripción, que solo se paga una vez.
+                                    {t("precios.descripcion")}
                                 </p>
                             </div>
 
@@ -218,19 +222,11 @@ const CertificationPrice = () => {
 
                             <div className="mx-auto max-w-3xl rounded-2xl border-2 border-white/40 bg-white/10 px-6 py-5 backdrop-blur-sm">
                         <p className="text-center text-white text-sm leading-relaxed md:text-base">
-                            <span className="font-semibold">¿Vas por más de un nivel?</span> Si ya
-                            cursaste Nido y Comunidad Infantil o Casa de Niños, puedes revalidar el
-                            tronco común: el siguiente diplomado se reduce aproximadamente 11 meses.
-                            Además,{" "}
-                            <span className="font-semibold">
-                                no volvemos a cobrarte inscripción
-                            </span>{" "}
-                            cuando ya terminaste un nivel con nosotros o si tomas otro programa
-                            después.
+                            <Trans i18nKey="precios.multiNivel" ns="diplomados" components={{ fuerte: <span className="font-semibold" /> }} />
                         </p>
                             </div>
                             <p className="text-white md:text-sm text-xs text-center sm:text-left">
-                                Precios sujetos a disponibilidad. Aplican Términos y Condiciones.
+                                {t("precios.terminos")}
                             </p>
                         </div>
 

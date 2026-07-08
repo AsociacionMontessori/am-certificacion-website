@@ -1,58 +1,32 @@
 import React from "react";
+import { useTranslation, Trans } from "react-i18next";
 
 /* Marco de objetivos de aprendizaje AMMAC.
    Fuente de verdad del contenido (dominios + niveles de Bloom):
    Diplomados/Nuevo 2026/Guias_Catedratico/data/marco_competencias.py
-   Aquí solo se presenta de cara al público el marco pedagógico. */
+   Aquí solo se presenta de cara al público el marco pedagógico.
+   Los textos viven en src/i18n/locales/<idioma>/home.json bajo `marco.*`. */
 
 /* 7 dominios de competencia AMMAC — espejo de los dominios internacionales
    de la formación Montessori (MACTE / AMI). */
 const DOMINIOS = [
-  {
-    code: "D1",
-    title: "Fundamentos filosóficos e históricos",
-    desc: "Las bases filosóficas, científicas e históricas del método: la vida y obra de María Montessori y los principios que sostienen la pedagogía.",
-  },
-  {
-    code: "D2",
-    title: "Desarrollo humano y planos del desarrollo",
-    desc: "El desarrollo del ser humano a lo largo de los planos del desarrollo y las características de cada periodo, base para acompañar a la niñez.",
-  },
-  {
-    code: "D3",
-    title: "El ambiente preparado y los materiales",
-    desc: "El diseño del ambiente preparado y el conocimiento, la presentación y el propósito de cada uno de los materiales Montessori.",
-  },
-  {
-    code: "D4",
-    title: "Observación científica",
-    desc: "La observación como herramienta científica: registrar, interpretar y responder a las necesidades reales de cada niño y niña.",
-  },
-  {
-    code: "D5",
-    title: "Rol y transformación del adulto (Guía)",
-    desc: "La preparación y transformación interior del adulto para convertirse en Guía: actitud, ética y servicio al desarrollo del niño.",
-  },
-  {
-    code: "D6",
-    title: "Pedagogía de las áreas del currículo",
-    desc: "El dominio pedagógico de las áreas del currículo Montessori y la secuencia de presentaciones que las integran.",
-  },
-  {
-    code: "D7",
-    title: "Comunidad, familia y liderazgo",
-    desc: "El vínculo con las familias, la comunidad educativa y el liderazgo de la Guía dentro y fuera del ambiente.",
-  },
+  { code: "D1", key: "fundamentos" },
+  { code: "D2", key: "desarrollo" },
+  { code: "D3", key: "ambiente" },
+  { code: "D4", key: "observacion" },
+  { code: "D5", key: "adulto" },
+  { code: "D6", key: "curriculo" },
+  { code: "D7", key: "comunidad" },
 ];
 
 /* 6 niveles cognitivos de la Taxonomía de Bloom (revisada). */
 const BLOOM = [
-  { nivel: "Recordar", desc: "Reconocer y evocar los conceptos fundamentales." },
-  { nivel: "Comprender", desc: "Explicar las ideas y darles sentido con palabras propias." },
-  { nivel: "Aplicar", desc: "Usar lo aprendido en situaciones reales del ambiente." },
-  { nivel: "Analizar", desc: "Distinguir partes, relaciones y principios." },
-  { nivel: "Evaluar", desc: "Valorar, fundamentar y tomar decisiones pedagógicas." },
-  { nivel: "Crear", desc: "Diseñar y proponer soluciones y materiales nuevos." },
+  "recordar",
+  "comprender",
+  "aplicar",
+  "analizar",
+  "evaluar",
+  "crear",
 ];
 
 /* Clases literales por acento (Tailwind necesita nombres completos). */
@@ -94,6 +68,19 @@ function DominioCard({ dominio, accent }) {
 }
 
 export default function MarcoPedagogico() {
+  const { t } = useTranslation("home");
+
+  const dominios = DOMINIOS.map((d) => ({
+    ...d,
+    title: t(`marco.dominios.${d.key}.nombre`),
+    desc: t(`marco.dominios.${d.key}.descripcion`),
+  }));
+
+  const bloom = BLOOM.map((key) => ({
+    nivel: t(`marco.bloom.${key}.nombre`),
+    desc: t(`marco.bloom.${key}.descripcion`),
+  }));
+
   return (
     <section
       id="marco-pedagogico"
@@ -103,27 +90,23 @@ export default function MarcoPedagogico() {
         {/* Encabezado */}
         <div className="max-w-4xl">
           <p className="text-blue dark:text-green text-sm uppercase tracking-wider mb-2 font-semibold">
-            Marco de objetivos de aprendizaje
+            {t("marco.eyebrow")}
           </p>
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-red dark:text-white">
-            Alineado a la formación Montessori internacional
+            {t("marco.titulo")}
           </h2>
           <p className="mt-4 text-base sm:text-lg text-black/85 dark:text-white/90">
-            Nuestro diplomado organiza toda la formación en{" "}
-            <strong className="text-blue dark:text-green">
-              siete dominios de competencia
-            </strong>
-            , espejo de los dominios internacionales de la formación Montessori
-            (MACTE&nbsp;/&nbsp;AMI) y compatibles con los fundamentos AMI. Cada
-            dominio se trabaja en los seis niveles cognitivos de la Taxonomía de
-            Bloom, de modo que la formación no solo transmite contenidos:
-            desarrolla comprensión, criterio y capacidad de crear.
+            <Trans
+              i18nKey="marco.intro"
+              ns="home"
+              components={{ destacado: <strong className="text-blue dark:text-green" /> }}
+            />
           </p>
         </div>
 
         {/* 7 dominios */}
         <div className="mt-10 sm:mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-          {DOMINIOS.map((dominio, i) => (
+          {dominios.map((dominio, i) => (
             <DominioCard
               key={dominio.code}
               dominio={dominio}
@@ -135,14 +118,13 @@ export default function MarcoPedagogico() {
         {/* 6 niveles de Bloom */}
         <div className="mt-16">
           <h3 className="text-2xl sm:text-3xl font-bold text-blue dark:text-white">
-            Seis niveles cognitivos
+            {t("marco.bloomTitulo")}
           </h3>
           <p className="mt-2 text-base sm:text-lg text-black/70 dark:text-white/70">
-            Cada dominio se desarrolla progresivamente a través de la Taxonomía
-            de Bloom, del reconocimiento inicial hasta la creación.
+            {t("marco.bloomDescripcion")}
           </p>
           <ol className="mt-8 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-            {BLOOM.map((b, i) => (
+            {bloom.map((b, i) => (
               <li
                 key={b.nivel}
                 className="relative rounded-2xl border border-blue/15 dark:border-white/15 bg-blue/5 dark:bg-white/5 p-4 flex flex-col"
@@ -165,19 +147,14 @@ export default function MarcoPedagogico() {
         <div className="mt-16 rounded-3xl bg-gradient-to-r from-blue via-purple to-green p-[2px]">
           <div className="rounded-[calc(1.5rem-2px)] bg-white dark:bg-gray px-6 py-8 sm:px-10 sm:py-10">
             <p className="text-base sm:text-lg lg:text-xl text-black/90 dark:text-white/90 leading-relaxed">
-              Cada actividad del diplomado tiene un objetivo de aprendizaje
-              codificado{" "}
-              <strong className="whitespace-nowrap text-red dark:text-green">
-                «Dominio·Nivel»
-              </strong>{" "}
-              —por ejemplo,{" "}
-              <span className="whitespace-nowrap font-mono font-semibold text-blue dark:text-white">
-                D1·Analizar
-              </span>
-              —: el dominio (D1–D7) indica el área de competencia y el verbo de
-              la Taxonomía de Bloom indica el nivel cognitivo que se espera
-              desarrollar. Así, cada tarea que realizas tiene un propósito
-              formativo explícito y evaluable.
+              <Trans
+                i18nKey="marco.codificacion"
+                ns="home"
+                components={{
+                  fuerte: <strong className="whitespace-nowrap text-red dark:text-green" />,
+                  codigo: <span className="whitespace-nowrap font-mono font-semibold text-blue dark:text-white" />,
+                }}
+              />
             </p>
           </div>
         </div>

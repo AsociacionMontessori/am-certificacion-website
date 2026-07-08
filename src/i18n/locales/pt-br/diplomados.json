@@ -1,1 +1,310 @@
-{}
+{
+  "seo": {
+    "title": "Diplomados Guía Montessori",
+    "description": "Conoce los diplomados en línea para formarte como Guía Montessori con certificación internacional, equipo docente y estructura del programa."
+  },
+  "schema": {
+    "nombre": "Diplomados Guía Montessori",
+    "descripcion": "Diplomados en línea para formarte como Guía Montessori con acompañamiento docente y certificación internacional.",
+    "categoria": "Guía Montessori",
+    "proveedor": "Asociación Montessori de México A.C."
+  },
+  "ctaProgramasPrecios": "Ver programas y precios",
+  "hero": {
+    "kicker": "Certificación internacional • 100% en línea • A tu ritmo",
+    "title": "Diplomados: <linea>Guía Montessori</linea>",
+    "p1": "Programas diseñados para un conocimiento práctico y profundo en educación y método Montessori. Termina como Guía Montessori con certificado de validez internacional.",
+    "p2": "Somos la Asociación Montessori de México, una institución mexicana con proyección internacional: formamos Guías Montessori en línea para estudiantes de todo el mundo.",
+    "decorAlt": "decoración",
+    "card": {
+      "p1": "Al finalizar tus programas estarás listo para trabajar como Guía Montessori en cualquier escuela del mundo y marcar una diferencia real en la vida de tus alumnos. Estudia desde cualquier lugar con nuestra plataforma en línea.",
+      "acceso": "Tu acceso incluye: <fuerte>Google Workspace</fuerte> (Drive 1 TB, correo institucional y servicios de Google), además de estudio con apoyo de <fuerte>IA de Google</fuerte> (Notebook LM, Gemini).",
+      "badges": [
+        "Compatible con MACTE / AMI",
+        "Estándar CONOCER (SEP)",
+        "RVOE en trámite",
+        "Google for Education",
+        "Gemini IA"
+      ],
+      "altClassroom": "Google Classroom",
+      "altForEducation": "Google for Education",
+      "altGemini": "Gemini IA",
+      "altNotebookLm": "Notebook LM"
+    }
+  },
+  "contenido": {
+    "kicker": "Contenido del programa",
+    "titulo": "Todo lo que necesitas para ser Guía Montessori",
+    "descripcion": "Cada materia se trabaja en bloques de unas 9 sesiones (una por semana), con material, actividades y acompañamiento de tu catedrático para resolver dudas y profundizar.",
+    "badge": "1. Tronco común",
+    "materias": {
+      "filosofia": {
+        "nombre": "FILOSOFÍA MONTESSORI",
+        "descripcion": "Conocerás la historia y principios detrás de la metodología Montessori."
+      },
+      "observacion": {
+        "nombre": "MÉTODOS DE OBSERVACIÓN",
+        "descripcion": "Desarrolla la capacidad de observar y entender las necesidades únicas de cada uno de tus alumnos."
+      },
+      "neuroeducacion": {
+        "nombre": "NEURO - EDUCACIÓN",
+        "descripcion": "Descubre cómo se desarrolla el cerebro humano en las primeras etapas de la vida"
+      },
+      "psicologia": {
+        "nombre": "PSICOLOGÍA EDUCATIVA",
+        "descripcion": "Descubre de qué manera integra el alumno su entorno y cómo garantizar un aprendizaje significativo."
+      },
+      "musicoterapia": {
+        "nombre": "MUSICOTERAPIA",
+        "descripcion": "Conoce la importancia de la música en el aprendizaje con las campanas Montessori."
+      },
+      "psicomotricidad": {
+        "nombre": "PSICO-MOTRICIDAD",
+        "descripcion": "Explora cómo el movimiento es fundamental en el desarrollo y aprendizaje."
+      },
+      "inclusiva": {
+        "nombre": "EDUCACIÓN INCLUSIVA",
+        "descripcion": "Conoce cómo se prepara el conocimiento, el ambiente y la pedagogía para todo tipo de aprendizajes y necesidades de los niños."
+      },
+      "creativa": {
+        "nombre": "INTELIGENCIA CREATIVA",
+        "descripcion": "Fomenta la creatividad y el pensamiento innovador en todos tus estudiantes."
+      }
+    }
+  },
+  "practica": {
+    "titulo": "El método Montessori en la práctica",
+    "descripcion": "Aprenderás el material científico de María Montessori y cómo presentarlo según cada etapa de desarrollo.",
+    "badge": "2. Materiales y presentaciones"
+  },
+  "modalidad": {
+    "kicker": "Modalidad",
+    "titulo": "Clases accesibles y flexibles",
+    "intro": "Estudia a tu ritmo con contenido nuevo cada semana y acompañamiento constante:",
+    "items": {
+      "publicacion": {
+        "titulo": "Publicación semanal",
+        "texto": "Cada sábado a las 8:00 se publica una clase nueva."
+      },
+      "actividades": {
+        "titulo": "Actividades a tu ritmo",
+        "texto": "Entrega cuando quieras mientras la materia esté activa (aprox. dos meses por materia)."
+      },
+      "acceso": {
+        "titulo": "Acceso 24/7",
+        "texto": "Revisa las clases cuando y donde quieras."
+      },
+      "guia": {
+        "titulo": "Guía personalizada",
+        "texto": "Solicita videollamada con tu profesor cuando lo necesites."
+      }
+    }
+  },
+  "programasSeccion": {
+    "kicker": "Programas y precios",
+    "titulo": "Elige tu programa y da el siguiente paso",
+    "descripcion": "Certificación internacional, modalidad en línea y acompañamiento de guías certificadas."
+  },
+  "inscripcionSeccion": {
+    "kicker": "Inscripción",
+    "titulo": "3 pasos para empezar",
+    "proximoInicio": "Próximo inicio: <verde>{{fecha}}</verde>",
+    "intro": "Completa el formulario de inscripción y luego solo necesitas:",
+    "ctaFormulario": "Inscribirme — Formulario de inscripción",
+    "paso1": {
+      "titulo": "Inscripción",
+      "texto": "📄 Hoja de inscripción y formas de pago en el mismo formulario:",
+      "linkTexto": "Abrir formulario de inscripción"
+    },
+    "paso2": {
+      "titulo": "👨‍🎓 Documentos Personales",
+      "intro": "Para tu certificado con validez internacional:",
+      "docs": {
+        "domicilio": "📍 Comprobante de domicilio",
+        "identificacion": "🪪 Identificación oficial",
+        "acta": "👶 Acta de nacimiento",
+        "certificado": "👨‍🎓 Último certificado de estudios"
+      },
+      "nota": "No hay requisito de nivel educativo para cursar; algunas escuelas exigen licenciatura para estar frente a grupo — depende de cada institución."
+    },
+    "paso3": {
+      "titulo": "📜 Reglamento firmado",
+      "texto": "Nos comprometemos a una educación de <destacado>calidad</destacado> en un ambiente de <destacado>respeto</destacado>. Conoce y firma nuestro reglamento para iniciar tu diplomado."
+    }
+  },
+  "calendario": {
+    "fechas": {
+      "2025-11-29": "29 de noviembre 2025",
+      "2026-01-24": "24 de enero 2026",
+      "2026-02-28": "28 de febrero 2026",
+      "2026-04-25": "25 de abril 2026",
+      "2026-05-30": "30 de mayo 2026",
+      "2026-06-27": "27 de junio 2026",
+      "2026-08-29": "29 de agosto 2026",
+      "2026-09-26": "26 de septiembre 2026",
+      "2026-10-24": "24 de octubre 2026",
+      "2026-11-28": "28 de noviembre 2026"
+    }
+  },
+  "precios": {
+    "tituloSeccion": "Certificación Montessori",
+    "kicker": "Certificación internacional",
+    "titulo": "Guía Montessori",
+    "descripcion": "Programas con reconocimiento internacional. Los precios de programa (colegiatura o diplomado) son independientes de la inscripción, que solo se paga una vez.",
+    "colegiaturaMensual": "Colegiatura mensual",
+    "inscripcionIncluida": "Inscripción incluida (promoción)",
+    "inscripcionAparte": "Inscripción aparte ({{monto}})",
+    "certificado": {
+      "titulo": "Certificado",
+      "subtitulo": "Diploma físico con sellos y firmas oficiales, validado con código QR y folio único.",
+      "pagoUnico": "pago único",
+      "footer": "+ gastos de envío"
+    },
+    "multiNivel": "<fuerte>¿Vas por más de un nivel?</fuerte> Si ya cursaste Nido y Comunidad Infantil o Casa de Niños, puedes revalidar el tronco común: el siguiente diplomado se reduce aproximadamente 11 meses. Además, <fuerte>no volvemos a cobrarte inscripción</fuerte> cuando ya terminaste un nivel con nosotros o si tomas otro programa después.",
+    "terminos": "Precios sujetos a disponibilidad. Aplican Términos y Condiciones."
+  },
+  "programas": {
+    "inscripcion": {
+      "titulo": "Inscripción",
+      "subtitulo": "Pagas la inscripción una sola vez. Si después tomas otro diplomado o curso con nosotros, no volvemos a cobrarla.",
+      "beneficio": "Inscripción única de por vida en la institución",
+      "textoMonto": "Monto de inscripción (hoy)"
+    },
+    "cosmica": {
+      "cardTitle": "Educación Cósmica",
+      "cardSubtitle": "Diplomado · Grandes Lecciones Montessori",
+      "duration": "5 meses",
+      "paymentNote": "programa + inscripción"
+    },
+    "neuro": {
+      "cardTitle": "Neuroeducación",
+      "cardSubtitle": "3 meses • A tu ritmo • 100% en línea",
+      "duration": "3 meses",
+      "paymentNote": "promo todo incluido"
+    },
+    "taller": {
+      "cardTitle": "Taller I y II",
+      "cardSubtitle": "Certificación internacional",
+      "duration": "20 meses",
+      "priceNote": "Inscripción $4,900 (1 vez) + colegiatura mensual"
+    },
+    "casa": {
+      "cardTitle": "Casa de Niños",
+      "cardSubtitle": "Certificación internacional",
+      "duration": "17 meses",
+      "priceNote": "Inscripción $4,900 (1 vez) + colegiatura mensual"
+    },
+    "nido": {
+      "cardTitle": "Nido y Comunidad Infantil",
+      "cardSubtitle": "Certificación internacional",
+      "duration": "16 meses",
+      "priceNote": "Inscripción $4,900 (1 vez) + colegiatura mensual"
+    }
+  },
+  "profesores": {
+    "kicker": "Equipo docente",
+    "titulo": "Conoce a quienes te acompañarán en tu certificación",
+    "intro": "En este diplomado estarás acompañada por personas con experiencia, formación y compromiso con la filosofía Montessori. Queremos que conozcas un poco más a quienes estarán contigo a lo largo de este proceso.",
+    "leerMas": "Leer más",
+    "leerMenos": "Leer menos",
+    "items": {
+      "roxanaMunoz": {
+        "badge": "Acompañamiento institucional y académico",
+        "parrafos": [
+          "Roxana Muñoz Guevara es <fuerte>licenciada en Educación Preescolar</fuerte> por la Universidad Femenina de México, con estudios en Educación Especial, Psicomotricidad Aplicada, Psicología Infantil y formación como <fuerte>Guía Montessori de Taller I y II</fuerte> por el Centro de Desarrollo y Comunicación.",
+          "Cuenta además con estudios adicionales realizados con la <fuerte>Dra. Cato Hanrath</fuerte>, alumna de María Montessori. Desde <fuerte>1997 es Presidenta de la Asociación Montessori de México A.C.</fuerte>, donde coordina los Diplomados Profesionales para Guía Montessori e imparte Antropología filosófica, Filosofía Montessori y Materiales Montessori.",
+          "Actualmente es <fuerte>Directora General de la Escuela Primaria y del Centro Educativo Montessori Kalpilli</fuerte>, además de capacitadora de Guías Montessori en México y el extranjero. Su acompañamiento dentro del diplomado aporta profundidad académica, experiencia institucional y una mirada fiel a la filosofía Montessori."
+        ]
+      },
+      "ivanLopezCarmona": {
+        "badge": "Formación inclusiva y práctica docente",
+        "parrafos": [
+          "Iván forma parte del equipo de profesores de este diplomado. Es <fuerte>Licenciado en Intervención Educativa</fuerte> con línea inclusiva por la Universidad Pedagógica Nacional, <fuerte>Licenciado en Artes</fuerte> por el IDMA y <fuerte>Maestro en Ciencias de la Educación</fuerte> por el Instituto de Estudios Universitarios.",
+          "Cuenta con <fuerte>15 años de experiencia</fuerte> en el ámbito educativo y una trayectoria sólida dentro de la filosofía Montessori. Está certificado como <fuerte>Guía Montessori de Casa de Niños, Taller I y II, Nido y Comunidad Infantil</fuerte> por la Asociación Montessori de México.",
+          "Actualmente es <fuerte>catedrático presencial de la Asociación Montessori de México</fuerte> en la sede Acapulco, formando Guías de Casa de Niños y Taller. También <fuerte>coordina el departamento montessoriano en ECNH</fuerte> y desarrolla talleres para docentes en escuelas públicas y particulares."
+        ]
+      },
+      "carlosRomero": {
+        "badge": "Gestión académica y tecnología educativa",
+        "parrafos": [
+          "Carlos forma parte del equipo que acompaña la organización, el seguimiento y el desarrollo de los diplomados. Su relación con Montessori también es vivencial: <fuerte>toda su formación, desde Nido, fue Montessori</fuerte>, por lo que conoce el método desde la experiencia directa.",
+          "Es <fuerte>Licenciado en Economía y en Contaduría Pública</fuerte>, además de programador. Esta combinación le permite integrar administración, análisis, tecnología y organización académica al servicio de la formación Montessori. También cuenta con <fuerte>estudios de maestría en Música</fuerte>, con enfoque en piano y composición.",
+          "Dentro del diplomado, aporta <fuerte>estructura, claridad y soluciones prácticas</fuerte> para fortalecer la experiencia de las alumnas, uniendo Montessori, gestión educativa, pensamiento analítico y herramientas tecnológicas con un compromiso genuino con la educación."
+        ]
+      }
+    }
+  },
+  "proximo": {
+    "calculando": "Calculando la próxima fecha de diplomado…",
+    "cierre": {
+      "titulo": "Te deseamos un excelente cierre de año.",
+      "subtitulo": "Mantente al tanto de nuevas fechas de diplomados."
+    },
+    "envivo": {
+      "texto": "Estamos en vivo.",
+      "link": "Únete a la clase en vivo."
+    },
+    "urgencia": "¡Últimos lugares disponibles!",
+    "iniciamos": "Inscríbete en línea, iniciamos el:",
+    "faltan": "Faltan:",
+    "dia": "día",
+    "dias": "días",
+    "hora": "hora",
+    "horas": "horas",
+    "ya": "¡Ya!",
+    "iniciaPronto": "Inicia pronto",
+    "titulo": "Próximo Diplomado",
+    "subtitulo": "Transforma la manera en que acompañas a niñas y niños.",
+    "neuro": {
+      "cta": "Inscríbete al Diplomado en Neuroeducación",
+      "pagoUnico": "Pago único",
+      "duracion": "Duración: 3 meses • A tu ritmo"
+    },
+    "certInternacional": {
+      "titulo": "🌍 Certificación Internacional • Guía Montessori",
+      "intro": "Nuestros diplomados incluyen certificación con reconocimiento internacional:",
+      "items": [
+        "Neuroeducación",
+        "Nido y Comunidad Infantil",
+        "Casa de Niños",
+        "Taller"
+      ],
+      "alineados": "Están alineados al Estándar EC0301 de la red CONOCER y contamos con RVOE en trámite."
+    },
+    "beneficios": {
+      "enLinea": {
+        "titulo": "100% en línea",
+        "texto": "Sin traslados"
+      },
+      "aplicacion": {
+        "titulo": "Aplicación inmediata",
+        "texto": "Enfoque práctico"
+      },
+      "acompanamiento": {
+        "titulo": "Acompañamiento experto",
+        "texto": "Especialistas certificados"
+      }
+    },
+    "ctaInscribete": "Inscríbete Ahora",
+    "ctaConoce": "Conoce el Diplomado",
+    "decorAlt": "decoration",
+    "confianza": [
+      "Cupo limitado",
+      "Certificación internacional",
+      "Guía Montessori certificada"
+    ]
+  },
+  "becas": {
+    "titulo": "Conoce nuestro proyecto de becas",
+    "requisitos": "Requisitos",
+    "items": [
+      "No tener ningún atraso en la entrega de actividades",
+      "Asistir por lo menos al 80 % de clases",
+      "Realizar por lo menos una práctica virtual (conferencia o proyecto)"
+    ],
+    "cta": "Conocer Más",
+    "comite": "Todas las solicitudes son revisadas y evaluadas por el comité académico",
+    "disponibilidad": "Sujetas a disponibilidad",
+    "imagenAlt": "imagen becas"
+  }
+}

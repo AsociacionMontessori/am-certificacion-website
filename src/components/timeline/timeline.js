@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import './time.css';
 
 import resolveConfig from 'tailwindcss/resolveConfig'
@@ -9,6 +10,7 @@ const red = fullConfig.theme.colors.red.DEFAULT
 const blue = fullConfig.theme.colors.blue
 
 function TextoExpansible({ contenido }) {
+    const { t } = useTranslation('home');
     const [expanded, setExpanded] = useState(false);
   
     const toggleTexto = () => {
@@ -25,7 +27,7 @@ function TextoExpansible({ contenido }) {
             onClick={toggleTexto}
             className="text-blue-500 hover:underline cursor-pointer"
           >
-            Ver más
+            {t('timeline.verMas')}
           </button>
         )}
       </div>
@@ -33,100 +35,32 @@ function TextoExpansible({ contenido }) {
   }
 
 const Timeline = () => {
-    const title = "Asociación Montessori de México - AMMAC"
-    const items = [
-        {
-            title: 'Fundación de la AMMAC',
-            content: 'Fundada por la Dra. Angelina Almeida con el objetivo de introducir y promover la pedagogía y la filosofía del método de María Montessori en México, nace la Asociación Montessori de México A.C., convirtiéndose así en una de las primeras organizaciones formalmente constituida dedicada a la formación profesional de Guías Montessori, la apertura de escuelas y el estudio del método Montessori.',
-            year: '1965',
-            color: "blue"
-        },
-        {
-            title: 'La AMMAC crea la primera escuela Montessori en la Ciudad de México: la Escuela Montessori Kalpilli',
-            content: 'Durante el año de su fundación, la AMMAC abre las puertas de la Escuela Montessori Kalpilli, siendo ésta la primera escuela Montessori en la Ciudad de México. Ubicada  originalmente en la colonia Polanco, Montessori Kalpilli inició sus labores impartiendo una educación basada en la pedagogía científica de María Montessori, cuyo método y filosofía tiene como propósito enfocarse en el desarrollo integral del niño.',
-            year: '1966',
-            color: "red"
-        },
-        {
-            title: 'Primera muestra pedagógica abierta',
-            content: 'La Asociación Montessori organiza en la Escuela Montessori  Kalpilli, la primera muestra pedagógica abierta a público y prensa con el objetivo de difundir y mostrar la aplicación del método Montessori, el uso de materiales y la importancia de las presentaciones Montessori. Las muestras pedagógicas se han convertido en una tradición de la AMMAC que año con año realiza en las instalaciones de la Escuela Montessori Kalpilli. ',
-            year: '1967',
-            color: "blue"
-        },
-        {
-            title: 'La AMMAC y su participación en la creación de Escuelas Montessori',
-            content: 'Durante sus primeros años, la AMMAC participó en la creación y desarrollo de escuelas Montessori en el país, realizando programas de estudio, distribución de material Montessori exportado directamente de Italia y formando guías Montessori nivel profesional. ',
-            year: '1970',
-            color: "red"
-        },
-        {
-            title: 'La AMMAC y el Gobierno de Tabasco',
-            content: 'La AMMAC forma una alianza con el gobierno de Tabasco y de manera conjunta desarrollan un programa de capacitación pedagógica a maestros Nahuas, Chontales, Mayas, Zapotecos, Totonacas y Mixes.',
-            year: '1984',
-            color: "blue"
-        },
-        {
-            title: 'Montessori Kalpilli en San Pedro de los Pinos',
-            content: 'La Escuela Montessori Kalpilli encuentra su nueva sede en la colonia San Pedro de los Pinos, entre libros, aprendizaje, material Montessori, ferias, campamentos, y mucho amor, Kalpilli y la Asociación Montessori de México han hecho historia, construyendo una comunidad por y para los niños, con una Educación Humanista e Innovadora que a la fecha ha dado más de 50 generaciones. ',
-            year: '1992',
-            color: "red"
-        },
-        {
-            title: 'Programa de capacitación a escuelas rurales',
-            content: 'La AMMAC crea un programa de capacitación del método Montessori a maestros de escuelas rurales y los talleres de producción de materiales y mobiliario Montessori de bajo costo y con recursos renovables. A través de este programa se han realizado proyectos de apertura de escuelas Montessori en zonas rurales de Veracruz, Guerrero y Oaxaca. ',
-            year: '1997',
-            color: "blue"
-        },
-        {
-            title: 'Certificaciones profesionales para Guías Montessori con validez internacional',
-            content: 'La AMMAC inició su oferta de formación profesional de Guías Montessori,destacándose por ser la única reconocida oficialmente por la Universidad Nacional Autónoma de México, la Universidad Autónoma Metropolitana y la Universidad del Valle de México, cumpliendo además con las competencias y acuerdos internacionales para generar certificaciones con validez internacional. ',
-            year: '2005',
-            color: "red"
-        },
-        {
-            title: 'Certificaciones profesionales para Guías Montessori en línea',
-            content: 'En colaboración con Google Classroom, la AMMAC crea la primera versión de sus diplomados de certificación para Guía Montessori en línea, siendo así la primera escuela de formación que ofrecía diplomados a distancia y la primera organización educativa en México vinculada a Google Classroom.  Desde entonces, las certificaciones en línea forman parte de la oferta educativa de la AMMAC, la cual ha generado una metodología de enseñanza personalizada de formación con materiales audiovisuales e interactivos. ',
-            year: '2014',
-            color: "blue"
-        },
-        {
-            title: 'La AMMAC participa en proyectos Internacionales',
-            content: 'A partir de este año, la AMMAC diseña y coordina cursos y diplomados en países como Colombia, Puerto Rico, España, Costa Rica y Estados Unidos, Israel, Suiza y la India. Atendiendo a la población hispanohablante de cada una de estas regiones y contribuyendo con la traducción, a diferentes lenguas, de varias de las cátedras diseñadas por la AMMAC para presentarse en diferentes centros educativos internacionales.',
-            year: '2016',
-            color: "red"
-        },
-        {
-            title: 'La AMMAC crea su sello editorial',
-            content: 'Nace la serie de libros en español basados en las obras originales de María Montessori, cada uno acompañado por una revisión actualizada del método, pues atendiendo el llamado de la Dra. Montessori, la pedagogía debe ser puesta constantemente a revisión y renovación, no solo por los avances científicos, sino también -y sobre todo- por la observación permanente a los niños, quienes nos siguen guiando para encontrar caminos que nos permitan continuar sirviendo a su desarrollo. El sello editorial ha publicado ya 3 números los cuales pueden adquirirse en Amazon y directamente con la AMMAC.',
-            year: '2018',
-            color: "blue"
-        },
-        {
-            title: 'Aportaciones de la AMMAC a investigaciones educativas con motivo de la contingencia epidemiológica mundial por el COVID-19',
-            content: 'A raíz de la contingencia epidemiológica mundial, la AMMAC participa en una red de escuelas de diferentes partes del mundo para de manera conjunta realizar una investigación en torno a los procesos de aprendizaje en momentos de la crisis sanitaria, los recursos de adaptabilidad de las escuelas, el desarrollo de estrategias pedagógicas para el trabajo con niños a distancia y el registro y análisis de indicadores de afectación en el desarrollo educativo de los niños por las transformaciones a los modelos educativos y sus secuelas.',
-            year: '2020',
-            color: "red"
-        },
-        {
-            title: 'Alineación a estándares internacionales y fundamentos AMI',
-            content: 'El programa de formación se alinea por completo a los estándares internacionales oficiales y se hace compatible con los fundamentos AMI: aborda sus bases esenciales e incorpora contenidos complementarios nuevos que enriquecen la formación — observación, psicología educativa, neuroeducación, educación inclusiva, psicomotricidad, musicoterapia e inteligencia creativa — contextualizados a la realidad educativa de México.',
-            year: '2023',
-            color: "blue"
-        },
-        {
-            title: '60 años de la Asociación Montessori de México',
-            content: 'En 2025 la AMMAC cumple 60 años promoviendo la pedagogía y la filosofía Montessori en México: seis décadas de formación de guías, apertura de escuelas, investigación y comunidad educativa comprometida con una educación humanista e innovadora.',
-            year: '2025',
-            color: "red"
-        },
-        {
-            title: 'RVOE en trámite y validez oficial en México',
-            content: 'En 2026 estamos finalizando los trámites ante la autoridad educativa (RVOE) para ofrecer, además del reconocimiento internacional de nuestras certificaciones, validez oficial en México que respalde la formación de nuestras y nuestros egresados.',
-            year: '2026',
-            color: "blue"
-        },
-
+    const { t } = useTranslation('home');
+    const title = t('timeline.titulo')
+    // Los textos viven en home.json bajo `timeline.items.<clave>`.
+    const itemKeys = [
+        { key: 'fundacion', year: '1965', color: "blue" },
+        { key: 'kalpilli', year: '1966', color: "red" },
+        { key: 'muestraPedagogica', year: '1967', color: "blue" },
+        { key: 'creacionEscuelas', year: '1970', color: "red" },
+        { key: 'tabasco', year: '1984', color: "blue" },
+        { key: 'sanPedroDeLosPinos', year: '1992', color: "red" },
+        { key: 'escuelasRurales', year: '1997', color: "blue" },
+        { key: 'certificacionesInternacionales', year: '2005', color: "red" },
+        { key: 'certificacionesEnLinea', year: '2014', color: "blue" },
+        { key: 'proyectosInternacionales', year: '2016', color: "red" },
+        { key: 'selloEditorial', year: '2018', color: "blue" },
+        { key: 'covid', year: '2020', color: "red" },
+        { key: 'estandaresAmi', year: '2023', color: "blue" },
+        { key: 'sesentaAnios', year: '2025', color: "red" },
+        { key: 'rvoe', year: '2026', color: "blue" },
     ];
+    const items = itemKeys.map(({ key, year, color }) => ({
+        title: t(`timeline.items.${key}.titulo`),
+        content: t(`timeline.items.${key}.contenido`),
+        year,
+        color,
+    }));
 
 
     const getColor = (color) => {

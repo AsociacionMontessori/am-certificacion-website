@@ -1,18 +1,17 @@
 import * as React from "react"
 import { Link } from "gatsby"
+import { Trans, useTranslation } from "react-i18next"
 import { roxanaBooks } from "../data/roxanaBooks"
 import { roxanaBookBundles } from "../data/roxanaBookOffers"
 
-const DEFAULT_DESCRIPTION = (
-  <>
-    Serie en español basada en las obras de María Montessori. Consigue cada título
-    en su edición impresa y digital en <strong className="font-semibold text-yellow">Amazon México</strong>.
-  </>
-)
-
 function BookCard({ book }) {
+  const { t } = useTranslation("publicaciones")
   const digitalFormats = book.digital?.formats?.join(" + ")
   const isGift = Boolean(book.gift)
+  const bookTitle = t(`libros.${book.id}.titulo`, { defaultValue: book.title })
+  const bookDescription = t(`libros.${book.id}.descripcion`, {
+    defaultValue: book.description,
+  })
 
   return (
     <article
@@ -24,7 +23,7 @@ function BookCard({ book }) {
         <div className="aspect-[2/3] w-full max-w-[160px] overflow-hidden sm:max-w-[200px] md:max-w-[220px]">
           <img
             src={book.coverImage}
-            alt={`Portada de «${book.title}»`}
+            alt={t("card.portadaAlt", { titulo: bookTitle })}
             className="h-full w-full object-contain object-center"
             loading="lazy"
             width={220}
@@ -38,38 +37,38 @@ function BookCard({ book }) {
             isGift ? "bg-yellow/40 text-blue" : "bg-yellow/20 text-blue"
           }`}
         >
-          {isGift ? "🎁 Regalo gratis" : `Libro ${book.volume}`}
+          {isGift ? t("card.regaloGratis") : t("card.libroVolumen", { volumen: book.volume })}
         </p>
         <h3 className="mt-3 text-lg font-bold leading-snug text-blue sm:text-xl">
-          {book.title}
+          {bookTitle}
         </h3>
         <div className="mt-3 grid gap-2 text-sm text-blue">
           {book.digital?.enabled && book.digital?.priceMx && (
             <p className="rounded-md bg-green/10 px-3 py-2 font-semibold">
-              Ebook: ${book.digital.priceMx} MXN
+              {t("card.ebookPrecio", { precio: book.digital.priceMx })}
               <span className="block text-xs font-normal text-gray">
-                {digitalFormats} descargable
+                {t("card.formatosDescargable", { formatos: digitalFormats })}
               </span>
             </p>
           )}
           {isGift ? (
             <p className="rounded-md bg-yellow/15 px-3 py-2 font-semibold">
-              También gratis con cualquier otra compra
+              {t("card.regaloConCompra")}
               <span className="block text-xs font-normal text-gray">
-                Recibes {digitalFormats} al comprar cualquier otro libro o paquete
+                {t("card.regaloDetalle", { formatos: digitalFormats })}
               </span>
             </p>
           ) : (
             <p className="rounded-md bg-blue/5 px-3 py-2 font-semibold">
-              Edición impresa
+              {t("card.edicionImpresa")}
               <span className="block text-xs font-normal text-gray">
-                Disponible en Amazon México
+                {t("card.disponibleAmazon")}
               </span>
             </p>
           )}
         </div>
         <p className="mt-3 flex-grow text-sm leading-relaxed text-gray sm:text-base">
-          {book.description}
+          {bookDescription}
         </p>
 
         <div className="mt-5 flex flex-col gap-2">
@@ -78,7 +77,7 @@ function BookCard({ book }) {
               to={`/checkout/libro?sku=${book.digital.stripeSku}`}
               className="inline-flex min-h-[48px] w-full items-center justify-center rounded-lg bg-green px-5 py-3 text-center text-sm font-semibold text-white transition duration-150 ease-in-out hover:bg-green/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow focus-visible:ring-offset-2"
             >
-              Comprar ebook
+              {t("card.comprarEbook")}
             </Link>
           )}
           <a
@@ -86,9 +85,9 @@ function BookCard({ book }) {
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex min-h-[48px] w-full items-center justify-center rounded-lg border border-blue/40 bg-white px-5 py-3 text-center text-sm font-semibold text-blue transition hover:bg-blue/5 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue"
-            title={`Ver «${book.title}» en Amazon`}
+            title={t("card.verEnAmazonTitle", { titulo: bookTitle })}
           >
-            Ver en Amazon
+            {t("card.verEnAmazon")}
           </a>
         </div>
       </div>
@@ -97,26 +96,34 @@ function BookCard({ book }) {
 }
 
 function BundleCard({ bundle }) {
+  const { t } = useTranslation("publicaciones")
   const formats = bundle.formats?.join(" + ") || "PDF + EPUB"
   const count = bundle.bookIds?.length || 0
+  const bundleTitle = t(`paquetes.${bundle.id}.titulo`, { defaultValue: bundle.title })
+  const bundleDescription = t(`paquetes.${bundle.id}.descripcion`, {
+    defaultValue: bundle.description,
+  })
+  const bundleNote = bundle.note
+    ? t(`paquetes.${bundle.id}.nota`, { defaultValue: bundle.note })
+    : t("bundle.incluye", { formatos: formats, cantidad: count })
 
   return (
     <div className="overflow-hidden rounded-lg border border-yellow/40 bg-white/95 p-5 text-left shadow-xl sm:p-6">
       <div className="grid gap-5 md:grid-cols-[1fr_auto] md:items-center">
         <div>
           <p className="inline-flex rounded-md bg-yellow/20 px-3 py-1 text-xs font-semibold text-blue">
-            Paquete digital
+            {t("bundle.etiqueta")}
           </p>
           <h3 className="mt-3 text-xl font-bold text-blue">
-            {bundle.title}
+            {bundleTitle}
           </h3>
           <p className="mt-2 text-sm leading-relaxed text-gray sm:text-base">
-            {bundle.description}
+            {bundleDescription}
           </p>
           <p className="mt-3 text-base font-semibold text-blue">
-            ${bundle.priceMx} MXN
+            {t("bundle.precio", { precio: bundle.priceMx })}
             <span className="block text-xs font-normal text-gray">
-              {bundle.note || `Incluye ${formats} de los ${count} libros`}
+              {bundleNote}
             </span>
           </p>
         </div>
@@ -124,7 +131,7 @@ function BundleCard({ bundle }) {
           to={`/checkout/libro?sku=${bundle.stripeSku}`}
           className="inline-flex min-h-[48px] items-center justify-center rounded-lg bg-green px-6 py-3 text-center text-sm font-semibold text-white transition hover:bg-green/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow focus-visible:ring-offset-2"
         >
-          Comprar paquete
+          {t("bundle.comprar")}
         </Link>
       </div>
     </div>
@@ -134,11 +141,25 @@ function BundleCard({ bundle }) {
 const RoxanaBooksSection = ({
   id = "libros",
   headingId = "roxana-libros-heading",
-  eyebrow = "Publicaciones",
-  title = "Sus libros",
-  description = DEFAULT_DESCRIPTION,
+  eyebrow,
+  title,
+  description,
   className = "border-t border-white/20 pt-10",
 }) => {
+  const { t } = useTranslation("publicaciones")
+  const eyebrowContent = eyebrow === undefined ? t("seccion.eyebrow") : eyebrow
+  const titleContent = title === undefined ? t("seccion.title") : title
+  const descriptionContent =
+    description === undefined ? (
+      <Trans
+        i18nKey="seccion.description"
+        ns="publicaciones"
+        components={{ destacado: <strong className="font-semibold text-yellow" /> }}
+      />
+    ) : (
+      description
+    )
+
   return (
     <section
       id={id}
@@ -147,20 +168,20 @@ const RoxanaBooksSection = ({
     >
       <div className="container mx-auto px-6 pb-12">
         <div className="mx-auto max-w-3xl text-center">
-          {eyebrow && (
+          {eyebrowContent && (
             <p className="inline-flex rounded-md bg-yellow/25 px-4 py-1 text-xs font-semibold uppercase tracking-wide text-white">
-              {eyebrow}
+              {eyebrowContent}
             </p>
           )}
           <h2
             id={headingId}
             className="mt-4 text-2xl font-bold text-white md:text-3xl"
           >
-            {title}
+            {titleContent}
           </h2>
-          {description && (
+          {descriptionContent && (
             <p className="mt-3 text-sm text-white/90 sm:text-base">
-              {description}
+              {descriptionContent}
             </p>
           )}
         </div>
@@ -180,8 +201,7 @@ const RoxanaBooksSection = ({
         </ul>
 
         <p className="mx-auto mt-8 max-w-2xl text-center text-xs text-white/80 sm:text-sm">
-          Los precios en sitio son referencia; el monto final se confirma en la pasarela
-          de pago al crear el pedido.
+          {t("seccion.nota")}
         </p>
       </div>
     </section>

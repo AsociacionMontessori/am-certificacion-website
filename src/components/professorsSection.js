@@ -1,37 +1,27 @@
 import React, { useState, useEffect } from "react";
 import { StaticImage } from "gatsby-plugin-image";
+import { useTranslation, Trans } from "react-i18next";
 
-/* Fragmentos con negritas — usamos JSX inline para <strong> */
+/* Nombres propios: no se extraen a i18n. Badges y párrafos (con <fuerte> para
+   negritas) viven en el namespace "diplomados" bajo profesores.items.<clave>. */
 const PROFESSORS = [
   {
     id: "roxana-munoz",
     name: "Roxana Muñoz",
-    badge: "Acompañamiento institucional y académico",
-    description: [
-      <>Roxana Muñoz Guevara es <strong>licenciada en Educación Preescolar</strong> por la Universidad Femenina de México, con estudios en Educación Especial, Psicomotricidad Aplicada, Psicología Infantil y formación como <strong>Guía Montessori de Taller I y II</strong> por el Centro de Desarrollo y Comunicación.</>,
-      <>Cuenta además con estudios adicionales realizados con la <strong>Dra. Cato Hanrath</strong>, alumna de María Montessori. Desde <strong>1997 es Presidenta de la Asociación Montessori de México A.C.</strong>, donde coordina los Diplomados Profesionales para Guía Montessori e imparte Antropología filosófica, Filosofía Montessori y Materiales Montessori.</>,
-      <>Actualmente es <strong>Directora General de la Escuela Primaria y del Centro Educativo Montessori Kalpilli</strong>, además de capacitadora de Guías Montessori en México y el extranjero. Su acompañamiento dentro del diplomado aporta profundidad académica, experiencia institucional y una mirada fiel a la filosofía Montessori.</>,
-    ],
+    i18nKey: "roxanaMunoz",
+    numParagraphs: 3,
   },
   {
     id: "ivan-lopez-carmona",
     name: "Iván López Carmona",
-    badge: "Formación inclusiva y práctica docente",
-    description: [
-      <>Iván forma parte del equipo de profesores de este diplomado. Es <strong>Licenciado en Intervención Educativa</strong> con línea inclusiva por la Universidad Pedagógica Nacional, <strong>Licenciado en Artes</strong> por el IDMA y <strong>Maestro en Ciencias de la Educación</strong> por el Instituto de Estudios Universitarios.</>,
-      <>Cuenta con <strong>15 años de experiencia</strong> en el ámbito educativo y una trayectoria sólida dentro de la filosofía Montessori. Está certificado como <strong>Guía Montessori de Casa de Niños, Taller I y II, Nido y Comunidad Infantil</strong> por la Asociación Montessori de México.</>,
-      <>Actualmente es <strong>catedrático presencial de la Asociación Montessori de México</strong> en la sede Acapulco, formando Guías de Casa de Niños y Taller. También <strong>coordina el departamento montessoriano en ECNH</strong> y desarrolla talleres para docentes en escuelas públicas y particulares.</>,
-    ],
+    i18nKey: "ivanLopezCarmona",
+    numParagraphs: 3,
   },
   {
     id: "carlos-romero",
     name: "Carlos Romero",
-    badge: "Gestión académica y tecnología educativa",
-    description: [
-      <>Carlos forma parte del equipo que acompaña la organización, el seguimiento y el desarrollo de los diplomados. Su relación con Montessori también es vivencial: <strong>toda su formación, desde Nido, fue Montessori</strong>, por lo que conoce el método desde la experiencia directa.</>,
-      <>Es <strong>Licenciado en Economía y en Contaduría Pública</strong>, además de programador. Esta combinación le permite integrar administración, análisis, tecnología y organización académica al servicio de la formación Montessori. También cuenta con <strong>estudios de maestría en Música</strong>, con enfoque en piano y composición.</>,
-      <>Dentro del diplomado, aporta <strong>estructura, claridad y soluciones prácticas</strong> para fortalecer la experiencia de las alumnas, uniendo Montessori, gestión educativa, pensamiento analítico y herramientas tecnológicas con un compromiso genuino con la educación.</>,
-    ],
+    i18nKey: "carlosRomero",
+    numParagraphs: 3,
   },
 ];
 
@@ -108,6 +98,7 @@ function ProfessorPhoto({ id, name }) {
 
 /* Tarjeta individual con desplegable */
 function ProfessorCard({ professor, expanded, onToggle }) {
+  const { t } = useTranslation("diplomados");
   return (
     <article className="group h-full rounded-2xl bg-white/95 backdrop-blur-sm shadow-xl border border-white/70 overflow-hidden flex flex-col">
       {/* Foto con zoom al hover */}
@@ -157,7 +148,7 @@ function ProfessorCard({ professor, expanded, onToggle }) {
               onClick={onToggle}
               className="mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-blue hover:text-blue/70 transition-colors self-start cursor-pointer"
             >
-              {expanded ? "Leer menos" : "Leer más"}
+              {expanded ? t("profesores.leerMenos") : t("profesores.leerMas")}
               <svg
                 className={`w-4 h-4 transition-transform duration-300 ${expanded ? "rotate-180" : ""}`}
                 fill="none"
@@ -175,6 +166,7 @@ function ProfessorCard({ professor, expanded, onToggle }) {
 }
 
 export default function ProfessorsSection() {
+  const { t } = useTranslation("diplomados");
   const isDesktop = useIsDesktop();
 
   /* Gatsby no hace scroll automático a anchors — lo manejamos aquí */
@@ -202,6 +194,19 @@ export default function ProfessorsSection() {
     }
   };
 
+  const professors = PROFESSORS.map((professor) => ({
+    ...professor,
+    badge: t(`profesores.items.${professor.i18nKey}.badge`),
+    description: Array.from({ length: professor.numParagraphs }, (_, i) => (
+      <Trans
+        key={`${professor.id}-p${i}`}
+        i18nKey={`profesores.items.${professor.i18nKey}.parrafos.${i}`}
+        ns="diplomados"
+        components={{ fuerte: <strong /> }}
+      />
+    )),
+  }));
+
   return (
     <section
       id="profesores"
@@ -210,21 +215,18 @@ export default function ProfessorsSection() {
       <div className="container mx-auto w-full max-w-full px-4">
         <div className="max-w-4xl">
           <p className="text-green-300/90 text-sm uppercase tracking-wider mb-2">
-            Equipo docente
+            {t("profesores.kicker")}
           </p>
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white">
-            Conoce a quienes te acompañarán en tu certificación
+            {t("profesores.titulo")}
           </h2>
           <p className="mt-4 text-base sm:text-lg text-white/90">
-            En este diplomado estarás acompañada por personas con experiencia,
-            formación y compromiso con la filosofía Montessori. Queremos que
-            conozcas un poco más a quienes estarán contigo a lo largo de este
-            proceso.
+            {t("profesores.intro")}
           </p>
         </div>
 
         <div className="mt-8 sm:mt-10 grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
-          {PROFESSORS.map((professor) => (
+          {professors.map((professor) => (
             <ProfessorCard
               key={professor.id}
               professor={professor}
