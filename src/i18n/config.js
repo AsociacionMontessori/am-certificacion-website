@@ -7,9 +7,9 @@
 
 const DEFAULT_LANGUAGE = "es"
 
-// Idioma al que cae un navegador que no es es/en/pt (p. ej. fr, de).
-// PENDIENTE decisión de Carlos; mientras tanto se queda en español (no se redirige).
-const FALLBACK_LANGUAGE = "es"
+// Idioma al que cae un navegador que no es es/en/pt (p. ej. fr, de):
+// inglés como lengua franca (decisión de Carlos, 2026-07-08).
+const FALLBACK_LANGUAGE = "en"
 
 // Mientras las traducciones EN/PT-BR no estén revisadas, sus páginas se
 // generan con noindex para no publicar contenido duplicado en español.
