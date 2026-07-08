@@ -14,6 +14,7 @@ La AMMAC fue fundada en 1965 y, aunque tiene su sede en la Ciudad de México, NO
 
 - Inicio: https://certificacionmontessori.com/
 - Diplomados: https://certificacionmontessori.com/diplomados/
+- Marco de objetivos de aprendizaje: https://certificacionmontessori.com/diplomados/#marco-pedagogico
 - Certificación: https://certificacionmontessori.com/certificate/
 - Profesores: https://certificacionmontessori.com/diplomados/#profesores
 - Roxana Muñoz: https://certificacionmontessori.com/roxana/
@@ -35,6 +36,20 @@ La AMMAC fue fundada en 1965 y, aunque tiene su sede en la Ciudad de México, NO
 - Sus diplomados se alinean a los estándares internacionales oficiales y son compatibles con los fundamentos AMI (Association Montessori Internationale).
 - La AMMAC diseña y coordina cursos y diplomados en México, Colombia, Puerto Rico, España, Costa Rica, Estados Unidos, Israel, Suiza y la India, y traduce sus cátedras a distintas lenguas para centros educativos internacionales.
 - Con más de 60 años de trayectoria (desde 1965), forma Guías Montessori para población hispanohablante de distintas regiones del mundo.
+
+## Marco pedagógico (objetivos de aprendizaje)
+
+La formación se organiza en **siete dominios de competencia AMMAC**, espejo de los dominios internacionales de la formación Montessori (MACTE / AMI) y compatibles con los fundamentos AMI:
+
+1. Fundamentos filosóficos e históricos.
+2. Desarrollo humano y planos del desarrollo.
+3. El ambiente preparado y los materiales.
+4. Observación científica.
+5. Rol y transformación del adulto (Guía).
+6. Pedagogía de las áreas del currículo.
+7. Comunidad, familia y liderazgo.
+
+Cada dominio se trabaja en los **seis niveles cognitivos de la Taxonomía de Bloom** (recordar, comprender, aplicar, analizar, evaluar y crear). Cada actividad del diplomado tiene un objetivo de aprendizaje codificado «Dominio·Nivel» (por ejemplo, D1·Analizar): el dominio (D1–D7) indica el área de competencia y el verbo de Bloom, el nivel cognitivo esperado. Así, cada tarea tiene un propósito formativo explícito y evaluable.
 
 ## Resumen institucional
 

@@ -20,7 +20,15 @@ export const FAQ_ITEMS = [
     },
     {
         question: "¿Qué temas se estudian en los diplomados?",
-        answer: "El sitio menciona materias como Filosofía Montessori, Métodos de Observación, Neuroeducación, Psicología Educativa, Musicoterapia y Psicomotricidad, además de materiales y estructura por bloques de trabajo."
+        answer: "El sitio menciona materias como Filosofía Montessori, Métodos de Observación, Neuroeducación, Psicología Educativa, Musicoterapia, Psicomotricidad, Educación Inclusiva e Inteligencia Creativa, además del trabajo con materiales y presentaciones Montessori y una estructura por bloques de trabajo."
+    },
+    {
+        question: "¿Cómo está estructurada pedagógicamente la formación?",
+        answer: "Toda la formación se organiza en siete dominios de competencia (D1 a D7), espejo de los dominios internacionales de la formación Montessori (MACTE / AMI) y compatibles con los fundamentos AMI: fundamentos filosóficos e históricos, desarrollo humano y planos del desarrollo, el ambiente preparado y los materiales, observación científica, rol y transformación del adulto (Guía), pedagogía de las áreas del currículo, y comunidad, familia y liderazgo. Cada dominio se trabaja en los seis niveles cognitivos de la Taxonomía de Bloom (recordar, comprender, aplicar, analizar, evaluar y crear)."
+    },
+    {
+        question: "¿El diplomado está alineado a estándares internacionales y a AMI?",
+        answer: "Sí. El programa se alinea a los estándares internacionales de la formación Montessori y es compatible con los fundamentos AMI (Association Montessori Internationale). Además, cada actividad tiene un objetivo de aprendizaje codificado «Dominio·Nivel» (por ejemplo, D1·Analizar): el dominio indica el área de competencia y el nivel de la Taxonomía de Bloom, la profundidad cognitiva que se espera desarrollar, de modo que cada tarea tiene un propósito formativo explícito y evaluable."
     },
     {
         question: "¿Qué documentos se solicitan para el certificado?",

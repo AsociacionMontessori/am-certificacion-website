@@ -42,9 +42,10 @@ export const PROGRAMAS_DESTACADOS = [
 
 export const TRUST_BADGES = [
   "Certificación internacional",
+  "Compatible con MACTE / AMI",
   "100% en línea",
   "Google for Education",
-  "Estándar CONOCER",
+  "Estándar CONOCER (SEP)",
 ]
 
 export const BENEFICIOS_HERO = [

@@ -369,7 +369,13 @@ const HomeMarketingHero = () => {
             </h1>
             <p className="text-base sm:text-lg text-white/90 max-w-xl leading-relaxed">
               Diplomados con validez internacional, a tu ritmo y con acompañamiento de
-              especialistas. Inscríbete hoy y aparta tu lugar en el próximo ciclo.
+              especialistas, para estudiar en línea desde cualquier país. Inscríbete hoy
+              y aparta tu lugar en el próximo ciclo.
+            </p>
+            <p className="text-sm text-white/75 max-w-xl leading-relaxed">
+              Somos la Asociación Montessori de México, una institución mexicana con
+              proyección internacional: formamos Guías Montessori en línea para
+              estudiantes de todo el mundo.
             </p>
 
             <ul className="flex flex-wrap gap-2">

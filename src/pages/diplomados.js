@@ -4,6 +4,7 @@ import { StaticImage } from "gatsby-plugin-image";
 import Layout from "../components/layout";
 import CertificationPrice from "../components/certificationPrice";
 import ProfessorsSection from "../components/professorsSection";
+import MarcoPedagogico from "../components/marcoPedagogico";
 import Scholarship from "../components/scholarship";
 import Seo from "../components/seo";
 import { DIPLOMADOS_EN_LINEA, getNextItem } from "../data/diplomadosCalendario";
@@ -54,6 +55,9 @@ export default function Landing() {
                       <p className="mt-6 sm:mt-10 text-md sm:text-lg md:text-xl text-gray-300 max-w-2xl">
                         Programas diseñados para un conocimiento práctico y profundo en educación y método Montessori. Termina como Guía Montessori con certificado de validez internacional.
                       </p>
+                      <p className="mt-3 text-sm sm:text-base text-gray-300/90 max-w-2xl">
+                        Somos la Asociación Montessori de México, una institución mexicana con proyección internacional: formamos Guías Montessori en línea para estudiantes de todo el mundo.
+                      </p>
                       <a
                         href="#certificacion_internacional"
                         className="inline-flex items-center gap-2 mt-6 sm:mt-8 px-6 py-3 rounded-full bg-white text-blue font-semibold hover:bg-green hover:text-white transition-all duration-300 shadow-lg"
@@ -73,7 +77,8 @@ export default function Landing() {
                           Tu acceso incluye: <strong className="text-white">Google Workspace</strong> (Drive 1 TB, correo institucional y servicios de Google), además de estudio con apoyo de <strong className="text-white">IA de Google</strong> (Notebook LM, Gemini).
                         </p>
                         <div className="flex flex-wrap justify-center gap-2 mt-4 text-xs text-white/80">
-                          <span className="px-2 py-1 rounded bg-white/10">CONOCER</span>
+                          <span className="px-2 py-1 rounded bg-white/10">Compatible con MACTE / AMI</span>
+                          <span className="px-2 py-1 rounded bg-white/10">Estándar CONOCER (SEP)</span>
                           <span className="px-2 py-1 rounded bg-white/10">RVOE en trámite</span>
                           <span className="px-2 py-1 rounded bg-white/10">Google for Education</span>
                           <span className="px-2 py-1 rounded bg-white/10">Gemini IA</span>
@@ -416,6 +421,8 @@ export default function Landing() {
           </section>
 
           <ProfessorsSection />
+
+          <MarcoPedagogico />
 
           <section className="relative block overflow-hidden bg-blue">
             <div

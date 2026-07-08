@@ -8,6 +8,7 @@ import ImgMap from '../images/banners/map.png';
 import ImgMapDark from '../images/banners/dark_map.png';
 import { StaticImage } from 'gatsby-plugin-image';
 import Timeline from '../components/timeline/timeline';
+import MarcoPedagogico from '../components/marcoPedagogico';
 import Nav from '../components/nav';
 import HomeMarketingHero from '../components/home/HomeMarketingHero';
 
@@ -126,6 +127,7 @@ const IndexPage = ({ location }) => {
           </div>
           <Timeline />
         </section>
+        <MarcoPedagogico />
       </main>
     </Layout>
   )

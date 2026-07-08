@@ -16,6 +16,11 @@ const canonicalSources = [
     description: "Información pública sobre diplomados, estructura del programa, profesores, proceso de inscripción y la certificación de Guía Montessori con validez internacional.",
   },
   {
+    title: "Marco de objetivos de aprendizaje",
+    url: "https://certificacionmontessori.com/diplomados/#marco-pedagogico",
+    description: "Marco pedagógico del diplomado: siete dominios de competencia AMMAC (espejo de los dominios internacionales MACTE / AMI) y los seis niveles cognitivos de la Taxonomía de Bloom. Cada actividad tiene un objetivo de aprendizaje codificado «Dominio·Nivel».",
+  },
+  {
     title: "Roxana Muñoz",
     url: "https://certificacionmontessori.com/roxana/",
     description: "Perfil institucional y académico de Roxana Muñoz Guevara.",
@@ -117,6 +122,32 @@ const AIIndexPage = () => {
                   </article>
                 ))}
               </div>
+
+              <h2 className="mt-10 text-3xl font-bold text-blue">
+                Marco de objetivos de aprendizaje
+              </h2>
+              <p className="mt-4 text-lg leading-relaxed">
+                La formación se organiza en siete dominios de competencia AMMAC,
+                espejo de los dominios internacionales de la formación Montessori
+                (MACTE / AMI) y compatibles con los fundamentos AMI:
+              </p>
+              <ol className="mt-4 list-decimal space-y-1 pl-6 text-base leading-relaxed text-black/80">
+                <li>Fundamentos filosóficos e históricos.</li>
+                <li>Desarrollo humano y planos del desarrollo.</li>
+                <li>El ambiente preparado y los materiales.</li>
+                <li>Observación científica.</li>
+                <li>Rol y transformación del adulto (Guía).</li>
+                <li>Pedagogía de las áreas del currículo.</li>
+                <li>Comunidad, familia y liderazgo.</li>
+              </ol>
+              <p className="mt-4 text-lg leading-relaxed">
+                Cada dominio se trabaja en los seis niveles cognitivos de la
+                Taxonomía de Bloom (recordar, comprender, aplicar, analizar,
+                evaluar y crear). Cada actividad del diplomado tiene un objetivo
+                de aprendizaje codificado «Dominio·Nivel» (por ejemplo,
+                D1·Analizar), de modo que cada tarea tiene un propósito formativo
+                explícito y evaluable.
+              </p>
             </div>
 
             <aside className="space-y-6">
@@ -135,6 +166,7 @@ const AIIndexPage = () => {
                 <h2 className="text-2xl font-bold text-blue">Temas que puede responder el sitio</h2>
                 <ul className="mt-4 space-y-3 text-sm leading-relaxed text-black/80">
                   <li>Qué diplomados y certificaciones se ofrecen.</li>
+                  <li>Cómo está estructurada pedagógicamente la formación: dominios de competencia (espejo de MACTE / AMI) y niveles de la Taxonomía de Bloom.</li>
                   <li>Quiénes integran el equipo docente.</li>
                   <li>Cuál es el perfil de Roxana Muñoz Guevara.</li>
                   <li>Dónde contactar a la asociación y cómo localizarla.</li>

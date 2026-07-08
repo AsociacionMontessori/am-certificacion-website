@@ -9,7 +9,7 @@ export default function Footer() {
                     <StaticImage src="../images/lasc.png" className="w-14 h-14 m-1.5" alt={"Logo Asociación Montessori"} />
                     <div className="m-1.5 lg:text-base text-sm ">
                         <div className="font-medium">Asociación Montessori de México A.C.</div>
-                        <p>Todos los derechos reservados 2024</p>
+                        <p>Todos los derechos reservados 2026</p>
                     </div>
                 </a>
                 <div className="flex mx-2 justify-center p-4 items-center lg:w-4/12 md:w-9/12">
@@ -19,6 +19,10 @@ export default function Footer() {
                     </div>
                 </div>
             </div>
+
+            <p className="text-xs text-white/70 text-center max-w-3xl px-4 mb-2">
+                Institución mexicana con proyección internacional: formamos Guías Montessori en línea para estudiantes de todo el mundo, con certificación de validez internacional.
+            </p>
 
             <div className="bg-gray-700 mt-8 text-xs">
                 <div className="mx-1 md:mx-10  sm:py-0 md:py-2 lg:py-4 px-1 md:px-6 grid grid-cols-1 md:grid-cols-4 gap-1 md:gap-0">
@@ -49,13 +53,13 @@ export default function Footer() {
                         <br />
                         <a className="hover:underline decoration-red" href="../reembolsos" target="_blank" rel="noopener noreferrer">Política de reembolsos</a>
                         <br />
-                        <a className="hover:underline decoration-red" href="https://drive.google.com/file/d/1XaVbYjwltjMJjcjvCuqdhKIAFvxjecOJ/view" target="_blank" rel="noopener noreferrer">Constacia de Seguridad Estructural</a>
+                        <a className="hover:underline decoration-red" href="https://drive.google.com/file/d/1XaVbYjwltjMJjcjvCuqdhKIAFvxjecOJ/view" target="_blank" rel="noopener noreferrer">Constancia de Seguridad Estructural</a>
                         <br />
                         <a className="hover:underline decoration-red" href='https://drive.google.com/file/d/1mE54tJUcoFfaX4mJQjaD7slE_ESlPY-r/view' target='_blank' rel="noopener noreferrer">Visto Bueno de Seguridad Estructural</a>
 
                     </div>
                     <div className="text-center md:text-left m-4 md:m-0">
-                        <h3 className="text-lg font-semibold mb-2">Escuelas Montassori</h3>
+                        <h3 className="text-lg font-semibold mb-2">Escuelas Montessori</h3>
                         <a className="hover:underline decoration-red italic" href="https://www.google.com.mx/maps/place/Primaria+Montessori+Kalpilli/@19.3925921,-99.1847762,17z/data=!4m6!3m5!1s0x85d1ff7b7998ce53:0x3f544be41b8ca559!8m2!3d19.3928452!4d-99.1838964!16s%2Fg%2F11sj5sp5xh?entry=ttu"  target="_blank" rel="noopener noreferrer">Kalpilli</a> ver en mapa
                         <br />
                         <a href="mailto:admin@certificacionmontessori.com" target="_blank" rel="noopener noreferrer">admin@certificacionmontessori.com</a>
