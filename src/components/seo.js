@@ -21,17 +21,19 @@ const formatBreadcrumbName = segment =>
     .replace(/-/g, " ")
     .replace(/\b\w/g, char => char.toUpperCase())
 
-const buildBreadcrumbSchema = ({ pathname, canonicalUrl, title, homeName }) => {
-  const normalizedPathname = normalizePathname(pathname)
-  if (normalizedPathname === "/") return null
+// El breadcrumb se construye sobre la ruta canónica en español (sin el prefijo
+// de idioma) y luego se localiza cada URL: así /en/diplomados/ produce
+// «Home › Diploma Courses» y no «Home › En › Diplomados».
+const buildBreadcrumbSchema = ({ siteUrl, language, originalPath, canonicalUrl, title, homeName }) => {
+  if (originalPath === "/") return null
 
-  const segments = normalizedPathname.split("/").filter(Boolean)
+  const segments = originalPath.split("/").filter(Boolean)
   const items = [
     {
       "@type": "ListItem",
       position: 1,
       name: homeName || "Inicio",
-      item: "https://certificacionmontessori.com/",
+      item: `${siteUrl}${localizePath(language, "/")}`,
     },
   ]
 
@@ -43,7 +45,7 @@ const buildBreadcrumbSchema = ({ pathname, canonicalUrl, title, homeName }) => {
       "@type": "ListItem",
       position: index + 2,
       name: isLast && title ? title : formatBreadcrumbName(segment),
-      item: isLast ? canonicalUrl : `https://certificacionmontessori.com${currentPath}/`,
+      item: isLast ? canonicalUrl : `${siteUrl}${localizePath(language, `${currentPath}/`)}`,
     })
   })
 
@@ -119,12 +121,14 @@ function Seo({
   const fullTitle = defaultTitle ? `${title} | ${defaultTitle}` : title
   const shouldIndex = !effectiveRobots.includes("noindex")
 
-  const areaServed = [
-    { "@type": "Country", name: "México" },
-    ...(metadata?.areaServedCountries || [])
-      .filter(country => country && country !== "México")
-      .map(country => ({ "@type": "Country", name: country })),
-  ]
+  // Textos del JSON-LD en el idioma de la página (el Head se renderiza fuera
+  // del provider de i18next, así que se resuelve el idioma desde el pathname).
+  const tc = getT(normalizedPathname, "common")
+  const countries = tc("schema.paises", { returnObjects: true })
+  const areaServed = (Array.isArray(countries) ? countries : []).map(country => ({
+    "@type": "Country",
+    name: country,
+  }))
 
   const organizationSchema = {
     "@context": "https://schema.org",
@@ -132,28 +136,21 @@ function Seo({
     name: metadata?.organizationName || defaultTitle,
     legalName: metadata?.legalName || metadata?.organizationName || defaultTitle,
     url: siteUrl,
-    description: metadata?.description,
-    slogan: metadata?.slogan,
+    description: tc("schema.description"),
+    slogan: tc("schema.slogan"),
     foundingDate: metadata?.foundingDate,
     email: metadata?.email,
     telephone: metadata?.telephone,
     logo: imageUrl,
     sameAs: metadata?.sameAs || [],
     areaServed,
-    knowsLanguage: ["es", "en"],
-    knowsAbout: [
-      "Método Montessori",
-      "Formación de Guías Montessori",
-      "Certificación Montessori internacional",
-      "Pedagogía científica de María Montessori",
-      "Estándares internacionales AMI",
-    ],
+    knowsLanguage: ["es", "en", "pt-BR"],
+    knowsAbout: tc("schema.knowsAbout", { returnObjects: true }),
     hasCredential: {
       "@type": "EducationalOccupationalCredential",
-      name: "Certificación Montessori internacional emitida por la AMMAC",
+      name: tc("schema.credencial.nombre"),
       credentialCategory: "certification",
-      description:
-        "Certificación profesional internacional para Guías Montessori emitida por la Asociación Montessori de México A.C. (AMMAC), alineada a los estándares internacionales de la formación Montessori y desarrollada con referencia a los fundamentos AMI.",
+      description: tc("schema.credencial.descripcion"),
     },
     contactPoint: [
       {
@@ -168,7 +165,7 @@ function Seo({
         contactType: "WhatsApp support",
         telephone: metadata?.whatsappNumber,
         url: metadata?.whatsappUrl,
-        description: metadata?.whatsappHours,
+        description: tc("schema.whatsappHorario"),
         availableLanguage: ["es"],
       },
     ],
@@ -185,7 +182,7 @@ function Seo({
   const websiteSchema = {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    name: metadata?.siteName || defaultTitle,
+    name: tc("schema.siteName"),
     alternateName: metadata?.organizationName || defaultTitle,
     url: siteUrl,
     inLanguage: lang.htmlLang,
@@ -201,15 +198,17 @@ function Seo({
     isPartOf: {
       "@type": "WebSite",
       url: siteUrl,
-      name: metadata?.siteName || defaultTitle,
+      name: tc("schema.siteName"),
     },
   }
 
   const breadcrumbSchema = buildBreadcrumbSchema({
-    pathname: normalizedPathname,
+    siteUrl,
+    language,
+    originalPath,
     canonicalUrl: pageUrl,
     title,
-    homeName: getT(normalizedPathname, "common")("breadcrumb.inicio"),
+    homeName: tc("breadcrumb.inicio"),
   })
 
   const schemas = shouldIndex
