@@ -1,11 +1,11 @@
-# Citas de Maria Montessori pendientes de cotejo (EN, sitio web)
+# Citas de Maria Montessori — estado EN (sitio web)
 
-Regla (glosario §1): las citas usan la versión canónica inglesa publicada (Clio Press / Montessori-Pierson), no re-traducción. Mismo formato que `diplomado-ammac-2026-en/glosario/CITAS_PENDIENTES.md`.
+Regla (glosario §1): las citas usan la versión canónica inglesa publicada (Clio Press / Montessori-Pierson), no re-traducción. Dictamen de Carlos 2026-07-08 (ver `CITAS_PENDIENTES_EN_REVISION.md`) aplicado a `en/home.json`.
 
-| # | Clave i18n | Cita ES | Rendición EN provisional | Candidata canónica | Estado |
+| # | Clave i18n | Cita ES | Rendición EN final | Fuente canónica / candidata | Estado |
 |---|---|---|---|---|---|
-| 1 | home:marquee.frases[0] | «El niño crea sus propios movimientos y, una vez creados, los perfecciona» | "The child creates his own movements and, once he has created them, perfects them" | Probable *The Absorbent Mind* (caps. sobre movimiento). Localizar pasaje exacto Clio/Pierson. | PENDIENTE |
-| 2 | home:marquee.frases[1] | «No se puede ser libre, si no se es independiente» | "No one can be free unless he is independent" | *The Montessori Method* / *The Discovery of the Child* — fórmula instalada. | CONFIRMADA (uso extendido; falta página exacta) |
-| 3 | home:marquee.frases[2] | «Lo que la mano hace, la mente lo recuerda» | "What the hand does, the mind remembers" | Fórmula circulante atribuida; verificar edición canónica o marcar como paráfrasis. | PENDIENTE |
+| 1 | home:marquee.frases[0] | «El niño crea sus propios movimientos y, una vez creados, los perfecciona» | "In other words the child creates his own movements and, having done so, perfects them." | *The Absorbent Mind*. Redacción localizada en texto EN (Internet Archive); cotejar página exacta en edición Clio/Montessori-Pierson antes de cierre. | LOCALIZADA; PÁGINA CANÓNICA PENDIENTE |
+| 2 | home:marquee.frases[1] | «No se puede ser libre, si no se es independiente» | "No one can be free unless he is independent." | *The Discovery of the Child*, p. 118, Montessori 150 / AMI. | VERIFICADA |
+| 3 | home:marquee.frases[2] | «Lo que la mano hace, la mente lo recuerda» | "The hands are the instruments of man's intelligence." | *The Absorbent Mind*, p. 25, Montessori 150 / AMI. Sustituye la fórmula circulante no localizada «What the hand does, the mind remembers» (no publicar como cita literal). | SUSTITUIDA POR CITA CANÓNICA |
 
-Al resolver: actualizar `en/home.json`, marcar aquí con edición y página.
+Nota PT-BR (Fase 4): usar las ediciones canónicas en portugués (Kírion/Papirus) para las tres frases; si no hay versión publicada localizable, aplicar el mismo criterio (sustituir por cita canónica cercana, no re-traducir).

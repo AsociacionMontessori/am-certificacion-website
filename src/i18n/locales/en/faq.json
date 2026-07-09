@@ -4,7 +4,7 @@
   "items": {
     "queOfrece": {
       "pregunta": "What does certificacionmontessori.com offer?",
-      "respuesta": "The public website of AMMAC (Asociación Montessori de México A.C., Mexico's Montessori Association, founded in 1965) brings together institutional information about diploma courses, certifications, publications, faculty profiles, contact details, and open resources related to Montessori training."
+      "respuesta": "The public website of AMMAC — the Montessori Association of Mexico (Asociación Montessori de México A.C.), founded in 1965 — brings together institutional information about diploma courses, certifications, publications, faculty profiles, contact details, and open resources related to Montessori training."
     },
     "modalidad": {
       "pregunta": "Are the diploma courses online or in person?",
@@ -12,7 +12,7 @@
     },
     "certificacion": {
       "pregunta": "What certification do I receive upon completion?",
-      "respuesta": "The site's public offering states that the programs include internationally recognized certification and are designed to train you as a Montessori Guide. Specific details can be found on the Diploma Courses page."
+      "respuesta": "The site's public offering states that the programs include international Montessori certification issued by AMMAC and are designed to train you as a Montessori Guide. Specific details can be found on the Diploma Courses page."
     },
     "equipoDocente": {
       "pregunta": "Who is on the teaching team?",
@@ -24,7 +24,7 @@
     },
     "estructuraPedagogica": {
       "pregunta": "How is the training structured pedagogically?",
-      "respuesta": "The entire training program is organized into seven competency domains (D1 through D7), mirroring the international domains of Montessori training (MACTE / AMI) and compatible with AMI foundations: Philosophical and Historical Foundations; Human Development and the Planes of Development; The Prepared Environment and the Materials; Scientific Observation; Role and Transformation of the Adult (the Guide); Pedagogy of the Curriculum Areas; and Community, Family, and Leadership. Each domain is developed across the six cognitive levels of Bloom's Taxonomy (Remember, Understand, Apply, Analyze, Evaluate, and Create)."
+      "respuesta": "The entire training program is organized into seven competency domains (D1 through D7), developed with reference to the international domains of Montessori training (MACTE / AMI) and to AMI foundations: Philosophical and Historical Foundations; Human Development and the Planes of Development; The Prepared Environment and the Materials; Scientific Observation; Role and Transformation of the Adult (the Guide); Pedagogy of the Curriculum Areas; and Community, Family, and Leadership. Each domain is developed across the six cognitive levels of Bloom's Taxonomy (Remember, Understand, Apply, Analyze, Evaluate, and Create)."
     },
     "estandaresAmi": {
       "pregunta": "Is the diploma course aligned with international standards and AMI?",
@@ -32,10 +32,10 @@
     },
     "documentos": {
       "pregunta": "What documents are required for the certificate?",
-      "respuesta": "The Diploma Courses page states that, for the internationally recognized certificate, you will be asked to provide proof of address, official identification, a birth certificate, and your most recent academic certificate."
+      "respuesta": "The Diploma Courses page states that, for your international certificate, you will be asked to provide proof of address, official identification, a birth certificate, and your most recent academic certificate."
     },
     "informes": {
-      "pregunta": "How can I request information or get in touch?",
+      "pregunta": "How can I request more information or get in touch?",
       "respuesta": "You can write to admin@certificacionmontessori.com, call 55 5515 2701, or reach out on WhatsApp at 55 4888 5013. WhatsApp support is available from 9:00 a.m. to 6:00 p.m., chat only."
     },
     "ubicacion": {

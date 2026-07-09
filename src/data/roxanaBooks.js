@@ -102,7 +102,7 @@ export const roxanaBooks = [
     },
     title: "Guiones Cósmicos: Las cinco grandes lecciones y las lecciones complementarias",
     description:
-      "Las grandes lecciones de María Montessori se cuentan, no se leen. Colección completa de once guiones narrativos del Taller del segundo plano: las cinco grandes lecciones (Universo, Vida, Ser Humano, Escritura y Números) y siete lecciones complementarias, con indicaciones técnicas, materiales y notas de seguimiento. Complemento técnico de Educación Cósmica.",
+      "Las grandes lecciones de María Montessori se cuentan, no se leen. Colección completa de doce guiones narrativos del Taller del segundo plano: las cinco grandes lecciones (Universo, Vida, Ser Humano, Escritura y Números) y siete lecciones complementarias, con indicaciones técnicas, materiales y notas de seguimiento. Complemento técnico de Educación Cósmica.",
     coverImage: "/books/guiones-cosmicos.jpg",
     amazonUrl: "https://www.amazon.com.mx/dp/B0H14FT9K4",
   },

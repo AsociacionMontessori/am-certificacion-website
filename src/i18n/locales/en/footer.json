@@ -1,14 +1,14 @@
 {
   "ammac": {
     "logoAlt": "Asociación Montessori de México logo",
-    "nombre": "Asociación Montessori de México A.C.",
+    "nombre": "Montessori Association of Mexico (Asociación Montessori de México A.C.)",
     "derechos": "All rights reserved 2026"
   },
   "sems": {
     "logoAlt": "Sociedad de Escuelas Montessori logo",
     "nombre": "Sociedad de Escuelas Montessori S.C."
   },
-  "leyenda": "A Mexican institution with international reach: we train Montessori Guides online for students around the world, with internationally recognized certification.",
+  "leyenda": "A Mexican institution with international reach: we train Montessori Guides online for students around the world, with international Montessori certification issued by AMMAC.",
   "asociacion": {
     "titulo": "Association",
     "diplomados": "Diploma Courses",
@@ -44,6 +44,6 @@
     "tiktokAlt": "TikTok"
   },
   "whatsapp": {
-    "solicitaInformes": "Request Information"
+    "solicitaInformes": "Request More Information"
   }
 }

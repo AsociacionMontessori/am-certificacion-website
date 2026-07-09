@@ -1,11 +1,11 @@
 {
   "seo": {
     "title": "Montessori Guide Certification — Online Diploma Courses",
-    "description": "Train as a Montessori Guide with our online Montessori diploma courses: internationally recognized certification, expert faculty, and a flexible pace."
+    "description": "Train as a Montessori Guide with our online Montessori diploma courses: international certification issued by AMMAC, expert faculty, and a flexible pace."
   },
   "schema": {
     "nombre": "Montessori Guide Diploma Courses",
-    "descripcion": "Online diploma courses to train as a Montessori Guide, with faculty mentorship and internationally recognized certification.",
+    "descripcion": "Online diploma courses to train as a Montessori Guide, with faculty mentorship and international Montessori certification issued by AMMAC.",
     "categoria": "Montessori Guide",
     "proveedor": "Asociación Montessori de México A.C."
   },
@@ -13,16 +13,16 @@
   "hero": {
     "kicker": "International certification • 100% online • At your own pace",
     "title": "Diploma Courses: <linea>Montessori Guide</linea>",
-    "p1": "Programs designed to give you deep, practical knowledge of Montessori education and the Montessori method. Graduate as a Montessori Guide with an internationally recognized certificate.",
-    "p2": "We are the Asociación Montessori de México (Mexico's Montessori Association, founded in 1965), a Mexican institution with international reach: we train Montessori Guides online for students all over the world.",
+    "p1": "Programs designed to give you deep, practical knowledge of Montessori education and the Montessori method. Graduate as a Montessori Guide with an international Montessori certification issued by AMMAC.",
+    "p2": "We are the Montessori Association of Mexico (Asociación Montessori de México A.C.), founded in 1965 — a Mexican institution with international reach: we train Montessori Guides online for students all over the world.",
     "decorAlt": "decoration",
     "card": {
       "p1": "By the time you complete your program, you will be ready to work as a Montessori Guide at any school in the world and make a real difference in your students' lives. Study from anywhere with our online platform.",
       "acceso": "Your access includes: <fuerte>Google Workspace</fuerte> (1 TB of Drive storage, an institutional email address, and Google services), plus study supported by <fuerte>Google AI</fuerte> (NotebookLM, Gemini).",
       "badges": [
-        "Compatible with MACTE / AMI",
-        "CONOCER Standard (SEP)",
-        "RVOE in process",
+        "Developed with reference to MACTE / AMI",
+        "CONOCER competency standard (SEP)",
+        "RVOE application in process",
         "Google for Education",
         "Gemini AI"
       ],
@@ -84,7 +84,7 @@
     "items": {
       "publicacion": {
         "titulo": "Weekly releases",
-        "texto": "A new class is published every Saturday at 8:00 a.m."
+        "texto": "A new class is published every Saturday at 8:00 a.m. Mexico City time (GMT-6)."
       },
       "actividades": {
         "titulo": "Activities at your own pace",
@@ -118,7 +118,7 @@
     },
     "paso2": {
       "titulo": "👨‍🎓 Personal Documents",
-      "intro": "For your internationally recognized certificate:",
+      "intro": "For your international certificate:",
       "docs": {
         "domicilio": "📍 Proof of address",
         "identificacion": "🪪 Government-issued ID",
@@ -150,7 +150,7 @@
     "tituloSeccion": "Montessori Certification",
     "kicker": "International certification",
     "titulo": "Montessori Guide",
-    "descripcion": "Internationally recognized programs. Program prices (tuition or diploma course) are separate from the enrollment fee, which you only pay once.",
+    "descripcion": "International programs certified by AMMAC. Program prices (tuition or diploma course) are separate from the enrollment fee, which you only pay once.",
     "colegiaturaMensual": "Monthly tuition",
     "inscripcionIncluida": "Enrollment fee included (promotion)",
     "inscripcionAparte": "Enrollment fee separate ({{monto}})",
@@ -167,7 +167,7 @@
     "inscripcion": {
       "titulo": "Enrollment",
       "subtitulo": "You pay the enrollment fee only once. If you later take another diploma course or program with us, we never charge it again.",
-      "beneficio": "One-time lifetime enrollment with the institution",
+      "beneficio": "One-time enrollment with lifetime access to the institution",
       "textoMonto": "Enrollment fee (today)"
     },
     "cosmica": {
@@ -262,14 +262,14 @@
     },
     "certInternacional": {
       "titulo": "🌍 International Certification • Montessori Guide",
-      "intro": "Our diploma courses include internationally recognized certification:",
+      "intro": "Our diploma courses include international Montessori certification issued by AMMAC:",
       "items": [
         "Neuroeducation",
         "Nido and Infant Community",
         "Children's House",
         "Elementary"
       ],
-      "alineados": "They are aligned with the EC0301 Standard of Mexico's CONOCER network (official professional certification, SEP), and our RVOE official recognition (Mexico's Ministry of Public Education) is in process."
+      "alineados": "They are aligned with the EC0301 competency standard of Mexico's CONOCER system, part of the country's official professional competency certification framework (SEP), and our RVOE application is in process with Mexico's Ministry of Public Education (SEP)."
     },
     "beneficios": {
       "enLinea": {

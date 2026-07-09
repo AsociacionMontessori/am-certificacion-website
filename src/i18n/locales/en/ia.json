@@ -6,7 +6,7 @@
   "hero": {
     "eyebrow": "Public AI index",
     "title": "A public guide for search engines and AI agents",
-    "p1": "This page summarizes the canonical sources of public information on certificacionmontessori.com. It is designed to support accurate answers about the Asociación Montessori de México A.C. (AMMAC, Mexico's Montessori Association), its diploma courses, faculty, publications, and institutional contact channels.",
+    "p1": "This page summarizes the canonical sources of public information on certificacionmontessori.com. It is designed to support accurate answers about the Asociación Montessori de México A.C. (AMMAC, the Montessori Association of Mexico), its diploma courses, faculty, publications, and institutional contact channels.",
     "p2": "The scope of this index is limited to the public content of the main site. It does not include private areas, internal information, or `alumnos-app`."
   },
   "queEs": {
@@ -19,11 +19,11 @@
     "items": {
       "inicio": {
         "titulo": "Home",
-        "descripcion": "Overview of the Asociación Montessori de México A.C. (founded in 1965), its educational approach, and its public programs with internationally recognized certification."
+        "descripcion": "Overview of the Asociación Montessori de México A.C. (founded in 1965), its educational approach, and its public programs with international Montessori certification issued by AMMAC."
       },
       "diplomados": {
         "titulo": "Diploma Courses",
-        "descripcion": "Public information about the diploma courses, program structure, instructors, the enrollment process, and the internationally recognized Montessori Guide certification."
+        "descripcion": "Public information about the diploma courses, program structure, instructors, the enrollment process, and the international Montessori Guide certification issued by AMMAC."
       },
       "marco": {
         "titulo": "Learning objectives framework",
@@ -64,9 +64,9 @@
   "resumen": {
     "titulo": "Institutional summary",
     "items": [
-      "Organization: Asociación Montessori de México A.C. (AMMAC), Mexico's Montessori Association, founded in 1965.",
-      "Focus: training of Montessori Guides, internationally recognized certification, and dissemination of the Montessori method.",
-      "Reach: an institution based in Mexico with international scope; its certifications are internationally recognized worldwide. It coordinates diploma courses in Mexico, Colombia, Puerto Rico, Spain, Costa Rica, the United States, Israel, Switzerland, and India.",
+      "Organization: Asociación Montessori de México A.C. (AMMAC), the Montessori Association of Mexico, founded in 1965.",
+      "Focus: training of Montessori Guides, international Montessori certification issued by AMMAC, and dissemination of the Montessori method.",
+      "Reach: an institution based in Mexico with international scope. It coordinates diploma courses in Mexico, Colombia, Puerto Rico, Spain, Costa Rica, the United States, Israel, Switzerland, and India.",
       "Public address: Avenida Dos 48, San Pedro de los Pinos, Benito Juárez, Mexico City.",
       "Public contact: admin@certificacionmontessori.com, +52 55 5515 2701, and WhatsApp +52 55 4888 5013."
     ]

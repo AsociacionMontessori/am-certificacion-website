@@ -1,20 +1,20 @@
 {
   "seo": {
     "title": "Online Montessori Guide Certification",
-    "description": "Earn your Montessori Guide certification 100% online. Internationally recognized diploma courses with limited spots. Reserve yours from $4,900 MXN."
+    "description": "Earn your Montessori Guide certification 100% online. International diploma courses issued by AMMAC — limited spots. Reserve yours from $4,900 MXN."
   },
   "hero": {
     "imagenAlt": "Online Montessori training",
     "eyebrow": "International certification • Montessori Guide",
     "titulo": "Become a Montessori Guide <enLinea>100% online</enLinea>",
-    "descripcion": "Internationally recognized diploma courses — at your own pace and with expert mentorship, so you can study online from any country. Enroll today and reserve your spot in the upcoming cohort.",
-    "quienesSomos": "We are AMMAC (Asociación Montessori de México), Mexico's Montessori Association — a Mexican institution with international reach: we train Montessori Guides online for students all over the world.",
+    "descripcion": "International Montessori diploma courses issued by AMMAC — at your own pace and with expert mentorship, so you can study online from any country. Enroll today and reserve your spot in the upcoming cohort.",
+    "quienesSomos": "We are the Montessori Association of Mexico — AMMAC (Asociación Montessori de México A.C.) — a Mexican institution with international reach: we train Montessori Guides online for students all over the world.",
     "badges": [
-      "Internationally recognized certification",
-      "Compatible with MACTE / AMI",
+      "AMMAC Montessori certification",
+      "Developed with reference to MACTE / AMI",
       "100% online",
       "Google for Education",
-      "CONOCER standard (SEP)"
+      "CONOCER competency standard (SEP)"
     ],
     "ctaInscribete": "Enroll now",
     "verProgramas": "See all programs and pricing →"
@@ -30,7 +30,7 @@
     "titulo": "Next online diploma course",
     "subtitulo": "Transform the way you accompany children.",
     "inscripcionPortal": "Enrollment + portal access",
-    "beneficioUnica": "One-time lifetime enrollment fee with the institution",
+    "beneficioUnica": "One-time enrollment fee with lifetime access to the institution",
     "beneficioNota": "{{beneficio}}. Monthly tuition depends on the program you choose."
   },
   "pagos": {
@@ -109,7 +109,7 @@
       "tipo": "Certification",
       "eyebrow": "Ages 6 to 12",
       "titulo": "Elementary I and II",
-      "subtitulo": "Internationally recognized certification",
+      "subtitulo": "International certification issued by AMMAC",
       "notaPrecio": "$4,900 enrollment fee (one time) + monthly tuition",
       "duracion": "20 months"
     },
@@ -117,7 +117,7 @@
       "tipo": "Certification",
       "eyebrow": "Ages 3 to 6",
       "titulo": "Children's House",
-      "subtitulo": "Internationally recognized certification",
+      "subtitulo": "International certification issued by AMMAC",
       "notaPrecio": "$4,900 enrollment fee (one time) + monthly tuition",
       "duracion": "17 months"
     },
@@ -125,7 +125,7 @@
       "tipo": "Certification",
       "eyebrow": "Ages 0 to 3",
       "titulo": "Nido and Infant Community",
-      "subtitulo": "Internationally recognized certification",
+      "subtitulo": "International certification issued by AMMAC",
       "notaPrecio": "$4,900 enrollment fee (one time) + monthly tuition",
       "duracion": "16 months"
     }
@@ -155,9 +155,9 @@
   },
   "marquee": {
     "frases": [
-      "The child creates his own movements and, once he has created them, perfects them",
+      "In other words the child creates his own movements and, having done so, perfects them.",
       "No one can be free unless he is independent",
-      "What the hand does, the mind remembers"
+      "The hands are the instruments of man's intelligence."
     ]
   },
   "educacion": {
@@ -170,7 +170,7 @@
   },
   "certificacionInternacional": {
     "encabezado": "All our diploma courses include: ",
-    "titulo": "Internationally Recognized Certification",
+    "titulo": "International Certification",
     "reconocimiento": "Montessori certifications are highly regarded all over the world"
   },
   "marco": {
@@ -243,7 +243,7 @@
     "items": {
       "fundacion": {
         "titulo": "Founding of AMMAC",
-        "contenido": "Founded by Dr. Angelina Almeida to introduce and promote the pedagogy and philosophy of Maria Montessori's method in Mexico, the Asociación Montessori de México A.C. (AMMAC, Mexico's Montessori Association) was born — becoming one of the first formally constituted organizations dedicated to the professional training of Montessori Guides, the opening of schools, and the study of the Montessori method."
+        "contenido": "Founded by Dr. Angelina Almeida to introduce and promote the pedagogy and philosophy of Maria Montessori's method in Mexico, the Asociación Montessori de México A.C. (AMMAC, the Montessori Association of Mexico) was born — becoming one of the first formally constituted organizations dedicated to the professional training of Montessori Guides, the opening of schools, and the study of the Montessori method."
       },
       "kalpilli": {
         "titulo": "AMMAC creates the first Montessori school in Mexico City: Escuela Montessori Kalpilli",
@@ -270,8 +270,8 @@
         "contenido": "AMMAC created a Montessori method training program for teachers in rural schools, along with workshops for producing low-cost Montessori materials and furniture from renewable resources. Through this program, projects to open Montessori schools have been carried out in rural areas of Veracruz, Guerrero, and Oaxaca."
       },
       "certificacionesInternacionales": {
-        "titulo": "Internationally recognized professional certifications for Montessori Guides",
-        "contenido": "AMMAC began offering professional training for Montessori Guides, standing out as the only one officially recognized by the National Autonomous University of Mexico (UNAM), the Metropolitan Autonomous University (UAM), and the Universidad del Valle de México, while also meeting the international competencies and agreements required to grant internationally recognized certifications."
+        "titulo": "International professional certifications for Montessori Guides",
+        "contenido": "AMMAC began offering professional training for Montessori Guides, standing out as the only one officially recognized by the National Autonomous University of Mexico (UNAM), the Metropolitan Autonomous University (UAM), and the Universidad del Valle de México, while also meeting the international competencies and agreements under which AMMAC grants its international certifications."
       },
       "certificacionesEnLinea": {
         "titulo": "Online professional certifications for Montessori Guides",
@@ -298,8 +298,8 @@
         "contenido": "In 2025, AMMAC celebrates 60 years of promoting Montessori pedagogy and philosophy in Mexico: six decades of training Guides, opening schools, conducting research, and building an educational community committed to a humanistic, innovative education."
       },
       "rvoe": {
-        "titulo": "RVOE official recognition in process in Mexico",
-        "contenido": "In 2026 we are finalizing the RVOE process with Mexico's educational authority so that, in addition to the international recognition of our certifications, they carry official recognition in Mexico backing our graduates' training."
+        "titulo": "RVOE application in process with Mexico's SEP",
+        "contenido": "In 2026 we are pursuing the RVOE application with Mexico's Ministry of Public Education (SEP) so that, in addition to their international scope, our certifications carry official recognition in Mexico backing our graduates' training."
       }
     }
   }

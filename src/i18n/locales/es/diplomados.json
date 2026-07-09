@@ -84,7 +84,7 @@
     "items": {
       "publicacion": {
         "titulo": "Publicación semanal",
-        "texto": "Cada sábado a las 8:00 se publica una clase nueva."
+        "texto": "Cada sábado a las 8:00 (hora de la Ciudad de México) se publica una clase nueva."
       },
       "actividades": {
         "titulo": "Actividades a tu ritmo",
