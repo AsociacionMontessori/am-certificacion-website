@@ -14,7 +14,7 @@ module.exports = {
   siteMetadata: {
     title: `Asociación Montessori de México A.C.`,
     siteName: `Certificación Montessori`,
-    description: `Formación y certificaciones Montessori con reconocimiento internacional. La Asociación Montessori de México A.C. (AMMAC), fundada en 1965, forma Guías Montessori con certificación de validez internacional y coordina diplomados en México, América Latina, Estados Unidos, España, Europa, Israel y la India.`,
+    description: `Formación y certificaciones Montessori internacionales. La Asociación Montessori de México A.C. (AMMAC), fundada en 1965, forma Guías Montessori en línea para estudiantes de todo el mundo y coordina diplomados en México, América Latina, Estados Unidos, España, Europa, Israel y la India.`,
     author: `@AsociacionMontessori`,
     siteUrl: `https://certificacionmontessori.com`,
     defaultOgImage: `/og-default.svg`,
@@ -22,7 +22,7 @@ module.exports = {
     organizationName: `Asociación Montessori de México A.C.`,
     legalName: `Asociación Montessori de México A.C.`,
     foundingDate: `1965`,
-    slogan: `Certificación Montessori con validez internacional, reconocida mundialmente`,
+    slogan: `Certificación Montessori internacional emitida por la AMMAC, para estudiantes de todo el mundo`,
     areaServedCountries: [
       `México`,
       `Colombia`,

@@ -1,5 +1,5 @@
 # robots.txt — certificacionmontessori.com
-# Asociación Montessori de México A.C. (AMMAC) — certificación Montessori con validez internacional.
+# Asociación Montessori de México A.C. (AMMAC) — certificación Montessori internacional emitida por la AMMAC.
 
 User-agent: *
 Allow: /

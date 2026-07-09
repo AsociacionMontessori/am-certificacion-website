@@ -13,7 +13,7 @@
   "hero": {
     "kicker": "Certificación internacional • 100% en línea • A tu ritmo",
     "title": "Diplomados: <linea>Guía Montessori</linea>",
-    "p1": "Programas diseñados para un conocimiento práctico y profundo en educación y método Montessori. Termina como Guía Montessori con certificado de validez internacional.",
+    "p1": "Programas diseñados para un conocimiento práctico y profundo en educación y método Montessori. Termina como Guía Montessori con una certificación Montessori internacional emitida por la AMMAC.",
     "p2": "Somos la Asociación Montessori de México, una institución mexicana con proyección internacional: formamos Guías Montessori en línea para estudiantes de todo el mundo.",
     "decorAlt": "decoración",
     "card": {
@@ -118,7 +118,7 @@
     },
     "paso2": {
       "titulo": "👨‍🎓 Documentos Personales",
-      "intro": "Para tu certificado con validez internacional:",
+      "intro": "Para tu certificado internacional:",
       "docs": {
         "domicilio": "📍 Comprobante de domicilio",
         "identificacion": "🪪 Identificación oficial",

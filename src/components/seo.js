@@ -150,10 +150,10 @@ function Seo({
     ],
     hasCredential: {
       "@type": "EducationalOccupationalCredential",
-      name: "Certificación Montessori con validez internacional",
+      name: "Certificación Montessori internacional emitida por la AMMAC",
       credentialCategory: "certification",
       description:
-        "Certificación profesional para Guías Montessori con reconocimiento internacional, alineada a los estándares internacionales y a los fundamentos AMI.",
+        "Certificación profesional internacional para Guías Montessori emitida por la Asociación Montessori de México A.C. (AMMAC), alineada a los estándares internacionales de la formación Montessori y desarrollada con referencia a los fundamentos AMI.",
     },
     contactPoint: [
       {

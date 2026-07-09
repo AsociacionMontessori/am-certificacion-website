@@ -19,11 +19,11 @@
     "items": {
       "inicio": {
         "titulo": "Inicio",
-        "descripcion": "Visión general de la Asociación Montessori de México A.C. (fundada en 1965), su propuesta educativa y sus programas públicos con certificación internacional reconocida mundialmente."
+        "descripcion": "Visión general de la Asociación Montessori de México A.C. (fundada en 1965), su propuesta educativa y sus programas públicos con certificación Montessori internacional emitida por la AMMAC."
       },
       "diplomados": {
         "titulo": "Diplomados",
-        "descripcion": "Información pública sobre diplomados, estructura del programa, profesores, proceso de inscripción y la certificación de Guía Montessori con validez internacional."
+        "descripcion": "Información pública sobre diplomados, estructura del programa, profesores, proceso de inscripción y la certificación internacional de Guía Montessori emitida por la AMMAC."
       },
       "marco": {
         "titulo": "Marco de objetivos de aprendizaje",
@@ -49,7 +49,7 @@
   },
   "marco": {
     "titulo": "Marco de objetivos de aprendizaje",
-    "p1": "La formación se organiza en siete dominios de competencia AMMAC, espejo de los dominios internacionales de la formación Montessori (MACTE / AMI) y compatibles con los fundamentos AMI:",
+    "p1": "La formación se organiza en siete dominios de competencia AMMAC, espejo de los dominios internacionales de la formación Montessori (MACTE / AMI), desarrollados con referencia a los fundamentos AMI:",
     "dominios": [
       "Fundamentos filosóficos e históricos.",
       "Desarrollo humano y planos del desarrollo.",
@@ -66,7 +66,7 @@
     "items": [
       "Organización: Asociación Montessori de México A.C. (AMMAC), fundada en 1965.",
       "Enfoque: formación de Guías Montessori, certificación internacional y difusión del método Montessori.",
-      "Alcance: institución con sede en México y proyección internacional; sus certificaciones tienen validez internacional y reconocimiento mundial. Coordina diplomados en México, Colombia, Puerto Rico, España, Costa Rica, Estados Unidos, Israel, Suiza y la India.",
+      "Alcance: institución con sede en México y proyección internacional. Coordina diplomados en México, Colombia, Puerto Rico, España, Costa Rica, Estados Unidos, Israel, Suiza y la India.",
       "Ubicación pública: Avenida Dos 48, San Pedro de los Pinos, Benito Juárez, Ciudad de México.",
       "Contacto público: admin@certificacionmontessori.com, 55 5515 2701 y WhatsApp 55 4888 5013."
     ]

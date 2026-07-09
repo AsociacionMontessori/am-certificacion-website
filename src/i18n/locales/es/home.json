@@ -7,7 +7,7 @@
     "imagenAlt": "Formación Montessori en línea",
     "eyebrow": "Certificación internacional • Guía Montessori",
     "titulo": "Conviértete en Guía Montessori <enLinea>100% en línea</enLinea>",
-    "descripcion": "Diplomados con validez internacional, a tu ritmo y con acompañamiento de especialistas, para estudiar en línea desde cualquier país. Inscríbete hoy y aparta tu lugar en el próximo ciclo.",
+    "descripcion": "Diplomados con certificación Montessori internacional emitida por la AMMAC, a tu ritmo y con acompañamiento de especialistas, para estudiar en línea desde cualquier país. Inscríbete hoy y aparta tu lugar en el próximo ciclo.",
     "quienesSomos": "Somos la Asociación Montessori de México, una institución mexicana con proyección internacional: formamos Guías Montessori en línea para estudiantes de todo el mundo.",
     "badges": [
       "Certificación internacional",
@@ -45,10 +45,22 @@
     }
   },
   "beneficios": [
-    { "titulo": "100% en línea", "texto": "Estudia desde cualquier lugar" },
-    { "titulo": "Aplicación inmediata", "texto": "Enfoque práctico Montessori" },
-    { "titulo": "Acompañamiento experto", "texto": "Guías certificadas" },
-    { "titulo": "Inscripción única", "texto": "No pagas de nuevo al cambiar de programa" }
+    {
+      "titulo": "100% en línea",
+      "texto": "Estudia desde cualquier lugar"
+    },
+    {
+      "titulo": "Aplicación inmediata",
+      "texto": "Enfoque práctico Montessori"
+    },
+    {
+      "titulo": "Acompañamiento experto",
+      "texto": "Guías certificadas"
+    },
+    {
+      "titulo": "Inscripción única",
+      "texto": "No pagas de nuevo al cambiar de programa"
+    }
   ],
   "catalogo": {
     "eyebrow": "Catálogo de formación",
@@ -164,7 +176,7 @@
   "marco": {
     "eyebrow": "Marco de objetivos de aprendizaje",
     "titulo": "Alineado a la formación Montessori internacional",
-    "intro": "Nuestro diplomado organiza toda la formación en <destacado>siete dominios de competencia</destacado>, espejo de los dominios internacionales de la formación Montessori (MACTE / AMI) y compatibles con los fundamentos AMI. Cada dominio se trabaja en los seis niveles cognitivos de la Taxonomía de Bloom, de modo que la formación no solo transmite contenidos: desarrolla comprensión, criterio y capacidad de crear.",
+    "intro": "Nuestro diplomado organiza toda la formación en <destacado>siete dominios de competencia</destacado>, espejo de los dominios internacionales de la formación Montessori (MACTE / AMI), desarrollados con referencia a los fundamentos AMI. Cada dominio se trabaja en los seis niveles cognitivos de la Taxonomía de Bloom, de modo que la formación no solo transmite contenidos: desarrolla comprensión, criterio y capacidad de crear.",
     "dominios": {
       "fundamentos": {
         "nombre": "Fundamentos filosóficos e históricos",
@@ -258,8 +270,8 @@
         "contenido": "La AMMAC crea un programa de capacitación del método Montessori a maestros de escuelas rurales y los talleres de producción de materiales y mobiliario Montessori de bajo costo y con recursos renovables. A través de este programa se han realizado proyectos de apertura de escuelas Montessori en zonas rurales de Veracruz, Guerrero y Oaxaca. "
       },
       "certificacionesInternacionales": {
-        "titulo": "Certificaciones profesionales para Guías Montessori con validez internacional",
-        "contenido": "La AMMAC inició su oferta de formación profesional de Guías Montessori,destacándose por ser la única reconocida oficialmente por la Universidad Nacional Autónoma de México, la Universidad Autónoma Metropolitana y la Universidad del Valle de México, cumpliendo además con las competencias y acuerdos internacionales para generar certificaciones con validez internacional. "
+        "titulo": "Certificaciones profesionales internacionales para Guías Montessori",
+        "contenido": "La AMMAC inició su oferta de formación profesional de Guías Montessori, destacándose por ser la única reconocida oficialmente por la Universidad Nacional Autónoma de México, la Universidad Autónoma Metropolitana y la Universidad del Valle de México, cumpliendo además con las competencias y acuerdos internacionales bajo los cuales la AMMAC emite sus certificaciones internacionales. "
       },
       "certificacionesEnLinea": {
         "titulo": "Certificaciones profesionales para Guías Montessori en línea",
