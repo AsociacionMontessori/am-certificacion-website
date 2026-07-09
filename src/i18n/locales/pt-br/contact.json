@@ -1,37 +1,37 @@
 {
   "seo": {
-    "title": "Contacto",
-    "description": "Contacta a la Asociación Montessori de México A.C. por correo, teléfono, WhatsApp o visita presencial en Ciudad de México."
+    "title": "Contato | Certificação Montessori Online – AMMAC",
+    "description": "Fale com a AMMAC, Associação Montessori do México, por e-mail, telefone ou WhatsApp e conheça nossos cursos de formação de Guias Montessori online."
   },
   "hero": {
-    "title": "Envíanos un mensaje",
-    "description": "Nuestro equipo estará encantado de atenderte. La comunicación siempre es la clave."
+    "title": "Envie-nos uma mensagem",
+    "description": "Nossa equipe terá o maior prazer em atender você. A comunicação é sempre a chave."
   },
   "methods": {
     "email": {
-      "title": "Email",
-      "description": "Envíanos un correo electrónico.\nadmin@certificacionmontessori.com"
+      "title": "E-mail",
+      "description": "Envie-nos um e-mail.\nadmin@certificacionmontessori.com"
     },
     "ubicacion": {
-      "title": "Encuéntranos en",
-      "description": "Calle Av. Dos 48, San Pedro de los Pinos, Benito Juárez, 03800 Ciudad de México, CDMX"
+      "title": "Onde estamos",
+      "description": "Calle Av. Dos 48, San Pedro de los Pinos, Benito Juárez, 03800 Cidade do México, México"
     },
     "telefono": {
-      "title": "Llámanos",
-      "description": "Llamadas en horario de 8am a 5pm.\nNúmero de teléfono: 55 5515 2701"
+      "title": "Ligue para nós",
+      "description": "Atendemos ligações das 8h às 17h (horário da Cidade do México).\nTelefone: 55 5515 2701"
     },
     "whatsapp": {
       "title": "WhatsApp",
-      "description": "Atención de 9am a 6pm.\nSolo por chat: 55 4888 5013"
+      "description": "Atendimento das 9h às 18h (horário da Cidade do México).\nSomente por chat: 55 4888 5013"
     }
   },
   "schema": {
     "contactPage": {
-      "name": "Contacto",
-      "description": "Datos de contacto institucional de la Asociación Montessori de México A.C."
+      "name": "Contato",
+      "description": "Dados de contato institucional da Associação Montessori do México (Asociación Montessori de México A.C.)."
     },
     "whatsapp": {
-      "description": "Atención por WhatsApp de 9:00 a 18:00 horas, solo por chat."
+      "description": "Atendimento por WhatsApp das 9h às 18h (horário da Cidade do México), somente por chat."
     }
   }
 }

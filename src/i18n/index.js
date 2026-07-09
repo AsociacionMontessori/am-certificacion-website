@@ -41,6 +41,9 @@ export const getI18nInstance = language => {
     const instance = i18next.createInstance()
     instance.use(initReactI18next).init({
       lng: lang,
+      // Nuestro código es «pt-br» (minúsculas, igual que la ruta); sin esto
+      // i18next lo normaliza a «pt-BR», no encuentra recursos y cae al español.
+      lowerCaseLng: true,
       fallbackLng: DEFAULT_LANGUAGE,
       resources,
       ns: NAMESPACES,

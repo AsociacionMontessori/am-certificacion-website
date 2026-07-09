@@ -1,33 +1,33 @@
 {
   "seo": {
-    "title": "Directorio de Escuelas Montessori",
-    "description": "Directorio público de escuelas Montessori en México y el mundo. Identifica las escuelas con certificación de la Asociación Montessori de México A.C. (AMMAC)."
+    "title": "Diretório de Escolas Montessori",
+    "description": "Diretório público de escolas Montessori no Brasil, no México e no mundo. Identifique as escolas certificadas pela Associação Montessori do México (AMMAC)."
   },
   "header": {
-    "eyebrow": "Directorio Montessori",
-    "title": "Directorio de Escuelas Montessori",
-    "description": "Encuentra escuelas Montessori en México y el resto del mundo. Las marcadas con el distintivo <distintivo>★ Certificación AMMAC</distintivo> cuentan con el aval de la Asociación Montessori de México A.C."
+    "eyebrow": "Diretório Montessori",
+    "title": "Diretório de Escolas Montessori",
+    "description": "Encontre escolas Montessori no México e no resto do mundo. As escolas marcadas com o selo <distintivo>★ Certificação AMMAC</distintivo> contam com o aval da Associação Montessori do México (Asociación Montessori de México A.C.)."
   },
   "filtros": {
-    "buscarPlaceholder": "Buscar por nombre, ciudad o estado…",
-    "buscarAriaLabel": "Buscar escuela Montessori",
+    "buscarPlaceholder": "Buscar por nome, cidade ou estado…",
+    "buscarAriaLabel": "Buscar escola Montessori",
     "todos": "🌎 Todos",
-    "soloAmmac": "Solo certificadas AMMAC"
+    "soloAmmac": "Apenas certificadas AMMAC"
   },
   "resultados": {
-    "cargando": "Cargando escuelas…",
-    "muchas": "{{total}} escuelas encontradas — mostrando las primeras {{limite}}. Afina con el buscador o el filtro de país.",
-    "contador": "{{total}} escuela(s) encontradas",
-    "error": "No se pudo cargar el directorio. Intenta de nuevo más tarde.",
-    "vacio": "No tenemos escuelas registradas para esa búsqueda."
+    "cargando": "Carregando escolas…",
+    "muchas": "{{total}} escolas encontradas — exibindo as primeiras {{limite}}. Refine com a busca ou com o filtro de país.",
+    "contador": "{{total}} escola(s) encontrada(s)",
+    "error": "Não foi possível carregar o diretório. Tente novamente mais tarde.",
+    "vacio": "Não temos escolas cadastradas para essa busca."
   },
   "tarjeta": {
-    "certificacion": "★ Certificación AMMAC",
-    "telefono": "Tel: {{telefono}}"
+    "certificacion": "★ Certificação AMMAC",
+    "telefono": "Tel.: {{telefono}}"
   },
   "cobertura": {
-    "descripcion": "¿No encuentras una escuela Montessori en tu ciudad o país? Nuestro directorio crece poco a poco. Mientras tanto, puedes buscarla directamente en Google Maps:",
-    "boton": "Buscar {{termino}} en Google Maps →",
-    "terminoPorDefecto": "escuelas Montessori"
+    "descripcion": "Não encontrou uma escola Montessori na sua cidade ou no seu país? Nosso diretório cresce aos poucos. Enquanto isso, você pode buscá-la diretamente no Google Maps:",
+    "boton": "Buscar {{termino}} no Google Maps →",
+    "terminoPorDefecto": "escolas Montessori"
   }
 }

@@ -1,46 +1,46 @@
 {
-  "titulo": "Preguntas Frecuentes",
-  "intro": "Reunimos aquí preguntas reales sobre diplomados, certificación, contacto y contenido institucional para que cualquier persona, buscador o agente de IA encuentre respuestas directas en una sola página.",
+  "titulo": "Perguntas Frequentes",
+  "intro": "Reunimos aqui perguntas reais sobre cursos de formação, certificação, contato e conteúdo institucional, para que qualquer pessoa, mecanismo de busca ou agente de IA encontre respostas diretas em uma única página.",
   "items": {
     "queOfrece": {
-      "pregunta": "¿Qué ofrece certificacionmontessori.com?",
-      "respuesta": "El sitio público de la Asociación Montessori de México A.C. reúne información institucional sobre diplomados, certificaciones, publicaciones, perfiles docentes, contacto y recursos abiertos relacionados con la formación Montessori."
+      "pregunta": "O que o certificacionmontessori.com oferece?",
+      "respuesta": "O site público da AMMAC — Associação Montessori do México (Asociación Montessori de México A.C.), fundada em 1965 — reúne informações institucionais sobre cursos de formação, certificações, publicações, perfis do corpo docente, contato e recursos abertos relacionados à formação Montessori."
     },
     "modalidad": {
-      "pregunta": "¿Los diplomados son en línea o presenciales?",
-      "respuesta": "Los diplomados mostrados en el sitio están planteados como programas en línea. El contenido público explica que puedes estudiar desde cualquier lugar con acompañamiento de catedráticos y acceso a plataforma digital."
+      "pregunta": "Os cursos de formação são online ou presenciais?",
+      "respuesta": "Os cursos de formação apresentados no site são concebidos como programas online. O conteúdo público explica que você pode estudar de qualquer lugar do mundo, com mentoria dos professores das disciplinas e acesso à plataforma digital."
     },
     "certificacion": {
-      "pregunta": "¿Qué certificación obtengo al terminar?",
-      "respuesta": "La oferta pública del sitio comunica que los programas cuentan con certificación internacional y están orientados a formarte como Guía Montessori. Los detalles específicos se concentran en la página de Diplomados."
+      "pregunta": "Qual certificação eu recebo ao concluir?",
+      "respuesta": "A oferta pública do site comunica que os programas incluem certificação Montessori internacional emitida pela AMMAC e são voltados a formar você como Guia Montessori. Os detalhes específicos estão concentrados na página de Cursos de Formação."
     },
     "equipoDocente": {
-      "pregunta": "¿Quiénes forman parte del equipo docente?",
-      "respuesta": "En la sección de profesores del diplomado se presentan perfiles públicos como Roxana Muñoz, Iván López Carmona y Carlos Romero, con información sobre su trayectoria, formación y rol dentro del programa."
+      "pregunta": "Quem faz parte do corpo docente?",
+      "respuesta": "Na seção de professores do curso de formação são apresentados perfis públicos como Roxana Muñoz, Iván López Carmona e Carlos Romero, com informações sobre sua trajetória, sua formação e seu papel dentro do programa."
     },
     "temas": {
-      "pregunta": "¿Qué temas se estudian en los diplomados?",
-      "respuesta": "El sitio menciona materias como Filosofía Montessori, Métodos de Observación, Neuroeducación, Psicología Educativa, Musicoterapia, Psicomotricidad, Educación Inclusiva e Inteligencia Creativa, además del trabajo con materiales y presentaciones Montessori y una estructura por bloques de trabajo."
+      "pregunta": "Quais temas são estudados nos cursos de formação?",
+      "respuesta": "O site menciona disciplinas como Filosofia Montessori, Métodos de Observação, Neuroeducação, Psicologia Educacional, Musicoterapia, Psicomotricidade, Educação Inclusiva e Inteligência Criativa, além do trabalho com os materiais e as apresentações Montessori, tudo organizado em uma estrutura de blocos de trabalho."
     },
     "estructuraPedagogica": {
-      "pregunta": "¿Cómo está estructurada pedagógicamente la formación?",
-      "respuesta": "Toda la formación se organiza en siete dominios de competencia (D1 a D7), espejo de los dominios internacionales de la formación Montessori (MACTE / AMI) y compatibles con los fundamentos AMI: fundamentos filosóficos e históricos, desarrollo humano y planos del desarrollo, el ambiente preparado y los materiales, observación científica, rol y transformación del adulto (Guía), pedagogía de las áreas del currículo, y comunidad, familia y liderazgo. Cada dominio se trabaja en los seis niveles cognitivos de la Taxonomía de Bloom (recordar, comprender, aplicar, analizar, evaluar y crear)."
+      "pregunta": "Como a formação está estruturada pedagogicamente?",
+      "respuesta": "Toda a formação se organiza em sete domínios de competência (D1 a D7), desenvolvidos com referência aos domínios internacionais da formação Montessori (MACTE / AMI) e aos fundamentos da AMI: Fundamentos Filosóficos e Históricos; Desenvolvimento Humano e os Planos do Desenvolvimento; O Ambiente Preparado e os Materiais; Observação Científica; Papel e Transformação do Adulto (a Guia); Pedagogia das Áreas do Currículo; e Comunidade, Família e Liderança. Cada domínio é trabalhado nos seis níveis cognitivos da Taxonomia de Bloom (lembrar, compreender, aplicar, analisar, avaliar e criar)."
     },
     "estandaresAmi": {
-      "pregunta": "¿El diplomado está alineado a estándares internacionales y a AMI?",
-      "respuesta": "Sí. El programa se alinea a los estándares internacionales de la formación Montessori y es compatible con los fundamentos AMI (Association Montessori Internationale). Además, cada actividad tiene un objetivo de aprendizaje codificado «Dominio·Nivel» (por ejemplo, D1·Analizar): el dominio indica el área de competencia y el nivel de la Taxonomía de Bloom, la profundidad cognitiva que se espera desarrollar, de modo que cada tarea tiene un propósito formativo explícito y evaluable."
+      "pregunta": "O curso de formação está alinhado a padrões internacionais e à AMI?",
+      "respuesta": "Sim. O programa está alinhado aos padrões internacionais da formação Montessori e foi desenvolvido com referência aos fundamentos da AMI (Association Montessori Internationale). Além disso, cada atividade tem um objetivo de aprendizagem codificado como \"Domínio·Nível\" (por exemplo, D1·Analisar): o domínio indica a área de competência e o nível, tomado da Taxonomia de Bloom, indica a profundidade cognitiva que se espera desenvolver, de modo que cada tarefa tem um propósito formativo explícito e avaliável."
     },
     "documentos": {
-      "pregunta": "¿Qué documentos se solicitan para el certificado?",
-      "respuesta": "En la página de diplomados se informa que para el certificado con validez internacional se solicitan comprobante de domicilio, identificación oficial, acta de nacimiento y último certificado de estudios."
+      "pregunta": "Quais documentos são solicitados para o certificado?",
+      "respuesta": "A página de Cursos de Formação informa que, para o seu certificado internacional, são solicitados comprovante de residência, documento de identificação oficial, certidão de nascimento e o último certificado de estudos."
     },
     "informes": {
-      "pregunta": "¿Cómo puedo pedir informes o iniciar contacto?",
-      "respuesta": "Puedes escribir a admin@certificacionmontessori.com, llamar al 55 5515 2701 o contactar por WhatsApp en el 55 4888 5013. El WhatsApp se atiende de 9am a 6pm y es solo por chat."
+      "pregunta": "Como posso pedir mais informações ou entrar em contato?",
+      "respuesta": "Você pode escrever para admin@certificacionmontessori.com, ligar para 55 5515 2701 ou falar pelo WhatsApp no número 55 4888 5013. O atendimento pelo WhatsApp é das 9h às 18h (horário da Cidade do México) e acontece somente por chat."
     },
     "ubicacion": {
-      "pregunta": "¿Dónde se encuentra la Asociación Montessori de México?",
-      "respuesta": "La dirección pública mostrada en el sitio es Avenida Dos 48, San Pedro de los Pinos, Benito Juárez, 03800 Ciudad de México, CDMX."
+      "pregunta": "Onde fica a Associação Montessori do México?",
+      "respuesta": "O endereço público mostrado no site é Avenida Dos 48, San Pedro de los Pinos, Benito Juárez, 03800 Cidade do México, México."
     }
   }
 }

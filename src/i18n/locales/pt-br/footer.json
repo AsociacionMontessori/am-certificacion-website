@@ -1,49 +1,49 @@
 {
   "ammac": {
-    "logoAlt": "Logo Asociación Montessori",
-    "nombre": "Asociación Montessori de México A.C.",
-    "derechos": "Todos los derechos reservados 2026"
+    "logoAlt": "Logo da Associação Montessori do México",
+    "nombre": "Associação Montessori do México (Asociación Montessori de México A.C.)",
+    "derechos": "Todos os direitos reservados 2026"
   },
   "sems": {
-    "logoAlt": "Logo Sociedad de Escuelas Montessori",
+    "logoAlt": "Logo da Sociedad de Escuelas Montessori",
     "nombre": "Sociedad de Escuelas Montessori S.C."
   },
-  "leyenda": "Institución mexicana con proyección internacional: formamos Guías Montessori en línea para estudiantes de todo el mundo, con certificación de validez internacional.",
+  "leyenda": "Instituição mexicana com projeção internacional: formamos Guias Montessori online para estudantes do mundo todo, com certificação Montessori internacional emitida pela AMMAC.",
   "asociacion": {
-    "titulo": "Asociación",
-    "diplomados": "Diplomados",
-    "sobreNosotros": "Sobre nosotros",
-    "publicaciones": "Publicaciones",
-    "contacto": "Contacto",
+    "titulo": "Associação",
+    "diplomados": "Cursos de Formação",
+    "sobreNosotros": "Sobre nós",
+    "publicaciones": "Publicações",
+    "contacto": "Contato",
     "indiceIa": "Índice IA",
-    "preguntasFrecuentes": "Preguntas Frecuentes"
+    "preguntasFrecuentes": "Perguntas Frequentes"
   },
   "legal": {
     "titulo": "Legal",
-    "avisoPrivacidad": "Aviso de Privacidad",
-    "politicaReembolsos": "Política de reembolsos",
-    "constanciaSeguridad": "Constancia de Seguridad Estructural",
-    "vistoBuenoSeguridad": "Visto Bueno de Seguridad Estructural"
+    "avisoPrivacidad": "Aviso de Privacidade",
+    "politicaReembolsos": "Política de Reembolso",
+    "constanciaSeguridad": "Certificado de Segurança Estrutural",
+    "vistoBuenoSeguridad": "Aprovação de Segurança Estrutural"
   },
   "escuelas": {
-    "titulo": "Escuelas Montessori",
+    "titulo": "Escolas Montessori",
     "kalpilli": "Kalpilli",
-    "verEnMapa": "ver en mapa",
+    "verEnMapa": "ver no mapa",
     "email": "admin@certificacionmontessori.com",
     "telefono": "55 5515 2701",
     "whatsapp": "WhatsApp: 55 4888 5013",
-    "atencionChat": "Atención por chat de 9am a 6pm",
-    "direccion": "Calle Av. Dos 48, San Pedro de los Pinos, Benito Juárez, 03800 Ciudad de México, CDMX"
+    "atencionChat": "Atendimento por chat das 9h às 18h (horário da Cidade do México)",
+    "direccion": "Calle Av. Dos 48, San Pedro de los Pinos, Benito Juárez, 03800 Cidade do México, México"
   },
   "redes": {
-    "titulo": "Redes Sociales",
-    "instagramAlt": "Instragram",
+    "titulo": "Redes Sociais",
+    "instagramAlt": "Instagram",
     "linkedinAlt": "LinkedIn",
     "youtubeAlt": "YouTube",
     "facebookAlt": "Facebook",
     "tiktokAlt": "TikTok"
   },
   "whatsapp": {
-    "solicitaInformes": "Solicita Informes"
+    "solicitaInformes": "Solicite mais informações"
   }
 }

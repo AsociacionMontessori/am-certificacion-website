@@ -1,18 +1,18 @@
 {
   "nav": {
-    "diplomados": "DIPLOMADOS",
-    "publicaciones": "PUBLICACIONES",
-    "escuelaParaNinos": "ESCUELA PARA NIÑOS",
-    "directorioEscuelas": "DIRECTORIO DE ESCUELAS",
-    "contacto": "CONTACTO",
-    "abrirMenu": "Abrir Menu",
-    "logoAlt": "Asociación Montessori de México"
+    "diplomados": "CURSOS DE FORMAÇÃO",
+    "publicaciones": "PUBLICAÇÕES",
+    "escuelaParaNinos": "ESCOLA MONTESSORI KALPILLI",
+    "directorioEscuelas": "DIRETÓRIO DE ESCOLAS",
+    "contacto": "CONTATO",
+    "abrirMenu": "Abrir menu",
+    "logoAlt": "Associação Montessori do México (Asociación Montessori de México)"
   },
   "languageSelector": {
     "label": "Idioma",
     "ariaLabel": "Selecionar idioma"
   },
   "breadcrumb": {
-    "inicio": "Inicio"
+    "inicio": "Início"
   }
 }

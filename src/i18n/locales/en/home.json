@@ -176,7 +176,7 @@
   "marco": {
     "eyebrow": "Learning objectives framework",
     "titulo": "Aligned with international Montessori training",
-    "intro": "Our diploma course organizes the entire training into <destacado>seven competency domains</destacado>, mirroring the international Montessori training domains (MACTE / AMI) and compatible with AMI foundations. Each domain is developed across the six cognitive levels of Bloom's Taxonomy, so the training doesn't just deliver content: it builds understanding, judgment, and the capacity to create.",
+    "intro": "Our diploma course organizes the entire training into <destacado>seven competency domains</destacado>, mirroring the international Montessori training domains (MACTE / AMI), developed with reference to AMI foundations. Each domain is developed across the six cognitive levels of Bloom's Taxonomy, so the training doesn't just deliver content: it builds understanding, judgment, and the capacity to create.",
     "dominios": {
       "fundamentos": {
         "nombre": "Philosophical and Historical Foundations",
@@ -238,7 +238,7 @@
     "codificacion": "Every activity in the diploma course has a learning objective coded as <fuerte>“Domain·Level”</fuerte> — for example, <codigo>D1·Analyze</codigo>: the domain (D1–D7) indicates the area of competency, and the Bloom's Taxonomy verb indicates the cognitive level you are expected to develop. That way, every task you complete has an explicit, assessable learning purpose."
   },
   "timeline": {
-    "titulo": "Asociación Montessori de México - AMMAC",
+    "titulo": "Montessori Association of Mexico (Asociación Montessori de México A.C.) — AMMAC",
     "verMas": "See more",
     "items": {
       "fundacion": {
@@ -291,7 +291,7 @@
       },
       "estandaresAmi": {
         "titulo": "Alignment with international standards and AMI foundations",
-        "contenido": "The training program is fully aligned with official international standards and made compatible with AMI foundations: it covers their essential bases and incorporates new complementary content that enriches the training — observation, educational psychology, neuroeducation, inclusive education, psychomotor development, music therapy, and creative intelligence — contextualized to Mexico's educational reality."
+        "contenido": "The training program is fully aligned with official international standards and developed with reference to AMI foundations: it covers their essential bases and incorporates new complementary content that enriches the training — observation, educational psychology, neuroeducation, inclusive education, psychomotor development, music therapy, and creative intelligence — contextualized to Mexico's educational reality."
       },
       "sesentaAnios": {
         "titulo": "60 years of the Asociación Montessori de México",

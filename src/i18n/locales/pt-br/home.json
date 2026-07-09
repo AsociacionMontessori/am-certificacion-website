@@ -1,293 +1,293 @@
 {
   "seo": {
-    "title": "Inicio",
-    "description": "Inscríbete a diplomados Guía Montessori 100% en línea. Certificación internacional, próximo ciclo con cupo limitado. Aparta tu lugar desde $4,900 MXN."
+    "title": "Certificação Montessori Online | Formação de Guias",
+    "description": "Curso de formação de Guias Montessori 100% online. Certificação internacional emitida pela AMMAC. Vagas limitadas — inscreva-se a partir de $4,900 MXN."
   },
   "hero": {
-    "imagenAlt": "Formación Montessori en línea",
-    "eyebrow": "Certificación internacional • Guía Montessori",
-    "titulo": "Conviértete en Guía Montessori <enLinea>100% en línea</enLinea>",
-    "descripcion": "Diplomados con validez internacional, a tu ritmo y con acompañamiento de especialistas, para estudiar en línea desde cualquier país. Inscríbete hoy y aparta tu lugar en el próximo ciclo.",
-    "quienesSomos": "Somos la Asociación Montessori de México, una institución mexicana con proyección internacional: formamos Guías Montessori en línea para estudiantes de todo el mundo.",
+    "imagenAlt": "Formação Montessori online",
+    "eyebrow": "Certificação internacional • Guia Montessori",
+    "titulo": "Torne-se Guia Montessori <enLinea>100% online</enLinea>",
+    "descripcion": "Cursos de formação com certificação Montessori internacional emitida pela AMMAC, no seu ritmo e com mentoria de especialistas, para estudar online de qualquer país. Inscreva-se hoje e reserve sua vaga na próxima turma.",
+    "quienesSomos": "Somos a Associação Montessori do México (Asociación Montessori de México A.C.) — AMMAC, instituição mexicana fundada em 1965 e com projeção internacional: formamos Guias Montessori online para estudantes do mundo todo.",
     "badges": [
-      "Certificación internacional",
-      "Compatible con MACTE / AMI",
-      "100% en línea",
+      "Certificação Montessori AMMAC",
+      "Desenvolvido com referência a MACTE / AMI",
+      "100% online",
       "Google for Education",
-      "Estándar CONOCER (SEP)"
+      "Padrão de competência CONOCER (SEP)"
     ],
-    "ctaInscribete": "Inscríbete ahora",
-    "verProgramas": "Ver todos los programas y precios →"
+    "ctaInscribete": "Inscreva-se agora",
+    "verProgramas": "Ver todos os programas e preços →"
   },
   "whatsapp": {
-    "mensajeDudas": "Hola, estoy revisando los diplomados Montessori en línea y tengo algunas dudas antes de inscribirme. ¿Me pueden orientar?",
-    "ariaLabel": "Resolver dudas por WhatsApp antes de inscribirte",
-    "titulo": "Resolver dudas",
-    "subtitulo": "Por WhatsApp antes de pagar"
+    "mensajeDudas": "Olá! Estou conhecendo os cursos de formação Montessori online e tenho algumas dúvidas antes de me inscrever. Vocês podem me orientar?",
+    "ariaLabel": "Tire suas dúvidas pelo WhatsApp antes de se inscrever",
+    "titulo": "Dúvidas? Fale conosco",
+    "subtitulo": "Pelo WhatsApp, antes de pagar"
   },
   "oferta": {
-    "badge": "Oferta de inicio",
-    "titulo": "Próximo diplomado en línea",
-    "subtitulo": "Transforma la manera en que acompañas a niñas y niños.",
-    "inscripcionPortal": "Inscripción + acceso al portal",
-    "beneficioUnica": "Inscripción única de por vida en la institución",
-    "beneficioNota": "{{beneficio}}. Colegiaturas según el programa que elijas."
+    "badge": "Oferta de abertura",
+    "titulo": "Próximo curso de formação online",
+    "subtitulo": "Transforme a maneira como você acompanha as crianças.",
+    "inscripcionPortal": "Inscrição + acesso ao portal",
+    "beneficioUnica": "Taxa de inscrição única com acesso vitalício à instituição",
+    "beneficioNota": "{{beneficio}}. Mensalidades conforme o programa escolhido."
   },
   "pagos": {
-    "titulo": "Pagos sin sorpresas",
+    "titulo": "Pagamentos sem surpresas",
     "hoy": {
-      "titulo": "Qué pagas hoy",
-      "texto": "Inscripción única de <fuerte>${{precio}} {{coin}}</fuerte>. Si eliges inicio completo, también cubres el primer pago del programa en este mismo paso."
+      "titulo": "O que você paga hoje",
+      "texto": "Taxa de inscrição única de <fuerte>${{precio}} {{coin}}</fuerte>. Se você escolher o início completo, também cobre o primeiro pagamento do programa nesta mesma etapa."
     },
     "despues": {
-      "titulo": "Qué pagas después",
-      "texto": "Guías desde <fuerte>${{guia}} {{coin}} al mes</fuerte> o diplomados cortos desde <fuerte>${{diplomado}} {{coin}}</fuerte>. La inscripción no se repite."
+      "titulo": "O que você paga depois",
+      "texto": "Certificações de Guia a partir de <fuerte>${{guia}} {{coin}} por mês</fuerte> ou cursos de formação curtos a partir de <fuerte>${{diplomado}} {{coin}}</fuerte>. A taxa de inscrição não se repete."
     }
   },
   "beneficios": [
-    { "titulo": "100% en línea", "texto": "Estudia desde cualquier lugar" },
-    { "titulo": "Aplicación inmediata", "texto": "Enfoque práctico Montessori" },
-    { "titulo": "Acompañamiento experto", "texto": "Guías certificadas" },
-    { "titulo": "Inscripción única", "texto": "No pagas de nuevo al cambiar de programa" }
+    { "titulo": "100% online", "texto": "Estude de onde quiser" },
+    { "titulo": "Aplicação imediata", "texto": "Abordagem prática Montessori" },
+    { "titulo": "Mentoria de especialistas", "texto": "Guias certificadas" },
+    { "titulo": "Inscrição única", "texto": "Você não paga de novo ao mudar de programa" }
   ],
   "catalogo": {
-    "eyebrow": "Catálogo de formación",
-    "titulo": "Programas disponibles",
-    "descripcion": "Recorre las portadas y compara el inicio de cada programa.",
+    "eyebrow": "Catálogo de formação",
+    "titulo": "Programas disponíveis",
+    "descripcion": "Percorra as capas e compare o início de cada programa.",
     "anteriores": "Ver programas anteriores",
-    "siguientes": "Ver programas siguientes",
+    "siguientes": "Ver próximos programas",
     "comparar": "Comparar"
   },
   "carrusel": {
-    "titulo": "Nuestros programas — desliza para comparar"
+    "titulo": "Nossos programas — deslize para comparar"
   },
   "programaCard": {
-    "ctaPagarInscripcion": "Pagar inscripción",
-    "ctaInscribeteYPaga": "Inscríbete y paga",
-    "masAccesible": "Más accesible",
+    "ctaPagarInscripcion": "Pagar taxa de inscrição",
+    "ctaInscribeteYPaga": "Inscreva-se e pague",
+    "masAccesible": "Mais acessível",
     "popular": "Popular",
-    "inscripcionIncluida": "Inscripción incluida",
-    "duracionEtiqueta": "Duración: {{duracion}}"
+    "inscripcionIncluida": "Taxa de inscrição incluída",
+    "duracionEtiqueta": "Duração: {{duracion}}"
   },
   "programas": {
     "inscripcion": {
-      "tipo": "Inscripción",
-      "eyebrow": "Inicio",
-      "titulo": "Aparta tu lugar",
-      "subtitulo": "Da el primer paso hacia tu certificación",
-      "notaPrecio": "Pago único — no se repite en otros programas"
+      "tipo": "Inscrição",
+      "eyebrow": "Primeiro passo",
+      "titulo": "Reserve sua vaga",
+      "subtitulo": "Dê o primeiro passo rumo à sua certificação",
+      "notaPrecio": "Pagamento único — não se repete em outros programas"
     },
     "cosmica": {
-      "tipo": "Diplomado",
-      "eyebrow": "Grandes Lecciones",
-      "titulo": "Educación Cósmica",
-      "subtitulo": "Diplomado · Grandes Lecciones Montessori",
-      "notaPrecio": "Programa $2,800 + inscripción $4,900 (solo la primera vez)",
+      "tipo": "Curso de Formação",
+      "eyebrow": "Grandes Lições",
+      "titulo": "Educação Cósmica",
+      "subtitulo": "Curso de Formação · Grandes Lições Montessori",
+      "notaPrecio": "Programa $2,800 + inscrição $4,900 (só na primeira vez)",
       "duracion": "5 meses"
     },
     "neuro": {
-      "tipo": "Diplomado",
-      "eyebrow": "Cerebro y aprendizaje",
-      "titulo": "Neuroeducación",
-      "subtitulo": "3 meses • A tu ritmo • 100% en línea",
-      "notaPrecio": "Promoción: $4,500 todo incluido (programa + inscripción)",
+      "tipo": "Curso de Formação",
+      "eyebrow": "Cérebro e aprendizagem",
+      "titulo": "Neuroeducação",
+      "subtitulo": "3 meses • No seu ritmo • 100% online",
+      "notaPrecio": "Promoção: $4,500 tudo incluído (programa + inscrição)",
       "duracion": "3 meses"
     },
     "taller": {
-      "tipo": "Certificación",
-      "eyebrow": "6 a 12 años",
-      "titulo": "Taller I y II",
-      "subtitulo": "Certificación internacional",
-      "notaPrecio": "Inscripción $4,900 (1 vez) + colegiatura mensual",
+      "tipo": "Certificação",
+      "eyebrow": "6 a 12 anos",
+      "titulo": "Fundamental I e II",
+      "subtitulo": "Certificação internacional emitida pela AMMAC",
+      "notaPrecio": "Inscrição $4,900 (1 vez) + mensalidade",
       "duracion": "20 meses"
     },
     "casa": {
-      "tipo": "Certificación",
-      "eyebrow": "3 a 6 años",
-      "titulo": "Casa de Niños",
-      "subtitulo": "Certificación internacional",
-      "notaPrecio": "Inscripción $4,900 (1 vez) + colegiatura mensual",
+      "tipo": "Certificação",
+      "eyebrow": "3 a 6 anos",
+      "titulo": "Casa das Crianças",
+      "subtitulo": "Certificação internacional emitida pela AMMAC",
+      "notaPrecio": "Inscrição $4,900 (1 vez) + mensalidade",
       "duracion": "17 meses"
     },
     "nido": {
-      "tipo": "Certificación",
-      "eyebrow": "0 a 3 años",
-      "titulo": "Nido y Comunidad Infantil",
-      "subtitulo": "Certificación internacional",
-      "notaPrecio": "Inscripción $4,900 (1 vez) + colegiatura mensual",
+      "tipo": "Certificação",
+      "eyebrow": "0 a 3 anos",
+      "titulo": "Nido e Comunidade Infantil",
+      "subtitulo": "Certificação internacional emitida pela AMMAC",
+      "notaPrecio": "Inscrição $4,900 (1 vez) + mensalidade",
       "duracion": "16 meses"
     }
   },
   "countdown": {
-    "calculando": "Calculando próxima fecha…",
-    "sinFechas": "Mantente al tanto de nuevas fechas de inicio en nuestros diplomados.",
-    "enVivo": "¡Estamos en vivo!",
-    "unete": "Únete a la clase",
-    "ultimosLugares": "¡Últimos lugares!",
-    "proximoInicio": "Próximo inicio: ",
-    "faltan": "Faltan:",
-    "dias": "días",
-    "horas": "hrs",
+    "calculando": "Calculando a próxima data…",
+    "sinFechas": "Fique por dentro das novas datas de início dos nossos cursos de formação.",
+    "enVivo": "Estamos ao vivo!",
+    "unete": "Entre na aula",
+    "ultimosLugares": "Últimas vagas!",
+    "proximoInicio": "Próximo início: ",
+    "faltan": "Faltam:",
+    "dias": "dias",
+    "horas": "h",
     "fechas": {
-      "2025-11-29": "29 de noviembre 2025",
-      "2026-01-24": "24 de enero 2026",
-      "2026-02-28": "28 de febrero 2026",
-      "2026-04-25": "25 de abril 2026",
-      "2026-05-30": "30 de mayo 2026",
-      "2026-06-27": "27 de junio 2026",
-      "2026-08-29": "29 de agosto 2026",
-      "2026-09-26": "26 de septiembre 2026",
-      "2026-10-24": "24 de octubre 2026",
-      "2026-11-28": "28 de noviembre 2026"
+      "2025-11-29": "29 de novembro de 2025",
+      "2026-01-24": "24 de janeiro de 2026",
+      "2026-02-28": "28 de fevereiro de 2026",
+      "2026-04-25": "25 de abril de 2026",
+      "2026-05-30": "30 de maio de 2026",
+      "2026-06-27": "27 de junho de 2026",
+      "2026-08-29": "29 de agosto de 2026",
+      "2026-09-26": "26 de setembro de 2026",
+      "2026-10-24": "24 de outubro de 2026",
+      "2026-11-28": "28 de novembro de 2026"
     }
   },
   "marquee": {
     "frases": [
-      "El niño crea sus propios movimientos y, una vez creados, los perfecciona",
-      "No se puede ser libre, si no se es independiente",
-      "Lo que la mano hace, la mente lo recuerda"
+      "A criança cria os próprios movimentos e, uma vez criados, os aperfeiçoa",
+      "Ninguém pode ser livre a menos que seja independente",
+      "As mãos são os instrumentos da inteligência do homem"
     ]
   },
   "educacion": {
-    "titulo": "EDUCACIÓN SIGNIFICATIVA",
-    "p1": "En la educación significativa,<destacado> se busca que los estudiantes se involucren de manera activa en su propio proceso de aprendizaje,</destacado> relacionando los nuevos conceptos con su conocimiento previo y con su entorno. El objetivo es que los estudiantes no solo adquieran información de manera pasiva, sino que la comprendan, le encuentren sentido y la integren en su propia estructura cognitiva."
+    "titulo": "APRENDIZAGEM SIGNIFICATIVA",
+    "p1": "Na aprendizagem significativa,<destacado> busca-se que os estudantes se envolvam de maneira ativa em seu próprio processo de aprendizagem,</destacado> relacionando os novos conceitos com seus conhecimentos prévios e com o seu entorno. O objetivo é que os estudantes não apenas recebam informações de maneira passiva, mas que as compreendam, encontrem sentido nelas e as integrem à sua própria estrutura cognitiva."
   },
   "mapa": {
-    "alt": "map",
-    "altOscuro": "map in dark"
+    "alt": "mapa",
+    "altOscuro": "mapa no modo escuro"
   },
   "certificacionInternacional": {
-    "encabezado": "Todas nuestros diplomados cuentan con: ",
-    "titulo": "Certificación Internacional",
-    "reconocimiento": "Las certificaciones Montessori cuentan con un gran reconocimiento en todo el mundo"
+    "encabezado": "Todos os nossos cursos de formação contam com: ",
+    "titulo": "Certificação Internacional",
+    "reconocimiento": "As certificações Montessori são altamente valorizadas em todo o mundo"
   },
   "marco": {
-    "eyebrow": "Marco de objetivos de aprendizaje",
-    "titulo": "Alineado a la formación Montessori internacional",
-    "intro": "Nuestro diplomado organiza toda la formación en <destacado>siete dominios de competencia</destacado>, espejo de los dominios internacionales de la formación Montessori (MACTE / AMI) y compatibles con los fundamentos AMI. Cada dominio se trabaja en los seis niveles cognitivos de la Taxonomía de Bloom, de modo que la formación no solo transmite contenidos: desarrolla comprensión, criterio y capacidad de crear.",
+    "eyebrow": "Estrutura de objetivos de aprendizagem",
+    "titulo": "Alinhado à formação Montessori internacional",
+    "intro": "Nosso curso de formação organiza todo o percurso em <destacado>sete domínios de competência</destacado>, que espelham os domínios internacionais da formação Montessori, desenvolvidos com referência a MACTE / AMI e aos fundamentos AMI. Cada domínio é trabalhado nos seis níveis cognitivos da Taxonomia de Bloom, de modo que a formação não apenas transmite conteúdos: desenvolve compreensão, critério e capacidade de criar.",
     "dominios": {
       "fundamentos": {
-        "nombre": "Fundamentos filosóficos e históricos",
-        "descripcion": "Las bases filosóficas, científicas e históricas del método: la vida y obra de María Montessori y los principios que sostienen la pedagogía."
+        "nombre": "Fundamentos Filosóficos e Históricos",
+        "descripcion": "As bases filosóficas, científicas e históricas do método: a vida e a obra de Maria Montessori e os princípios que sustentam a pedagogia."
       },
       "desarrollo": {
-        "nombre": "Desarrollo humano y planos del desarrollo",
-        "descripcion": "El desarrollo del ser humano a lo largo de los planos del desarrollo y las características de cada periodo, base para acompañar a la niñez."
+        "nombre": "Desenvolvimento Humano e os Planos do Desenvolvimento",
+        "descripcion": "O desenvolvimento do ser humano ao longo dos planos do desenvolvimento e as características de cada período — a base para acompanhar as crianças."
       },
       "ambiente": {
-        "nombre": "El ambiente preparado y los materiales",
-        "descripcion": "El diseño del ambiente preparado y el conocimiento, la presentación y el propósito de cada uno de los materiales Montessori."
+        "nombre": "O Ambiente Preparado e os Materiais",
+        "descripcion": "O desenho do ambiente preparado e o conhecimento, a apresentação e o propósito de cada um dos materiais Montessori."
       },
       "observacion": {
-        "nombre": "Observación científica",
-        "descripcion": "La observación como herramienta científica: registrar, interpretar y responder a las necesidades reales de cada niño y niña."
+        "nombre": "Observação Científica",
+        "descripcion": "A observação como ferramenta científica: registrar, interpretar e responder às necessidades reais de cada criança."
       },
       "adulto": {
-        "nombre": "Rol y transformación del adulto (Guía)",
-        "descripcion": "La preparación y transformación interior del adulto para convertirse en Guía: actitud, ética y servicio al desarrollo del niño."
+        "nombre": "Papel e Transformação do Adulto (a Guia)",
+        "descripcion": "A preparação e a transformação interior do adulto para se tornar Guia: atitude, ética e serviço ao desenvolvimento da criança."
       },
       "curriculo": {
-        "nombre": "Pedagogía de las áreas del currículo",
-        "descripcion": "El dominio pedagógico de las áreas del currículo Montessori y la secuencia de presentaciones que las integran."
+        "nombre": "Pedagogia das Áreas do Currículo",
+        "descripcion": "O domínio pedagógico das áreas do currículo Montessori e a sequência de apresentações que as integram."
       },
       "comunidad": {
-        "nombre": "Comunidad, familia y liderazgo",
-        "descripcion": "El vínculo con las familias, la comunidad educativa y el liderazgo de la Guía dentro y fuera del ambiente."
+        "nombre": "Comunidade, Família e Liderança",
+        "descripcion": "O vínculo com as famílias, a comunidade educativa e a liderança da Guia dentro e fora do ambiente."
       }
     },
-    "bloomTitulo": "Seis niveles cognitivos",
-    "bloomDescripcion": "Cada dominio se desarrolla progresivamente a través de la Taxonomía de Bloom, del reconocimiento inicial hasta la creación.",
+    "bloomTitulo": "Seis níveis cognitivos",
+    "bloomDescripcion": "Cada domínio se desenvolve progressivamente ao longo da Taxonomia de Bloom, do reconhecimento inicial até a criação.",
     "bloom": {
       "recordar": {
-        "nombre": "Recordar",
-        "descripcion": "Reconocer y evocar los conceptos fundamentales."
+        "nombre": "Lembrar",
+        "descripcion": "Reconhecer e evocar os conceitos fundamentais."
       },
       "comprender": {
-        "nombre": "Comprender",
-        "descripcion": "Explicar las ideas y darles sentido con palabras propias."
+        "nombre": "Compreender",
+        "descripcion": "Explicar as ideias e dar sentido a elas com as próprias palavras."
       },
       "aplicar": {
         "nombre": "Aplicar",
-        "descripcion": "Usar lo aprendido en situaciones reales del ambiente."
+        "descripcion": "Usar o que foi aprendido em situações reais do ambiente."
       },
       "analizar": {
-        "nombre": "Analizar",
-        "descripcion": "Distinguir partes, relaciones y principios."
+        "nombre": "Analisar",
+        "descripcion": "Distinguir partes, relações e princípios."
       },
       "evaluar": {
-        "nombre": "Evaluar",
-        "descripcion": "Valorar, fundamentar y tomar decisiones pedagógicas."
+        "nombre": "Avaliar",
+        "descripcion": "Julgar, fundamentar e tomar decisões pedagógicas."
       },
       "crear": {
-        "nombre": "Crear",
-        "descripcion": "Diseñar y proponer soluciones y materiales nuevos."
+        "nombre": "Criar",
+        "descripcion": "Projetar e propor novas soluções e novos materiais."
       }
     },
-    "codificacion": "Cada actividad del diplomado tiene un objetivo de aprendizaje codificado <fuerte>«Dominio·Nivel»</fuerte> —por ejemplo, <codigo>D1·Analizar</codigo>—: el dominio (D1–D7) indica el área de competencia y el verbo de la Taxonomía de Bloom indica el nivel cognitivo que se espera desarrollar. Así, cada tarea que realizas tiene un propósito formativo explícito y evaluable."
+    "codificacion": "Cada atividade do curso de formação tem um objetivo de aprendizagem codificado como <fuerte>“Domínio·Nível”</fuerte> — por exemplo, <codigo>D1·Analisar</codigo>: o domínio (D1–D7) indica a área de competência e o verbo da Taxonomia de Bloom indica o nível cognitivo que se espera desenvolver. Assim, cada tarefa que você realiza tem um propósito formativo explícito e avaliável."
   },
   "timeline": {
-    "titulo": "Asociación Montessori de México - AMMAC",
-    "verMas": "Ver más",
+    "titulo": "Associação Montessori do México (Asociación Montessori de México A.C.) — AMMAC",
+    "verMas": "Ver mais",
     "items": {
       "fundacion": {
-        "titulo": "Fundación de la AMMAC",
-        "contenido": "Fundada por la Dra. Angelina Almeida con el objetivo de introducir y promover la pedagogía y la filosofía del método de María Montessori en México, nace la Asociación Montessori de México A.C., convirtiéndose así en una de las primeras organizaciones formalmente constituida dedicada a la formación profesional de Guías Montessori, la apertura de escuelas y el estudio del método Montessori."
+        "titulo": "Fundação da AMMAC",
+        "contenido": "Fundada pela Dra. Angelina Almeida com o objetivo de introduzir e promover a pedagogia e a filosofia do método de Maria Montessori no México, nasce a Asociación Montessori de México A.C. (AMMAC, Associação Montessori do México), tornando-se uma das primeiras organizações formalmente constituídas dedicadas à formação profissional de Guias Montessori, à abertura de escolas e ao estudo do método Montessori."
       },
       "kalpilli": {
-        "titulo": "La AMMAC crea la primera escuela Montessori en la Ciudad de México: la Escuela Montessori Kalpilli",
-        "contenido": "Durante el año de su fundación, la AMMAC abre las puertas de la Escuela Montessori Kalpilli, siendo ésta la primera escuela Montessori en la Ciudad de México. Ubicada  originalmente en la colonia Polanco, Montessori Kalpilli inició sus labores impartiendo una educación basada en la pedagogía científica de María Montessori, cuyo método y filosofía tiene como propósito enfocarse en el desarrollo integral del niño."
+        "titulo": "A AMMAC cria a primeira escola Montessori na Cidade do México: a Escola Montessori Kalpilli",
+        "contenido": "No ano de sua fundação, a AMMAC abre as portas da Escola Montessori Kalpilli, a primeira escola Montessori na Cidade do México. Localizada originalmente no bairro de Polanco, a Montessori Kalpilli iniciou suas atividades oferecendo uma educação baseada na pedagogia científica de Maria Montessori, cujo método e filosofia têm como propósito o desenvolvimento integral da criança."
       },
       "muestraPedagogica": {
-        "titulo": "Primera muestra pedagógica abierta",
-        "contenido": "La Asociación Montessori organiza en la Escuela Montessori  Kalpilli, la primera muestra pedagógica abierta a público y prensa con el objetivo de difundir y mostrar la aplicación del método Montessori, el uso de materiales y la importancia de las presentaciones Montessori. Las muestras pedagógicas se han convertido en una tradición de la AMMAC que año con año realiza en las instalaciones de la Escuela Montessori Kalpilli. "
+        "titulo": "Primeira mostra pedagógica aberta",
+        "contenido": "A Associação Montessori organiza, na Escola Montessori Kalpilli, a primeira mostra pedagógica aberta ao público e à imprensa, com o objetivo de difundir e mostrar a aplicação do método Montessori, o uso dos materiais e a importância das apresentações Montessori. As mostras pedagógicas se tornaram uma tradição da AMMAC, realizada ano após ano nas instalações da Escola Montessori Kalpilli."
       },
       "creacionEscuelas": {
-        "titulo": "La AMMAC y su participación en la creación de Escuelas Montessori",
-        "contenido": "Durante sus primeros años, la AMMAC participó en la creación y desarrollo de escuelas Montessori en el país, realizando programas de estudio, distribución de material Montessori exportado directamente de Italia y formando guías Montessori nivel profesional. "
+        "titulo": "A AMMAC e sua participação na criação de escolas Montessori",
+        "contenido": "Durante seus primeiros anos, a AMMAC participou da criação e do desenvolvimento de escolas Montessori no país, elaborando programas de estudo, distribuindo material Montessori importado diretamente da Itália e formando Guias Montessori em nível profissional."
       },
       "tabasco": {
-        "titulo": "La AMMAC y el Gobierno de Tabasco",
-        "contenido": "La AMMAC forma una alianza con el gobierno de Tabasco y de manera conjunta desarrollan un programa de capacitación pedagógica a maestros Nahuas, Chontales, Mayas, Zapotecos, Totonacas y Mixes."
+        "titulo": "A AMMAC e o Governo de Tabasco",
+        "contenido": "A AMMAC forma uma aliança com o governo de Tabasco e, de maneira conjunta, desenvolvem um programa de capacitação pedagógica para professores Nahuas, Chontales, Maias, Zapotecas, Totonacas e Mixes."
       },
       "sanPedroDeLosPinos": {
-        "titulo": "Montessori Kalpilli en San Pedro de los Pinos",
-        "contenido": "La Escuela Montessori Kalpilli encuentra su nueva sede en la colonia San Pedro de los Pinos, entre libros, aprendizaje, material Montessori, ferias, campamentos, y mucho amor, Kalpilli y la Asociación Montessori de México han hecho historia, construyendo una comunidad por y para los niños, con una Educación Humanista e Innovadora que a la fecha ha dado más de 50 generaciones. "
+        "titulo": "Montessori Kalpilli em San Pedro de los Pinos",
+        "contenido": "A Escola Montessori Kalpilli encontra sua nova sede no bairro de San Pedro de los Pinos. Entre livros, aprendizagem, material Montessori, feiras, acampamentos e muito amor, a Kalpilli e a Associação Montessori do México têm feito história, construindo uma comunidade pelas crianças e para as crianças, com uma educação humanista e inovadora que já formou mais de 50 gerações."
       },
       "escuelasRurales": {
-        "titulo": "Programa de capacitación a escuelas rurales",
-        "contenido": "La AMMAC crea un programa de capacitación del método Montessori a maestros de escuelas rurales y los talleres de producción de materiales y mobiliario Montessori de bajo costo y con recursos renovables. A través de este programa se han realizado proyectos de apertura de escuelas Montessori en zonas rurales de Veracruz, Guerrero y Oaxaca. "
+        "titulo": "Programa de capacitação para escolas rurais",
+        "contenido": "A AMMAC cria um programa de capacitação no método Montessori para professores de escolas rurais, além de oficinas de produção de materiais e mobiliário Montessori de baixo custo e com recursos renováveis. Por meio desse programa, foram realizados projetos de abertura de escolas Montessori em zonas rurais de Veracruz, Guerrero e Oaxaca."
       },
       "certificacionesInternacionales": {
-        "titulo": "Certificaciones profesionales para Guías Montessori con validez internacional",
-        "contenido": "La AMMAC inició su oferta de formación profesional de Guías Montessori,destacándose por ser la única reconocida oficialmente por la Universidad Nacional Autónoma de México, la Universidad Autónoma Metropolitana y la Universidad del Valle de México, cumpliendo además con las competencias y acuerdos internacionales para generar certificaciones con validez internacional. "
+        "titulo": "Certificações profissionais internacionais para Guias Montessori",
+        "contenido": "A AMMAC iniciou sua oferta de formação profissional de Guias Montessori, destacando-se por ser a única reconhecida oficialmente pela Universidade Nacional Autônoma do México (UNAM), pela Universidade Autônoma Metropolitana (UAM) e pela Universidad del Valle de México, cumprindo também as competências e os acordos internacionais sob os quais a AMMAC emite suas certificações internacionais."
       },
       "certificacionesEnLinea": {
-        "titulo": "Certificaciones profesionales para Guías Montessori en línea",
-        "contenido": "En colaboración con Google Classroom, la AMMAC crea la primera versión de sus diplomados de certificación para Guía Montessori en línea, siendo así la primera escuela de formación que ofrecía diplomados a distancia y la primera organización educativa en México vinculada a Google Classroom.  Desde entonces, las certificaciones en línea forman parte de la oferta educativa de la AMMAC, la cual ha generado una metodología de enseñanza personalizada de formación con materiales audiovisuales e interactivos. "
+        "titulo": "Certificações profissionais online para Guias Montessori",
+        "contenido": "Em colaboração com o Google Classroom, a AMMAC cria a primeira versão de seus cursos de formação e certificação de Guias Montessori online, tornando-se a primeira escola de formação a oferecer cursos a distância e a primeira organização educacional do México vinculada ao Google Classroom. Desde então, as certificações online fazem parte da oferta educacional da AMMAC, que desenvolveu uma metodologia de ensino personalizada, com materiais audiovisuais e interativos."
       },
       "proyectosInternacionales": {
-        "titulo": "La AMMAC participa en proyectos Internacionales",
-        "contenido": "A partir de este año, la AMMAC diseña y coordina cursos y diplomados en países como Colombia, Puerto Rico, España, Costa Rica y Estados Unidos, Israel, Suiza y la India. Atendiendo a la población hispanohablante de cada una de estas regiones y contribuyendo con la traducción, a diferentes lenguas, de varias de las cátedras diseñadas por la AMMAC para presentarse en diferentes centros educativos internacionales."
+        "titulo": "A AMMAC participa de projetos internacionais",
+        "contenido": "A partir desse ano, a AMMAC concebe e coordena cursos e formações em países como Colômbia, Porto Rico, Espanha, Costa Rica, Estados Unidos, Israel, Suíça e Índia, atendendo à população hispanofalante de cada uma dessas regiões e contribuindo com a tradução, para diferentes línguas, de várias das disciplinas criadas pela AMMAC para serem apresentadas em diferentes centros educacionais internacionais."
       },
       "selloEditorial": {
-        "titulo": "La AMMAC crea su sello editorial",
-        "contenido": "Nace la serie de libros en español basados en las obras originales de María Montessori, cada uno acompañado por una revisión actualizada del método, pues atendiendo el llamado de la Dra. Montessori, la pedagogía debe ser puesta constantemente a revisión y renovación, no solo por los avances científicos, sino también -y sobre todo- por la observación permanente a los niños, quienes nos siguen guiando para encontrar caminos que nos permitan continuar sirviendo a su desarrollo. El sello editorial ha publicado ya 3 números los cuales pueden adquirirse en Amazon y directamente con la AMMAC."
+        "titulo": "A AMMAC cria seu selo editorial",
+        "contenido": "Nasce a série de livros em espanhol baseados nas obras originais de Maria Montessori, cada um acompanhado de uma revisão atualizada do método — pois, atendendo ao chamado da Dra. Montessori, a pedagogia deve ser constantemente revisada e renovada, não só pelos avanços científicos, mas também, e sobretudo, pela observação permanente das crianças, que continuam nos guiando para encontrar caminhos que nos permitam seguir servindo ao seu desenvolvimento. O selo editorial já publicou 3 títulos, que podem ser adquiridos na Amazon e diretamente com a AMMAC."
       },
       "covid": {
-        "titulo": "Aportaciones de la AMMAC a investigaciones educativas con motivo de la contingencia epidemiológica mundial por el COVID-19",
-        "contenido": "A raíz de la contingencia epidemiológica mundial, la AMMAC participa en una red de escuelas de diferentes partes del mundo para de manera conjunta realizar una investigación en torno a los procesos de aprendizaje en momentos de la crisis sanitaria, los recursos de adaptabilidad de las escuelas, el desarrollo de estrategias pedagógicas para el trabajo con niños a distancia y el registro y análisis de indicadores de afectación en el desarrollo educativo de los niños por las transformaciones a los modelos educativos y sus secuelas."
+        "titulo": "Contribuições da AMMAC para pesquisas educacionais durante a emergência sanitária mundial da COVID-19",
+        "contenido": "Em razão da emergência sanitária mundial, a AMMAC participa de uma rede de escolas de diferentes partes do mundo para, de maneira conjunta, realizar uma pesquisa sobre os processos de aprendizagem em meio à crise sanitária, os recursos de adaptabilidade das escolas, o desenvolvimento de estratégias pedagógicas para o trabalho com crianças a distância e o registro e a análise de indicadores de impacto no desenvolvimento educacional das crianças diante das transformações dos modelos educacionais e de suas sequelas."
       },
       "estandaresAmi": {
-        "titulo": "Alineación a estándares internacionales y fundamentos AMI",
-        "contenido": "El programa de formación se alinea por completo a los estándares internacionales oficiales y se hace compatible con los fundamentos AMI: aborda sus bases esenciales e incorpora contenidos complementarios nuevos que enriquecen la formación — observación, psicología educativa, neuroeducación, educación inclusiva, psicomotricidad, musicoterapia e inteligencia creativa — contextualizados a la realidad educativa de México."
+        "titulo": "Alinhamento a padrões internacionais e aos fundamentos AMI",
+        "contenido": "O programa de formação alinha-se integralmente aos padrões internacionais oficiais e é desenvolvido com referência aos fundamentos AMI: aborda suas bases essenciais e incorpora novos conteúdos complementares que enriquecem a formação — observação, psicologia educacional, neuroeducação, educação inclusiva, psicomotricidade, musicoterapia e inteligência criativa — contextualizados à realidade educacional do México."
       },
       "sesentaAnios": {
-        "titulo": "60 años de la Asociación Montessori de México",
-        "contenido": "En 2025 la AMMAC cumple 60 años promoviendo la pedagogía y la filosofía Montessori en México: seis décadas de formación de guías, apertura de escuelas, investigación y comunidad educativa comprometida con una educación humanista e innovadora."
+        "titulo": "60 anos da Associação Montessori do México",
+        "contenido": "Em 2025, a AMMAC completa 60 anos promovendo a pedagogia e a filosofia Montessori no México: seis décadas de formação de Guias, abertura de escolas, pesquisa e uma comunidade educativa comprometida com uma educação humanista e inovadora."
       },
       "rvoe": {
-        "titulo": "RVOE en trámite y validez oficial en México",
-        "contenido": "En 2026 estamos finalizando los trámites ante la autoridad educativa (RVOE) para ofrecer, además del reconocimiento internacional de nuestras certificaciones, validez oficial en México que respalde la formación de nuestras y nuestros egresados."
+        "titulo": "Pedido de RVOE em andamento junto à SEP",
+        "contenido": "Em 2026, estamos finalizando o pedido de RVOE (reconhecimento oficial de validade de estudos no México) junto à SEP (Secretaria de Educação Pública do México) para oferecer, além do alcance internacional das nossas certificações, validade oficial no México que respalde a formação de nossas egressas e egressos."
       }
     }
   }
