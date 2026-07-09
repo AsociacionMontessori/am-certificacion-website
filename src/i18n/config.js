@@ -11,10 +11,10 @@ const DEFAULT_LANGUAGE = "es"
 // inglés como lengua franca (decisión de Carlos, 2026-07-08).
 const FALLBACK_LANGUAGE = "en"
 
-// Mientras las traducciones EN/PT-BR no estén revisadas, sus páginas se
-// generan con noindex para no publicar contenido duplicado en español.
-// Cambiar a true en la Fase 5 (SEO), cuando la traducción humana esté lista.
-const INDEX_TRANSLATIONS = false
+// Fase 5 (2026-07-09): traducciones EN/PT-BR listas y dictaminadas →
+// indexables (index,follow + sitemap + hreflang). Si hubiera que retirar
+// un idioma del índice, regresar a false y reconstruir.
+const INDEX_TRANSLATIONS = true
 
 const LANGUAGES = {
   es: {

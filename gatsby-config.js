@@ -1,4 +1,14 @@
-const { INDEX_TRANSLATIONS } = require("./src/i18n/config")
+const {
+  INDEX_TRANSLATIONS,
+  LANGUAGES,
+  LANGUAGE_CODES,
+  DEFAULT_LANGUAGE,
+  parsePath,
+  localizePath,
+  isLocalizedPath,
+} = require("./src/i18n/config")
+
+const SITE_URL = "https://certificacionmontessori.com"
 
 module.exports = {
   siteMetadata: {
@@ -81,6 +91,25 @@ module.exports = {
           // en la Fase 5 (SEO) INDEX_TRANSLATIONS pasa a true y entran solos.
           ...(INDEX_TRANSLATIONS ? [] : [`/en/`, `/en/**`, `/pt-br/`, `/pt-br/**`]),
         ],
+        // hreflang en el sitemap: cada página localizada anuncia sus 3 versiones
+        // + x-default (el español en la raíz).
+        serialize: page => {
+          const { originalPath } = parsePath(page.path)
+          const entry = { url: page.path, changefreq: `weekly` }
+          if (INDEX_TRANSLATIONS && isLocalizedPath(originalPath)) {
+            entry.links = [
+              ...LANGUAGE_CODES.map(code => ({
+                lang: LANGUAGES[code].hreflang,
+                url: `${SITE_URL}${localizePath(code, originalPath)}`,
+              })),
+              {
+                lang: `x-default`,
+                url: `${SITE_URL}${localizePath(DEFAULT_LANGUAGE, originalPath)}`,
+              },
+            ]
+          }
+          return entry
+        },
       },
     },
     {

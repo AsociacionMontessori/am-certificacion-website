@@ -4,36 +4,44 @@ import { useTranslation } from "react-i18next"
 import Layout from "../components/layout"
 import Nav from "../components/nav"
 import Seo from "../components/seo"
-import { getT } from "../i18n"
+import { getT, useLocalization } from "../i18n"
+import { LANGUAGES, DEFAULT_LANGUAGE, localizePath, parsePath } from "../i18n/config"
 
-const canonicalSources = [
-  { id: "inicio", url: "https://certificacionmontessori.com/" },
-  { id: "diplomados", url: "https://certificacionmontessori.com/diplomados/" },
-  { id: "marco", url: "https://certificacionmontessori.com/diplomados/#marco-pedagogico" },
-  { id: "roxana", url: "https://certificacionmontessori.com/roxana/" },
-  { id: "publicaciones", url: "https://certificacionmontessori.com/publicaciones/" },
-  { id: "contacto", url: "https://certificacionmontessori.com/contact/" },
-  { id: "privacidad", url: "https://certificacionmontessori.com/privacy/" },
+const SITE_URL = "https://certificacionmontessori.com"
+
+// Cada versión de idioma de /ia/ enlaza a las URLs canónicas de SU idioma.
+const buildCanonicalSources = lp => [
+  { id: "inicio", url: `${SITE_URL}${lp("/")}` },
+  { id: "diplomados", url: `${SITE_URL}${lp("/diplomados/")}` },
+  { id: "marco", url: `${SITE_URL}${lp("/diplomados/")}#marco-pedagogico` },
+  { id: "roxana", url: `${SITE_URL}${lp("/roxana/")}` },
+  { id: "publicaciones", url: `${SITE_URL}${lp("/publicaciones/")}` },
+  { id: "contacto", url: `${SITE_URL}${lp("/contact/")}` },
+  { id: "privacidad", url: `${SITE_URL}${lp("/privacy/")}` },
 ]
 
-const dataSources = [
-  "https://certificacionmontessori.com/llms.txt",
-  "https://certificacionmontessori.com/sitemap-index.xml",
-  "https://certificacionmontessori.com/schools.json",
+// llms.txt localizado vive en /<prefijo>/llms.txt (sin barra final: es archivo).
+const buildDataSources = language => [
+  `${SITE_URL}${LANGUAGES[language]?.prefix || ""}/llms.txt`,
+  `${SITE_URL}/sitemap-index.xml`,
+  `${SITE_URL}/schools.json`,
 ]
 
-const buildAiPageSchema = t => [
+const buildAiPageSchema = (t, language = DEFAULT_LANGUAGE) => [
   {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
     name: t("schema.nombre"),
     description: t("schema.descripcion"),
-    url: "https://certificacionmontessori.com/ia/",
+    url: `${SITE_URL}${localizePath(language, "/ia/")}`,
   },
 ]
 
 const AIIndexPage = () => {
   const { t } = useTranslation("ia")
+  const { language, localizedPath } = useLocalization()
+  const canonicalSources = buildCanonicalSources(localizedPath)
+  const dataSources = buildDataSources(language)
   return (
     <Layout>
       <Nav textColor="text-white" />
@@ -145,12 +153,13 @@ const AIIndexPage = () => {
 
 export const Head = ({ location }) => {
   const t = getT(location.pathname, "ia")
+  const { language } = parsePath(location.pathname)
   return (
     <Seo
       title={t("seo.title")}
       pathname={location.pathname}
       description={t("seo.description")}
-      schema={buildAiPageSchema(t)}
+      schema={buildAiPageSchema(t, language)}
     />
   )
 }
