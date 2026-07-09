@@ -1,49 +1,49 @@
 {
   "ammac": {
-    "logoAlt": "Logo Asociación Montessori",
+    "logoAlt": "Asociación Montessori de México logo",
     "nombre": "Asociación Montessori de México A.C.",
-    "derechos": "Todos los derechos reservados 2026"
+    "derechos": "All rights reserved 2026"
   },
   "sems": {
-    "logoAlt": "Logo Sociedad de Escuelas Montessori",
+    "logoAlt": "Sociedad de Escuelas Montessori logo",
     "nombre": "Sociedad de Escuelas Montessori S.C."
   },
-  "leyenda": "Institución mexicana con proyección internacional: formamos Guías Montessori en línea para estudiantes de todo el mundo, con certificación de validez internacional.",
+  "leyenda": "A Mexican institution with international reach: we train Montessori Guides online for students around the world, with internationally recognized certification.",
   "asociacion": {
-    "titulo": "Asociación",
-    "diplomados": "Diplomados",
-    "sobreNosotros": "Sobre nosotros",
-    "publicaciones": "Publicaciones",
-    "contacto": "Contacto",
-    "indiceIa": "Índice IA",
-    "preguntasFrecuentes": "Preguntas Frecuentes"
+    "titulo": "Association",
+    "diplomados": "Diploma Courses",
+    "sobreNosotros": "About Us",
+    "publicaciones": "Publications",
+    "contacto": "Contact",
+    "indiceIa": "AI Index",
+    "preguntasFrecuentes": "Frequently Asked Questions"
   },
   "legal": {
     "titulo": "Legal",
-    "avisoPrivacidad": "Aviso de Privacidad",
-    "politicaReembolsos": "Política de reembolsos",
-    "constanciaSeguridad": "Constancia de Seguridad Estructural",
-    "vistoBuenoSeguridad": "Visto Bueno de Seguridad Estructural"
+    "avisoPrivacidad": "Privacy Notice",
+    "politicaReembolsos": "Refund Policy",
+    "constanciaSeguridad": "Certificate of Structural Safety",
+    "vistoBuenoSeguridad": "Structural Safety Clearance"
   },
   "escuelas": {
-    "titulo": "Escuelas Montessori",
+    "titulo": "Montessori Schools",
     "kalpilli": "Kalpilli",
-    "verEnMapa": "ver en mapa",
+    "verEnMapa": "view on map",
     "email": "admin@certificacionmontessori.com",
     "telefono": "55 5515 2701",
     "whatsapp": "WhatsApp: 55 4888 5013",
-    "atencionChat": "Atención por chat de 9am a 6pm",
-    "direccion": "Calle Av. Dos 48, San Pedro de los Pinos, Benito Juárez, 03800 Ciudad de México, CDMX"
+    "atencionChat": "Chat support from 9:00 a.m. to 6:00 p.m.",
+    "direccion": "Calle Av. Dos 48, San Pedro de los Pinos, Benito Juárez, 03800 Mexico City, Mexico"
   },
   "redes": {
-    "titulo": "Redes Sociales",
-    "instagramAlt": "Instragram",
+    "titulo": "Social Media",
+    "instagramAlt": "Instagram",
     "linkedinAlt": "LinkedIn",
     "youtubeAlt": "YouTube",
     "facebookAlt": "Facebook",
     "tiktokAlt": "TikTok"
   },
   "whatsapp": {
-    "solicitaInformes": "Solicita Informes"
+    "solicitaInformes": "Request Information"
   }
 }

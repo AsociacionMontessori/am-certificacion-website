@@ -109,9 +109,18 @@ Marco propio de AMMAC — traducción fiel, no canon externo (salvo términos §
 
 Bloom (canon EN): Recordar→**Remember**, Comprender→**Understand**, Aplicar→**Apply**, Analizar→**Analyze**, Evaluar→**Evaluate**, Crear→**Create**. Codificación Dominio·Nivel (D1…D7) no cambia.
 
-## 7. Títulos de libros de Roxana Muñoz
+## 7. Títulos de libros de Roxana Muñoz (dictamen Carlos 2026-07-08)
 
-Los libros mostrados en /publicaciones tienen ediciones EN publicadas o en pipeline (Biblioteca Montessori Roxana Muñoz / proyecto KDP i18n). En la traducción usar el **título EN publicado real** (verificar en `/home/carlos/Documentos/KDP_Roxana/`), nunca traducir el título al vuelo. Si un libro aún no tiene edición EN, conservar título ES + glosa breve «(in Spanish)».
+Usar el **título EN publicado real**, nunca traducir al vuelo:
+
+| Libro ES | Título EN publicado | ASIN |
+|---|---|---|
+| Educación Cósmica | **Cosmic Education: A Pedagogy for the Child to Discover Their Place in the Universe** | B0H2TVSGT1 (.com) / B0H2TBLQFV (.es) |
+| El secreto de la infancia (presentación) | **Montessori: A Presentation of The Secret of Childhood** | B0H2SRM231 |
+| Pedagogía científica (presentación) | **Montessori: A Presentation of the Method of Scientific Pedagogy** | B0H35ZB7DK |
+| La mente absorbente (presentación) | SIN edición EN aún → título ES + «(in Spanish)» en la descripción | — |
+
+Ediciones PT-BR: aún no disponibles (2026-07-08) → en Fase 4, títulos ES + glosa «(em espanhol)».
 
 ## 8. Reglas técnicas para agentes de traducción
 

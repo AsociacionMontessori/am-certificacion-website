@@ -1,11 +1,11 @@
 {
   "nav": {
-    "diplomados": "DIPLOMADOS",
-    "publicaciones": "PUBLICACIONES",
-    "escuelaParaNinos": "ESCUELA PARA NIÑOS",
-    "directorioEscuelas": "DIRECTORIO DE ESCUELAS",
-    "contacto": "CONTACTO",
-    "abrirMenu": "Abrir Menu",
+    "diplomados": "DIPLOMA COURSES",
+    "publicaciones": "PUBLICATIONS",
+    "escuelaParaNinos": "SCHOOL FOR CHILDREN",
+    "directorioEscuelas": "SCHOOL DIRECTORY",
+    "contacto": "CONTACT",
+    "abrirMenu": "Open menu",
     "logoAlt": "Asociación Montessori de México"
   },
   "languageSelector": {
@@ -13,6 +13,6 @@
     "ariaLabel": "Select language"
   },
   "breadcrumb": {
-    "inicio": "Inicio"
+    "inicio": "Home"
   }
 }

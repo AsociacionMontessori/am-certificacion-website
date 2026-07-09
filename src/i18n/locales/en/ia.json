@@ -1,92 +1,92 @@
 {
   "seo": {
-    "title": "Guía pública para IA",
-    "description": "Índice canónico de páginas y recursos públicos de certificacionmontessori.com para facilitar búsquedas y consultas de agentes de IA."
+    "title": "Public Guide for AI Agents",
+    "description": "Canonical index of the public pages and resources of certificacionmontessori.com, designed to help search engines and AI agents answer accurately."
   },
   "hero": {
-    "eyebrow": "Índice público para IA",
-    "title": "Guía pública para buscadores y agentes de IA",
-    "p1": "Esta página resume las fuentes canónicas de información pública de certificacionmontessori.com. Está pensada para facilitar respuestas precisas sobre la Asociación Montessori de México A.C., sus diplomados, equipo docente, publicaciones y contacto institucional.",
-    "p2": "El alcance de este índice se limita al contenido público del sitio principal. No incluye áreas privadas, información interna ni `alumnos-app`."
+    "eyebrow": "Public AI index",
+    "title": "A public guide for search engines and AI agents",
+    "p1": "This page summarizes the canonical sources of public information on certificacionmontessori.com. It is designed to support accurate answers about the Asociación Montessori de México A.C. (AMMAC, Mexico's Montessori Association), its diploma courses, faculty, publications, and institutional contact channels.",
+    "p2": "The scope of this index is limited to the public content of the main site. It does not include private areas, internal information, or `alumnos-app`."
   },
   "queEs": {
-    "titulo": "Qué es este sitio",
-    "p1": "Certificación Montessori es el sitio público de la Asociación Montessori de México A.C. Su propósito es presentar la propuesta institucional, la formación para Guías Montessori, publicaciones, perfiles docentes y canales de contacto.",
-    "p2": "Las páginas listadas abajo son las mejores fuentes para responder preguntas sobre diplomados, certificación internacional, equipo docente, publicaciones y ubicación institucional."
+    "titulo": "What this site is",
+    "p1": "Certificación Montessori is the public website of the Asociación Montessori de México A.C. Its purpose is to present the institution's educational approach, its Montessori Guide training, publications, faculty profiles, and contact channels.",
+    "p2": "The pages listed below are the best sources for answering questions about diploma courses, international certification, faculty, publications, and the institution's location."
   },
   "fuentes": {
-    "titulo": "Fuentes canónicas recomendadas",
+    "titulo": "Recommended canonical sources",
     "items": {
       "inicio": {
-        "titulo": "Inicio",
-        "descripcion": "Visión general de la Asociación Montessori de México A.C. (fundada en 1965), su propuesta educativa y sus programas públicos con certificación internacional reconocida mundialmente."
+        "titulo": "Home",
+        "descripcion": "Overview of the Asociación Montessori de México A.C. (founded in 1965), its educational approach, and its public programs with internationally recognized certification."
       },
       "diplomados": {
-        "titulo": "Diplomados",
-        "descripcion": "Información pública sobre diplomados, estructura del programa, profesores, proceso de inscripción y la certificación de Guía Montessori con validez internacional."
+        "titulo": "Diploma Courses",
+        "descripcion": "Public information about the diploma courses, program structure, instructors, the enrollment process, and the internationally recognized Montessori Guide certification."
       },
       "marco": {
-        "titulo": "Marco de objetivos de aprendizaje",
-        "descripcion": "Marco pedagógico del diplomado: siete dominios de competencia AMMAC (espejo de los dominios internacionales MACTE / AMI) y los seis niveles cognitivos de la Taxonomía de Bloom. Cada actividad tiene un objetivo de aprendizaje codificado «Dominio·Nivel»."
+        "titulo": "Learning objectives framework",
+        "descripcion": "The pedagogical framework of the diploma course: seven AMMAC competency domains (mirroring the international MACTE / AMI domains) and the six cognitive levels of Bloom's Taxonomy. Every activity has a learning objective coded “Domain·Level”."
       },
       "roxana": {
         "titulo": "Roxana Muñoz",
-        "descripcion": "Perfil institucional y académico de Roxana Muñoz Guevara."
+        "descripcion": "Institutional and academic profile of Roxana Muñoz Guevara."
       },
       "publicaciones": {
-        "titulo": "Publicaciones",
-        "descripcion": "Libros y recursos públicos relacionados con la filosofía Montessori."
+        "titulo": "Publications",
+        "descripcion": "Books and public resources related to Montessori philosophy."
       },
       "contacto": {
-        "titulo": "Contacto",
-        "descripcion": "Canales de contacto institucional, ubicación y redes públicas."
+        "titulo": "Contact",
+        "descripcion": "Institutional contact channels, location, and public social media."
       },
       "privacidad": {
-        "titulo": "Aviso de Privacidad",
-        "descripcion": "Condiciones públicas sobre privacidad y tratamiento de datos del sitio."
+        "titulo": "Privacy Notice",
+        "descripcion": "Public terms on privacy and the site's processing of personal data."
       }
     }
   },
   "marco": {
-    "titulo": "Marco de objetivos de aprendizaje",
-    "p1": "La formación se organiza en siete dominios de competencia AMMAC, espejo de los dominios internacionales de la formación Montessori (MACTE / AMI) y compatibles con los fundamentos AMI:",
+    "titulo": "Learning objectives framework",
+    "p1": "The training is organized into seven AMMAC competency domains, mirroring the international domains of Montessori training (MACTE / AMI) and compatible with AMI foundations:",
     "dominios": [
-      "Fundamentos filosóficos e históricos.",
-      "Desarrollo humano y planos del desarrollo.",
-      "El ambiente preparado y los materiales.",
-      "Observación científica.",
-      "Rol y transformación del adulto (Guía).",
-      "Pedagogía de las áreas del currículo.",
-      "Comunidad, familia y liderazgo."
+      "Philosophical and Historical Foundations.",
+      "Human Development and the Planes of Development.",
+      "The Prepared Environment and the Materials.",
+      "Scientific Observation.",
+      "Role and Transformation of the Adult (the Guide).",
+      "Pedagogy of the Curriculum Areas.",
+      "Community, Family, and Leadership."
     ],
-    "p2": "Cada dominio se trabaja en los seis niveles cognitivos de la Taxonomía de Bloom (recordar, comprender, aplicar, analizar, evaluar y crear). Cada actividad del diplomado tiene un objetivo de aprendizaje codificado «Dominio·Nivel» (por ejemplo, D1·Analizar), de modo que cada tarea tiene un propósito formativo explícito y evaluable."
+    "p2": "Each domain is worked through the six cognitive levels of Bloom's Taxonomy (remember, understand, apply, analyze, evaluate, and create). Every activity in the diploma course has a learning objective coded “Domain·Level” (for example, D1·Analyze), so that every task has an explicit, assessable formative purpose."
   },
   "resumen": {
-    "titulo": "Resumen institucional",
+    "titulo": "Institutional summary",
     "items": [
-      "Organización: Asociación Montessori de México A.C. (AMMAC), fundada en 1965.",
-      "Enfoque: formación de Guías Montessori, certificación internacional y difusión del método Montessori.",
-      "Alcance: institución con sede en México y proyección internacional; sus certificaciones tienen validez internacional y reconocimiento mundial. Coordina diplomados en México, Colombia, Puerto Rico, España, Costa Rica, Estados Unidos, Israel, Suiza y la India.",
-      "Ubicación pública: Avenida Dos 48, San Pedro de los Pinos, Benito Juárez, Ciudad de México.",
-      "Contacto público: admin@certificacionmontessori.com, 55 5515 2701 y WhatsApp 55 4888 5013."
+      "Organization: Asociación Montessori de México A.C. (AMMAC), Mexico's Montessori Association, founded in 1965.",
+      "Focus: training of Montessori Guides, internationally recognized certification, and dissemination of the Montessori method.",
+      "Reach: an institution based in Mexico with international scope; its certifications are internationally recognized worldwide. It coordinates diploma courses in Mexico, Colombia, Puerto Rico, Spain, Costa Rica, the United States, Israel, Switzerland, and India.",
+      "Public address: Avenida Dos 48, San Pedro de los Pinos, Benito Juárez, Mexico City.",
+      "Public contact: admin@certificacionmontessori.com, +52 55 5515 2701, and WhatsApp +52 55 4888 5013."
     ]
   },
   "temas": {
-    "titulo": "Temas que puede responder el sitio",
+    "titulo": "Topics this site can answer",
     "items": [
-      "Qué diplomados y certificaciones se ofrecen.",
-      "Cómo está estructurada pedagógicamente la formación: dominios de competencia (espejo de MACTE / AMI) y niveles de la Taxonomía de Bloom.",
-      "Quiénes integran el equipo docente.",
-      "Cuál es el perfil de Roxana Muñoz Guevara.",
-      "Dónde contactar a la asociación y cómo localizarla.",
-      "Qué publicaciones y recursos públicos están disponibles."
+      "Which diploma courses and certifications are offered.",
+      "How the training is structured pedagogically: competency domains (mirroring MACTE / AMI) and the levels of Bloom's Taxonomy.",
+      "Who makes up the faculty.",
+      "The profile of Roxana Muñoz Guevara.",
+      "Where to contact the association and how to find it.",
+      "Which publications and public resources are available."
     ]
   },
   "recursos": {
-    "titulo": "Recursos machine-readable"
+    "titulo": "Machine-readable resources"
   },
   "schema": {
-    "nombre": "Guía pública para buscadores y agentes de IA",
-    "descripcion": "Índice canónico de páginas y recursos públicos de certificacionmontessori.com pensado para facilitar búsquedas y consultas de agentes de IA."
+    "nombre": "Public guide for search engines and AI agents",
+    "descripcion": "Canonical index of the public pages and resources of certificacionmontessori.com, designed to support searches and queries by AI agents."
   }
 }

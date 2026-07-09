@@ -1,85 +1,85 @@
 {
   "seo": {
-    "title": "Publicaciones",
-    "description": "Consulta publicaciones, libros y recursos públicos relacionados con la filosofía y el método Montessori."
+    "title": "Montessori Books and Publications",
+    "description": "Books and public resources on the Montessori method and philosophy, published by AMMAC, Mexico's Montessori Association, by Roxana Muñoz Guevara."
   },
   "hero": {
-    "eyebrow": "Biblioteca Montessori",
-    "title": "Publicaciones de la Asociación Montessori de México",
-    "description": "Una serie editorial para acercar la filosofía Montessori, sus fundamentos y sus grandes lecciones a familias, docentes y comunidades educativas.",
-    "ctaLibros": "Ver libros",
-    "ctaAmazon": "Página de autor en Amazon"
+    "eyebrow": "Montessori Library",
+    "title": "Publications of the Asociación Montessori de México",
+    "description": "A book series that brings Montessori philosophy, its foundations, and its Great Lessons to families, teachers, and school communities.",
+    "ctaLibros": "See the books",
+    "ctaAmazon": "Author page on Amazon"
   },
   "catalogo": {
-    "eyebrow": "Catálogo editorial",
-    "title": "Libros disponibles",
-    "description": "Consigue cada título en su edición impresa y digital directamente en Amazon México."
+    "eyebrow": "Book catalog",
+    "title": "Available books",
+    "description": "Get each title in its print and digital editions directly on Amazon México."
   },
   "blog": {
     "eyebrow": "Blog",
-    "title": "Entradas recientes",
-    "description": "Artículos, avisos y recursos publicados en Montessori México.",
-    "cta": "Abrir blog",
-    "iframeTitle": "Blog Montessori México"
+    "title": "Recent posts",
+    "description": "Articles, announcements, and resources published on Montessori México.",
+    "cta": "Open the blog",
+    "iframeTitle": "Montessori México blog"
   },
   "seccion": {
-    "eyebrow": "Publicaciones",
-    "title": "Sus libros",
-    "description": "Serie en español basada en las obras de María Montessori. Consigue cada título en su edición impresa y digital en <destacado>Amazon México</destacado>.",
-    "nota": "Los precios en sitio son referencia; el monto final se confirma en la pasarela de pago al crear el pedido."
+    "eyebrow": "Publications",
+    "title": "Her books",
+    "description": "A series in Spanish based on the works of Maria Montessori. Get each title in its print and digital editions on <destacado>Amazon México</destacado>.",
+    "nota": "Prices shown on this site are for reference; the final amount is confirmed at checkout when the order is created."
   },
   "card": {
-    "portadaAlt": "Portada de «{{titulo}}»",
-    "regaloGratis": "🎁 Regalo gratis",
-    "libroVolumen": "Libro {{volumen}}",
+    "portadaAlt": "Cover of “{{titulo}}”",
+    "regaloGratis": "🎁 Free gift",
+    "libroVolumen": "Book {{volumen}}",
     "ebookPrecio": "Ebook: ${{precio}} MXN",
-    "formatosDescargable": "{{formatos}} descargable",
-    "regaloConCompra": "También gratis con cualquier otra compra",
-    "regaloDetalle": "Recibes {{formatos}} al comprar cualquier otro libro o paquete",
-    "edicionImpresa": "Edición impresa",
-    "disponibleAmazon": "Disponible en Amazon México",
-    "comprarEbook": "Comprar ebook",
-    "verEnAmazonTitle": "Ver «{{titulo}}» en Amazon",
-    "verEnAmazon": "Ver en Amazon"
+    "formatosDescargable": "Downloadable {{formatos}}",
+    "regaloConCompra": "Also free with any other purchase",
+    "regaloDetalle": "You receive {{formatos}} when you buy any other book or bundle",
+    "edicionImpresa": "Print edition",
+    "disponibleAmazon": "Available on Amazon México",
+    "comprarEbook": "Buy ebook",
+    "verEnAmazonTitle": "View “{{titulo}}” on Amazon",
+    "verEnAmazon": "View on Amazon"
   },
   "bundle": {
-    "etiqueta": "Paquete digital",
+    "etiqueta": "Digital bundle",
     "precio": "${{precio}} MXN",
-    "incluye": "Incluye {{formatos}} de los {{cantidad}} libros",
-    "comprar": "Comprar paquete"
+    "incluye": "Includes {{formatos}} of all {{cantidad}} books",
+    "comprar": "Buy bundle"
   },
   "libros": {
     "ammac-libro-5": {
       "titulo": "La mente absorbente: Montessori a la luz de la neuroeducación y la psicomotricidad actuales",
-      "descripcion": "La síntesis más madura de María Montessori (1949) puesta a dialogar, capítulo a capítulo, con la neurociencia del desarrollo, la neuroeducación y la psicomotricidad: plasticidad cerebral, períodos sensibles, la unidad entre movimiento e inteligencia y la emoción como motor del aprendizaje. Con honestidad sobre convergencias, tensiones y neuromitos."
+      "descripcion": "Maria Montessori's most mature synthesis (1949) placed in dialogue, chapter by chapter, with developmental neuroscience, neuroeducation, and psychomotricity: brain plasticity, sensitive periods, the unity of movement and intelligence, and emotion as the engine of learning. Honest about convergences, tensions, and neuromyths. (In Spanish.)"
     },
     "ammac-libro-1": {
-      "titulo": "Montessori: Una presentación del método de la pedagogía científica",
-      "descripcion": "Primer volumen de la serie AMMAC: Roxana Muñoz Guevara revisa, presenta y actualiza la pedagogía científica de María Montessori — fruto de años de estudio y práctica con niños. Un método adoptado en escuelas de todo el mundo que abre una nueva posibilidad de enseñanza y pone en entredicho los presupuestos de la educación tradicional."
+      "titulo": "Montessori: A Presentation of the Method of Scientific Pedagogy",
+      "descripcion": "First volume of the AMMAC series: Roxana Muñoz Guevara reviews, presents, and updates Maria Montessori's scientific pedagogy — the fruit of years of study and practice with children. A method adopted by schools around the world, it opens a new possibility for teaching and calls into question the assumptions of traditional education."
     },
     "ammac-libro-2": {
-      "titulo": "Montessori: Una presentación del secreto de la infancia",
-      "descripcion": "Segundo volumen de la serie basada en las obras originales de María Montessori. Roxana Muñoz Guevara sintetiza las ideas de El niño, el secreto de la infancia: la etapa incipiente de la vida donde el niño guarda el secreto práctico de nuestra propia existencia. Introducción y herramienta de estudio para todo público interesado en el método."
+      "titulo": "Montessori: A Presentation of The Secret of Childhood",
+      "descripcion": "Second volume of the series based on the original works of Maria Montessori. Roxana Muñoz Guevara distills the ideas of The Secret of Childhood: the incipient stage of life in which the child holds the practical secret of our own existence. An introduction and study companion for anyone interested in the method."
     },
     "ammac-libro-3": {
-      "titulo": "Educación Cósmica: Una pedagogía para que el niño se sepa parte del universo",
-      "descripcion": "Alrededor de los seis años, el niño empieza a preguntar por la totalidad: cómo nació el universo, cómo apareció la vida, cómo el ser humano llegó a hablar. La Educación Cósmica de María Montessori toma esa pregunta en serio. Presentación accesible de las cinco grandes lecciones, las cascadas curriculares y la formación del adulto que acompaña al niño."
+      "titulo": "Cosmic Education: A Pedagogy for the Child to Discover Their Place in the Universe",
+      "descripcion": "Around the age of six, the child begins to ask about the whole: how the universe was born, how life appeared, how human beings came to speak. Maria Montessori's Cosmic Education takes that question seriously. An accessible presentation of the Five Great Lessons, the curricular cascades, and the formation of the adult who accompanies the child."
     },
     "ammac-libro-4": {
       "titulo": "Guiones Cósmicos: Las cinco grandes lecciones y las lecciones complementarias",
-      "descripcion": "Las grandes lecciones de María Montessori se cuentan, no se leen. Colección completa de once guiones narrativos del Taller del segundo plano: las cinco grandes lecciones (Universo, Vida, Ser Humano, Escritura y Números) y siete lecciones complementarias, con indicaciones técnicas, materiales y notas de seguimiento. Complemento técnico de Educación Cósmica."
+      "descripcion": "Maria Montessori's Great Lessons are told, not read. The complete collection of twelve narrative scripts for the second-plane Elementary classroom: the Five Great Lessons (Universe, Life, Human Beings, Writing, and Numbers) and seven complementary lessons, with technical notes, materials, and follow-up guidance. The technical companion to Cosmic Education. (In Spanish.)"
     }
   },
   "paquetes": {
     "ammac-ebook-pack-4": {
-      "titulo": "Paquete digital: la serie completa (5 libros)",
-      "descripcion": "Los cuatro ebooks de la serie en PDF y EPUB —pagas el equivalente de tres libros, el de menor precio va incluido— y además recibes «La mente absorbente» de regalo. 5 libros en total.",
-      "nota": "PDF + EPUB de 4 libros + «La mente absorbente» de regalo · 5 en total"
+      "titulo": "Digital bundle: the complete series (5 books)",
+      "descripcion": "All four ebooks in the series in PDF and EPUB — you pay the equivalent of three books, and the lowest-priced one is included — plus “La mente absorbente” as a free gift. 5 books in total.",
+      "nota": "PDF + EPUB of 4 books + “La mente absorbente” as a gift · 5 in total"
     },
     "ammac-ebook-pack-cosmica": {
-      "titulo": "Paquete Cósmico: Educación Cósmica + Guiones Cósmicos",
-      "descripcion": "Los dos libros del segundo plano juntos en PDF y EPUB: la pedagogía de la Educación Cósmica y la colección completa de guiones de las grandes lecciones. Llévate ambos por $400 en lugar de $634, con «La mente absorbente» de regalo.",
-      "nota": "PDF + EPUB de 2 libros + «La mente absorbente» de regalo"
+      "titulo": "Cosmic Bundle: Cosmic Education + Cosmic Scripts",
+      "descripcion": "The two second-plane books together in PDF and EPUB: the pedagogy of Cosmic Education and the complete collection of Great Lesson scripts. Take both for $400 instead of $634, with “La mente absorbente” as a free gift.",
+      "nota": "PDF + EPUB of 2 books + “La mente absorbente” as a gift"
     }
   }
 }

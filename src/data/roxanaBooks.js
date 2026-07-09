@@ -48,6 +48,7 @@ export const roxanaBooks = [
       "Primer volumen de la serie AMMAC: Roxana Muñoz Guevara revisa, presenta y actualiza la pedagogía científica de María Montessori — fruto de años de estudio y práctica con niños. Un método adoptado en escuelas de todo el mundo que abre una nueva posibilidad de enseñanza y pone en entredicho los presupuestos de la educación tradicional.",
     coverImage: "/books/pedagogia-cientifica.jpg",
     amazonUrl: "https://www.amazon.com.mx/dp/B0GZY8N61G",
+    amazonUrlEn: "https://www.amazon.com/dp/B0H35ZB7DK",
   },
   {
     id: "ammac-libro-2",
@@ -66,6 +67,7 @@ export const roxanaBooks = [
       "Segundo volumen de la serie basada en las obras originales de María Montessori. Roxana Muñoz Guevara sintetiza las ideas de El niño, el secreto de la infancia: la etapa incipiente de la vida donde el niño guarda el secreto práctico de nuestra propia existencia. Introducción y herramienta de estudio para todo público interesado en el método.",
     coverImage: "/books/secreto-infancia.jpg",
     amazonUrl: "https://www.amazon.com.mx/dp/B0H13SC1QK",
+    amazonUrlEn: "https://www.amazon.com/dp/B0H2SRM231",
   },
   {
     id: "ammac-libro-3",
@@ -84,6 +86,7 @@ export const roxanaBooks = [
       "Alrededor de los seis años, el niño empieza a preguntar por la totalidad: cómo nació el universo, cómo apareció la vida, cómo el ser humano llegó a hablar. La Educación Cósmica de María Montessori toma esa pregunta en serio. Presentación accesible de las cinco grandes lecciones, las cascadas curriculares y la formación del adulto que acompaña al niño.",
     coverImage: "/books/educacion-cosmica.jpg",
     amazonUrl: "https://www.amazon.com.mx/dp/B0H143L8GN",
+    amazonUrlEn: "https://www.amazon.com/dp/B0H2TVSGT1",
   },
   {
     id: "ammac-libro-4",

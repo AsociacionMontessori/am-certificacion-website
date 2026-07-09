@@ -3,11 +3,15 @@ import { Link } from "gatsby"
 import { Trans, useTranslation } from "react-i18next"
 import { roxanaBooks } from "../data/roxanaBooks"
 import { roxanaBookBundles } from "../data/roxanaBookOffers"
+import { useLocalization } from "../i18n"
 
 function BookCard({ book }) {
   const { t } = useTranslation("publicaciones")
+  const { language } = useLocalization()
   const digitalFormats = book.digital?.formats?.join(" + ")
   const isGift = Boolean(book.gift)
+  // Edición EN publicada en Amazon.com cuando existe (dictamen 2026-07-08)
+  const amazonUrl = (language === "en" && book.amazonUrlEn) || book.amazonUrl
   const bookTitle = t(`libros.${book.id}.titulo`, { defaultValue: book.title })
   const bookDescription = t(`libros.${book.id}.descripcion`, {
     defaultValue: book.description,
@@ -81,7 +85,7 @@ function BookCard({ book }) {
             </Link>
           )}
           <a
-            href={book.amazonUrl}
+            href={amazonUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex min-h-[48px] w-full items-center justify-center rounded-lg border border-blue/40 bg-white px-5 py-3 text-center text-sm font-semibold text-blue transition hover:bg-blue/5 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue"

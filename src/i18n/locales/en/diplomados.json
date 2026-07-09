@@ -1,310 +1,310 @@
 {
   "seo": {
-    "title": "Diplomados Guía Montessori",
-    "description": "Conoce los diplomados en línea para formarte como Guía Montessori con certificación internacional, equipo docente y estructura del programa."
+    "title": "Montessori Guide Certification — Online Diploma Courses",
+    "description": "Train as a Montessori Guide with our online Montessori diploma courses: internationally recognized certification, expert faculty, and a flexible pace."
   },
   "schema": {
-    "nombre": "Diplomados Guía Montessori",
-    "descripcion": "Diplomados en línea para formarte como Guía Montessori con acompañamiento docente y certificación internacional.",
-    "categoria": "Guía Montessori",
+    "nombre": "Montessori Guide Diploma Courses",
+    "descripcion": "Online diploma courses to train as a Montessori Guide, with faculty mentorship and internationally recognized certification.",
+    "categoria": "Montessori Guide",
     "proveedor": "Asociación Montessori de México A.C."
   },
-  "ctaProgramasPrecios": "Ver programas y precios",
+  "ctaProgramasPrecios": "See programs and pricing",
   "hero": {
-    "kicker": "Certificación internacional • 100% en línea • A tu ritmo",
-    "title": "Diplomados: <linea>Guía Montessori</linea>",
-    "p1": "Programas diseñados para un conocimiento práctico y profundo en educación y método Montessori. Termina como Guía Montessori con certificado de validez internacional.",
-    "p2": "Somos la Asociación Montessori de México, una institución mexicana con proyección internacional: formamos Guías Montessori en línea para estudiantes de todo el mundo.",
-    "decorAlt": "decoración",
+    "kicker": "International certification • 100% online • At your own pace",
+    "title": "Diploma Courses: <linea>Montessori Guide</linea>",
+    "p1": "Programs designed to give you deep, practical knowledge of Montessori education and the Montessori method. Graduate as a Montessori Guide with an internationally recognized certificate.",
+    "p2": "We are the Asociación Montessori de México (Mexico's Montessori Association, founded in 1965), a Mexican institution with international reach: we train Montessori Guides online for students all over the world.",
+    "decorAlt": "decoration",
     "card": {
-      "p1": "Al finalizar tus programas estarás listo para trabajar como Guía Montessori en cualquier escuela del mundo y marcar una diferencia real en la vida de tus alumnos. Estudia desde cualquier lugar con nuestra plataforma en línea.",
-      "acceso": "Tu acceso incluye: <fuerte>Google Workspace</fuerte> (Drive 1 TB, correo institucional y servicios de Google), además de estudio con apoyo de <fuerte>IA de Google</fuerte> (Notebook LM, Gemini).",
+      "p1": "By the time you complete your program, you will be ready to work as a Montessori Guide at any school in the world and make a real difference in your students' lives. Study from anywhere with our online platform.",
+      "acceso": "Your access includes: <fuerte>Google Workspace</fuerte> (1 TB of Drive storage, an institutional email address, and Google services), plus study supported by <fuerte>Google AI</fuerte> (NotebookLM, Gemini).",
       "badges": [
-        "Compatible con MACTE / AMI",
-        "Estándar CONOCER (SEP)",
-        "RVOE en trámite",
+        "Compatible with MACTE / AMI",
+        "CONOCER Standard (SEP)",
+        "RVOE in process",
         "Google for Education",
-        "Gemini IA"
+        "Gemini AI"
       ],
       "altClassroom": "Google Classroom",
       "altForEducation": "Google for Education",
-      "altGemini": "Gemini IA",
-      "altNotebookLm": "Notebook LM"
+      "altGemini": "Gemini AI",
+      "altNotebookLm": "NotebookLM"
     }
   },
   "contenido": {
-    "kicker": "Contenido del programa",
-    "titulo": "Todo lo que necesitas para ser Guía Montessori",
-    "descripcion": "Cada materia se trabaja en bloques de unas 9 sesiones (una por semana), con material, actividades y acompañamiento de tu catedrático para resolver dudas y profundizar.",
-    "badge": "1. Tronco común",
+    "kicker": "Program content",
+    "titulo": "Everything you need to become a Montessori Guide",
+    "descripcion": "Each subject unfolds in blocks of about 9 sessions (one per week), with materials, activities, and guidance from your course instructor to answer questions and go deeper.",
+    "badge": "1. Common Core",
     "materias": {
       "filosofia": {
-        "nombre": "FILOSOFÍA MONTESSORI",
-        "descripcion": "Conocerás la historia y principios detrás de la metodología Montessori."
+        "nombre": "MONTESSORI PHILOSOPHY",
+        "descripcion": "Discover the history and principles behind the Montessori method."
       },
       "observacion": {
-        "nombre": "MÉTODOS DE OBSERVACIÓN",
-        "descripcion": "Desarrolla la capacidad de observar y entender las necesidades únicas de cada uno de tus alumnos."
+        "nombre": "OBSERVATION METHODS",
+        "descripcion": "Develop the ability to observe and understand the unique needs of each of your students."
       },
       "neuroeducacion": {
-        "nombre": "NEURO - EDUCACIÓN",
-        "descripcion": "Descubre cómo se desarrolla el cerebro humano en las primeras etapas de la vida"
+        "nombre": "NEUROEDUCATION",
+        "descripcion": "Discover how the human brain develops during the earliest stages of life."
       },
       "psicologia": {
-        "nombre": "PSICOLOGÍA EDUCATIVA",
-        "descripcion": "Descubre de qué manera integra el alumno su entorno y cómo garantizar un aprendizaje significativo."
+        "nombre": "EDUCATIONAL PSYCHOLOGY",
+        "descripcion": "Discover how students integrate their environment and how to ensure meaningful learning."
       },
       "musicoterapia": {
-        "nombre": "MUSICOTERAPIA",
-        "descripcion": "Conoce la importancia de la música en el aprendizaje con las campanas Montessori."
+        "nombre": "MUSIC THERAPY",
+        "descripcion": "Learn about the importance of music in learning through the Montessori bells."
       },
       "psicomotricidad": {
-        "nombre": "PSICO-MOTRICIDAD",
-        "descripcion": "Explora cómo el movimiento es fundamental en el desarrollo y aprendizaje."
+        "nombre": "PSYCHOMOTOR DEVELOPMENT",
+        "descripcion": "Explore how movement is fundamental to development and learning."
       },
       "inclusiva": {
-        "nombre": "EDUCACIÓN INCLUSIVA",
-        "descripcion": "Conoce cómo se prepara el conocimiento, el ambiente y la pedagogía para todo tipo de aprendizajes y necesidades de los niños."
+        "nombre": "INCLUSIVE EDUCATION",
+        "descripcion": "Learn how knowledge, the environment, and pedagogy are prepared for every kind of learner and every child's needs."
       },
       "creativa": {
-        "nombre": "INTELIGENCIA CREATIVA",
-        "descripcion": "Fomenta la creatividad y el pensamiento innovador en todos tus estudiantes."
+        "nombre": "CREATIVE INTELLIGENCE",
+        "descripcion": "Foster creativity and innovative thinking in all of your students."
       }
     }
   },
   "practica": {
-    "titulo": "El método Montessori en la práctica",
-    "descripcion": "Aprenderás el material científico de María Montessori y cómo presentarlo según cada etapa de desarrollo.",
-    "badge": "2. Materiales y presentaciones"
+    "titulo": "The Montessori method in practice",
+    "descripcion": "You will learn Maria Montessori's scientific materials and how to present them at each stage of development.",
+    "badge": "2. Materials and Presentations"
   },
   "modalidad": {
-    "kicker": "Modalidad",
-    "titulo": "Clases accesibles y flexibles",
-    "intro": "Estudia a tu ritmo con contenido nuevo cada semana y acompañamiento constante:",
+    "kicker": "Format",
+    "titulo": "Accessible, flexible classes",
+    "intro": "Study at your own pace with new content every week and ongoing support:",
     "items": {
       "publicacion": {
-        "titulo": "Publicación semanal",
-        "texto": "Cada sábado a las 8:00 se publica una clase nueva."
+        "titulo": "Weekly releases",
+        "texto": "A new class is published every Saturday at 8:00 a.m."
       },
       "actividades": {
-        "titulo": "Actividades a tu ritmo",
-        "texto": "Entrega cuando quieras mientras la materia esté activa (aprox. dos meses por materia)."
+        "titulo": "Activities at your own pace",
+        "texto": "Submit whenever you like while the subject is active (about two months per subject)."
       },
       "acceso": {
-        "titulo": "Acceso 24/7",
-        "texto": "Revisa las clases cuando y donde quieras."
+        "titulo": "24/7 access",
+        "texto": "Review your classes whenever and wherever you want."
       },
       "guia": {
-        "titulo": "Guía personalizada",
-        "texto": "Solicita videollamada con tu profesor cuando lo necesites."
+        "titulo": "One-on-one guidance",
+        "texto": "Request a video call with your instructor whenever you need it."
       }
     }
   },
   "programasSeccion": {
-    "kicker": "Programas y precios",
-    "titulo": "Elige tu programa y da el siguiente paso",
-    "descripcion": "Certificación internacional, modalidad en línea y acompañamiento de guías certificadas."
+    "kicker": "Programs and pricing",
+    "titulo": "Choose your program and take the next step",
+    "descripcion": "International certification, fully online, with guidance from certified Montessori Guides."
   },
   "inscripcionSeccion": {
-    "kicker": "Inscripción",
-    "titulo": "3 pasos para empezar",
-    "proximoInicio": "Próximo inicio: <verde>{{fecha}}</verde>",
-    "intro": "Completa el formulario de inscripción y luego solo necesitas:",
-    "ctaFormulario": "Inscribirme — Formulario de inscripción",
+    "kicker": "Enrollment",
+    "titulo": "3 steps to get started",
+    "proximoInicio": "Next start date: <verde>{{fecha}}</verde>",
+    "intro": "Complete the enrollment form, and then you only need:",
+    "ctaFormulario": "Enroll now — Enrollment form",
     "paso1": {
-      "titulo": "Inscripción",
-      "texto": "📄 Hoja de inscripción y formas de pago en el mismo formulario:",
-      "linkTexto": "Abrir formulario de inscripción"
+      "titulo": "Enrollment",
+      "texto": "📄 Enrollment sheet and payment options in the same form:",
+      "linkTexto": "Open the enrollment form"
     },
     "paso2": {
-      "titulo": "👨‍🎓 Documentos Personales",
-      "intro": "Para tu certificado con validez internacional:",
+      "titulo": "👨‍🎓 Personal Documents",
+      "intro": "For your internationally recognized certificate:",
       "docs": {
-        "domicilio": "📍 Comprobante de domicilio",
-        "identificacion": "🪪 Identificación oficial",
-        "acta": "👶 Acta de nacimiento",
-        "certificado": "👨‍🎓 Último certificado de estudios"
+        "domicilio": "📍 Proof of address",
+        "identificacion": "🪪 Government-issued ID",
+        "acta": "👶 Birth certificate",
+        "certificado": "👨‍🎓 Most recent academic certificate"
       },
-      "nota": "No hay requisito de nivel educativo para cursar; algunas escuelas exigen licenciatura para estar frente a grupo — depende de cada institución."
+      "nota": "There is no minimum education requirement to take the course; some schools require a bachelor's degree to lead a classroom — that depends on each institution."
     },
     "paso3": {
-      "titulo": "📜 Reglamento firmado",
-      "texto": "Nos comprometemos a una educación de <destacado>calidad</destacado> en un ambiente de <destacado>respeto</destacado>. Conoce y firma nuestro reglamento para iniciar tu diplomado."
+      "titulo": "📜 Signed regulations",
+      "texto": "We are committed to <destacado>quality</destacado> education in an environment of <destacado>respect</destacado>. Review and sign our program regulations to begin your diploma course."
     }
   },
   "calendario": {
     "fechas": {
-      "2025-11-29": "29 de noviembre 2025",
-      "2026-01-24": "24 de enero 2026",
-      "2026-02-28": "28 de febrero 2026",
-      "2026-04-25": "25 de abril 2026",
-      "2026-05-30": "30 de mayo 2026",
-      "2026-06-27": "27 de junio 2026",
-      "2026-08-29": "29 de agosto 2026",
-      "2026-09-26": "26 de septiembre 2026",
-      "2026-10-24": "24 de octubre 2026",
-      "2026-11-28": "28 de noviembre 2026"
+      "2025-11-29": "November 29, 2025",
+      "2026-01-24": "January 24, 2026",
+      "2026-02-28": "February 28, 2026",
+      "2026-04-25": "April 25, 2026",
+      "2026-05-30": "May 30, 2026",
+      "2026-06-27": "June 27, 2026",
+      "2026-08-29": "August 29, 2026",
+      "2026-09-26": "September 26, 2026",
+      "2026-10-24": "October 24, 2026",
+      "2026-11-28": "November 28, 2026"
     }
   },
   "precios": {
-    "tituloSeccion": "Certificación Montessori",
-    "kicker": "Certificación internacional",
-    "titulo": "Guía Montessori",
-    "descripcion": "Programas con reconocimiento internacional. Los precios de programa (colegiatura o diplomado) son independientes de la inscripción, que solo se paga una vez.",
-    "colegiaturaMensual": "Colegiatura mensual",
-    "inscripcionIncluida": "Inscripción incluida (promoción)",
-    "inscripcionAparte": "Inscripción aparte ({{monto}})",
+    "tituloSeccion": "Montessori Certification",
+    "kicker": "International certification",
+    "titulo": "Montessori Guide",
+    "descripcion": "Internationally recognized programs. Program prices (tuition or diploma course) are separate from the enrollment fee, which you only pay once.",
+    "colegiaturaMensual": "Monthly tuition",
+    "inscripcionIncluida": "Enrollment fee included (promotion)",
+    "inscripcionAparte": "Enrollment fee separate ({{monto}})",
     "certificado": {
-      "titulo": "Certificado",
-      "subtitulo": "Diploma físico con sellos y firmas oficiales, validado con código QR y folio único.",
-      "pagoUnico": "pago único",
-      "footer": "+ gastos de envío"
+      "titulo": "Certificate",
+      "subtitulo": "Physical diploma with official seals and signatures, validated with a QR code and a unique serial number.",
+      "pagoUnico": "one-time payment",
+      "footer": "+ shipping costs"
     },
-    "multiNivel": "<fuerte>¿Vas por más de un nivel?</fuerte> Si ya cursaste Nido y Comunidad Infantil o Casa de Niños, puedes revalidar el tronco común: el siguiente diplomado se reduce aproximadamente 11 meses. Además, <fuerte>no volvemos a cobrarte inscripción</fuerte> cuando ya terminaste un nivel con nosotros o si tomas otro programa después.",
-    "terminos": "Precios sujetos a disponibilidad. Aplican Términos y Condiciones."
+    "multiNivel": "<fuerte>Planning to complete more than one level?</fuerte> If you have already completed Nido and Infant Community or Children's House, you can transfer the common-core credits: the next diploma course is about 11 months shorter. Plus, <fuerte>we never charge the enrollment fee again</fuerte> once you have completed a level with us or if you take another program afterward.",
+    "terminos": "Prices subject to availability. Terms and Conditions apply."
   },
   "programas": {
     "inscripcion": {
-      "titulo": "Inscripción",
-      "subtitulo": "Pagas la inscripción una sola vez. Si después tomas otro diplomado o curso con nosotros, no volvemos a cobrarla.",
-      "beneficio": "Inscripción única de por vida en la institución",
-      "textoMonto": "Monto de inscripción (hoy)"
+      "titulo": "Enrollment",
+      "subtitulo": "You pay the enrollment fee only once. If you later take another diploma course or program with us, we never charge it again.",
+      "beneficio": "One-time lifetime enrollment with the institution",
+      "textoMonto": "Enrollment fee (today)"
     },
     "cosmica": {
-      "cardTitle": "Educación Cósmica",
-      "cardSubtitle": "Diplomado · Grandes Lecciones Montessori",
-      "duration": "5 meses",
-      "paymentNote": "programa + inscripción"
+      "cardTitle": "Cosmic Education",
+      "cardSubtitle": "Diploma Course · The Montessori Great Lessons",
+      "duration": "5 months",
+      "paymentNote": "program + enrollment fee"
     },
     "neuro": {
-      "cardTitle": "Neuroeducación",
-      "cardSubtitle": "3 meses • A tu ritmo • 100% en línea",
-      "duration": "3 meses",
-      "paymentNote": "promo todo incluido"
+      "cardTitle": "Neuroeducation",
+      "cardSubtitle": "3 months • At your own pace • 100% online",
+      "duration": "3 months",
+      "paymentNote": "all-inclusive promo"
     },
     "taller": {
-      "cardTitle": "Taller I y II",
-      "cardSubtitle": "Certificación internacional",
-      "duration": "20 meses",
-      "priceNote": "Inscripción $4,900 (1 vez) + colegiatura mensual"
+      "cardTitle": "Elementary I and II",
+      "cardSubtitle": "International certification",
+      "duration": "20 months",
+      "priceNote": "$4,900 enrollment fee (one-time) + monthly tuition"
     },
     "casa": {
-      "cardTitle": "Casa de Niños",
-      "cardSubtitle": "Certificación internacional",
-      "duration": "17 meses",
-      "priceNote": "Inscripción $4,900 (1 vez) + colegiatura mensual"
+      "cardTitle": "Children's House",
+      "cardSubtitle": "International certification",
+      "duration": "17 months",
+      "priceNote": "$4,900 enrollment fee (one-time) + monthly tuition"
     },
     "nido": {
-      "cardTitle": "Nido y Comunidad Infantil",
-      "cardSubtitle": "Certificación internacional",
-      "duration": "16 meses",
-      "priceNote": "Inscripción $4,900 (1 vez) + colegiatura mensual"
+      "cardTitle": "Nido and Infant Community",
+      "cardSubtitle": "International certification",
+      "duration": "16 months",
+      "priceNote": "$4,900 enrollment fee (one-time) + monthly tuition"
     }
   },
   "profesores": {
-    "kicker": "Equipo docente",
-    "titulo": "Conoce a quienes te acompañarán en tu certificación",
-    "intro": "En este diplomado estarás acompañada por personas con experiencia, formación y compromiso con la filosofía Montessori. Queremos que conozcas un poco más a quienes estarán contigo a lo largo de este proceso.",
-    "leerMas": "Leer más",
-    "leerMenos": "Leer menos",
+    "kicker": "Faculty",
+    "titulo": "Meet the people who will accompany you through your certification",
+    "intro": "Throughout this diploma course you will be accompanied by people with experience, training, and a deep commitment to the Montessori philosophy. We want you to get to know the team that will walk alongside you through this journey.",
+    "leerMas": "Read more",
+    "leerMenos": "Read less",
     "items": {
       "roxanaMunoz": {
-        "badge": "Acompañamiento institucional y académico",
+        "badge": "Institutional and academic mentorship",
         "parrafos": [
-          "Roxana Muñoz Guevara es <fuerte>licenciada en Educación Preescolar</fuerte> por la Universidad Femenina de México, con estudios en Educación Especial, Psicomotricidad Aplicada, Psicología Infantil y formación como <fuerte>Guía Montessori de Taller I y II</fuerte> por el Centro de Desarrollo y Comunicación.",
-          "Cuenta además con estudios adicionales realizados con la <fuerte>Dra. Cato Hanrath</fuerte>, alumna de María Montessori. Desde <fuerte>1997 es Presidenta de la Asociación Montessori de México A.C.</fuerte>, donde coordina los Diplomados Profesionales para Guía Montessori e imparte Antropología filosófica, Filosofía Montessori y Materiales Montessori.",
-          "Actualmente es <fuerte>Directora General de la Escuela Primaria y del Centro Educativo Montessori Kalpilli</fuerte>, además de capacitadora de Guías Montessori en México y el extranjero. Su acompañamiento dentro del diplomado aporta profundidad académica, experiencia institucional y una mirada fiel a la filosofía Montessori."
+          "Roxana Muñoz Guevara holds a <fuerte>Licenciatura (Bachelor's degree) in Preschool Education</fuerte> from the Universidad Femenina de México, with further studies in Special Education, Applied Psychomotor Development, and Child Psychology, and trained as a <fuerte>Montessori Guide for Elementary I and II</fuerte> at the Centro de Desarrollo y Comunicación.",
+          "She also completed additional studies with <fuerte>Dr. Cato Hanrath</fuerte>, a student of Maria Montessori. Since <fuerte>1997 she has served as President of the Asociación Montessori de México A.C.</fuerte>, where she coordinates the Professional Montessori Guide Diploma Courses and teaches Philosophical Anthropology, Montessori Philosophy, and Montessori Materials.",
+          "She is currently <fuerte>General Director of the Elementary School and of the Centro Educativo Montessori Kalpilli</fuerte>, as well as a trainer of Montessori Guides in Mexico and abroad. Her mentorship within the diploma course brings academic depth, institutional experience, and a perspective deeply faithful to the Montessori philosophy."
         ]
       },
       "ivanLopezCarmona": {
-        "badge": "Formación inclusiva y práctica docente",
+        "badge": "Inclusive education and teaching practice",
         "parrafos": [
-          "Iván forma parte del equipo de profesores de este diplomado. Es <fuerte>Licenciado en Intervención Educativa</fuerte> con línea inclusiva por la Universidad Pedagógica Nacional, <fuerte>Licenciado en Artes</fuerte> por el IDMA y <fuerte>Maestro en Ciencias de la Educación</fuerte> por el Instituto de Estudios Universitarios.",
-          "Cuenta con <fuerte>15 años de experiencia</fuerte> en el ámbito educativo y una trayectoria sólida dentro de la filosofía Montessori. Está certificado como <fuerte>Guía Montessori de Casa de Niños, Taller I y II, Nido y Comunidad Infantil</fuerte> por la Asociación Montessori de México.",
-          "Actualmente es <fuerte>catedrático presencial de la Asociación Montessori de México</fuerte> en la sede Acapulco, formando Guías de Casa de Niños y Taller. También <fuerte>coordina el departamento montessoriano en ECNH</fuerte> y desarrolla talleres para docentes en escuelas públicas y particulares."
+          "Iván is part of the teaching team for this diploma course. He holds a <fuerte>Licenciatura in Educational Intervention</fuerte> with an inclusive-education focus from the Universidad Pedagógica Nacional, a <fuerte>Licenciatura in the Arts</fuerte> from IDMA, and a <fuerte>Master's degree in Educational Sciences</fuerte> from the Instituto de Estudios Universitarios.",
+          "He brings <fuerte>15 years of experience</fuerte> in education and a solid track record within the Montessori philosophy. He is certified as a <fuerte>Montessori Guide for Children's House, Elementary I and II, and Nido and Infant Community</fuerte> by the Asociación Montessori de México.",
+          "He is currently an <fuerte>in-person course instructor for the Asociación Montessori de México</fuerte> at the Acapulco campus, training Children's House and Elementary Guides. He also <fuerte>coordinates the Montessori department at ECNH</fuerte> and develops workshops for teachers in public and private schools."
         ]
       },
       "carlosRomero": {
-        "badge": "Gestión académica y tecnología educativa",
+        "badge": "Academic management and educational technology",
         "parrafos": [
-          "Carlos forma parte del equipo que acompaña la organización, el seguimiento y el desarrollo de los diplomados. Su relación con Montessori también es vivencial: <fuerte>toda su formación, desde Nido, fue Montessori</fuerte>, por lo que conoce el método desde la experiencia directa.",
-          "Es <fuerte>Licenciado en Economía y en Contaduría Pública</fuerte>, además de programador. Esta combinación le permite integrar administración, análisis, tecnología y organización académica al servicio de la formación Montessori. También cuenta con <fuerte>estudios de maestría en Música</fuerte>, con enfoque en piano y composición.",
-          "Dentro del diplomado, aporta <fuerte>estructura, claridad y soluciones prácticas</fuerte> para fortalecer la experiencia de las alumnas, uniendo Montessori, gestión educativa, pensamiento analítico y herramientas tecnológicas con un compromiso genuino con la educación."
+          "Carlos is part of the team that supports the organization, follow-up, and development of the diploma courses. His relationship with Montessori is also lived experience: <fuerte>his entire education, starting in the Nido, was Montessori</fuerte>, so he knows the method firsthand.",
+          "He holds <fuerte>Licenciaturas in Economics and in Public Accounting</fuerte> and is also a programmer. This combination allows him to bring administration, analysis, technology, and academic organization to the service of Montessori training. He has also pursued <fuerte>Master's studies in Music</fuerte>, focusing on piano and composition.",
+          "Within the diploma course, he contributes <fuerte>structure, clarity, and practical solutions</fuerte> that strengthen the student experience, weaving together Montessori, academic management, analytical thinking, and technology with a genuine commitment to education."
         ]
       }
     }
   },
   "proximo": {
-    "calculando": "Calculando la próxima fecha de diplomado…",
+    "calculando": "Calculating the next diploma course date…",
     "cierre": {
-      "titulo": "Te deseamos un excelente cierre de año.",
-      "subtitulo": "Mantente al tanto de nuevas fechas de diplomados."
+      "titulo": "We wish you a wonderful end of the year.",
+      "subtitulo": "Stay tuned for new diploma course dates."
     },
     "envivo": {
-      "texto": "Estamos en vivo.",
-      "link": "Únete a la clase en vivo."
+      "texto": "We are live.",
+      "link": "Join the live class."
     },
-    "urgencia": "¡Últimos lugares disponibles!",
-    "iniciamos": "Inscríbete en línea, iniciamos el:",
-    "faltan": "Faltan:",
-    "dia": "día",
-    "dias": "días",
-    "hora": "hora",
-    "horas": "horas",
-    "ya": "¡Ya!",
-    "iniciaPronto": "Inicia pronto",
-    "titulo": "Próximo Diplomado",
-    "subtitulo": "Transforma la manera en que acompañas a niñas y niños.",
+    "urgencia": "Only a few spots left!",
+    "iniciamos": "Enroll online — we start on:",
+    "faltan": "Starts in:",
+    "dia": "day",
+    "dias": "days",
+    "hora": "hour",
+    "horas": "hours",
+    "ya": "Now!",
+    "iniciaPronto": "Starting soon",
+    "titulo": "Next Diploma Course",
+    "subtitulo": "Transform the way you accompany children.",
     "neuro": {
-      "cta": "Inscríbete al Diplomado en Neuroeducación",
-      "pagoUnico": "Pago único",
-      "duracion": "Duración: 3 meses • A tu ritmo"
+      "cta": "Enroll in the Neuroeducation Diploma Course",
+      "pagoUnico": "One-time payment",
+      "duracion": "Duration: 3 months • At your own pace"
     },
     "certInternacional": {
-      "titulo": "🌍 Certificación Internacional • Guía Montessori",
-      "intro": "Nuestros diplomados incluyen certificación con reconocimiento internacional:",
+      "titulo": "🌍 International Certification • Montessori Guide",
+      "intro": "Our diploma courses include internationally recognized certification:",
       "items": [
-        "Neuroeducación",
-        "Nido y Comunidad Infantil",
-        "Casa de Niños",
-        "Taller"
+        "Neuroeducation",
+        "Nido and Infant Community",
+        "Children's House",
+        "Elementary"
       ],
-      "alineados": "Están alineados al Estándar EC0301 de la red CONOCER y contamos con RVOE en trámite."
+      "alineados": "They are aligned with the EC0301 Standard of Mexico's CONOCER network (official professional certification, SEP), and our RVOE official recognition (Mexico's Ministry of Public Education) is in process."
     },
     "beneficios": {
       "enLinea": {
-        "titulo": "100% en línea",
-        "texto": "Sin traslados"
+        "titulo": "100% online",
+        "texto": "No commuting"
       },
       "aplicacion": {
-        "titulo": "Aplicación inmediata",
-        "texto": "Enfoque práctico"
+        "titulo": "Immediate application",
+        "texto": "Hands-on approach"
       },
       "acompanamiento": {
-        "titulo": "Acompañamiento experto",
-        "texto": "Especialistas certificados"
+        "titulo": "Expert mentorship",
+        "texto": "Certified specialists"
       }
     },
-    "ctaInscribete": "Inscríbete Ahora",
-    "ctaConoce": "Conoce el Diplomado",
+    "ctaInscribete": "Enroll Now",
+    "ctaConoce": "Explore the Diploma Course",
     "decorAlt": "decoration",
     "confianza": [
-      "Cupo limitado",
-      "Certificación internacional",
-      "Guía Montessori certificada"
+      "Limited spots available",
+      "International certification",
+      "Certified Montessori Guide"
     ]
   },
   "becas": {
-    "titulo": "Conoce nuestro proyecto de becas",
-    "requisitos": "Requisitos",
+    "titulo": "Learn about our scholarship program",
+    "requisitos": "Requirements",
     "items": [
-      "No tener ningún atraso en la entrega de actividades",
-      "Asistir por lo menos al 80 % de clases",
-      "Realizar por lo menos una práctica virtual (conferencia o proyecto)"
+      "Be fully up to date on all activity submissions",
+      "Attend at least 80% of the classes",
+      "Complete at least one virtual practice session (conference or project)"
     ],
-    "cta": "Conocer Más",
-    "comite": "Todas las solicitudes son revisadas y evaluadas por el comité académico",
-    "disponibilidad": "Sujetas a disponibilidad",
-    "imagenAlt": "imagen becas"
+    "cta": "Learn More",
+    "comite": "All applications are reviewed and evaluated by the academic committee",
+    "disponibilidad": "Subject to availability",
+    "imagenAlt": "scholarships image"
   }
 }
