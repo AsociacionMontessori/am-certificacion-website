@@ -68,6 +68,7 @@ export const Head = () => (
     title="Pago por transferencia bancaria"
     description="Inscripciones por transferencia bancaria a Asociación Montessori de México A.C."
     pathname="/inscripcion/transferencia"
+    robots="noindex,follow"
   />
 )
 

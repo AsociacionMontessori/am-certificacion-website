@@ -138,6 +138,7 @@ export const Head = () => (
     title="Paso 3 · Expediente administrativo"
     description="Documentos e información complementaria. No necesitas comprobante de pago de inscripción."
     pathname="/inscripcion/documentos"
+    robots="noindex,follow"
   />
 )
 

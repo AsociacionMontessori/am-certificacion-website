@@ -42,7 +42,7 @@ const CheckoutCancelPage = () => (
 )
 
 export const Head = () => (
-  <Seo title="Pago cancelado" description="El pago no se completó." pathname="/checkout/cancel" />
+  <Seo title="Pago cancelado" description="El pago no se completó." pathname="/checkout/cancel" robots="noindex,follow" />
 )
 
 export default CheckoutCancelPage

@@ -61,6 +61,7 @@ export const Head = () => (
     title="Aparta tu lugar"
     description="Aparta tu lugar en los diplomados Montessori con tarjeta o por transferencia bancaria."
     pathname="/inscripcion/pagar"
+    robots="noindex,follow"
   />
 )
 

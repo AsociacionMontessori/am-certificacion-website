@@ -266,7 +266,7 @@ const CheckoutSuccessPage = () => {
 }
 
 export const Head = () => (
-  <Seo title="Pago recibido" description="Tu pago fue procesado correctamente." pathname="/checkout/success" />
+  <Seo title="Pago recibido" description="Tu pago fue procesado correctamente." pathname="/checkout/success" robots="noindex,follow" />
 )
 
 export default CheckoutSuccessPage

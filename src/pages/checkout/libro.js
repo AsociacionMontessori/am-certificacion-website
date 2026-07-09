@@ -77,6 +77,7 @@ export const Head = () => (
     title="Compra de libro"
     description="Compra segura de publicaciones Montessori."
     pathname="/checkout/libro"
+    robots="noindex,follow"
   />
 )
 

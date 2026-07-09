@@ -230,6 +230,7 @@ export const Head = () => (
     title="Paso 2 · Tu cuenta en el portal"
     description="Datos básicos para crear tu usuario institucional. El pago ya está vinculado automáticamente."
     pathname="/inscripcion/completar"
+    robots="noindex,follow"
   />
 )
 
