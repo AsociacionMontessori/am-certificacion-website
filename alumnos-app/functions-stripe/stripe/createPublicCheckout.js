@@ -10,6 +10,11 @@ const {generateAccessToken, hashAccessToken, ACCESS_TOKEN_TTL_MS} = require("./a
 const {rejectIfFlowDisabled} = require("./featureFlags");
 const {resolveGiftSkus, getDigitalBook} = require("./digitalBooks");
 const {
+  buildLocalizedCheckoutUrl,
+  getStripeCheckoutLocale,
+  resolveCheckoutLanguage,
+} = require("./checkoutLanguage");
+const {
   buildCheckoutItemsFromRequest,
   resolveOrdenTipo,
   estimateTotalMxn,
@@ -131,6 +136,7 @@ exports.createPublicCheckoutHandler = onRequest(
         const requiereFacturaFiscal = Boolean(body.requiereFacturaFiscal);
         const cuentaContable = String(body.cuentaContable || (requiereFacturaFiscal ? "banorte" : "hsbc")).trim();
         const codigo = String(body.codigo || "").trim();
+        const language = resolveCheckoutLanguage(body.language || body.idioma || body.locale);
 
         if (!nombre || nombre.length < 2) {
           res.status(400).json({error: "Nombre requerido"});
@@ -248,20 +254,35 @@ exports.createPublicCheckoutHandler = onRequest(
             new Date(Date.now() + ACCESS_TOKEN_TTL_MS),
         );
         const accessTokenQuery = `&t=${encodeURIComponent(accessToken)}`;
+        const successQuery =
+          `orden=${encodeURIComponent(ordenRef.id)}&tipo=${encodeURIComponent(tipo)}` +
+          `${promoQuery}${digitalQuery}${accessTokenQuery}`;
 
         const session = await stripe.checkout.sessions.create({
           mode: "payment",
           customer_email: email,
+          locale: getStripeCheckoutLocale(language),
           line_items: lineItems,
           ...(promotionCodeId ?
             {discounts: [{promotion_code: promotionCodeId}]} :
             allowPromotionCodes ? {allow_promotion_codes: true} : {}),
-          success_url: `${siteUrl}/checkout/success?orden=${ordenRef.id}&tipo=${tipo}${promoQuery}${digitalQuery}${accessTokenQuery}`,
-          cancel_url: `${siteUrl}/checkout/cancel?orden=${ordenRef.id}`,
+          success_url: buildLocalizedCheckoutUrl({
+            siteUrl,
+            language,
+            pathname: "/checkout/success",
+            query: successQuery,
+          }),
+          cancel_url: buildLocalizedCheckoutUrl({
+            siteUrl,
+            language,
+            pathname: "/checkout/cancel",
+            query: `orden=${encodeURIComponent(ordenRef.id)}`,
+          }),
           metadata: {
             ordenId: ordenRef.id,
             tipo,
             origen: "sitio_publico",
+            language,
             skus: skus.join(","),
             programa: (programaLabel || programa).slice(0, 200),
             modoPago: (modoPago || "").slice(0, 40),
@@ -284,6 +305,7 @@ exports.createPublicCheckoutHandler = onRequest(
           programa: programaLabel || programa || null,
           nivelFormulario: nivelFormulario || null,
           modoPago: modoPago || null,
+          language,
           promoInscripcionIncluida: promoInscripcionIncluida || false,
           codigoPromocional: codigo || null,
           montoEstimadoMxn,

@@ -1,5 +1,6 @@
 import * as React from "react"
 import { useState } from "react"
+import { Trans, useTranslation } from "react-i18next"
 import {
   DOMINIO_INSTITUCIONAL,
   MODALIDAD_INSCRIPCION,
@@ -17,6 +18,11 @@ const emptyForm = {
   usuarioInstitucional: "",
 }
 
+const getNivelDisplayLabel = (t, label) => {
+  const nivel = NIVELES_ESPECIALIZACION.find((item) => item.label === label)
+  return nivel ? t(`programs.levels.${nivel.id}`, { defaultValue: label }) : label
+}
+
 const InscripcionParte1Form = ({
   ordenId,
   accessToken,
@@ -25,6 +31,7 @@ const InscripcionParte1Form = ({
   programaPagadoLabel = "",
   onSuccess,
 }) => {
+  const { t } = useTranslation("checkout")
   const nivelFijo = nivelEspecializacionFijo || ""
   const [form, setForm] = useState({
     ...emptyForm,
@@ -47,7 +54,7 @@ const InscripcionParte1Form = ({
     setError("")
     const nivelElegido = nivelFijo || form.nivelEspecializacion
     if (!nivelElegido) {
-      setError("Elige la formación que quieres tomar para continuar.")
+      setError(t("part1.missingTraining"))
       return
     }
     setLoading(true)
@@ -64,7 +71,7 @@ const InscripcionParte1Form = ({
       }, accessToken)
       onSuccess?.(result)
     } catch (err) {
-      setError(err.message || "No se pudo crear tu cuenta")
+      setError(err.message || t("part1.submitError"))
       setLoading(false)
     }
   }
@@ -72,34 +79,33 @@ const InscripcionParte1Form = ({
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <p className="text-sm text-gray leading-relaxed">
-        Con estos datos crearemos tu cuenta en el portal de alumnos. El pago ya está
-        vinculado; no subas comprobante de inscripción si pagaste en línea.
+        {t("part1.intro")}
       </p>
 
       <div className="rounded-xl border border-blue/20 bg-blue/5 px-4 py-3">
-        <p className="text-xs text-gray">Modalidad</p>
-        <p className="text-sm font-semibold text-blue">{MODALIDAD_INSCRIPCION}</p>
+        <p className="text-xs text-gray">{t("part1.modality")}</p>
+        <p className="text-sm font-semibold text-blue">{t("part1.online", { defaultValue: MODALIDAD_INSCRIPCION })}</p>
       </div>
 
       <div className="rounded-xl border-2 border-green/30 bg-green/5 px-4 py-4">
         <p className="text-xs font-semibold uppercase tracking-wide text-green mb-1">
-          {nivelFijo ? "Formación seleccionada" : "Elige tu formación"}
+          {nivelFijo ? t("part1.selectedTraining") : t("part1.chooseTraining")}
         </p>
         {nivelFijo ? (
           <>
             <p className="text-sm font-semibold text-black leading-snug">
-              {nivelFijo}
+              {getNivelDisplayLabel(t, nivelFijo)}
             </p>
             {programaPagadoLabel && (
               <p className="text-xs text-gray mt-2">
-                Pago seleccionado: {programaPagadoLabel}. Cada programa tiene un costo distinto;
-                por eso no se puede cambiar después del pago inicial.
+                {t("common.selectedPayment")}:{" "}
+                {t("part1.selectedPaymentNote", { program: programaPagadoLabel })}
               </p>
             )}
           </>
         ) : (
           <>
-            <label className="sr-only" htmlFor="p1-nivel">Formación que quieres tomar</label>
+            <label className="sr-only" htmlFor="p1-nivel">{t("part1.trainingLabel")}</label>
             <select
               id="p1-nivel"
               name="nivelEspecializacion"
@@ -108,16 +114,15 @@ const InscripcionParte1Form = ({
               onChange={handleChange}
               className={inputClass}
             >
-              <option value="">Selecciona una formación</option>
+              <option value="">{t("part1.trainingPlaceholder")}</option>
               {NIVELES_ESPECIALIZACION.filter((nivel) => nivel.tipoPrograma !== "otro").map((nivel) => (
                 <option key={nivel.id} value={nivel.label}>
-                  {nivel.label}
+                  {t(`programs.levels.${nivel.id}`, { defaultValue: nivel.label })}
                 </option>
               ))}
             </select>
             <p className="text-xs text-gray mt-2">
-              Como pagaste solo la inscripción, puedes elegir aquí la formación que quieres
-              tomar antes de crear tu cuenta.
+              {t("part1.onlyEnrollmentNote")}
             </p>
           </>
         )}
@@ -125,20 +130,22 @@ const InscripcionParte1Form = ({
 
       <div className="rounded-xl border border-yellow/30 bg-yellow/10 px-4 py-3 space-y-2">
         <p className="text-sm text-gray leading-relaxed">
-          <strong className="text-black">Acceso:</strong> generamos una contraseña única para ti
-          (la misma en el portal de alumnos y en Google Classroom). La enviamos a tu correo de
-          contacto y queda en tu expediente del portal.
+          <strong className="text-black">{t("part1.accessStrong")}</strong>{" "}
+          {t("part1.accessText")}
         </p>
         <p className="text-sm text-gray leading-relaxed">
-          <strong className="text-black">Google:</strong> creamos tu usuario{" "}
-          <strong>@certificacionmontessori.com</strong>, te asignamos la unidad organizativa de
-          tu programa y te inscribimos en tus clases de Classroom.
+          <strong className="text-black">{t("part1.googleStrong")}</strong>{" "}
+          <Trans
+            i18nKey="part1.googleText"
+            ns="checkout"
+            components={{ strong: <strong className="text-black" /> }}
+          />
         </p>
       </div>
 
       <div>
         <label className="block text-sm font-medium text-black mb-1.5" htmlFor="p1-nombre">
-          Nombre completo (nombre(s) y apellidos) *
+          {t("part1.fullName")}
         </label>
         <input
           id="p1-nombre"
@@ -154,7 +161,7 @@ const InscripcionParte1Form = ({
 
       <div>
         <label className="block text-sm font-medium text-black mb-1.5" htmlFor="p1-nacimiento">
-          Fecha de nacimiento *
+          {t("part1.birthDate")}
         </label>
         <input
           id="p1-nacimiento"
@@ -169,7 +176,7 @@ const InscripcionParte1Form = ({
 
       <div>
         <label className="block text-sm font-medium text-black mb-1.5" htmlFor="p1-nacionalidad">
-          Nacionalidad *
+          {t("part1.nationality")}
         </label>
         <input
           id="p1-nacionalidad"
@@ -178,13 +185,13 @@ const InscripcionParte1Form = ({
           value={form.nacionalidad}
           onChange={handleChange}
           className={inputClass}
-          placeholder="Ej. Mexicana"
+          placeholder={t("part1.nationalityPlaceholder")}
         />
       </div>
 
       <div>
         <label className="block text-sm font-medium text-black mb-1.5" htmlFor="p1-tel">
-          Teléfono móvil de contacto *
+          {t("part1.mobile")}
         </label>
         <input
           id="p1-tel"
@@ -201,7 +208,7 @@ const InscripcionParte1Form = ({
 
       <div>
         <label className="block text-sm font-medium text-black mb-1.5" htmlFor="p1-email">
-          Correo electrónico de contacto *
+          {t("part1.email")}
         </label>
         <input
           id="p1-email"
@@ -214,13 +221,13 @@ const InscripcionParte1Form = ({
           autoComplete="email"
         />
         <p className="text-xs text-gray mt-1.5">
-          Recibirás aquí la confirmación de tu cuenta y acceso al portal.
+          {t("part1.emailHint")}
         </p>
       </div>
 
       <div>
         <label className="block text-sm font-medium text-black mb-1.5" htmlFor="p1-usuario">
-          Usuario institucional *
+          {t("part1.institutionalUser")}
         </label>
         <div className="flex rounded-xl border border-gray/25 overflow-hidden min-h-[48px] bg-white">
           <input
@@ -232,7 +239,7 @@ const InscripcionParte1Form = ({
             value={form.usuarioInstitucional}
             onChange={handleChange}
             className="flex-1 px-4 py-2.5 text-black text-base border-0 outline-none lowercase"
-            placeholder="tu.nombre"
+            placeholder={t("part1.userPlaceholder")}
             autoComplete="username"
           />
           <span className="inline-flex items-center px-3 text-sm text-gray bg-gray/5 shrink-0">
@@ -256,17 +263,17 @@ const InscripcionParte1Form = ({
           <>
             <span
               className="inline-block h-5 w-5 rounded-full border-2 border-white/40 border-t-white animate-spin"
-              aria-hidden="true"
+            aria-hidden="true"
             />
-            Creando tu cuenta…
+            {t("part1.submitting")}
           </>
         ) : (
-          "Crear mi cuenta y continuar"
+          t("part1.submit")
         )}
       </button>
       {loading && (
         <p className="text-xs text-gray text-center">
-          Estamos configurando tu acceso al portal y Google Classroom.
+          {t("part1.submittingHint")}
         </p>
       )}
     </form>

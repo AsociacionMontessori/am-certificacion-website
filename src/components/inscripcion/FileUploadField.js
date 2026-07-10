@@ -1,11 +1,13 @@
 import * as React from "react"
 import { useState } from "react"
+import { useTranslation } from "react-i18next"
 import { requestInscripcionUploadUrl, uploadFileToSignedUrl } from "../../utils/inscripcionApi"
 
 const ACCEPT = "image/jpeg,image/png,image/webp,application/pdf"
 const MAX_MB = 10
 
 const FileUploadField = ({ ordenId, accessToken, docId, label, hint, required, value, onUploaded }) => {
+  const { t } = useTranslation("checkout")
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState("")
 
@@ -14,7 +16,7 @@ const FileUploadField = ({ ordenId, accessToken, docId, label, hint, required, v
     if (!file) return
     setError("")
     if (file.size > MAX_MB * 1024 * 1024) {
-      setError(`El archivo debe ser menor a ${MAX_MB} MB`)
+      setError(t("upload.fileTooLarge", { mb: MAX_MB }))
       return
     }
     setUploading(true)
@@ -23,7 +25,7 @@ const FileUploadField = ({ ordenId, accessToken, docId, label, hint, required, v
       await uploadFileToSignedUrl(uploadUrl, file)
       onUploaded(docId, { storagePath, fileName: file.name, contentType: file.type })
     } catch (err) {
-      setError(err.message || "Error al subir el archivo")
+      setError(err.message || t("upload.error"))
     } finally {
       setUploading(false)
     }
@@ -47,7 +49,7 @@ const FileUploadField = ({ ordenId, accessToken, docId, label, hint, required, v
       {value?.fileName && (
         <p className="text-xs text-green font-medium">✓ {value.fileName}</p>
       )}
-      {uploading && <p className="text-xs text-gray">Subiendo archivo…</p>}
+      {uploading && <p className="text-xs text-gray">{t("upload.uploading")}</p>}
       {error && <p className="text-xs text-red">{error}</p>}
     </div>
   )

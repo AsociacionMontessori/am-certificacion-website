@@ -1,6 +1,8 @@
 import * as React from "react"
 import { useState, useEffect } from "react"
 import { Link } from "gatsby"
+import { Trans, useTranslation } from "react-i18next"
+import { useLocalization } from "../../i18n"
 import { createPublicCheckoutSession } from "../../utils/stripeCheckout"
 import { INSCRIPCION_PUBLIC } from "../../data/inscripcionPublic"
 import { getCuentaContableId } from "../../data/datosBancarios"
@@ -14,6 +16,8 @@ import { useVisitorGeo } from "../../hooks/useVisitorGeo"
  * KDP Select; ver roxanaBooks.js / digitalBooks.js.)
  */
 const ApartarInscripcionForm = ({ coin = "MXN", price, cancelHref = "/" }) => {
+  const { t } = useTranslation("checkout")
+  const { language, localizedPath } = useLocalization()
   const [nombre, setNombre] = useState("")
   const [email, setEmail] = useState("")
   const [telefono, setTelefono] = useState("")
@@ -22,10 +26,11 @@ const ApartarInscripcionForm = ({ coin = "MXN", price, cancelHref = "/" }) => {
   const [error, setError] = useState("")
   const [checkoutUrl, setCheckoutUrl] = useState("")
   const { esMexico: visitanteEnMexico } = useVisitorGeo()
+  const permiteFacturaFiscal = visitanteEnMexico && language === "es"
 
   useEffect(() => {
-    if (!visitanteEnMexico) setRequiereFacturaFiscal(false)
-  }, [visitanteEnMexico])
+    if (!permiteFacturaFiscal) setRequiereFacturaFiscal(false)
+  }, [permiteFacturaFiscal])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -40,8 +45,9 @@ const ApartarInscripcionForm = ({ coin = "MXN", price, cancelHref = "/" }) => {
         sku: INSCRIPCION_PUBLIC.sku,
         quantity: 1,
         soloInscripcion: true,
-        requiereFacturaFiscal,
-        cuentaContable: getCuentaContableId(requiereFacturaFiscal),
+        requiereFacturaFiscal: permiteFacturaFiscal && requiereFacturaFiscal,
+        cuentaContable: getCuentaContableId(permiteFacturaFiscal && requiereFacturaFiscal),
+        language,
         cliente: { nombre: nombre.trim(), email: email.trim(), telefono: telefono.trim() },
       })
       if (stripeTab && !stripeTab.closed) {
@@ -53,7 +59,7 @@ const ApartarInscripcionForm = ({ coin = "MXN", price, cancelHref = "/" }) => {
       }
     } catch (err) {
       if (stripeTab && !stripeTab.closed) stripeTab.close()
-      setError(err.message || "No se pudo iniciar el pago")
+      setError(err.message || t("apartarForm.error"))
       setLoading(false)
     }
   }
@@ -62,28 +68,30 @@ const ApartarInscripcionForm = ({ coin = "MXN", price, cancelHref = "/" }) => {
     <form onSubmit={handleSubmit} className="w-full text-left space-y-4">
       <div className="rounded-xl border border-blue/25 bg-blue/5 px-4 py-4 space-y-1">
         <p className="text-sm text-gray leading-relaxed">
-          <strong className="text-blue">Apartas tu lugar</strong> pagando la inscripción
-          {price ? <> ({coin} {price})</> : null}. Es un pago único: no se repite en
-          otros diplomados o cursos posteriores.
+          <strong className="text-blue">{t("apartarForm.introStrong")}</strong> {t("apartarForm.intro")}
+          {price ? <> ({coin} {price})</> : null}. {t("apartarForm.introAfter")}
         </p>
       </div>
 
-      {visitanteEnMexico ? (
+      {permiteFacturaFiscal ? (
         <ComprobanteFiscalMexico
           requiereFacturaFiscal={requiereFacturaFiscal}
           onChange={setRequiereFacturaFiscal}
         />
       ) : (
         <p className="text-sm text-gray rounded-xl border border-gray/20 bg-gray/5 px-4 py-3 leading-relaxed">
-          Comprobante: <strong className="text-black">recibo normal</strong> (sin factura fiscal
-          mexicana). La factura con RFC solo aplica para pagos desde México.
+          <Trans
+            i18nKey="apartarForm.receiptOutsideMexico"
+            ns="checkout"
+            components={{ strong: <strong className="text-black" /> }}
+          />
         </p>
       )}
 
       <div className="space-y-3">
         <div>
           <label className="block text-sm font-medium text-black mb-1.5" htmlFor="apartar-nombre">
-            Nombre completo
+            {t("apartarForm.fullName")}
           </label>
           <input
             id="apartar-nombre"
@@ -98,7 +106,7 @@ const ApartarInscripcionForm = ({ coin = "MXN", price, cancelHref = "/" }) => {
         </div>
         <div>
           <label className="block text-sm font-medium text-black mb-1.5" htmlFor="apartar-email">
-            Correo electrónico
+            {t("apartarForm.email")}
           </label>
           <input
             id="apartar-email"
@@ -112,7 +120,7 @@ const ApartarInscripcionForm = ({ coin = "MXN", price, cancelHref = "/" }) => {
         </div>
         <div>
           <label className="block text-sm font-medium text-black mb-1.5" htmlFor="apartar-tel">
-            Teléfono (opcional)
+            {t("apartarForm.phone")}
           </label>
           <input
             id="apartar-tel"
@@ -133,9 +141,9 @@ const ApartarInscripcionForm = ({ coin = "MXN", price, cancelHref = "/" }) => {
 
       {checkoutUrl && (
         <p className="text-sm text-blue rounded-lg bg-blue/5 px-3 py-2 leading-relaxed">
-          Abrimos el pago seguro en una pestaña nueva. ¿No la ves?{" "}
+          {t("common.openPayment")}{" "}
           <a href={checkoutUrl} target="_blank" rel="noopener noreferrer" className="font-semibold underline">
-            Ábrela aquí
+            {t("common.openHere")}
           </a>
           .
         </p>
@@ -147,13 +155,17 @@ const ApartarInscripcionForm = ({ coin = "MXN", price, cancelHref = "/" }) => {
           disabled={loading}
           className="min-h-[48px] w-full inline-flex items-center justify-center px-6 py-3 rounded-full font-semibold text-white bg-gradient-to-r from-blue to-green disabled:opacity-60"
         >
-          {loading ? "Redirigiendo…" : `Apartar mi lugar con tarjeta${price ? ` (${coin} ${price})` : ""}`}
+          {loading
+            ? t("common.redirecting")
+            : price
+              ? t("apartarForm.submitWithPrice", { coin, price })
+              : t("apartarForm.submit")}
         </button>
         <Link
-          to={cancelHref}
+          to={localizedPath(cancelHref)}
           className="min-h-[48px] w-full inline-flex items-center justify-center px-6 py-3 rounded-full font-medium text-blue border border-blue/30 bg-white text-center"
         >
-          Cancelar
+          {t("common.cancel")}
         </Link>
       </div>
     </form>

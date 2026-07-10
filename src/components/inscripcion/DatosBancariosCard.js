@@ -1,5 +1,7 @@
 import * as React from "react"
 import { useState } from "react"
+import { useTranslation } from "react-i18next"
+import { useLocalization } from "../../i18n"
 import {
   CUENTAS_BANCARIAS,
   DATOS_BANCARIOS_INSCRIPCION,
@@ -32,8 +34,11 @@ const OpcionFiscal = ({ id, selected, onSelect, titulo, subtitulo }) => (
 )
 
 const DatosBancariosCard = ({ compact = false, value, onChange, esMexico = true }) => {
+  const { t } = useTranslation("checkout")
+  const { language } = useLocalization()
+  const permiteFacturaFiscal = esMexico && language === "es"
   const [interno, setInterno] = useState("recibo")
-  const tipo = value ?? interno
+  const tipo = permiteFacturaFiscal ? value ?? interno : "recibo"
   const setTipo = onChange ?? setInterno
   const cuenta = getCuentaBancaria(tipo === "factura")
   const datos = DATOS_BANCARIOS_INSCRIPCION
@@ -43,15 +48,15 @@ const DatosBancariosCard = ({ compact = false, value, onChange, esMexico = true 
       className={`rounded-2xl border border-gray/20 bg-gray/5 ${compact ? "px-4 py-4" : "px-5 py-5"} space-y-4`}
     >
       <div>
-        <p className="text-sm font-semibold text-blue">Pago por transferencia bancaria</p>
+        <p className="text-sm font-semibold text-blue">{t("bank.title")}</p>
         <p className="text-xs text-gray leading-relaxed mt-1">
-          {esMexico
-            ? "Elige el tipo de comprobante fiscal. La cuenta de depósito depende de si necesitas factura con RFC o solo recibo normal."
-            : "Desde fuera de México solo aplica recibo normal (sin factura fiscal mexicana)."}
+          {permiteFacturaFiscal
+            ? t("bank.descriptionMexico")
+            : t("bank.descriptionOutside")}
         </p>
       </div>
 
-      {esMexico ? (
+      {permiteFacturaFiscal ? (
         <fieldset className="space-y-2">
           <legend className="sr-only">Tipo de comprobante fiscal (México)</legend>
           <p className="text-xs text-gray leading-relaxed">{FACTURA_FISCAL_SOLO_MEXICO}</p>
@@ -72,26 +77,26 @@ const DatosBancariosCard = ({ compact = false, value, onChange, esMexico = true 
         </fieldset>
       ) : (
         <p className="text-sm rounded-xl border border-gray/20 bg-white px-4 py-3 text-gray">
-          <span className="font-semibold text-black">Recibo normal</span> — sin opción de factura
-          fiscal (solo disponible en México).
+          <span className="font-semibold text-black">{t("bank.outsideReceipt")}</span> —{" "}
+          {t("bank.outsideReceiptHint")}
         </p>
       )}
 
       <article className="rounded-xl border border-blue/20 bg-white px-4 py-4 space-y-2">
         <p className="text-xs font-semibold uppercase tracking-wide text-blue">
-          Cuenta para {cuenta.banco}
+          {t("bank.accountFor", { bank: cuenta.banco })}
         </p>
         <ul className="text-sm text-black space-y-2">
           <li>
-            <span className="text-gray">Titular: </span>
+            <span className="text-gray">{t("bank.holder")}: </span>
             {cuenta.titular}
           </li>
           <li>
-            <span className="text-gray">Banco: </span>
+            <span className="text-gray">{t("bank.bank")}: </span>
             {cuenta.banco}
           </li>
           <li>
-            <span className="text-gray">Cuenta: </span>
+            <span className="text-gray">{t("bank.account")}: </span>
             <span className="font-mono">{cuenta.cuenta}</span>
           </li>
           <li>
@@ -99,20 +104,20 @@ const DatosBancariosCard = ({ compact = false, value, onChange, esMexico = true 
             <span className="font-mono break-all">{cuenta.clabe}</span>
           </li>
           <li>
-            <span className="text-gray">Monto: </span>
+            <span className="text-gray">{t("bank.amount")}: </span>
             {datos.montoReferencia} {datos.moneda}
           </li>
           <li>
-            <span className="text-gray">Concepto: </span>
+            <span className="text-gray">{t("bank.concept")}: </span>
             {datos.concepto}
           </li>
         </ul>
       </article>
 
-      {esMexico && tipo === "factura" && (
+      {permiteFacturaFiscal && tipo === "factura" && (
         <div className="rounded-xl border border-yellow/30 bg-yellow/10 px-3 py-3 space-y-2">
           <p className="text-xs font-semibold text-black">
-            Datos fiscales a enviar (exclusivo México)
+            {t("bank.taxData")}
           </p>
           <ul className="space-y-1.5">
             {DATOS_FISCALES_FACTURA_MX.map((item) => (
@@ -122,7 +127,7 @@ const DatosBancariosCard = ({ compact = false, value, onChange, esMexico = true 
             ))}
           </ul>
           <p className="text-xs text-gray leading-relaxed pt-1 border-t border-yellow/25">
-            Envía estos datos con tu comprobante de transferencia a{" "}
+            {t("bank.sendTaxData")}{" "}
             <a href={`mailto:${datos.correoComprobante}`} className="text-blue underline">
               {datos.correoComprobante}
             </a>
@@ -132,11 +137,11 @@ const DatosBancariosCard = ({ compact = false, value, onChange, esMexico = true 
       )}
 
       <p className="text-xs text-gray leading-relaxed">
-        Envía tu comprobante a{" "}
+        {t("bank.sendReceipt")}{" "}
         <a href={`mailto:${datos.correoComprobante}`} className="text-blue underline font-medium">
           {datos.correoComprobante}
         </a>
-        . Cuando confirmemos el depósito, podrás continuar con tu cuenta y expediente.
+        . {t("bank.afterDeposit")}
       </p>
     </aside>
   )

@@ -1,6 +1,8 @@
 import * as React from "react"
 import { useEffect, useState } from "react"
 import { Link, navigate } from "gatsby"
+import { useTranslation } from "react-i18next"
+import { getT, useLocalization } from "../../i18n"
 import CheckoutPageShell from "../../components/checkout/CheckoutPageShell"
 import Seo from "../../components/seo"
 import InscripcionParte1Form from "../../components/inscripcion/InscripcionParte1Form"
@@ -8,6 +10,8 @@ import { fetchInscripcionOrden, canjearCodigoDirecto } from "../../utils/inscrip
 import { mapProgramaCheckoutANivel, PORTAL_ALUMNOS_URL } from "../../data/inscripcionForm"
 
 const InscripcionCompletarPage = () => {
+  const { t } = useTranslation("checkout")
+  const { localizedPath } = useLocalization()
   const [ordenFromUrl, setOrdenFromUrl] = useState("")
   const [ordenId, setOrdenId] = useState("")
   const [ordenInput, setOrdenInput] = useState("")
@@ -20,7 +24,7 @@ const InscripcionCompletarPage = () => {
   const loadOrden = async (id, token) => {
     const trimmed = id.trim()
     if (!trimmed) {
-      setError("Indica la referencia de tu pago")
+      setError(t("completePage.missingReference"))
       return
     }
     setLoading(true)
@@ -46,7 +50,7 @@ const InscripcionCompletarPage = () => {
           window.history.replaceState(
             null,
             "",
-            `/inscripcion/completar?orden=${encodeURIComponent(effectiveId)}&t=${encodeURIComponent(effectiveToken)}`,
+            localizedPath(`/inscripcion/completar?orden=${encodeURIComponent(effectiveId)}&t=${encodeURIComponent(effectiveToken)}`),
           )
         }
       }
@@ -61,7 +65,7 @@ const InscripcionCompletarPage = () => {
       }
     } catch (err) {
       setContext(null)
-      setError(err.message || "No se pudo verificar el pago")
+      setError(err.message || t("completePage.verifyError"))
     } finally {
       setLoading(false)
     }
@@ -86,7 +90,7 @@ const InscripcionCompletarPage = () => {
   useEffect(() => {
     if (context?.parte1Completa && !context?.parte2Completa && ordenId && typeof window !== "undefined") {
       const tokenSuffix = accessToken ? `&t=${encodeURIComponent(accessToken)}` : ""
-      navigate(`/inscripcion/documentos?orden=${encodeURIComponent(ordenId)}${tokenSuffix}`)
+      navigate(localizedPath(`/inscripcion/documentos?orden=${encodeURIComponent(ordenId)}${tokenSuffix}`))
     }
   }, [context, ordenId, accessToken])
 
@@ -110,27 +114,27 @@ const InscripcionCompletarPage = () => {
     setCuentaCreada(result)
     if (typeof window !== "undefined") {
       const tokenSuffix = accessToken ? `&t=${encodeURIComponent(accessToken)}` : ""
-      navigate(`/inscripcion/documentos?orden=${encodeURIComponent(ordenId)}${tokenSuffix}`)
+      navigate(localizedPath(`/inscripcion/documentos?orden=${encodeURIComponent(ordenId)}${tokenSuffix}`))
     }
   }
 
   return (
     <CheckoutPageShell
-      title="Paso 2 · Tu cuenta en el portal"
-      description="Datos básicos para crear tu usuario institucional. El pago ya está vinculado automáticamente."
+      title={t("completePage.title")}
+      description={t("completePage.description")}
       backTo="/diplomados"
     >
       {!ordenFromUrl && !context && (
         <div className="mb-6 space-y-3">
           <label className="block text-sm font-medium text-black" htmlFor="orden-ref">
-            Referencia de pago
+            {t("completePage.paymentReference")}
           </label>
           <input
             id="orden-ref"
             type="text"
             value={ordenInput}
             onChange={(e) => setOrdenInput(e.target.value)}
-            placeholder="Ej. abc123..."
+            placeholder={t("completePage.referencePlaceholder")}
             className="w-full min-h-[48px] px-4 py-2.5 rounded-xl border border-gray/25 text-black text-base bg-white"
           />
           <button
@@ -139,7 +143,7 @@ const InscripcionCompletarPage = () => {
             disabled={loading}
             className="min-h-[48px] w-full rounded-full font-semibold text-white bg-blue disabled:opacity-60"
           >
-            {loading ? "Verificando…" : "Continuar"}
+            {loading ? t("completePage.verifyLoading") : t("common.continue")}
           </button>
         </div>
       )}
@@ -153,9 +157,9 @@ const InscripcionCompletarPage = () => {
                 aria-hidden="true"
               />
               <div>
-                <p className="text-sm font-semibold text-blue">Verificando tu pago…</p>
+                <p className="text-sm font-semibold text-blue">{t("completePage.verifyingTitle")}</p>
                 <p className="text-xs text-gray mt-1">
-                  Esto puede tardar unos segundos mientras validamos tu orden y habilitamos el siguiente paso.
+                  {t("completePage.verifyingText")}
                 </p>
               </div>
             </div>
@@ -167,8 +171,8 @@ const InscripcionCompletarPage = () => {
         <div className="rounded-xl bg-red/5 border border-red/20 px-4 py-3 mb-4">
           <p className="text-sm text-red">{error}</p>
           {!context?.pagado && (
-            <Link to="/inscripcion/pagar" className="inline-block mt-3 text-sm font-medium text-blue underline">
-              Ir al pago de inscripción
+            <Link to={localizedPath("/inscripcion/pagar")} className="inline-block mt-3 text-sm font-medium text-blue underline">
+              {t("completePage.goPay")}
             </Link>
           )}
         </div>
@@ -176,9 +180,9 @@ const InscripcionCompletarPage = () => {
 
       {!loading && context && !context.pagado && (
         <div className="rounded-2xl border border-yellow/30 bg-yellow/10 px-4 py-4 text-sm text-gray">
-          <p className="mb-3">Aún no confirmamos el pago. Si acabas de pagar, espera unos minutos e intenta de nuevo.</p>
-          <Link to="/inscripcion/pagar" className="font-semibold text-blue underline">
-            Ir al pago de inscripción
+          <p className="mb-3">{t("completePage.notConfirmed")}</p>
+          <Link to={localizedPath("/inscripcion/pagar")} className="font-semibold text-blue underline">
+            {t("completePage.goPay")}
           </Link>
         </div>
       )}
@@ -186,16 +190,16 @@ const InscripcionCompletarPage = () => {
       {!loading && context?.pagado && cuentaCreada && (
         <div className="text-center space-y-4 py-2">
           <div className="w-14 h-14 mx-auto rounded-full bg-green/20 flex items-center justify-center text-2xl text-green">✓</div>
-          <h2 className="text-lg font-bold text-blue">¡Cuenta creada!</h2>
+          <h2 className="text-lg font-bold text-blue">{t("completePage.accountCreated")}</h2>
           <p className="text-sm text-gray leading-relaxed">
-            Tu usuario:{" "}
+            {t("completePage.yourUser")}{" "}
             <strong className="text-blue">{cuentaCreada.emailInstitucional}</strong>
           </p>
           <Link
-            to={`/inscripcion/documentos?orden=${encodeURIComponent(ordenId)}${accessToken ? `&t=${encodeURIComponent(accessToken)}` : ""}`}
+            to={localizedPath(`/inscripcion/documentos?orden=${encodeURIComponent(ordenId)}${accessToken ? `&t=${encodeURIComponent(accessToken)}` : ""}`)}
             className="min-h-[48px] w-full inline-flex items-center justify-center px-6 py-3 rounded-full font-semibold text-white bg-gradient-to-r from-blue to-green"
           >
-            Continuar al expediente (paso 3)
+            {t("completePage.continueDocs")}
           </Link>
           <a
             href={cuentaCreada.portalUrl || PORTAL_ALUMNOS_URL}
@@ -203,7 +207,7 @@ const InscripcionCompletarPage = () => {
             target="_blank"
             rel="noopener noreferrer"
           >
-            Entrar al portal de alumnos
+            {t("completePage.enterPortal")}
           </a>
         </div>
       )}
@@ -225,13 +229,16 @@ const InscripcionCompletarPage = () => {
   )
 }
 
-export const Head = () => (
-  <Seo
-    title="Paso 2 · Tu cuenta en el portal"
-    description="Datos básicos para crear tu usuario institucional. El pago ya está vinculado automáticamente."
-    pathname="/inscripcion/completar"
-    robots="noindex,follow"
-  />
-)
+export const Head = ({ location }) => {
+  const t = getT(location.pathname, "checkout")
+  return (
+    <Seo
+      title={t("completePage.seoTitle")}
+      description={t("completePage.seoDescription")}
+      pathname={location.pathname}
+      robots="noindex,follow"
+    />
+  )
+}
 
 export default InscripcionCompletarPage

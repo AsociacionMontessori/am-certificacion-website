@@ -1,5 +1,6 @@
 import * as React from "react"
 import { Link } from "gatsby"
+import { useLocalization } from "../../i18n"
 import { getInscripcionPagarUrl } from "../../data/programasOferta"
 
 /**
@@ -12,11 +13,13 @@ const ProgramCheckoutLink = ({
   className = "",
   disabled = false,
 }) => {
+  const { localizedPath } = useLocalization()
+
   if (disabled || !programaId) {
     return <div className={className}>{children}</div>
   }
 
-  const to = getInscripcionPagarUrl(programaId)
+  const to = localizedPath(getInscripcionPagarUrl(programaId))
   const label = title ? `Inscribirte a ${title}` : "Ir al pago en línea"
 
   return (

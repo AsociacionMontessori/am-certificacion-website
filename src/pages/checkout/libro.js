@@ -1,5 +1,7 @@
 import * as React from "react"
 import { Link } from "gatsby"
+import { useTranslation } from "react-i18next"
+import { getT, useLocalization } from "../../i18n"
 import CheckoutPageShell from "../../components/checkout/CheckoutPageShell"
 import Seo from "../../components/seo"
 import BookCheckoutForm from "../../components/checkout/BookCheckoutForm"
@@ -21,6 +23,8 @@ function bundleToBook(bundle) {
 }
 
 const LibroCheckoutPage = () => {
+  const { t } = useTranslation("checkout")
+  const { localizedPath } = useLocalization()
   const [sku, setSku] = React.useState("")
 
   React.useEffect(() => {
@@ -39,15 +43,15 @@ const LibroCheckoutPage = () => {
 
   if (!book) {
     return (
-      <CheckoutPageShell title="Libro no encontrado" backTo="/publicaciones">
+      <CheckoutPageShell title={t("bookPage.notFoundTitle")} backTo="/publicaciones">
         <p className="text-sm text-gray mb-4">
-          No encontramos ese título. Elige un libro en la página de publicaciones.
+          {t("bookPage.notFoundText")}
         </p>
         <Link
-          to="/publicaciones"
+          to={localizedPath("/publicaciones")}
           className="min-h-[48px] inline-flex items-center text-blue font-medium underline"
         >
-          Ver libros
+          {t("bookPage.seeBooks")}
         </Link>
       </CheckoutPageShell>
     )
@@ -57,8 +61,8 @@ const LibroCheckoutPage = () => {
     <CheckoutPageShell
       title={
         isBundle
-          ? "Comprar paquete digital"
-          : `Comprar ebook · Libro ${book.volume}`
+          ? t("bookPage.bundleTitle")
+          : t("bookPage.ebookTitle", { volume: book.volume })
       }
       description={book.title}
       backTo="/publicaciones"
@@ -72,13 +76,16 @@ const LibroCheckoutPage = () => {
   )
 }
 
-export const Head = () => (
-  <Seo
-    title="Compra de libro"
-    description="Compra segura de publicaciones Montessori."
-    pathname="/checkout/libro"
-    robots="noindex,follow"
-  />
-)
+export const Head = ({ location }) => {
+  const t = getT(location.pathname, "checkout")
+  return (
+    <Seo
+      title={t("bookPage.seoTitle")}
+      description={t("bookPage.seoDescription")}
+      pathname={location.pathname}
+      robots="noindex,follow"
+    />
+  )
+}
 
 export default LibroCheckoutPage

@@ -1,6 +1,8 @@
 import * as React from "react"
 import { useEffect, useState } from "react"
 import { Link } from "gatsby"
+import { useTranslation } from "react-i18next"
+import { getT, useLocalization } from "../../i18n"
 import CheckoutPageShell from "../../components/checkout/CheckoutPageShell"
 import Seo from "../../components/seo"
 import InscripcionParte2Form from "../../components/inscripcion/InscripcionParte2Form"
@@ -8,6 +10,8 @@ import { fetchInscripcionOrden } from "../../utils/inscripcionApi"
 import { PORTAL_ALUMNOS_URL } from "../../data/inscripcionForm"
 
 const InscripcionDocumentosPage = () => {
+  const { t } = useTranslation("checkout")
+  const { localizedPath } = useLocalization()
   const [ordenFromUrl, setOrdenFromUrl] = useState("")
   const [ordenId, setOrdenId] = useState("")
   const [ordenInput, setOrdenInput] = useState("")
@@ -20,7 +24,7 @@ const InscripcionDocumentosPage = () => {
   const loadOrden = async (id, token) => {
     const trimmed = id.trim()
     if (!trimmed) {
-      setError("Indica la referencia de tu pago")
+      setError(t("documentsPage.missingReference"))
       return
     }
     setLoading(true)
@@ -32,7 +36,7 @@ const InscripcionDocumentosPage = () => {
       if (data.parte2Completa) setEnviado(true)
     } catch (err) {
       setContext(null)
-      setError(err.message || "No se pudo verificar la inscripción")
+      setError(err.message || t("documentsPage.verifyError"))
     } finally {
       setLoading(false)
     }
@@ -58,14 +62,14 @@ const InscripcionDocumentosPage = () => {
 
   return (
     <CheckoutPageShell
-      title="Paso 3 · Expediente administrativo"
-      description="Documentos e información complementaria. No necesitas comprobante de pago de inscripción."
+      title={t("documentsPage.title")}
+      description={t("documentsPage.description")}
       backTo={ordenId ? `/inscripcion/completar?orden=${encodeURIComponent(ordenId)}` : "/diplomados"}
     >
       {!ordenFromUrl && !context && (
         <div className="mb-6 space-y-3">
           <label className="block text-sm font-medium text-black" htmlFor="orden-ref-doc">
-            Referencia de pago
+            {t("documentsPage.paymentReference")}
           </label>
           <input
             id="orden-ref-doc"
@@ -80,23 +84,23 @@ const InscripcionDocumentosPage = () => {
             disabled={loading}
             className="min-h-[48px] w-full rounded-full font-semibold text-white bg-blue disabled:opacity-60"
           >
-            {loading ? "Verificando…" : "Continuar"}
+            {loading ? t("completePage.verifyLoading") : t("common.continue")}
           </button>
         </div>
       )}
 
-      {loading && <p className="text-sm text-gray text-center py-8">Cargando…</p>}
+      {loading && <p className="text-sm text-gray text-center py-8">{t("common.loading")}</p>}
 
       {error && <p className="text-sm text-red mb-4">{error}</p>}
 
       {!loading && context && !context.parte1Completa && (
         <div className="rounded-2xl border border-yellow/30 bg-yellow/10 px-4 py-4 text-sm text-gray space-y-3">
-          <p>Primero debes crear tu cuenta (paso 2).</p>
+          <p>{t("documentsPage.firstCreateAccount")}</p>
           <Link
-            to={`/inscripcion/completar?orden=${encodeURIComponent(ordenId)}${accessToken ? `&t=${encodeURIComponent(accessToken)}` : ""}`}
+            to={localizedPath(`/inscripcion/completar?orden=${encodeURIComponent(ordenId)}${accessToken ? `&t=${encodeURIComponent(accessToken)}` : ""}`)}
             className="font-semibold text-blue underline"
           >
-            Ir al paso 2
+            {t("documentsPage.goStep2")}
           </Link>
         </div>
       )}
@@ -104,9 +108,9 @@ const InscripcionDocumentosPage = () => {
       {!loading && context?.parte1Completa && enviado && (
         <div className="text-center space-y-4 py-4">
           <div className="w-14 h-14 mx-auto rounded-full bg-green/20 flex items-center justify-center text-2xl text-green">✓</div>
-          <h2 className="text-lg font-bold text-blue">¡Expediente recibido!</h2>
+          <h2 className="text-lg font-bold text-blue">{t("documentsPage.receivedTitle")}</h2>
           <p className="text-sm text-gray leading-relaxed">
-            Tu inscripción está completa. Revisaremos tu información y te contactaremos por correo.
+            {t("documentsPage.receivedText")}
           </p>
           <a
             href={context.portalUrl || PORTAL_ALUMNOS_URL}
@@ -114,7 +118,7 @@ const InscripcionDocumentosPage = () => {
             target="_blank"
             rel="noopener noreferrer"
           >
-            Entrar al portal de alumnos
+            {t("documentsPage.enterPortal")}
           </a>
         </div>
       )}
@@ -133,13 +137,16 @@ const InscripcionDocumentosPage = () => {
   )
 }
 
-export const Head = () => (
-  <Seo
-    title="Paso 3 · Expediente administrativo"
-    description="Documentos e información complementaria. No necesitas comprobante de pago de inscripción."
-    pathname="/inscripcion/documentos"
-    robots="noindex,follow"
-  />
-)
+export const Head = ({ location }) => {
+  const t = getT(location.pathname, "checkout")
+  return (
+    <Seo
+      title={t("documentsPage.seoTitle")}
+      description={t("documentsPage.seoDescription")}
+      pathname={location.pathname}
+      robots="noindex,follow"
+    />
+  )
+}
 
 export default InscripcionDocumentosPage

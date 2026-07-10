@@ -1,9 +1,13 @@
 import * as React from "react"
 import { useState } from "react"
 import { Link } from "gatsby"
+import { useTranslation } from "react-i18next"
+import { useLocalization } from "../../i18n"
 import { createPublicCheckoutSession } from "../../utils/stripeCheckout"
 
 const BookCheckoutForm = ({ book, purchase = "physical", cancelHref, onCancel }) => {
+  const { t } = useTranslation("checkout")
+  const { language, localizedPath } = useLocalization()
   const [nombre, setNombre] = useState("")
   const [email, setEmail] = useState("")
   const [codigo, setCodigo] = useState("")
@@ -15,7 +19,9 @@ const BookCheckoutForm = ({ book, purchase = "physical", cancelHref, onCancel })
   const selectedSku = isDigital ? book.digital?.stripeSku : book.stripeSku
   const selectedPrice = isDigital ? book.digital?.priceMx : book.priceMx
   const digitalFormats = book.digital?.formats?.join(" + ")
-  const label = book.volume ? `Libro ${book.volume}` : "Paquete digital"
+  const label = book.volume
+    ? t("bookForm.bookLabel", { volume: book.volume })
+    : t("bookForm.bundleLabel")
 
   const handleBuy = async (e) => {
     e.preventDefault()
@@ -33,6 +39,7 @@ const BookCheckoutForm = ({ book, purchase = "physical", cancelHref, onCancel })
           nombre: nombre.trim(),
           email: email.trim(),
         },
+        language,
         ...(isDigital && codigo.trim() ? { codigo: codigo.trim() } : {}),
       })
       if (stripeTab && !stripeTab.closed) {
@@ -45,7 +52,7 @@ const BookCheckoutForm = ({ book, purchase = "physical", cancelHref, onCancel })
       }
     } catch (err) {
       if (stripeTab && !stripeTab.closed) stripeTab.close()
-      setError(err.message || "No se pudo iniciar el pago")
+      setError(err.message || t("bookForm.error"))
       setLoading(false)
     }
   }
@@ -54,7 +61,7 @@ const BookCheckoutForm = ({ book, purchase = "physical", cancelHref, onCancel })
     <form onSubmit={handleBuy} className="w-full text-left space-y-4">
       <p className="text-sm text-gray leading-relaxed">
         <span className="font-semibold text-blue">
-          {label} · {isDigital ? "Ebook" : "Impreso"}
+          {label} · {isDigital ? t("bookForm.ebook") : t("bookForm.printed")}
         </span>
         <br />
         {book.title}
@@ -64,8 +71,8 @@ const BookCheckoutForm = ({ book, purchase = "physical", cancelHref, onCancel })
           ${selectedPrice} MXN
           <span className="block text-xs font-normal text-gray mt-1">
             {isDigital
-              ? `Incluye ${digitalFormats}; descarga disponible después del pago.`
-              : "Más gastos de envío (se solicitarán en el pago)"}
+              ? t("bookForm.includesDownload", { formats: digitalFormats })
+              : t("bookForm.shipping")}
           </span>
         </p>
       )}
@@ -73,7 +80,7 @@ const BookCheckoutForm = ({ book, purchase = "physical", cancelHref, onCancel })
       <div className="space-y-3">
         <div>
           <label className="block text-sm font-medium text-black mb-1.5" htmlFor={`book-nombre-${book.id}`}>
-            Tu nombre
+            {t("bookForm.name")}
           </label>
           <input
             id={`book-nombre-${book.id}`}
@@ -87,7 +94,7 @@ const BookCheckoutForm = ({ book, purchase = "physical", cancelHref, onCancel })
         </div>
         <div>
           <label className="block text-sm font-medium text-black mb-1.5" htmlFor={`book-email-${book.id}`}>
-            Tu correo
+            {t("bookForm.email")}
           </label>
           <input
             id={`book-email-${book.id}`}
@@ -102,21 +109,21 @@ const BookCheckoutForm = ({ book, purchase = "physical", cancelHref, onCancel })
         {isDigital && (
           <div>
             <label className="block text-sm font-medium text-black mb-1.5" htmlFor={`book-codigo-${book.id}`}>
-              ¿Tienes un código de regalo? <span className="font-normal text-gray">(opcional)</span>
+              {t("bookForm.giftCode")} <span className="font-normal text-gray">{t("bookForm.optional")}</span>
             </label>
             <input
               id={`book-codigo-${book.id}`}
               type="text"
               value={codigo}
               onChange={(e) => setCodigo(e.target.value)}
-              placeholder="Escríbelo aquí"
+              placeholder={t("bookForm.placeholder")}
               className="w-full min-h-[48px] px-4 py-2.5 rounded-xl border border-gray/25 text-black text-base bg-white uppercase placeholder:normal-case placeholder:text-gray/60"
               autoComplete="off"
               autoCapitalize="characters"
               spellCheck={false}
             />
             <span className="block text-xs text-gray mt-1">
-              Aplica el descuento antes de pagar; lo verás reflejado en el pago seguro.
+              {t("bookForm.giftHint")}
             </span>
           </div>
         )}
@@ -130,9 +137,9 @@ const BookCheckoutForm = ({ book, purchase = "physical", cancelHref, onCancel })
 
       {checkoutUrl && (
         <p className="text-sm text-blue rounded-lg bg-blue/5 px-3 py-2 leading-relaxed">
-          Abrimos el pago seguro en una pestaña nueva. ¿No la ves?{" "}
+          {t("common.openPayment")}{" "}
           <a href={checkoutUrl} target="_blank" rel="noopener noreferrer" className="font-semibold underline">
-            Ábrela aquí
+            {t("common.openHere")}
           </a>
           .
         </p>
@@ -144,14 +151,14 @@ const BookCheckoutForm = ({ book, purchase = "physical", cancelHref, onCancel })
           disabled={loading}
           className="min-h-[48px] w-full rounded-full bg-green px-5 py-3 text-sm font-semibold text-white disabled:opacity-60"
         >
-          {loading ? "Redirigiendo..." : "Continuar al pago seguro"}
+          {loading ? t("common.redirecting") : t("bookForm.submit")}
         </button>
         {cancelHref ? (
           <Link
-            to={cancelHref}
+            to={localizedPath(cancelHref)}
             className="min-h-[48px] w-full inline-flex items-center justify-center rounded-full border border-blue/30 text-blue text-sm font-medium text-center"
           >
-            Cancelar
+            {t("common.cancel")}
           </Link>
         ) : onCancel ? (
           <button
@@ -159,7 +166,7 @@ const BookCheckoutForm = ({ book, purchase = "physical", cancelHref, onCancel })
             onClick={onCancel}
             className="min-h-[48px] w-full rounded-full border border-blue/30 text-blue text-sm font-medium"
           >
-            Cancelar
+            {t("common.cancel")}
           </button>
         ) : null}
       </div>

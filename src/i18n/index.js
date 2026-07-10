@@ -15,6 +15,7 @@ const NAMESPACES = [
   "directorio",
   "ia",
   "legal",
+  "checkout",
   "footer",
 ]
 

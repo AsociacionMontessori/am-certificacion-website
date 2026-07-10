@@ -1,5 +1,7 @@
 import * as React from "react"
 import { Link } from "gatsby"
+import { useTranslation } from "react-i18next"
+import { getT, useLocalization } from "../../i18n"
 import CheckoutPageShell from "../../components/checkout/CheckoutPageShell"
 import Seo from "../../components/seo"
 import DatosBancariosCard from "../../components/inscripcion/DatosBancariosCard"
@@ -8,14 +10,16 @@ import { useVisitorGeo } from "../../hooks/useVisitorGeo"
 import { INSCRIPCION_PRECIO } from "../../data/programasOferta"
 
 const InscripcionPagarPage = () => {
+  const { t } = useTranslation("checkout")
+  const { localizedPath } = useLocalization()
   const { esMexico } = useVisitorGeo()
   const coin = esMexico ? "MXN" : "USD"
   const price = esMexico ? `$${INSCRIPCION_PRECIO.priceMx}` : `$${INSCRIPCION_PRECIO.priceUsd}`
 
   return (
     <CheckoutPageShell
-      title="Aparta tu lugar"
-      description="Paga tu inscripción con tarjeta o hazlo por transferencia bancaria."
+      title={t("payPage.title")}
+      description={t("payPage.description")}
       backTo="/diplomados"
     >
       <ApartarInscripcionForm coin={coin} price={price} cancelHref="/diplomados" />
@@ -23,7 +27,7 @@ const InscripcionPagarPage = () => {
       <div className="my-6 flex items-center gap-3" aria-hidden="true">
         <span className="h-px flex-1 bg-gray/20" />
         <span className="text-xs font-medium uppercase tracking-wide text-gray">
-          o paga por transferencia
+          {t("payPage.transferDivider")}
         </span>
         <span className="h-px flex-1 bg-gray/20" />
       </div>
@@ -32,22 +36,22 @@ const InscripcionPagarPage = () => {
 
       <div className="mt-4 space-y-3">
         <Link
-          to="/inscripcion/transferencia"
+          to={localizedPath("/inscripcion/transferencia")}
           className="min-h-[48px] w-full inline-flex items-center justify-center px-6 py-3 rounded-full font-semibold text-white bg-blue"
         >
-          Ver instrucciones de transferencia
+          {t("payPage.transferInstructions")}
         </Link>
       </div>
 
       <p className="mt-6 text-xs text-gray text-center leading-relaxed">
-        ¿Ya pagaste por transferencia?{" "}
-        <Link to="/inscripcion/completar" className="text-blue underline font-medium">
-          Continuar al paso 2
+        {t("payPage.alreadyPaid")}{" "}
+        <Link to={localizedPath("/inscripcion/completar")} className="text-blue underline font-medium">
+          {t("payPage.continueStep2")}
         </Link>
       </p>
 
       <p className="mt-2 text-xs text-gray text-center leading-relaxed">
-        ¿Dudas? Escríbenos a{" "}
+        {t("common.contactQuestions")}{" "}
         <a href="mailto:admin@certificacionmontessori.com" className="text-blue underline font-medium">
           admin@certificacionmontessori.com
         </a>
@@ -56,13 +60,16 @@ const InscripcionPagarPage = () => {
   )
 }
 
-export const Head = () => (
-  <Seo
-    title="Aparta tu lugar"
-    description="Aparta tu lugar en los diplomados Montessori con tarjeta o por transferencia bancaria."
-    pathname="/inscripcion/pagar"
-    robots="noindex,follow"
-  />
-)
+export const Head = ({ location }) => {
+  const t = getT(location.pathname, "checkout")
+  return (
+    <Seo
+      title={t("payPage.seoTitle")}
+      description={t("payPage.seoDescription")}
+      pathname={location.pathname}
+      robots="noindex,follow"
+    />
+  )
+}
 
 export default InscripcionPagarPage

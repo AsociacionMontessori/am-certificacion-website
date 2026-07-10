@@ -414,7 +414,7 @@ const HomeMarketingHero = () => {
 
             <div className="flex flex-col sm:flex-row gap-3 pt-1">
               <Link
-                to="/inscripcion/pagar"
+                to={localizedPath("/inscripcion/pagar")}
                 className="min-h-[48px] inline-flex items-center justify-center px-8 py-3 rounded-full font-bold text-white bg-gradient-to-r from-blue to-green shadow-lg hover:scale-[1.02] transition-transform text-center"
               >
                 {t("hero.ctaInscribete")}

@@ -7,7 +7,7 @@ import { useLocalization } from "../i18n"
 
 function BookCard({ book }) {
   const { t } = useTranslation("publicaciones")
-  const { language } = useLocalization()
+  const { language, localizedPath } = useLocalization()
   const digitalFormats = book.digital?.formats?.join(" + ")
   const isGift = Boolean(book.gift)
   // Edición EN publicada en Amazon.com cuando existe (dictamen 2026-07-08)
@@ -78,7 +78,7 @@ function BookCard({ book }) {
         <div className="mt-5 flex flex-col gap-2">
           {book.digital?.enabled && book.digital?.priceMx && (
             <Link
-              to={`/checkout/libro?sku=${book.digital.stripeSku}`}
+              to={localizedPath(`/checkout/libro?sku=${book.digital.stripeSku}`)}
               className="inline-flex min-h-[48px] w-full items-center justify-center rounded-lg bg-green px-5 py-3 text-center text-sm font-semibold text-white transition duration-150 ease-in-out hover:bg-green/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow focus-visible:ring-offset-2"
             >
               {t("card.comprarEbook")}
@@ -101,6 +101,7 @@ function BookCard({ book }) {
 
 function BundleCard({ bundle }) {
   const { t } = useTranslation("publicaciones")
+  const { localizedPath } = useLocalization()
   const formats = bundle.formats?.join(" + ") || "PDF + EPUB"
   const count = bundle.bookIds?.length || 0
   const bundleTitle = t(`paquetes.${bundle.id}.titulo`, { defaultValue: bundle.title })
@@ -132,7 +133,7 @@ function BundleCard({ bundle }) {
           </p>
         </div>
         <Link
-          to={`/checkout/libro?sku=${bundle.stripeSku}`}
+          to={localizedPath(`/checkout/libro?sku=${bundle.stripeSku}`)}
           className="inline-flex min-h-[48px] items-center justify-center rounded-lg bg-green px-6 py-3 text-center text-sm font-semibold text-white transition hover:bg-green/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow focus-visible:ring-offset-2"
         >
           {t("bundle.comprar")}

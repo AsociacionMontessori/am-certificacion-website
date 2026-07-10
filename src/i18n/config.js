@@ -49,8 +49,8 @@ const LANGUAGES = {
 const LANGUAGE_CODES = Object.keys(LANGUAGES)
 
 // Páginas públicas que se localizan (rutas canónicas en español, con barra final).
-// Los flujos transaccionales (inscripción, checkout, certificados, masterclasses)
-// se quedan solo en español por ahora.
+// El flujo público de inscripción/checkout también se duplica para que Stripe
+// regrese al mismo idioma. Certificados y masterclasses siguen solo en español.
 const LOCALIZED_PATHS = [
   "/",
   "/diplomados/",
@@ -61,6 +61,13 @@ const LOCALIZED_PATHS = [
   "/reembolsos/",
   "/roxana/",
   "/ia/",
+  "/checkout/cancel/",
+  "/checkout/libro/",
+  "/checkout/success/",
+  "/inscripcion/completar/",
+  "/inscripcion/documentos/",
+  "/inscripcion/pagar/",
+  "/inscripcion/transferencia/",
 ]
 
 // Claves de almacenamiento en el navegador
@@ -88,12 +95,31 @@ const parsePath = pathname => {
   return { language: DEFAULT_LANGUAGE, originalPath: normalized }
 }
 
+const splitPathSuffix = pathname => {
+  const value = String(pathname || "/")
+  const queryIndex = value.indexOf("?")
+  const hashIndex = value.indexOf("#")
+  const suffixIndex =
+    queryIndex === -1 ? hashIndex : hashIndex === -1 ? queryIndex : Math.min(queryIndex, hashIndex)
+
+  if (suffixIndex === -1) {
+    return { path: value, suffix: "" }
+  }
+
+  return {
+    path: value.slice(0, suffixIndex) || "/",
+    suffix: value.slice(suffixIndex),
+  }
+}
+
 /** Ruta de una página (originalPath en español) en el idioma dado. */
 const localizePath = (language, originalPath) => {
-  const normalized = normalizePath(originalPath)
+  const { path, suffix } = splitPathSuffix(originalPath)
+  const normalized = normalizePath(path)
   const lang = LANGUAGES[language] || LANGUAGES[DEFAULT_LANGUAGE]
-  if (!lang.prefix) return normalized
-  return normalized === "/" ? `${lang.prefix}/` : `${lang.prefix}${normalized}`
+  if (!lang.prefix) return `${normalized}${suffix}`
+  const localized = normalized === "/" ? `${lang.prefix}/` : `${lang.prefix}${normalized}`
+  return `${localized}${suffix}`
 }
 
 const isLocalizedPath = originalPath =>
