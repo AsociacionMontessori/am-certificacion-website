@@ -12,6 +12,7 @@ import {
   TRUST_BADGES,
 } from "../../data/marketingPrograms"
 import { buildWhatsAppUrl } from "../../data/contactoWhatsApp"
+import { useLocalization } from "../../i18n"
 import { getLocalizedPrice, isMexico } from "../../utils/localizedPrice"
 
 // Fondo del hero (servido desde static/). Reemplaza la imagen anterior.
@@ -207,6 +208,7 @@ const ProgramAlbumCard = ({ programa, coin, useMxn }) => {
 
 const ProgramAlbumDeck = ({ coin, useMxn }) => {
   const { t } = useTranslation("home")
+  const { localizedPath } = useLocalization()
   const railRef = useRef(null)
 
   const scrollPrograms = (direction) => {
@@ -249,7 +251,7 @@ const ProgramAlbumDeck = ({ coin, useMxn }) => {
             →
           </button>
           <Link
-            to="/diplomados/#certificacion_internacional"
+            to={`${localizedPath("/diplomados/")}#certificacion_internacional`}
             className="min-h-[40px] rounded-lg bg-white px-3 py-2 text-sm font-bold text-blue transition hover:bg-white/90"
           >
             {t("catalogo.comparar")}
@@ -277,6 +279,7 @@ const ProgramAlbumDeck = ({ coin, useMxn }) => {
 
 const HomeMarketingHero = () => {
   const { t } = useTranslation("home")
+  const { localizedPath } = useLocalization()
   const [geo, setGeo] = useState({ countryCode: "MX", countryName: "Mexico" })
   const [decorOffset, setDecorOffset] = useState({ x: 0, y: 0 })
   const heroRef = useRef(null)
@@ -435,7 +438,7 @@ const HomeMarketingHero = () => {
               </a>
             </div>
             <Link
-              to="/diplomados"
+              to={localizedPath("/diplomados/")}
               className="inline-block text-sm text-white/90 underline underline-offset-4 hover:text-white"
             >
               {t("hero.verProgramas")}
