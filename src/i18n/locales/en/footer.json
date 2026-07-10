@@ -44,6 +44,7 @@
     "tiktokAlt": "TikTok"
   },
   "whatsapp": {
-    "solicitaInformes": "Request More Information"
+    "solicitaInformes": "Request More Information",
+    "mensajeInformes": "Hi, I would like more information about the Montessori certification."
   }
 }

@@ -4,10 +4,12 @@ import "./../styles/wa.css"
 import { Transition } from "@headlessui/react"
 import "../styles/fonts.css"
 import { useTranslation } from "react-i18next"
+import { buildWhatsAppUrl } from "../data/contactoWhatsApp"
 
 const Layout = ({ children }) => {
   const [showWABtn, setShowWABtn] = React.useState(false)
   const { t } = useTranslation("footer")
+  const whatsappInformesUrl = buildWhatsAppUrl(t("whatsapp.mensajeInformes"))
 
   return (
     <>
@@ -26,7 +28,7 @@ const Layout = ({ children }) => {
           </section>
 
           <div id="wa" className="wa__widget_container">
-            <a target="_blank" rel="noreferrer" href="https://api.whatsapp.com/send?phone=5215548885013&text=Hola,%20Me%20gustar%C3%ADa%20informaci%C3%B3n%20sobre%20la%20certificaci%C3%B3n%20Montessori." >
+            <a target="_blank" rel="noreferrer" href={whatsappInformesUrl} >
 
               <div className="wa__btn_popup" style={{ left: 'unset', right: '20px', bottom: '30px' }}>
                 <Transition

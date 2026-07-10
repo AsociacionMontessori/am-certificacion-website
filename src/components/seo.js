@@ -10,6 +10,7 @@ import {
   isLocalizedPath,
 } from "../i18n/config"
 import { getT } from "../i18n"
+import { buildWhatsAppUrl } from "../data/contactoWhatsApp"
 
 const normalizePathname = pathname => {
   if (!pathname || pathname === "/") return "/"
@@ -125,6 +126,7 @@ function Seo({
   // del provider de i18next, así que se resuelve el idioma desde el pathname).
   const tc = getT(normalizedPathname, "common")
   const countries = tc("schema.paises", { returnObjects: true })
+  const whatsappUrl = buildWhatsAppUrl(tc("schema.whatsappMensaje"))
   const areaServed = (Array.isArray(countries) ? countries : []).map(country => ({
     "@type": "Country",
     name: country,
@@ -164,7 +166,7 @@ function Seo({
         "@type": "ContactPoint",
         contactType: "WhatsApp support",
         telephone: metadata?.whatsappNumber,
-        url: metadata?.whatsappUrl,
+        url: whatsappUrl,
         description: tc("schema.whatsappHorario"),
         availableLanguage: ["es"],
       },

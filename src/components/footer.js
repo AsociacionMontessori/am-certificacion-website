@@ -2,10 +2,12 @@ import * as React from "react"
 import { StaticImage } from "gatsby-plugin-image"
 import { useTranslation } from "react-i18next"
 import { useLocalization } from "../i18n"
+import { buildWhatsAppUrl } from "../data/contactoWhatsApp"
 
 export default function Footer() {
     const { t } = useTranslation("footer")
     const { localizedPath } = useLocalization()
+    const whatsappInformesUrl = buildWhatsAppUrl(t("whatsapp.mensajeInformes"))
     return (
         <footer className="bg-gray-700 text-white pb-8 flex flex-col justify-center items-center max-w-full">
             <div className=" pl-0 lg:pl-20 xl:pl-10 2xl:pl-0 py-4 px-1 flex flex-col md:flex-row justify-start items-center w-full">
@@ -70,7 +72,7 @@ export default function Footer() {
                         <br />
                         <a href="tel:5555152701" target="_blank" rel="noopener noreferrer">{t("escuelas.telefono")}</a>
                         <br />
-                        <a href="https://api.whatsapp.com/send?phone=5215548885013&text=Hola,%20Me%20gustar%C3%ADa%20informaci%C3%B3n%20sobre%20la%20certificaci%C3%B3n%20Montessori." target="_blank" rel="noopener noreferrer">{t("escuelas.whatsapp")}</a>
+                        <a href={whatsappInformesUrl} target="_blank" rel="noopener noreferrer">{t("escuelas.whatsapp")}</a>
                         <br />
                         <span className="text-white/70">{t("escuelas.atencionChat")}</span>
                         <br />
