@@ -53,7 +53,7 @@ const FLAGS = {
 }
 
 /**
- * Selector de idioma de un clic con burbujas de bandera.
+ * Selector de idioma de un clic con bandera compacta y codigo de idioma.
  * Lleva a la misma página en el otro idioma y guarda la elección explícita:
  * a partir de ahí no se vuelve a auto-redirigir por idioma del navegador.
  */
@@ -80,13 +80,18 @@ export default function LanguageSelector({ textColor = "text-black", className =
             aria-label={lang.name}
             aria-current={isCurrent ? "true" : undefined}
             onClick={() => storeLanguageChoice(code)}
-            className={`block h-7 w-7 rounded-full overflow-hidden shadow-md transition-all duration-200 ${
+            className={`inline-flex h-8 items-center gap-1 rounded-full border px-1.5 shadow-md transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue focus-visible:ring-offset-2 ${
               isCurrent
-                ? "ring-2 ring-blue ring-offset-1 scale-110"
-                : "opacity-60 hover:opacity-100 hover:scale-110"
+                ? "border-blue bg-white text-blue ring-2 ring-blue ring-offset-1 scale-105"
+                : "border-white/60 bg-white/80 text-slate-700 opacity-85 hover:bg-white hover:text-blue hover:opacity-100 hover:scale-105"
             }`}
           >
-            <Flag />
+            <span className="h-3.5 w-3.5 flex-shrink-0 rounded-full overflow-hidden ring-1 ring-black/10">
+              <Flag />
+            </span>
+            <span className="text-[0.68rem] font-bold leading-none tracking-normal">
+              {lang.label}
+            </span>
           </Link>
         )
       })}
