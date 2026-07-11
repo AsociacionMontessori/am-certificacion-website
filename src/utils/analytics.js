@@ -61,15 +61,24 @@ const ALLOWED_CTA_POSITIONS = new Set([
   "program_questions",
 ])
 const ALLOWED_LEAD_CHANNELS = new Set(["whatsapp", "form", "stripe"])
+const ALLOWED_SOURCE_HOSTNAMES = new Set([
+  "montessorimexico.org",
+  "certificacionmontessori.com",
+])
+const TRUSTED_REFERRER_HOSTNAMES = new Set([
+  "montessorimexico.org",
+  "www.montessorimexico.org",
+])
 
-const PROGRAM_LANDING_PATHS = [
-  "/diplomados/",
-  "/diplomados/nido-comunidad-infantil/",
-  "/diplomados/casa-de-ninos/",
-  "/diplomados/taller-i-ii/",
-  "/diplomados/educacion-cosmica/",
-  "/diplomados/neuroeducacion/",
-]
+const INTENT_LANDING_PATHS = Object.freeze({
+  nido: "/diplomados/nido-comunidad-infantil/",
+  casa: "/diplomados/casa-de-ninos/",
+  taller: "/diplomados/taller-i-ii/",
+  cosmica: "/diplomados/educacion-cosmica/",
+  neuro: "/diplomados/neuroeducacion/",
+  general_training: "/diplomados/",
+})
+const PROGRAM_LANDING_PATHS = Object.values(INTENT_LANDING_PATHS)
 const LOCALIZED_STATIC_PATHS = new Set(
   [...new Set([...LOCALIZED_PATHS, ...PROGRAM_LANDING_PATHS])].flatMap(path =>
     LANGUAGE_CODES.map(language => localizePath(language, path))
@@ -81,20 +90,44 @@ const ALLOWED_LANDING_PATHS = new Set([
   "/certificate/",
   "/masterclasses/",
 ])
-const ATTRIBUTED_LANDING_PATHS = new Set(
-  PROGRAM_LANDING_PATHS.flatMap(path =>
-    LANGUAGE_CODES.map(language => localizePath(language, path))
-  )
-)
-
 const SAFE_TOKEN_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
 const EMAIL_PATTERN = /[a-z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-z0-9.-]+\.[a-z]{2,}/i
 const UUID_PATTERN =
   /(?:^|-)[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}(?:-|$)/i
 const ORDER_ID_PATTERN =
-  /(?:^|-)(?:order|orden|checkout|payment|pago|stripe|session|pi|cs)(?:-id)?-[a-z0-9]{6,}(?:-|$)/i
+  /(?:^|-)(?:transaction|transaccion|order|orden|pedido|checkout|payment|pago|stripe|session|pi|cs)(?:-id)?-[a-z0-9]{6,}(?:-|$)/i
 const ORDER_MARKER_PATTERN =
-  /(?:^|-)(?:order|orden|checkout|payment|pago|stripe|session)(?:-|$)/i
+  /(?:^|-)(?:transaction|transaccion|order|orden|pedido|checkout|payment|pago|stripe|session)(?:-|$)/i
+const LONG_HEX_SEGMENT_PATTERN = /(?:^|-)[0-9a-f]{12,}(?:-|$)/i
+const EDITORIAL_TWO_TOKEN_SIGNALS = new Set([
+  "ambiente",
+  "aprendizaje",
+  "autonomia",
+  "casa",
+  "cerebro",
+  "cosmica",
+  "crianza",
+  "cultura",
+  "desarrollo",
+  "educacion",
+  "escritura",
+  "formacion",
+  "guia",
+  "infancia",
+  "lenguaje",
+  "lectura",
+  "matematicas",
+  "materiales",
+  "montessori",
+  "neuroeducacion",
+  "nido",
+  "observacion",
+  "pedagogia",
+  "sensorial",
+  "taller",
+  "universo",
+  "vida",
+])
 const sessionDedupe = new Set()
 
 const cleanString = value => {
@@ -117,6 +150,7 @@ const validateSafeToken = (value, maxLength) => {
   if (
     EMAIL_PATTERN.test(clean) ||
     UUID_PATTERN.test(clean) ||
+    LONG_HEX_SEGMENT_PATTERN.test(clean) ||
     ORDER_ID_PATTERN.test(clean) ||
     (digitCount > 0 && ORDER_MARKER_PATTERN.test(clean)) ||
     digitCount >= 7
@@ -124,6 +158,42 @@ const validateSafeToken = (value, maxLength) => {
     return undefined
   }
   return clean
+}
+
+const validateEditorialSlug = value => {
+  const clean = validateSafeToken(value, 100)
+  if (!clean) return undefined
+  const tokens = clean.split("-")
+  if (
+    tokens.length === 2 &&
+    !tokens.some(token => EDITORIAL_TWO_TOKEN_SIGNALS.has(token))
+  ) {
+    return undefined
+  }
+  return clean
+}
+
+const hasTrustedReferrer = runtime => {
+  let referrer
+  try {
+    referrer = cleanString(runtime?.document?.referrer)
+  } catch (_error) {
+    return false
+  }
+  if (!referrer) return false
+
+  try {
+    const url = new URL(referrer)
+    const authority = referrer.slice(referrer.indexOf("://") + 3).split(/[/?#]/, 1)[0]
+    return (
+      url.protocol === "https:" &&
+      TRUSTED_REFERRER_HOSTNAMES.has(url.hostname) &&
+      url.origin === `https://${url.hostname}` &&
+      authority.toLowerCase() === url.hostname
+    )
+  } catch (_error) {
+    return false
+  }
 }
 
 const validateLandingPath = value => {
@@ -137,8 +207,8 @@ const PARAM_VALIDATORS = {
   language: value => validateClosedValue(value, ALLOWED_LANGUAGES),
   program_id: value => validateClosedValue(value, ALLOWED_PROGRAM_IDS),
   source_hostname: value =>
-    cleanString(value) === "montessorimexico.org" ? "montessorimexico.org" : undefined,
-  source_post_slug: value => validateSafeToken(value, 100),
+    validateClosedValue(value, ALLOWED_SOURCE_HOSTNAMES),
+  source_post_slug: validateEditorialSlug,
   landing_path: validateLandingPath,
   cta_position: value => validateClosedValue(value, ALLOWED_CTA_POSITIONS),
   lead_channel: value => validateClosedValue(value, ALLOWED_LEAD_CHANNELS),
@@ -178,7 +248,7 @@ const getAttribution = search => {
     return null
   }
 
-  const sourcePostSlug = validateSafeToken(params.get("utm_content"), 100)
+  const sourcePostSlug = validateEditorialSlug(params.get("utm_content"))
   const programId = validateClosedValue(params.get("utm_term"), ATTRIBUTION_PROGRAM_IDS)
   if (!sourcePostSlug || !programId) return null
 
@@ -194,10 +264,17 @@ const trackAttributedArrival = (location, target) => {
   if (!attribution) return false
 
   const landingPath = validateLandingPath(location?.pathname)
-  if (!landingPath || !ATTRIBUTED_LANDING_PATHS.has(landingPath)) return false
+  const intendedPath = INTENT_LANDING_PATHS[attribution.program_id]
+  if (
+    !landingPath ||
+    !intendedPath ||
+    !LANGUAGE_CODES.some(language => localizePath(language, intendedPath) === landingPath)
+  ) {
+    return false
+  }
 
   const runtime = getTarget(target)
-  if (!runtime) return false
+  if (!runtime || !hasTrustedReferrer(runtime)) return false
   const dedupeKey = [
     "ammac-cta-arrival",
     landingPath,
@@ -231,6 +308,7 @@ const trackAttributedArrival = (location, target) => {
 module.exports = {
   ALLOWED_EVENTS,
   ALLOWED_PARAMS,
+  INTENT_LANDING_PATHS,
   buildSafeParams,
   getAttribution,
   trackAttributedArrival,
