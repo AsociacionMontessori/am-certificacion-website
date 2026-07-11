@@ -90,10 +90,15 @@ module.exports = {
           // Flujos transaccionales (Stripe / inscripción): noindex en el <head>
           // y fuera del sitemap. Son pasos de conversión, no páginas de entrada;
           // indexarlos canibaliza las búsquedas de marca.
-          `/checkout`,
-          `/checkout/*`,
-          `/inscripcion`,
-          `/inscripcion/*`,
+          ...LANGUAGE_CODES.flatMap(code => {
+            const prefix = LANGUAGES[code].prefix
+            return [
+              `${prefix}/checkout`,
+              `${prefix}/checkout/*`,
+              `${prefix}/inscripcion`,
+              `${prefix}/inscripcion/*`,
+            ]
+          }),
           // EN/PT-BR fuera del sitemap mientras estén en noindex (pre-traducción);
           // en la Fase 5 (SEO) INDEX_TRANSLATIONS pasa a true y entran solos.
           ...(INDEX_TRANSLATIONS ? [] : [`/en/`, `/en/**`, `/pt-br/`, `/pt-br/**`]),

@@ -35,12 +35,22 @@
       },
       {
         "source": "/masterclasses",
-        "destination": "/diplomados",
+        "destination": "/diplomados/",
         "type": 301
       },
       {
         "source": "/masterclasses/**",
-        "destination": "/diplomados",
+        "destination": "/diplomados/",
+        "type": 301
+      },
+      {
+        "source": "/otroscursos",
+        "destination": "/diplomados/",
+        "type": 301
+      },
+      {
+        "source": "/otroscursos/**",
+        "destination": "/diplomados/",
         "type": 301
       }
     ],
