@@ -76,3 +76,6 @@ yarn-error.log
 .cache.root-owned/
 public.root-owned/
 .playwright-cli/
+
+# Isolated feature worktrees
+.worktrees/
