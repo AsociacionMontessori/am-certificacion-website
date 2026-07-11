@@ -7,7 +7,11 @@ const {
   trackEvent,
   trackPageView,
 } = require("../src/utils/analytics")
-const { LANGUAGE_CODES, LOCALIZED_PATHS, localizePath } = require("../src/i18n/config")
+const {
+  LANGUAGE_CODES,
+  LOCALIZED_PATHS,
+  localizePath,
+} = require("../src/i18n/config")
 
 const VALID_SOURCE_CONTENT_IDS = [
   "post_d95119f319861cea",
@@ -15,7 +19,10 @@ const VALID_SOURCE_CONTENT_IDS = [
 ]
 const opaqueId = suffix => `post_${suffix.toString(16).padStart(16, "0")}`
 
-const attributionSearch = (content = VALID_SOURCE_CONTENT_IDS[0], term = "casa") =>
+const attributionSearch = (
+  content = VALID_SOURCE_CONTENT_IDS[0],
+  term = "casa"
+) =>
   `?utm_source=montessorimexico.org&utm_medium=referral&utm_campaign=guia_montessori&utm_content=${content}&utm_term=${term}`
 
 const createStorage = () => ({
@@ -41,10 +48,112 @@ const createTarget = (overrides = {}) => {
         setItem: (key, value) => consentValues.set(key, value),
       },
       sessionStorage: createStorage(),
-      document: { referrer: "https://montessorimexico.org/articulo-editorial/" },
+      location: { pathname: "/contact/" },
+      document: {
+        referrer: "https://montessorimexico.org/articulo-editorial/",
+      },
       ...overrides,
     },
   }
+}
+
+{
+  const { calls, target } = createTarget({
+    location: {
+      origin: "https://attacker.example",
+      pathname: "/diplomados/casa-de-ninos/",
+      search: "?email=persona@example.com&order=cs_secret",
+      hash: "#access-token",
+    },
+    document: { referrer: "https://www.google.com.mx/" },
+  })
+  assert.strictEqual(
+    trackEvent(
+      "click_whatsapp",
+      {
+        language: "es",
+        page_path: "/privacy/",
+        page_location: "https://attacker.example/persona@example.com",
+        page_referrer: "https://attacker.example/order/cs_secret",
+      },
+      target
+    ),
+    true
+  )
+  assert.deepStrictEqual(calls[0][2], {
+    language: "es",
+    page_path: "/diplomados/casa-de-ninos/",
+    page_location:
+      "https://certificacionmontessori.com/diplomados/casa-de-ninos/",
+    page_referrer: "https://www.google.com.mx/",
+  })
+}
+
+{
+  const { calls, target } = createTarget({
+    location: { pathname: "/checkout/success/order-cs_secret/" },
+    document: { referrer: "https://www.google.com.mx/search?q=montessori" },
+  })
+  assert.strictEqual(trackEvent("click_whatsapp", {}, target), true)
+  assert.deepStrictEqual(calls[0][2], {
+    page_path: "/",
+    page_location: "https://certificacionmontessori.com/",
+    page_referrer: "https://www.google.com.mx/",
+  })
+}
+
+for (const referrer of [
+  "https://certificacionmontessori.com/",
+  "https://montessorimexico.org/",
+  "https://www.montessorimexico.org/",
+  "https://google.com/",
+  "https://www.google.com.mx/",
+  "https://www.google.es/",
+  "https://www.google.co.uk/",
+  "https://www.google.com.br/",
+  "https://www.google.pt/",
+  "https://www.bing.com/",
+  "https://chatgpt.com/",
+  "https://chat.openai.com/",
+  "https://copilot.microsoft.com/",
+  "https://www.perplexity.ai/",
+  "https://search.yahoo.com/",
+  "https://duckduckgo.com/",
+]) {
+  const { calls, target } = createTarget({ document: { referrer } })
+  assert.strictEqual(trackEvent("click_article", {}, target), true, referrer)
+  assert.strictEqual(calls[0][2].page_referrer, referrer, referrer)
+}
+
+for (const [referrer, expectedOrigin] of [
+  [
+    "https://montessorimexico.org/articulo/?email=x#token",
+    "https://montessorimexico.org/",
+  ],
+  [
+    "https://www.google.com.mx/search?q=montessori",
+    "https://www.google.com.mx/",
+  ],
+]) {
+  const { calls, target } = createTarget({ document: { referrer } })
+  assert.strictEqual(trackEvent("click_article", {}, target), true, referrer)
+  assert.strictEqual(calls[0][2].page_referrer, expectedOrigin, referrer)
+}
+
+for (const referrer of [
+  "http://www.google.com/",
+  "https://user@example.com@www.google.com/",
+  "https://www.google.com:443/",
+  "https://www.google.com.evil.example/",
+  "https://search.google.com/",
+]) {
+  const { calls, target } = createTarget({ document: { referrer } })
+  assert.strictEqual(trackEvent("click_article", {}, target), true, referrer)
+  assert.strictEqual(
+    calls[0][2].page_referrer,
+    "https://certificacionmontessori.com/",
+    referrer
+  )
 }
 
 assert.deepStrictEqual(
@@ -145,7 +254,9 @@ assert.deepStrictEqual(
 )
 
 for (const source_content_id of VALID_SOURCE_CONTENT_IDS) {
-  assert.deepStrictEqual(buildSafeParams({ source_content_id }), { source_content_id })
+  assert.deepStrictEqual(buildSafeParams({ source_content_id }), {
+    source_content_id,
+  })
 }
 
 assert.deepStrictEqual(
@@ -162,7 +273,11 @@ assert.deepStrictEqual(
     ),
     true
   )
-  assert.deepStrictEqual(calls[0][2], {})
+  assert.deepStrictEqual(calls[0][2], {
+    page_path: "/contact/",
+    page_location: "https://certificacionmontessori.com/contact/",
+    page_referrer: "https://montessorimexico.org/",
+  })
 }
 
 const rejectedValues = [
@@ -190,13 +305,23 @@ const rejectedValues = [
   ["landing_path", "/arbitrary/user-550e8400-e29b-41d4-a716-446655440000/"],
 ]
 for (const [key, value] of rejectedValues) {
-  assert.deepStrictEqual(buildSafeParams({ [key]: value }), {}, `${key}: ${value}`)
+  assert.deepStrictEqual(
+    buildSafeParams({ [key]: value }),
+    {},
+    `${key}: ${value}`
+  )
 
   if (key === "source_hostname" || key === "source_content_id") {
     const { calls, target } = createTarget()
-    assert.strictEqual(trackEvent("click_article", { [key]: value }, target), true)
+    assert.strictEqual(
+      trackEvent("click_article", { [key]: value }, target),
+      true
+    )
     assert.strictEqual(calls.length, 1)
-    assert(!Object.values(calls[0][2]).includes(value), `${key} leaked to gtag: ${value}`)
+    assert(
+      !Object.values(calls[0][2]).includes(value),
+      `${key} leaked to gtag: ${value}`
+    )
   }
 }
 
@@ -220,6 +345,9 @@ for (const [key, value] of rejectedValues) {
     source_content_id: VALID_SOURCE_CONTENT_IDS[1],
     landing_path: "/publicaciones/",
     cta_position: "article_card",
+    page_path: "/contact/",
+    page_location: "https://certificacionmontessori.com/contact/",
+    page_referrer: "https://montessorimexico.org/",
   })
 }
 
@@ -238,7 +366,8 @@ for (const programId of [
   "general_training",
 ]) {
   assert.strictEqual(
-    getAttribution(attributionSearch(VALID_SOURCE_CONTENT_IDS[1], programId)).program_id,
+    getAttribution(attributionSearch(VALID_SOURCE_CONTENT_IDS[1], programId))
+      .program_id,
     programId
   )
 }
@@ -307,7 +436,11 @@ for (const content of [
     false,
     content
   )
-  assert.strictEqual(calls.length, 0, `invalid content reached gtag: ${content}`)
+  assert.strictEqual(
+    calls.length,
+    0,
+    `invalid content reached gtag: ${content}`
+  )
 }
 
 {
@@ -376,7 +509,11 @@ let referrerCase = 300
 for (const [referrer, expected, label] of [
   ["", false, "missing referrer"],
   ["https://montessorimexico.org/observacion/", true, "canonical referrer"],
-  ["https://www.montessorimexico.org/observacion/", true, "redirecting www referrer"],
+  [
+    "https://www.montessorimexico.org/observacion/",
+    true,
+    "redirecting www referrer",
+  ],
   ["http://montessorimexico.org/observacion/", false, "insecure referrer"],
   ["https://montessorimexico.org.evil.example/", false, "suffix referrer"],
   ["https://user@montessorimexico.org/", false, "credential referrer"],
@@ -473,7 +610,7 @@ for (const [referrer, expected, label] of [
       throw new Error("gtag unavailable")
     },
     localStorage: {
-      getItem: key => key === "ammac-analytics-consent-v1" ? "granted" : null,
+      getItem: key => (key === "ammac-analytics-consent-v1" ? "granted" : null),
     },
     sessionStorage: createStorage(),
     document: { referrer: "https://montessorimexico.org/universo-y-vida/" },
@@ -503,10 +640,16 @@ for (const [referrer, expected, label] of [
     ),
     true
   )
-  assert.deepStrictEqual(calls.at(-1), ["event", "page_view", {
-    page_path: "/diplomados/casa-de-ninos/",
-    page_location: "https://certificacionmontessori.com/diplomados/casa-de-ninos/",
-  }])
+  assert.deepStrictEqual(calls.at(-1), [
+    "event",
+    "page_view",
+    {
+      page_path: "/diplomados/casa-de-ninos/",
+      page_location:
+        "https://certificacionmontessori.com/diplomados/casa-de-ninos/",
+      page_referrer: "https://montessorimexico.org/",
+    },
+  ])
 
   for (const pathname of [
     "https://attacker.example/diplomados/",
@@ -540,5 +683,8 @@ for (const [referrer, expected, label] of [
   assert.strictEqual(calls.length, 0)
 }
 
-assert.strictEqual(trackEvent("invented_event", {}, createTarget().target), false)
+assert.strictEqual(
+  trackEvent("invented_event", {}, createTarget().target),
+  false
+)
 console.log("analytics contract ok")

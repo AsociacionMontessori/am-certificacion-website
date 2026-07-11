@@ -3,6 +3,7 @@ const MEASUREMENT_ID = "G-P0CNEGW276"
 const SCRIPT_ID = "ammac-google-tag"
 const CONSENT_CHANGE_EVENT = "ammac:analytics-consent-change"
 const CONSENT_OPEN_EVENT = "ammac:analytics-consent-open"
+const { buildSafePageContext } = require("./analyticsPageContext")
 
 const memoryConsent = new WeakMap()
 const loaderStates = new WeakMap()
@@ -11,7 +12,8 @@ const getRuntime = target =>
   target || (typeof window !== "undefined" ? window : undefined)
 
 const isRuntime = runtime =>
-  (typeof runtime === "object" && runtime !== null) || typeof runtime === "function"
+  (typeof runtime === "object" && runtime !== null) ||
+  typeof runtime === "function"
 
 const isConsentState = value => value === "granted" || value === "denied"
 
@@ -47,9 +49,11 @@ const consentPayload = analyticsStorage => ({
 const ensureGtagQueue = runtime => {
   try {
     runtime.dataLayer = runtime.dataLayer || []
-    runtime.gtag = runtime.gtag || function gtag() {
-      runtime.dataLayer.push(arguments)
-    }
+    runtime.gtag =
+      runtime.gtag ||
+      function gtag() {
+        runtime.dataLayer.push(arguments)
+      }
     return typeof runtime.gtag === "function"
   } catch (_error) {
     return false
@@ -69,23 +73,47 @@ const queueGtag = (runtime, ...args) => {
 const getLoaderState = runtime => {
   let state = loaderStates.get(runtime)
   if (!state) {
-    state = { commandStage: 0, loaded: false, script: null }
+    state = {
+      defaultQueued: false,
+      grantedUpdateRequired: true,
+      jsQueued: false,
+      configQueued: false,
+      loaded: false,
+      script: null,
+      failedScripts: new WeakSet(),
+    }
     loaderStates.set(runtime, state)
   }
   return state
 }
 
 const queueInitialCommands = (runtime, state) => {
-  const commands = [
-    ["consent", "default", consentPayload("denied")],
-    ["consent", "update", consentPayload("granted")],
-    ["js", new Date()],
-    ["config", MEASUREMENT_ID, { send_page_view: false }],
-  ]
-
-  while (state.commandStage < commands.length) {
-    if (!queueGtag(runtime, ...commands[state.commandStage])) return false
-    state.commandStage += 1
+  if (!state.defaultQueued) {
+    if (!queueGtag(runtime, "consent", "default", consentPayload("denied"))) {
+      return false
+    }
+    state.defaultQueued = true
+  }
+  if (state.grantedUpdateRequired) {
+    if (!queueGtag(runtime, "consent", "update", consentPayload("granted"))) {
+      return false
+    }
+    state.grantedUpdateRequired = false
+  }
+  if (!state.jsQueued) {
+    if (!queueGtag(runtime, "js", new Date())) return false
+    state.jsQueued = true
+  }
+  if (!state.configQueued) {
+    if (
+      !queueGtag(runtime, "config", MEASUREMENT_ID, {
+        send_page_view: false,
+        ...buildSafePageContext(runtime),
+      })
+    ) {
+      return false
+    }
+    state.configQueued = true
   }
   return true
 }
@@ -98,11 +126,13 @@ const getDocument = runtime => {
   }
 }
 
-const findScript = document => {
+const findScript = (document, state) => {
   try {
-    return typeof document?.querySelector === "function"
-      ? document.querySelector(`#${SCRIPT_ID}`)
-      : null
+    const script =
+      typeof document?.querySelector === "function"
+        ? document.querySelector(`#${SCRIPT_ID}`)
+        : null
+    return script && !state.failedScripts.has(script) ? script : null
   } catch (_error) {
     return null
   }
@@ -116,11 +146,12 @@ const loadGoogleTag = target => {
   const state = getLoaderState(runtime)
   if (!queueInitialCommands(runtime, state)) return false
   if (state.loaded) return true
+  if (state.script && !state.failedScripts.has(state.script)) return true
 
   const document = getDocument(runtime)
   if (!document) return false
 
-  const existing = findScript(document)
+  const existing = findScript(document, state)
   if (existing) {
     state.script = existing
     return true
@@ -139,10 +170,12 @@ const loadGoogleTag = target => {
     script.async = true
     script.src = `https://www.googletagmanager.com/gtag/js?id=${MEASUREMENT_ID}`
     script.onload = () => {
+      if (state.failedScripts.has(script)) return
       state.loaded = true
       state.script = script
     }
     script.onerror = () => {
+      state.failedScripts.add(script)
       state.loaded = false
       if (state.script === script) state.script = null
       try {
@@ -199,9 +232,14 @@ const removeGoogleAnalyticsCookies = runtime => {
     return false
   }
 
-  const expiry = "Expires=Thu, 01 Jan 1970 00:00:00 GMT; Max-Age=0; Path=/; SameSite=Lax"
+  const expiry =
+    "Expires=Thu, 01 Jan 1970 00:00:00 GMT; Max-Age=0; Path=/; SameSite=Lax"
   for (const name of new Set(cookieNames)) {
-    for (const domain of ["", " Domain=certificacionmontessori.com;", " Domain=.certificacionmontessori.com;"]) {
+    for (const domain of [
+      "",
+      " Domain=certificacionmontessori.com;",
+      " Domain=.certificacionmontessori.com;",
+    ]) {
       try {
         document.cookie = `${name}=;${domain} ${expiry}`
       } catch (_error) {
@@ -231,14 +269,11 @@ const setAnalyticsConsent = (state, target) => {
 
   if (state === "granted") {
     const loaderState = getLoaderState(runtime)
-    if (loaderState.commandStage === 4) {
-      if (ensureGtagQueue(runtime)) {
-        queueGtag(runtime, "consent", "update", consentPayload("granted"))
-      }
-    }
     loadGoogleTag(runtime)
   } else if (previous === "granted") {
+    const loaderState = getLoaderState(runtime)
     queueGtag(runtime, "consent", "update", consentPayload("denied"))
+    loaderState.grantedUpdateRequired = true
     removeGoogleAnalyticsCookies(runtime)
   }
 

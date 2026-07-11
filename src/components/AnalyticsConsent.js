@@ -3,16 +3,22 @@ import { Link } from "gatsby"
 import { useTranslation } from "react-i18next"
 import { useLocalization } from "../i18n"
 const {
-  CONSENT_OPEN_EVENT,
   getAnalyticsConsent,
   setAnalyticsConsent,
 } = require("../utils/analyticsConsent")
 const { trackAttributedArrival, trackPageView } = require("../utils/analytics")
+const {
+  createAnalyticsConsentDomController,
+} = require("../utils/analyticsConsentDom")
 
 const AnalyticsConsent = () => {
   const { t } = useTranslation("common")
   const { localizedPath } = useLocalization()
   const declineButton = React.useRef(null)
+  const domController = React.useMemo(
+    () => createAnalyticsConsentDomController(),
+    []
+  )
   const [choice, setChoice] = React.useState("unknown")
   const [open, setOpen] = React.useState(false)
 
@@ -22,22 +28,20 @@ const AnalyticsConsent = () => {
     setOpen(current === "unknown")
 
     const reopen = () => {
+      domController.captureOpener()
       setChoice(getAnalyticsConsent())
       setOpen(true)
     }
-    window.addEventListener(CONSENT_OPEN_EVENT, reopen)
-    return () => window.removeEventListener(CONSENT_OPEN_EVENT, reopen)
-  }, [])
+    return domController.subscribeOpen(reopen)
+  }, [domController])
 
   React.useEffect(() => {
-    if (open) declineButton.current?.focus()
-  }, [open])
+    if (open) domController.focusEntry(declineButton.current)
+  }, [domController, open])
 
   React.useEffect(() => {
-    if (typeof document === "undefined") return undefined
-    document.body.classList.toggle("analytics-consent-open", open)
-    return () => document.body.classList.remove("analytics-consent-open")
-  }, [open])
+    return domController.setPanelOpen(open)
+  }, [domController, open])
 
   const choose = next => {
     if (!setAnalyticsConsent(next)) return
@@ -47,6 +51,7 @@ const AnalyticsConsent = () => {
       trackPageView(window.location)
       trackAttributedArrival(window.location)
     }
+    domController.restoreOpener()
   }
 
   if (!open) return null
@@ -61,7 +66,10 @@ const AnalyticsConsent = () => {
     >
       <div className="mx-auto flex max-w-6xl flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div className="max-w-3xl">
-          <h2 id="analytics-consent-title" className="text-base font-bold text-blue">
+          <h2
+            id="analytics-consent-title"
+            className="text-base font-bold text-blue"
+          >
             {t("analyticsConsent.title")}
           </h2>
           <p className="mt-1 text-sm leading-relaxed">

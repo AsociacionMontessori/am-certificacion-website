@@ -1,12 +1,9 @@
-const {
-  LANGUAGE_CODES,
-  LOCALIZED_PATHS,
-  localizePath,
-  normalizePath,
-} = require("../i18n/config")
+const { LANGUAGE_CODES, localizePath } = require("../i18n/config")
 const { isAnalyticsGranted } = require("./analyticsConsent")
-
-const SITE_ORIGIN = "https://certificacionmontessori.com"
+const {
+  buildSafePageContext,
+  validatePagePath,
+} = require("./analyticsPageContext")
 
 const ALLOWED_EVENTS = new Set([
   "click_article",
@@ -81,18 +78,6 @@ const INTENT_LANDING_PATHS = Object.freeze({
   neuro: "/diplomados/neuroeducacion/",
   general_training: "/diplomados/",
 })
-const PROGRAM_LANDING_PATHS = Object.values(INTENT_LANDING_PATHS)
-const LOCALIZED_STATIC_PATHS = new Set(
-  [...new Set([...LOCALIZED_PATHS, ...PROGRAM_LANDING_PATHS])].flatMap(path =>
-    LANGUAGE_CODES.map(language => localizePath(language, path))
-  )
-)
-const ALLOWED_LANDING_PATHS = new Set([
-  ...LOCALIZED_STATIC_PATHS,
-  "/404/",
-  "/certificate/",
-  "/masterclasses/",
-])
 const SAFE_TOKEN_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
 const EMAIL_PATTERN = /[a-z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-z0-9.-]+\.[a-z]{2,}/i
 const UUID_PATTERN =
@@ -136,7 +121,9 @@ const validateSafeToken = (value, maxLength) => {
 }
 
 const validateSourceContentId = value =>
-  typeof value === "string" && SOURCE_CONTENT_ID_PATTERN.test(value) ? value : undefined
+  typeof value === "string" && SOURCE_CONTENT_ID_PATTERN.test(value)
+    ? value
+    : undefined
 
 const hasTrustedReferrer = runtime => {
   let referrer
@@ -149,7 +136,9 @@ const hasTrustedReferrer = runtime => {
 
   try {
     const url = new URL(referrer)
-    const authority = referrer.slice(referrer.indexOf("://") + 3).split(/[/?#]/, 1)[0]
+    const authority = referrer
+      .slice(referrer.indexOf("://") + 3)
+      .split(/[/?#]/, 1)[0]
     return (
       url.protocol === "https:" &&
       TRUSTED_REFERRER_HOSTNAMES.has(url.hostname) &&
@@ -161,12 +150,7 @@ const hasTrustedReferrer = runtime => {
   }
 }
 
-const validateLandingPath = value => {
-  const clean = cleanString(value)
-  if (!clean || !clean.startsWith("/") || /[?#]/.test(clean)) return undefined
-  const normalized = normalizePath(clean)
-  return ALLOWED_LANDING_PATHS.has(normalized) ? normalized : undefined
-}
+const validateLandingPath = validatePagePath
 
 const PARAM_VALIDATORS = {
   language: value => validateClosedValue(value, ALLOWED_LANGUAGES),
@@ -197,7 +181,10 @@ const trackEvent = (eventName, params = {}, target) => {
   if (!runtime || !isAnalyticsGranted(runtime)) return false
   try {
     if (typeof runtime.gtag !== "function") return false
-    runtime.gtag("event", eventName, buildSafeParams(params))
+    runtime.gtag("event", eventName, {
+      ...buildSafeParams(params),
+      ...buildSafePageContext(runtime),
+    })
     return true
   } catch (_error) {
     return false
@@ -212,10 +199,7 @@ const trackPageView = (location, target) => {
 
   try {
     if (typeof runtime.gtag !== "function") return false
-    runtime.gtag("event", "page_view", {
-      page_path: pathname,
-      page_location: `${SITE_ORIGIN}${pathname}`,
-    })
+    runtime.gtag("event", "page_view", buildSafePageContext(runtime, pathname))
     return true
   } catch (_error) {
     return false
@@ -233,7 +217,10 @@ const getAttribution = search => {
   }
 
   const sourceContentId = validateSourceContentId(params.get("utm_content"))
-  const programId = validateClosedValue(params.get("utm_term"), ATTRIBUTION_PROGRAM_IDS)
+  const programId = validateClosedValue(
+    params.get("utm_term"),
+    ATTRIBUTION_PROGRAM_IDS
+  )
   if (!sourceContentId || !programId) return null
 
   return {
@@ -252,7 +239,9 @@ const trackAttributedArrival = (location, target) => {
   if (
     !landingPath ||
     !intendedPath ||
-    !LANGUAGE_CODES.some(language => localizePath(language, intendedPath) === landingPath)
+    !LANGUAGE_CODES.some(
+      language => localizePath(language, intendedPath) === landingPath
+    )
   ) {
     return false
   }

@@ -9,9 +9,17 @@
 - Revocation immediately queues a denied update when `gtag` exists, blocks later app events and page views, and best-effort removes first-party `_ga` and `_ga_*` cookies. Revocation is non-retroactive for processing already performed.
 - Regrant sends a new granted update without duplicating script or config. Script/network failures remain retryable.
 - If local storage is unavailable, the choice remains effective in memory for the current page session. A reload may ask again.
-- Event parameters are closed and page views use only a normalized allowlisted pathname plus the fixed origin `https://certificacionmontessori.com`; query strings, hashes, arbitrary origins, credentials, PII, order identifiers, and access tokens are excluded.
+- Event parameters are closed. GA config, every custom event, and every manual page view include only a normalized allowlisted pathname, the fixed page origin `https://certificacionmontessori.com`, and a safe referrer origin.
+- Invalid or missing runtime paths fall back to `/` for config and custom events; explicit invalid manual page-view paths fail closed. Page query strings, hashes, arbitrary origins, credentials, PII, order identifiers, and access tokens are excluded.
+- Referrers are accepted only over HTTPS on the closed funnel-source hostname allowlist and reduced to `https://hostname/`. Their path, query, and hash are discarded. HTTP, credentials, explicit ports, suffix-host attacks, and unlisted hosts fall back to `https://certificacionmontessori.com/`.
 
 ## Operator checks
+
+### Hard pre-production GA4 stream gate
+
+In the GA4 web stream, **Disable every Enhanced Measurement option**, especially page views on browser-history changes. `send_page_view: false` disables the automatic config page view but does not supersede Enhanced Measurement history settings.
+
+With every Enhanced Measurement option disabled, navigate each localized route in an intercepted clean browser context and verify exactly one app-controlled `page_view` per route. Do not release while GA4 or the application produces a duplicate route page view.
 
 Run from the Gatsby repository root:
 
@@ -43,6 +51,10 @@ The notice aligns the implementation with AMMAC as a private civil association, 
 - Google, Consent mode troubleshooting: https://developers.google.com/tag-platform/security/guides/consent-debugging
 - Google Analytics, Consent settings and parameters: https://support.google.com/analytics/answer/17016975
 - Google Analytics, privacy controls: https://support.google.com/analytics/answer/10000067
+- Google Analytics, config reference: https://developers.google.com/analytics/devguides/collection/ga4/reference/config
+- Google Analytics, page-view measurement: https://developers.google.com/analytics/devguides/collection/ga4/views
+- Google Analytics, Enhanced Measurement: https://support.google.com/analytics/answer/9216061
+- Google tag API reference: https://developers.google.com/tag-platform/gtagjs/reference
 
 ## Legal sources
 

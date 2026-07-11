@@ -681,6 +681,8 @@ git commit -m "feat(analytics): measure contact and enrollment intent"
 
 **Files:**
 - Create: `src/utils/analyticsConsent.js`
+- Create: `src/utils/analyticsPageContext.js`
+- Create: `src/utils/analyticsConsentDom.js`
 - Create: `src/components/AnalyticsConsent.js`
 - Create: `scripts/test-analytics-consent.js`
 - Create: `docs/SEO_ANALYTICS_OPERATIONS.md`
@@ -713,10 +715,16 @@ git commit -m "feat(analytics): measure contact and enrollment intent"
 - Revocation queues denied when `gtag` exists, blocks later app events, best-effort removes `_ga`/`_ga_*` cookies, and is documented as non-retroactive. A regrant sends a new granted update without duplicate script/config.
 - Throwing storage, DOM, gtag, CustomEvent, dispatch, cookies, and script insertion never break functional flows. Storage failure uses in-memory session consent; script failure is retryable without a false initialized marker.
 - No component calls `gtag` directly.
+- One shared `analyticsPageContext.js` boundary supplies `page_path`, `page_location`, and `page_referrer` to GA config, every allowed custom event, and manual `page_view` events. These internal fields are appended only after public caller parameters are validated and are not public allowlisted parameters.
+- Page context accepts only the existing closed normalized certification paths and fixed page origin. Invalid or missing runtime paths fall back to `/` for config/custom events; explicit invalid `trackPageView` paths fail closed.
+- Safe referrers accept only HTTPS URLs on the exact closed funnel hostname allowlist, discard path/query/hash to `https://hostname/`, and reject credentials, explicit ports, HTTP, suffix-host attacks, and unlisted hosts to the fixed certification fallback.
+- Partial initialization keeps default, granted-update, `js`, and config state separate. Revoke/regrant after a failed `js` or config queues a fresh granted update before unfinished initialization without duplicating successful one-time commands.
+- Known-failed canonical scripts are ignored even if both id reassignment and removal throw. Pending or loaded replacements do not duplicate.
+- Event subscription/removal, body-class toggling/removal, active-element capture, and focus calls use executable fail-safe helpers. Footer reopen captures its active element, entry focuses decline, and either choice restores the opener.
 
 - [ ] **Step 1: Write the failing lifecycle and privacy-boundary tests**
 
-Create `scripts/test-analytics-consent.js` before production code. It must assert unknown/deny/grant/revoke/regrant, v2 payloads and command order, one config/script, script-error retry, in-memory consent, throwing DOM/gtag/events, cookie cleanup, no eager plugin, Gatsby/UI wiring, all locale records, legal review status, operations sources, and this binding Task 3.
+Create `scripts/test-analytics-consent.js` before production code. It must assert unknown/deny/grant/revoke/regrant, v2 payloads and command order, safe config context before script append, failures at both `js` and config followed by revoke/regrant, one successful default/`js`/config, dual-failure script cleanup retry, pending replacement deduplication, in-memory consent, executable throwing/absent event/body/focus helpers, opener focus restoration, cookie cleanup, no eager plugin, Gatsby/UI wiring, Article 30 rectification details in every locale, legal review status, operations sources, and this binding Task 3.
 
 Extend `scripts/test-analytics.js` before changing `src/utils/analytics.js`:
 
@@ -736,6 +744,8 @@ assert.strictEqual(trackEvent("click_whatsapp", {}, deniedTarget), false)
 assert.strictEqual(trackPageView({ pathname: "/contact/" }, throwingStorageTarget), false)
 ```
 
+Also assert that every allowed custom event receives non-overridable internal `page_path`, `page_location`, and `page_referrer`; invalid runtime paths fall back to `/`; manual page views include the same safe context; page context never exposes caller URL material; exact allowlisted HTTPS referrers such as `https://montessorimexico.org/articulo/?email=x#token` and `https://www.google.com.mx/search?q=montessori` reduce to their fixed origins; and HTTP, credentials, explicit ports, suffix-host attacks, and unlisted hosts use the certification fallback.
+
 Run:
 
 ```bash
@@ -747,7 +757,7 @@ Expected RED: missing `../src/utils/analyticsConsent`, then `trackPageView is no
 
 - [ ] **Step 2: Implement retryable Basic Consent Mode and analytics gating**
 
-Use `ammac-analytics-consent-v1`, `G-P0CNEGW276`, script id `ammac-google-tag`, and events `ammac:analytics-consent-change` / `ammac:analytics-consent-open`. Keep memory and loader state per runtime. Advance one-time command state only after each successful call; an `onerror` removes the failed script and permits later insertion.
+Use `ammac-analytics-consent-v1`, `G-P0CNEGW276`, script id `ammac-google-tag`, and events `ammac:analytics-consent-change` / `ammac:analytics-consent-open`. Keep memory and loader state per runtime. Advance each one-time command marker only after its successful call; track whether a fresh granted update is required independently. Mark failed script objects in memory so cleanup failure cannot block retry.
 
 The first-grant sequence is binding:
 
@@ -756,7 +766,12 @@ The first-grant sequence is binding:
   ["consent", "default", consentPayload("denied")],
   ["consent", "update", consentPayload("granted")],
   ["js", new Date()],
-  ["config", "G-P0CNEGW276", { send_page_view: false }],
+  ["config", "G-P0CNEGW276", {
+    send_page_view: false,
+    page_path: safePath,
+    page_location: safeLocation,
+    page_referrer: safeReferrer,
+  }],
 ]
 ```
 
@@ -785,7 +800,7 @@ Add complete `analyticsConsent` records to ES/EN/PT-BR `common.json`. Declining 
 
 For ES/EN/PT-BR, visibly render last updated 11 July 2026, controller identity and full metadata address, current private-sector `Ley Federal de Protección de Datos Personales en Posesión de los Particulares` (DOF 20-03-2025; latest reform 14-11-2025), required versus optional purposes, GA4 ID/provider/categories, local-storage key, non-retroactive revocation, GA cookie cleanup limitation, and exclusion of names, email, phones, messages, postal addresses, order IDs, and access tokens.
 
-ARCO text must provide `admin@certificacionmontessori.com` and office intake, summarize only the request information required by current law, state a 20 days decision period plus implementation within the following 15 days, and one justified equal extension. Publish changes at the same localized privacy URL. Render Google's policy with `target="_blank" rel="noopener noreferrer"`.
+ARCO text must provide `admin@certificacionmontessori.com` and office intake, summarize only the request information required by current law, identify requested changes and supporting documentation for rectification, state a 20 days decision period plus implementation within the following 15 days, and one justified equal extension. Publish changes at the same localized privacy URL. Render Google's policy with `target="_blank" rel="noopener noreferrer"`.
 
 Create `docs/i18n/PRIVACY_REVIEW_2026-07-11.md` with exactly ES, EN, and PT-BR at `pending_owner_review`. Never record legal approval. Production stays blocked pending AMMAC privacy-owner approval.
 
@@ -800,7 +815,13 @@ https://support.google.com/analytics/answer/17016975
 https://www.diputados.gob.mx/LeyesBiblio/pdf/LFPDPPP.pdf
 https://www.dof.gob.mx/nota_detalle.php?codigo=5752569&fecha=20/03/2025
 https://www.gov.br/anpd/pt-br/centrais-de-conteudo/materiais-educativos-e-publicacoes/guia_orientativo_cookies_e_protecao_de_dados_pessoais
+https://developers.google.com/analytics/devguides/collection/ga4/reference/config
+https://developers.google.com/analytics/devguides/collection/ga4/views
+https://support.google.com/analytics/answer/9216061
+https://developers.google.com/tag-platform/gtagjs/reference
 ```
+
+Before production, disable every GA4 Enhanced Measurement option for the web stream, especially browser-history page views, and verify exactly one app-controlled `page_view` per route.
 
 - [ ] **Step 6: Verify GREEN and rendered behavior without live analytics**
 
@@ -818,7 +839,7 @@ npm run build
 git diff --check
 ```
 
-Use Playwright CLI against the local Gatsby server. Before navigation, route and abort every request to `googletagmanager.com`, `google-analytics.com`, `analytics.google.com`, and `region1.google-analytics.com`; record attempted URLs without sending them. Verify unknown -> zero, decline -> zero, denied reload -> zero, footer reopen, grant -> one tag-script attempt, revoke -> later events blocked, regrant behavior, keyboard focus, console health, and no clipping/overlap at desktop and mobile widths. While open, verify `#wa` is not visible, interactive, keyboard reachable, or exposed in the accessibility tree; verify it returns after each choice. Store screenshots and temporary scripts outside tracked source.
+Use Playwright CLI against the local Gatsby server. Before navigation, route and abort every request to `googletagmanager.com`, `google-analytics.com`, `analytics.google.com`, and `region1.google-analytics.com`; record attempted URLs without sending them. Record evidence for panel open/close, body class, computed WhatsApp visibility, interaction, accessible role/name, decline focus entry, opener focus restoration after both choices, ES/EN/PT-BR, desktop/mobile layout, console health, and safe queued GA config/custom/page-view context. Verify unknown -> zero, decline -> zero, denied reload -> zero, footer reopen, grant -> one tag-script attempt, revoke -> later events blocked, and regrant behavior. While open, verify `#wa` is not visible, interactive, keyboard reachable, or exposed in the accessibility tree; verify it returns after each choice. Store screenshots and temporary scripts outside tracked source.
 
 Run secret/PII scans over the diff, verify `.superpowers` remains untracked, and do not deploy or read `.env`.
 
@@ -826,7 +847,8 @@ Run secret/PII scans over the diff, verify `.superpowers` remains untracked, and
 
 ```bash
 git add gatsby-browser.js gatsby-config.js package.json package-lock.json \
-  src/utils/analytics.js src/utils/analyticsConsent.js \
+  src/utils/analytics.js src/utils/analyticsConsent.js src/utils/analyticsPageContext.js \
+  src/utils/analyticsConsentDom.js src/styles/wa.css \
   src/components/AnalyticsConsent.js src/components/layout.js src/components/footer.js \
   src/pages/privacy.js src/i18n/locales/es/common.json src/i18n/locales/en/common.json \
   src/i18n/locales/pt-br/common.json src/i18n/locales/es/legal.json \
