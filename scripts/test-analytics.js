@@ -5,6 +5,7 @@ const {
   INTENT_LANDING_PATHS,
   trackAttributedArrival,
   trackEvent,
+  trackPageView,
 } = require("../src/utils/analytics")
 const { LANGUAGE_CODES, LOCALIZED_PATHS, localizePath } = require("../src/i18n/config")
 
@@ -29,10 +30,16 @@ const createStorage = () => ({
 
 const createTarget = (overrides = {}) => {
   const calls = []
+  const consentValues = new Map([["ammac-analytics-consent-v1", "granted"]])
   return {
     calls,
+    consentValues,
     target: {
       gtag: (...args) => calls.push(args),
+      localStorage: {
+        getItem: key => consentValues.get(key) || null,
+        setItem: (key, value) => consentValues.set(key, value),
+      },
       sessionStorage: createStorage(),
       document: { referrer: "https://montessorimexico.org/articulo-editorial/" },
       ...overrides,
@@ -465,6 +472,9 @@ for (const [referrer, expected, label] of [
       attempts += 1
       throw new Error("gtag unavailable")
     },
+    localStorage: {
+      getItem: key => key === "ammac-analytics-consent-v1" ? "granted" : null,
+    },
     sessionStorage: createStorage(),
     document: { referrer: "https://montessorimexico.org/universo-y-vida/" },
   }
@@ -477,6 +487,57 @@ for (const [referrer, expected, label] of [
   assert.strictEqual(attempts, 2)
   assert.strictEqual(trackEvent("click_whatsapp", {}, target), false)
   assert.strictEqual(attempts, 3)
+}
+
+{
+  const { calls, consentValues, target } = createTarget()
+  assert.strictEqual(
+    trackPageView(
+      {
+        origin: "https://attacker.example",
+        pathname: "/diplomados/casa-de-ninos/",
+        search: "?email=persona@example.com&order=cs_secret",
+        hash: "#access-token",
+      },
+      target
+    ),
+    true
+  )
+  assert.deepStrictEqual(calls.at(-1), ["event", "page_view", {
+    page_path: "/diplomados/casa-de-ninos/",
+    page_location: "https://certificacionmontessori.com/diplomados/casa-de-ninos/",
+  }])
+
+  for (const pathname of [
+    "https://attacker.example/diplomados/",
+    "//attacker.example/diplomados/",
+    "/arbitrary/persona@example.com/",
+    "/checkout/success/?order=cs_secret",
+    "/checkout/success/#access-token",
+    "/checkout/success/cs_live_secret/",
+  ]) {
+    assert.strictEqual(trackPageView({ pathname }, target), false, pathname)
+  }
+
+  consentValues.set("ammac-analytics-consent-v1", "denied")
+  assert.strictEqual(trackEvent("click_whatsapp", {}, target), false)
+  assert.strictEqual(trackPageView({ pathname: "/contact/" }, target), false)
+  consentValues.delete("ammac-analytics-consent-v1")
+  assert.strictEqual(trackEvent("click_whatsapp", {}, target), false)
+  assert.strictEqual(trackPageView({ pathname: "/contact/" }, target), false)
+}
+
+{
+  const { calls, target } = createTarget({
+    localStorage: {
+      getItem() {
+        throw new Error("storage unavailable")
+      },
+    },
+  })
+  assert.strictEqual(trackEvent("click_whatsapp", {}, target), false)
+  assert.strictEqual(trackPageView({ pathname: "/contact/" }, target), false)
+  assert.strictEqual(calls.length, 0)
 }
 
 assert.strictEqual(trackEvent("invented_event", {}, createTarget().target), false)

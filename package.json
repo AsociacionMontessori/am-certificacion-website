@@ -10,7 +10,6 @@
     "axios": "^1.4.0",
     "d3-fetch": "^3.0.1",
     "gatsby": "^5.16.1",
-    "gatsby-plugin-google-gtag": "^5.16.0",
     "gatsby-plugin-image": "^3.16.0",
     "gatsby-plugin-manifest": "^5.16.0",
     "gatsby-plugin-sharp": "^5.16.0",
@@ -57,7 +56,8 @@
     "deploy:preview": "npm run build && npx firebase hosting:channel:deploy preview",
     "firebase:init": "npx firebase init hosting",
     "firebase:login": "npx firebase login",
-    "firebase:use": "npx firebase use certificacionmontessori"
+    "firebase:use": "npx firebase use certificacionmontessori",
+    "test:analytics-consent": "node scripts/test-analytics-consent.js"
   },
   "repository": {
     "type": "git",

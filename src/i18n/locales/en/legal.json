@@ -2,38 +2,51 @@
   "privacy": {
     "seo": {
       "title": "Privacy Notice",
-      "description": "Privacy notice of the Asociación Montessori de México A.C. (AMMAC) governing the use of certificacionmontessori.com."
+      "description": "Privacy notice of Asociación Montessori de México A.C. (AMMAC) governing the use of certificacionmontessori.com."
     },
     "intro": {
       "titulo": "<rojo>Your Privacy</rojo> Matters<rojo>!</rojo>",
-      "p1": "<blanco>At the Asociación Montessori de México A.C., </blanco>we care about our users' privacy, and we are committed to protecting the personal information you provide to us. Please review our privacy notice and the terms and conditions of use of our website."
+      "p1": "<blanco>At Asociación Montessori de México A.C., </blanco>we protect the personal data you provide and explain here how we process it."
     },
     "titulo": "Privacy Notice",
+    "actualizacion": "Last updated: 11 July 2026.",
+    "responsable": {
+      "titulo": "Data controller",
+      "p1": "Asociación Montessori de México A.C. (AMMAC), a private civil association, is the controller of personal data. Its address is Avenida Dos 48, San Pedro de los Pinos, Benito Juárez, 03800 Ciudad de México, CDMX, México."
+    },
     "fundamento": {
-      "titulo": "Legal basis for the processing of personal data",
-      "p1": "Articles 6, Section A, subsections II and III, and 16, second paragraph, of the Political Constitution of the United Mexican States; and Articles 3 (Section XXXIII), 16, 17, 18, 19, 20, 21, 22, 23, 26, 27, 28, 48, 49, 51, 52, and 86 of the Ley General de Protección de Datos Personales en Posesión de Sujetos Obligados (LGPDPPSO, Mexico's general law on the protection of personal data held by regulated entities);"
+      "titulo": "Legal basis for processing personal data",
+      "p1": "This notice is governed by the Ley Federal de Protección de Datos Personales en Posesión de los Particulares (Mexico's federal law on personal data held by private parties), published in the DOF on 20-03-2025 and last reformed on 14-11-2025, and other provisions applicable to private controllers."
     },
     "recopilamos": {
       "titulo": "What information do we collect?",
-      "p1": "For statistical analysis and to improve the user experience, the Asociación Montessori reserves the right to collect and process the following data. Information provided voluntarily: personal information submitted through forms on the Site, such as your name, email address, telephone number, and postal address, as well as additional information such as your interests and preferences. Automatic information: when you use the site https://certificacionmontessori.com/, data about your device and your use of the Site may be collected automatically, such as your IP address, the type of browser you use, the pages of the Site you visit, and the dates and times of access, as well as information about your browsing habits and preferences through the use of cookies and other tracking technologies."
+      "p1": "When you request information, enroll, make a payment, or contact us, we may process the data you provide, such as your name, email address, telephone number, message, postal address, and necessary academic or administrative data. Stripe processes payment-method data; AMMAC does not store full card numbers. Optional analytics is described separately."
     },
     "uso": {
-      "titulo": "Use of Information",
-      "p1": "The information collected through the Site is used to provide and improve our services, as well as to carry out the following activities. Providing information about products and services: the information collected is used to send you information about products and services, with the option to unsubscribe from this service at any time. Your experience on the Site is also personalized according to your interests and preferences. Marketing communications: if you have subscribed to our mailing list or otherwise given your consent, the information collected is used to send marketing and promotional communications. You are always offered the option to opt out of receiving these communications. Site analysis and improvement: the information collected is used to analyze and improve the performance of the Site and the services offered. Troubleshooting: information is collected in order to resolve issues and address any questions or concerns that may arise."
+      "titulo": "Purposes of processing",
+      "p1": "Required purposes are responding to requests and contact, managing enrollment and programs, processing and reconciling payments, delivering publications or services, maintaining records, providing support, and meeting legal obligations. These operations do not depend on allowing analytics. Promotional communications and Google Analytics are optional purposes and require the applicable consent."
+    },
+    "analytics": {
+      "titulo": "Optional analytics and your choice",
+      "p1": "Google Analytics (GA4, measurement G-P0CNEGW276) loads only when you choose Allow analytics. Google acts as the provider and may process technical and usage information such as pages visited, date and time, browser, device, referrer, and approximate location.",
+      "p2": "Your choice is stored in browser local storage under ammac-analytics-consent-v1. You may decline, revoke, or allow it again at any time through Privacy preferences in the site footer. Declining or revoking does not limit programs, forms, payments, or contact. Revocation blocks later events and attempts to remove first-party GA cookies, but it is not retroactive regarding processing already performed.",
+      "exclusiones": "AMMAC does not send names, email addresses, telephone numbers, messages, postal addresses, order identifiers, or access tokens to GA4.",
+      "proveedor": "Read Google's privacy policy.",
+      "proveedorUrl": "https://policies.google.com/privacy"
     },
     "compartimos": {
       "titulo": "When do we share information?",
-      "p1": "Entities belonging to the Asociación Montessori de México A.C. (AMMAC): the information collected may be shared with entities belonging to AMMAC in order to provide services and improve the user experience. The Asociación Montessori shares information with third parties only in the following circumstances. With our service providers: we may share information with third parties that provide services to us, such as payment processors (for example, <strong>Stripe</strong>, for online payments of enrollment fees and publications) and analytics service providers.",
-      "nota": "Note: all third parties with whom we share information are required to comply with applicable data privacy and security laws. We do not allow our service providers to use your personal information for their own purposes, and we only allow them to process your personal information for specific purposes and in accordance with our instructions.",
-      "p2": "For legal purposes: we may share information if we believe in good faith that doing so is necessary to comply with the law or to protect our rights or those of third parties. In the event of a merger or acquisition: if we sell or acquire a company or assets, we may share information with the buyer or seller."
+      "p1": "We may share strictly necessary data with providers acting for AMMAC, such as <strong>Stripe</strong> for payments and Google for analytics only after consent, and with authorities when legally required.",
+      "nota": "Providers must process data for specific purposes and under applicable privacy and security measures.",
+      "p2": "We do not sell personal data. Any additional transfer will follow applicable law and, where required, the corresponding consent."
     },
     "modificaciones": {
       "titulo": "Changes to this Privacy Notice",
-      "p1": "This privacy notice may be modified or updated from time to time. Any updates or modifications will be made available to the public, and the data subject may consult them on the website https://certificacionmontessori.com/, in the Privacy Notice section. Data subjects are advised and expected to review this Privacy Notice at least every six months in order to stay informed of its terms and conditions."
+      "p1": "Changes or updates to this notice will be published at this same URL: https://certificacionmontessori.com/en/privacy/. The visible last-updated date identifies the current version."
     },
     "arco": {
-      "titulo": "Exercising your ARCO rights (Access, Rectification, Cancellation, and Objection to the use of your personal data)",
-      "p1": "You have the right to know what personal data we hold about you, what we use it for, and the conditions under which we use it (Access). You also have the right to request the correction of your personal information if it is outdated, inaccurate, or incomplete (Rectification); to request that we delete it from our records or databases when you consider that it is not being used appropriately (Cancellation); and to object to the use of your personal data for specific purposes (Objection). These are known as the ARCO rights under Mexican data protection law. To exercise your rights of access, rectification, cancellation, and objection (ARCO rights), you may visit the offices of the Asociación Montessori at Av. Dos 48, San Pedro de los Pinos, Benito Juárez, 03800 Mexico City, Mexico. The decision reached will be communicated to you within a maximum of 30 business days from the date the request was received so that, if it is granted, it can be carried out within the following fifteen business days after the response is communicated. You may revoke any consent you have given us for the processing of your personal data. However, please bear in mind that we will not be able to grant every request or end the processing immediately in all cases, since a legal obligation may require us to continue processing your personal data. You should also consider that, for certain purposes, revoking your consent will mean that we can no longer provide the online service you requested, or that your relationship with us will come to an end."
+      "titulo": "ARCO rights, revocation, and limitation",
+      "p1": "You may request access, rectification, cancellation, or objection (ARCO rights), revoke consent, or limit use of your data by sending your request to admin@certificacionmontessori.com or filing it at Avenida Dos 48, San Pedro de los Pinos, Benito Juárez, 03800 Ciudad de México, CDMX, México. State your name and a contact method, documents proving identity or representation when applicable, a clear description of the right you wish to exercise, and data or details that help locate the information. AMMAC will communicate its decision within no more than 20 days after receipt and, if granted, will implement it within the following 15 days. Each period may be extended once for an equal period when justified."
     }
   },
   "reembolsos": {

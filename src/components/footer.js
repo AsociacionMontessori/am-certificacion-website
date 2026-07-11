@@ -4,9 +4,11 @@ import { useTranslation } from "react-i18next"
 import { useLocalization } from "../i18n"
 import { buildWhatsAppUrl } from "../data/contactoWhatsApp"
 import TrackedActionLink from "./TrackedActionLink"
+import { openAnalyticsConsent } from "../utils/analyticsConsent"
 
 export default function Footer() {
     const { t } = useTranslation("footer")
+    const { t: tc } = useTranslation("common")
     const { language, localizedPath } = useLocalization()
     const whatsappInformesUrl = buildWhatsAppUrl(t("whatsapp.mensajeInformes"))
     return (
@@ -63,7 +65,14 @@ export default function Footer() {
                         <a className="hover:underline decoration-red" href="https://drive.google.com/file/d/1XaVbYjwltjMJjcjvCuqdhKIAFvxjecOJ/view" target="_blank" rel="noopener noreferrer">{t("legal.constanciaSeguridad")}</a>
                         <br />
                         <a className="hover:underline decoration-red" href='https://drive.google.com/file/d/1mE54tJUcoFfaX4mJQjaD7slE_ESlPY-r/view' target='_blank' rel="noopener noreferrer">{t("legal.vistoBuenoSeguridad")}</a>
-
+                        <br />
+                        <button
+                            type="button"
+                            onClick={() => openAnalyticsConsent()}
+                            className="mt-2 underline decoration-red focus:outline-none focus:ring-2 focus:ring-red"
+                        >
+                            {tc("analyticsConsent.settings")}
+                        </button>
                     </div>
                     <div className="text-center md:text-left m-4 md:m-0">
                         <h3 className="text-lg font-semibold mb-2">{t("escuelas.titulo")}</h3>

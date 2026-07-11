@@ -692,473 +692,145 @@ git commit -m "feat(analytics): measure contact and enrollment intent"
 - Modify: `src/components/layout.js`
 - Modify: `src/components/footer.js`
 - Modify: `src/pages/privacy.js`
-- Modify: `src/i18n/locales/es/common.json`
-- Modify: `src/i18n/locales/en/common.json`
-- Modify: `src/i18n/locales/pt-br/common.json`
-- Modify: `src/i18n/locales/es/legal.json`
-- Modify: `src/i18n/locales/en/legal.json`
-- Modify: `src/i18n/locales/pt-br/legal.json`
+- Modify: `src/i18n/locales/{es,en,pt-br}/common.json`
+- Modify: `src/i18n/locales/{es,en,pt-br}/legal.json`
 - Modify: `package.json`
 - Modify: `package-lock.json`
+- Modify: `docs/superpowers/plans/2026-07-11-analytics-indexnow-foundation.md`
+- Verify: `scripts/test-analytics-instrumentation.js`
 
 **Interfaces:**
-- Produces `getAnalyticsConsent(target?) -> "unknown" | "granted" | "denied"`.
-- Produces `setAnalyticsConsent(state, target?) -> boolean`, `initializeAnalyticsConsent(target?) -> boolean` and `openAnalyticsConsent(target?) -> boolean`.
-- Uses basic Consent Mode: no Google tag request occurs before `granted`.
-- A denial is reversible from the footer and never blocks a functional flow.
+- Produce `getAnalyticsConsent(target?) -> "unknown" | "granted" | "denied"`.
+- Produce `setAnalyticsConsent(state, target?) -> boolean`, `initializeAnalyticsConsent(target?) -> boolean`, `openAnalyticsConsent(target?) -> boolean`, and `isAnalyticsGranted(target?) -> boolean`.
+- Produce `trackPageView(location, target?) -> boolean` using only a closed normalized certification pathname and `https://certificacionmontessori.com`.
+- Keep all A1/A2 event, attribution, payment, and navigation contracts unchanged.
 
-- [ ] **Step 1: Write the failing consent lifecycle test**
+**Binding contract:**
+- Use Basic Consent Mode globally. Unknown and fresh denial create no Google queue, tag script, request, event, or page view.
+- First grant queues exactly: consent default denied, consent update with analytics granted, `js`, then `config` with `send_page_view: false`; append the script only afterward.
+- Keep `ad_storage`, `ad_user_data`, and `ad_personalization` denied. Only `analytics_storage` may be granted.
+- Revocation queues denied when `gtag` exists, blocks later app events, best-effort removes `_ga`/`_ga_*` cookies, and is documented as non-retroactive. A regrant sends a new granted update without duplicate script/config.
+- Throwing storage, DOM, gtag, CustomEvent, dispatch, cookies, and script insertion never break functional flows. Storage failure uses in-memory session consent; script failure is retryable without a false initialized marker.
+- No component calls `gtag` directly.
+
+- [ ] **Step 1: Write the failing lifecycle and privacy-boundary tests**
+
+Create `scripts/test-analytics-consent.js` before production code. It must assert unknown/deny/grant/revoke/regrant, v2 payloads and command order, one config/script, script-error retry, in-memory consent, throwing DOM/gtag/events, cookie cleanup, no eager plugin, Gatsby/UI wiring, all locale records, legal review status, operations sources, and this binding Task 3.
+
+Extend `scripts/test-analytics.js` before changing `src/utils/analytics.js`:
 
 ```javascript
-// scripts/test-analytics-consent.js
-const assert = require("assert")
-const {
-  CONSENT_KEY,
-  getAnalyticsConsent,
-  initializeAnalyticsConsent,
-  setAnalyticsConsent,
-} = require("../src/utils/analyticsConsent")
-
-const values = new Map()
-const scripts = []
-const dispatched = []
-const target = {
-  dataLayer: [],
-  localStorage: {
-    getItem: key => values.get(key) || null,
-    setItem: (key, value) => values.set(key, value),
-  },
-  document: {
-    querySelector: selector => scripts.find(script => `#${script.id}` === selector) || null,
-    createElement: tagName => ({ tagName }),
-    head: { appendChild: script => scripts.push(script) },
-  },
-  CustomEvent: class CustomEvent {
-    constructor(type, options) { this.type = type; this.detail = options.detail }
-  },
-  dispatchEvent: event => dispatched.push(event),
-}
-
-assert.strictEqual(getAnalyticsConsent(target), "unknown")
-assert.strictEqual(initializeAnalyticsConsent(target), false)
-assert.strictEqual(scripts.length, 0)
-
-assert.strictEqual(setAnalyticsConsent("denied", target), true)
-assert.strictEqual(values.get(CONSENT_KEY), "denied")
-assert.strictEqual(scripts.length, 0)
-
-assert.strictEqual(setAnalyticsConsent("granted", target), true)
-assert.strictEqual(getAnalyticsConsent(target), "granted")
-assert.strictEqual(scripts.length, 1)
-assert.strictEqual(scripts[0].src, "https://www.googletagmanager.com/gtag/js?id=G-P0CNEGW276")
-
-const commands = target.dataLayer.map(args => Array.from(args))
-const defaultConsent = commands.find(args => args[0] === "consent" && args[1] === "default")
-const grantedConsent = commands.find(args => args[0] === "consent" && args[1] === "update")
-assert.strictEqual(defaultConsent[2].analytics_storage, "denied")
-assert.strictEqual(grantedConsent[2].analytics_storage, "granted")
-assert.strictEqual(grantedConsent[2].ad_storage, "denied")
-assert(commands.some(args => args[0] === "config" && args[1] === "G-P0CNEGW276"))
-
-initializeAnalyticsConsent(target)
-assert.strictEqual(scripts.length, 1)
-setAnalyticsConsent("denied", target)
-assert.strictEqual(getAnalyticsConsent(target), "denied")
-assert.strictEqual(dispatched.at(-1).detail.state, "denied")
-console.log("analytics consent contract ok")
+assert.strictEqual(trackPageView({
+  origin: "https://attacker.example",
+  pathname: "/diplomados/casa-de-ninos/",
+  search: "?email=persona@example.com&order=cs_secret",
+  hash: "#access-token",
+}, grantedTarget), true)
+assert.deepStrictEqual(calls.at(-1)[2], {
+  page_path: "/diplomados/casa-de-ninos/",
+  page_location: "https://certificacionmontessori.com/diplomados/casa-de-ninos/",
+})
+assert.strictEqual(trackPageView({ pathname: "/checkout/success/?order=cs_secret" }, grantedTarget), false)
+assert.strictEqual(trackEvent("click_whatsapp", {}, deniedTarget), false)
+assert.strictEqual(trackPageView({ pathname: "/contact/" }, throwingStorageTarget), false)
 ```
 
-- [ ] **Step 2: Verify the missing module failure**
+Run:
 
 ```bash
 node scripts/test-analytics-consent.js
+node scripts/test-analytics.js
 ```
 
-Expected: missing `analyticsConsent` module.
+Expected RED: missing `../src/utils/analyticsConsent`, then `trackPageView is not a function`; after core implementation, the consent test remains RED until UI/docs exist.
 
-- [ ] **Step 3: Implement the basic Consent Mode loader**
+- [ ] **Step 2: Implement retryable Basic Consent Mode and analytics gating**
+
+Use `ammac-analytics-consent-v1`, `G-P0CNEGW276`, script id `ammac-google-tag`, and events `ammac:analytics-consent-change` / `ammac:analytics-consent-open`. Keep memory and loader state per runtime. Advance one-time command state only after each successful call; an `onerror` removes the failed script and permits later insertion.
+
+The first-grant sequence is binding:
 
 ```javascript
-// src/utils/analyticsConsent.js
-const CONSENT_KEY = "ammac-analytics-consent-v1"
-const MEASUREMENT_ID = "G-P0CNEGW276"
-const SCRIPT_ID = "ammac-google-tag"
-const CONSENT_CHANGE_EVENT = "ammac:analytics-consent-change"
-const CONSENT_OPEN_EVENT = "ammac:analytics-consent-open"
+[
+  ["consent", "default", consentPayload("denied")],
+  ["consent", "update", consentPayload("granted")],
+  ["js", new Date()],
+  ["config", "G-P0CNEGW276", { send_page_view: false }],
+]
+```
 
-const getRuntime = target => target || (typeof window !== "undefined" ? window : undefined)
+Gate `trackEvent`, `trackAttributedArrival` through `trackEvent`, and `trackPageView` with `isAnalyticsGranted`. Implement page views as:
 
-const getAnalyticsConsent = target => {
-  const runtime = getRuntime(target)
-  try {
-    const value = runtime?.localStorage?.getItem(CONSENT_KEY)
-    return value === "granted" || value === "denied" ? value : "unknown"
-  } catch {
-    return "unknown"
-  }
-}
-
-const isAnalyticsGranted = target => getAnalyticsConsent(target) === "granted"
-
-const ensureGtagQueue = runtime => {
-  runtime.dataLayer = runtime.dataLayer || []
-  runtime.gtag = runtime.gtag || function gtag() { runtime.dataLayer.push(arguments) }
-}
-
-const consentPayload = analyticsStorage => ({
-  ad_storage: "denied",
-  ad_user_data: "denied",
-  ad_personalization: "denied",
-  analytics_storage: analyticsStorage,
+```javascript
+const pathname = validateLandingPath(location?.pathname)
+if (!pathname) return false
+runtime.gtag("event", "page_view", {
+  page_path: pathname,
+  page_location: `https://certificacionmontessori.com${pathname}`,
 })
-
-const loadGoogleTag = target => {
-  const runtime = getRuntime(target)
-  if (!runtime?.document || !isAnalyticsGranted(runtime)) return false
-  if (runtime.__ammacGoogleTagInitialized) return true
-
-  ensureGtagQueue(runtime)
-  runtime.gtag("consent", "default", consentPayload("denied"))
-  runtime.gtag("consent", "update", consentPayload("granted"))
-  runtime.gtag("js", new Date())
-  runtime.gtag("config", MEASUREMENT_ID, { send_page_view: false })
-
-  if (!runtime.document.querySelector(`#${SCRIPT_ID}`)) {
-    const script = runtime.document.createElement("script")
-    script.id = SCRIPT_ID
-    script.async = true
-    script.src = `https://www.googletagmanager.com/gtag/js?id=${MEASUREMENT_ID}`
-    runtime.document.head.appendChild(script)
-  }
-  runtime.__ammacGoogleTagInitialized = true
-  return true
-}
-
-const dispatch = (runtime, type, detail = {}) => {
-  if (typeof runtime?.dispatchEvent !== "function" || typeof runtime?.CustomEvent !== "function") {
-    return false
-  }
-  runtime.dispatchEvent(new runtime.CustomEvent(type, { detail }))
-  return true
-}
-
-const setAnalyticsConsent = (state, target) => {
-  if (state !== "granted" && state !== "denied") return false
-  const runtime = getRuntime(target)
-  if (!runtime?.localStorage) return false
-  try {
-    runtime.localStorage.setItem(CONSENT_KEY, state)
-  } catch {
-    return false
-  }
-  if (state === "granted") {
-    loadGoogleTag(runtime)
-  } else if (typeof runtime.gtag === "function") {
-    runtime.gtag("consent", "update", consentPayload("denied"))
-  }
-  dispatch(runtime, CONSENT_CHANGE_EVENT, { state })
-  return true
-}
-
-const initializeAnalyticsConsent = target =>
-  isAnalyticsGranted(target) ? loadGoogleTag(target) : false
-
-const openAnalyticsConsent = target =>
-  dispatch(getRuntime(target), CONSENT_OPEN_EVENT)
-
-module.exports = {
-  CONSENT_CHANGE_EVENT,
-  CONSENT_KEY,
-  CONSENT_OPEN_EVENT,
-  getAnalyticsConsent,
-  initializeAnalyticsConsent,
-  isAnalyticsGranted,
-  loadGoogleTag,
-  openAnalyticsConsent,
-  setAnalyticsConsent,
-}
 ```
 
-- [ ] **Step 4: Remove eager gtag injection and gate all events**
+Remove `gatsby-plugin-google-gtag` from config, package, and lock. Do not replace it with SSR or eager injection.
 
-Run:
+- [ ] **Step 3: Wire Gatsby and reversible localized UI**
 
-```bash
-npm uninstall gatsby-plugin-google-gtag
+Call `initializeAnalyticsConsent()` before browser-language redirect and call `trackPageView(location)` before attributed-arrival tracking on route updates. Render one `<AnalyticsConsent />` outside layout content. The banner must be non-modal, keyboard accessible, focus-visible, responsive, and provide equally functional decline/allow buttons. The footer preference button must reopen after either choice; revoke and later regrant must work. Only analytics utilities may queue events.
+
+Add complete `analyticsConsent` records to ES/EN/PT-BR `common.json`. Declining must not block links, programs, forms, payments, or contact.
+
+- [ ] **Step 4: Correct and render all privacy notices**
+
+For ES/EN/PT-BR, visibly render last updated 11 July 2026, controller identity and full metadata address, current private-sector `Ley Federal de Protección de Datos Personales en Posesión de los Particulares` (DOF 20-03-2025; latest reform 14-11-2025), required versus optional purposes, GA4 ID/provider/categories, local-storage key, non-retroactive revocation, GA cookie cleanup limitation, and exclusion of names, email, phones, messages, postal addresses, order IDs, and access tokens.
+
+ARCO text must provide `admin@certificacionmontessori.com` and office intake, summarize only the request information required by current law, state a 20 days decision period plus implementation within the following 15 days, and one justified equal extension. Publish changes at the same localized privacy URL. Render Google's policy with `target="_blank" rel="noopener noreferrer"`.
+
+Create `docs/i18n/PRIVACY_REVIEW_2026-07-11.md` with exactly ES, EN, and PT-BR at `pending_owner_review`. Never record legal approval. Production stays blocked pending AMMAC privacy-owner approval.
+
+- [ ] **Step 5: Add operations and package contract**
+
+Add `test:analytics-consent` and document lifecycle, troubleshooting, query/hash/PII boundary, non-retroactive revocation, cookie cleanup, clean-profile QA, and release gate. Cite:
+
+```text
+https://developers.google.com/tag-platform/security/concepts/consent-mode
+https://developers.google.com/tag-platform/security/guides/consent
+https://support.google.com/analytics/answer/17016975
+https://www.diputados.gob.mx/LeyesBiblio/pdf/LFPDPPP.pdf
+https://www.dof.gob.mx/nota_detalle.php?codigo=5752569&fecha=20/03/2025
+https://www.gov.br/anpd/pt-br/centrais-de-conteudo/materiais-educativos-e-publicacoes/guia_orientativo_cookies_e_protecao_de_dados_pessoais
 ```
 
-Remove the complete `gatsby-plugin-google-gtag` block from `gatsby-config.js`. In `src/utils/analytics.js`, import:
-
-```javascript
-const { isAnalyticsGranted } = require("./analyticsConsent")
-```
-
-After resolving `runtime` in `trackEvent`, add:
-
-```javascript
-if (!isAnalyticsGranted(runtime)) return false
-```
-
-Add this internal SPA page-view function and export it:
-
-```javascript
-const trackPageView = (location, target) => {
-  const runtime = getTarget(target)
-  if (!runtime || typeof runtime.gtag !== "function" || !isAnalyticsGranted(runtime)) return false
-  const pathname = String(location?.pathname || "/")
-  const origin = String(location?.origin || runtime.location?.origin || "https://certificacionmontessori.com")
-  runtime.gtag("event", "page_view", {
-    page_path: pathname,
-    page_location: `${origin}${pathname}`,
-  })
-  return true
-}
-```
-
-Update the target in `scripts/test-analytics.js` with this separate store and import `trackPageView`:
-
-```javascript
-const consentValues = new Map([["ammac-analytics-consent-v1", "granted"]])
-target.localStorage = {
-  getItem: key => consentValues.get(key) || null,
-  setItem: (key, value) => consentValues.set(key, value),
-}
-```
-
-After the attributed-arrival dedupe assertions, add:
-
-```javascript
-assert.strictEqual(
-  trackPageView({ origin: "https://certificacionmontessori.com", pathname: "/diplomados/casa-de-ninos/" }, target),
-  true
-)
-assert.strictEqual(calls.at(-1)[1], "page_view")
-assert.strictEqual(calls.at(-1)[2].page_location, "https://certificacionmontessori.com/diplomados/casa-de-ninos/")
-consentValues.set("ammac-analytics-consent-v1", "denied")
-assert.strictEqual(trackEvent("click_whatsapp", {}, target), false)
-assert.strictEqual(trackPageView({ pathname: "/contact/" }, target), false)
-```
-
-- [ ] **Step 5: Initialize on Gatsby navigation and add a reversible localized banner**
-
-In `gatsby-browser.js`, add these CommonJS imports and call `initializeAnalyticsConsent()` in `onClientEntry` before the language redirect:
-
-```javascript
-const { initializeAnalyticsConsent } = require("./src/utils/analyticsConsent")
-const { trackAttributedArrival, trackPageView } = require("./src/utils/analytics")
-```
-
-```javascript
-export const onClientEntry = () => {
-  initializeAnalyticsConsent()
-  maybeRedirectToBrowserLanguage()
-}
-```
-
-Replace `onRouteUpdate` with:
-
-```javascript
-export const onRouteUpdate = ({ location }) => {
-  trackPageView(location)
-  trackAttributedArrival(location)
-}
-```
-
-Create:
-
-```javascript
-// src/components/AnalyticsConsent.js
-import * as React from "react"
-import { Link } from "gatsby"
-import { useTranslation } from "react-i18next"
-import { useLocalization } from "../i18n"
-const {
-  CONSENT_OPEN_EVENT,
-  getAnalyticsConsent,
-  setAnalyticsConsent,
-} = require("../utils/analyticsConsent")
-const { trackAttributedArrival, trackPageView } = require("../utils/analytics")
-
-const AnalyticsConsent = () => {
-  const { t } = useTranslation("common")
-  const { localizedPath } = useLocalization()
-  const [choice, setChoice] = React.useState("unknown")
-  const [open, setOpen] = React.useState(false)
-
-  React.useEffect(() => {
-    const current = getAnalyticsConsent()
-    setChoice(current)
-    setOpen(current === "unknown")
-    const reopen = () => setOpen(true)
-    window.addEventListener(CONSENT_OPEN_EVENT, reopen)
-    return () => window.removeEventListener(CONSENT_OPEN_EVENT, reopen)
-  }, [])
-
-  const choose = next => {
-    if (!setAnalyticsConsent(next)) return
-    setChoice(next)
-    setOpen(false)
-    if (next === "granted") {
-      trackPageView(window.location)
-      trackAttributedArrival(window.location)
-    }
-  }
-
-  if (!open) return null
-  return (
-    <aside
-      role="dialog"
-      aria-modal="false"
-      aria-labelledby="analytics-consent-title"
-      className="fixed inset-x-0 bottom-0 z-50 border-t border-blue/20 bg-white px-5 py-4 shadow-2xl"
-      data-consent-state={choice}
-    >
-      <div className="mx-auto flex max-w-6xl flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <div className="max-w-3xl">
-          <h2 id="analytics-consent-title" className="text-base font-bold text-blue">
-            {t("analyticsConsent.title")}
-          </h2>
-          <p className="mt-1 text-sm leading-relaxed text-gray">
-            {t("analyticsConsent.body")} {" "}
-            <Link to={localizedPath("/privacy/")} className="font-semibold text-blue underline">
-              {t("analyticsConsent.privacy")}
-            </Link>
-          </p>
-        </div>
-        <div className="grid shrink-0 grid-cols-2 gap-2">
-          <button type="button" onClick={() => choose("denied")} className="min-h-[44px] border border-blue px-4 py-2 font-semibold text-blue">
-            {t("analyticsConsent.reject")}
-          </button>
-          <button type="button" onClick={() => choose("granted")} className="min-h-[44px] bg-blue px-4 py-2 font-semibold text-white">
-            {t("analyticsConsent.accept")}
-          </button>
-        </div>
-      </div>
-    </aside>
-  )
-}
-
-export default AnalyticsConsent
-```
-
-Render `<AnalyticsConsent />` once in `Layout`, outside the content `<main>`. In `Footer`, add `const { t: tc } = useTranslation("common")`, import `openAnalyticsConsent`, and place this button in the existing Legal column:
-
-```jsx
-<button
-  type="button"
-  onClick={() => openAnalyticsConsent()}
-  className="mt-2 text-left underline decoration-red"
->
-  {tc("analyticsConsent.settings")}
-</button>
-```
-
-Merge these localized keys into `common.json`:
-
-```json
-// es
-"analyticsConsent": {
-  "title": "Privacidad y analítica",
-  "body": "Usamos Google Analytics solo si lo aceptas para entender qué contenido resulta útil. Tu decisión no limita el sitio.",
-  "privacy": "Aviso de privacidad",
-  "reject": "No aceptar",
-  "accept": "Aceptar analítica",
-  "settings": "Preferencias de privacidad"
-}
-```
-
-Add a visible `privacy.analytics` section after `privacy.uso` in `src/pages/privacy.js`. Merge these records into each `legal.json`:
-
-```json
-// es
-"analytics": {
-  "titulo": "Analítica opcional y tu elección",
-  "p1": "Google Analytics (medición G-P0CNEGW276) se carga únicamente cuando eliges Aceptar analítica. Puede procesar información técnica y de uso, como páginas visitadas, fecha y hora, navegador, dispositivo, referencia y ubicación aproximada. AMMAC no envía a GA4 nombres, correos, teléfonos, mensajes, direcciones ni identificadores de orden.",
-  "p2": "La elección se conserva en el almacenamiento local del navegador con la clave ammac-analytics-consent-v1. Puedes cambiarla en cualquier momento desde Preferencias de privacidad en el pie del sitio; rechazar o revocar no limita los programas, formularios, pagos ni contacto.",
-  "proveedor": "Consulta la política de privacidad de Google.",
-  "proveedorUrl": "https://policies.google.com/privacy"
-}
-```
-
-```json
-// en
-"analytics": {
-  "titulo": "Optional analytics and your choice",
-  "p1": "Google Analytics (measurement G-P0CNEGW276) loads only when you choose Allow analytics. It may process technical and usage information such as pages visited, date and time, browser, device, referrer, and approximate location. AMMAC does not send names, email addresses, telephone numbers, messages, addresses, or order identifiers to GA4.",
-  "p2": "Your choice is stored in browser local storage under ammac-analytics-consent-v1. You can change it at any time through Privacy preferences in the site footer; declining or revoking does not limit programs, forms, payments, or contact.",
-  "proveedor": "Read Google's privacy policy.",
-  "proveedorUrl": "https://policies.google.com/privacy"
-}
-```
-
-```json
-// pt-br
-"analytics": {
-  "titulo": "Análise opcional e sua escolha",
-  "p1": "O Google Analytics (medição G-P0CNEGW276) é carregado somente quando você escolhe Aceitar análise. Ele pode tratar informações técnicas e de uso, como páginas visitadas, data e hora, navegador, dispositivo, referência e localização aproximada. A AMMAC não envia ao GA4 nomes, e-mails, telefones, mensagens, endereços nem identificadores de pedido.",
-  "p2": "Sua escolha é armazenada no armazenamento local do navegador com a chave ammac-analytics-consent-v1. Você pode alterá-la a qualquer momento em Preferências de privacidade no rodapé; recusar ou revogar não limita programas, formulários, pagamentos nem contato.",
-  "proveedor": "Consulte a política de privacidade do Google.",
-  "proveedorUrl": "https://policies.google.com/privacy"
-}
-```
-
-Render the provider URL with `target="_blank"` and `rel="noopener noreferrer"`. Correct the existing malformed Spanish modifications URL from `https://www.https://certificacionmontessori.com/` to `https://certificacionmontessori.com/`. Record a new last-updated date in all three notices. Create `docs/i18n/PRIVACY_REVIEW_2026-07-11.md` with one row for `es`, `en` and `pt-BR`, the reviewer name/date and status; production requires all three statuses to be `approved` by AMMAC's privacy owner.
-
-```json
-// en
-"analyticsConsent": {
-  "title": "Privacy and analytics",
-  "body": "We use Google Analytics only with your permission to understand which content is useful. Your choice does not limit the site.",
-  "privacy": "Privacy notice",
-  "reject": "Decline",
-  "accept": "Allow analytics",
-  "settings": "Privacy preferences"
-}
-```
-
-```json
-// pt-br
-"analyticsConsent": {
-  "title": "Privacidade e análise",
-  "body": "Usamos o Google Analytics somente com sua permissão para entender quais conteúdos são úteis. Sua escolha não limita o site.",
-  "privacy": "Aviso de privacidade",
-  "reject": "Não aceitar",
-  "accept": "Aceitar análise",
-  "settings": "Preferências de privacidade"
-}
-```
-
-- [ ] **Step 6: Test no-request-before-consent and document the policy boundary**
-
-Add package script:
-
-```json
-"test:analytics-consent": "node scripts/test-analytics-consent.js"
-```
-
-Run:
+- [ ] **Step 6: Verify GREEN and rendered behavior without live analytics**
 
 ```bash
 npm run test:analytics-consent
 npm run test:analytics
+npm run test:analytics-instrumentation
+npm run test:seo-redirects
+npm run test:seo-sitemap
+node -e 'for (const f of ["es","en","pt-br"]) JSON.parse(require("fs").readFileSync(`src/i18n/locales/${f}/common.json`));'
+node -e 'for (const f of ["es","en","pt-br"]) JSON.parse(require("fs").readFileSync(`src/i18n/locales/${f}/legal.json`));'
 npm run build
-! rg -n '<script[^>]+googletagmanager.com/gtag/js' public/index.html
+! rg -n '<script[^>]+googletagmanager.com/gtag/js|G-P0CNEGW276' public/index.html
+! rg -n 'gatsby-plugin-google-gtag' package.json package-lock.json gatsby-config.js
+git diff --check
 ```
 
-Expected: consent and analytics contracts pass; built HTML has no eager Google tag script.
+Use Playwright CLI against the local Gatsby server. Before navigation, route and abort every request to `googletagmanager.com`, `google-analytics.com`, `analytics.google.com`, and `region1.google-analytics.com`; record attempted URLs without sending them. Verify unknown -> zero, decline -> zero, denied reload -> zero, footer reopen, grant -> one tag-script attempt, revoke -> later events blocked, regrant behavior, keyboard focus, console health, and no clipping/overlap at desktop and mobile widths. Store screenshots and temporary scripts outside tracked source.
 
-In a clean browser profile verify: unknown and denied choices produce no request to `googletagmanager.com` or `google-analytics.com`; accepting creates one tag request and one `page_view`; the footer reopens preferences; revoking prevents later SPA events. Record the exact evidence and state that AMMAC's privacy/legal owner must approve banner wording and regional policy before production. Include these official technical references in `docs/SEO_ANALYTICS_OPERATIONS.md`:
+Run secret/PII scans over the diff, verify `.superpowers` remains untracked, and do not deploy or read `.env`.
 
-```text
-https://developers.google.com/tag-platform/security/guides/consent
-https://support.google.com/analytics/answer/10000067
-https://developers.google.com/tag-platform/security/guides/consent-debugging
-```
-
-- [ ] **Step 7: Commit**
+- [ ] **Step 7: Create one Gatsby commit**
 
 ```bash
-git add gatsby-browser.js gatsby-config.js package.json package-lock.json src/utils/analytics.js src/utils/analyticsConsent.js src/components/AnalyticsConsent.js src/components/layout.js src/components/footer.js src/pages/privacy.js src/i18n/locales/es/common.json src/i18n/locales/en/common.json src/i18n/locales/pt-br/common.json src/i18n/locales/es/legal.json src/i18n/locales/en/legal.json src/i18n/locales/pt-br/legal.json scripts/test-analytics.js scripts/test-analytics-consent.js docs/SEO_ANALYTICS_OPERATIONS.md docs/i18n/PRIVACY_REVIEW_2026-07-11.md
+git add gatsby-browser.js gatsby-config.js package.json package-lock.json \
+  src/utils/analytics.js src/utils/analyticsConsent.js \
+  src/components/AnalyticsConsent.js src/components/layout.js src/components/footer.js \
+  src/pages/privacy.js src/i18n/locales/es/common.json src/i18n/locales/en/common.json \
+  src/i18n/locales/pt-br/common.json src/i18n/locales/es/legal.json \
+  src/i18n/locales/en/legal.json src/i18n/locales/pt-br/legal.json \
+  scripts/test-analytics.js scripts/test-analytics-consent.js \
+  docs/SEO_ANALYTICS_OPERATIONS.md docs/i18n/PRIVACY_REVIEW_2026-07-11.md \
+  docs/superpowers/plans/2026-07-11-analytics-indexnow-foundation.md
 git commit -m "feat(privacy): gate analytics behind reversible consent"
 ```
 

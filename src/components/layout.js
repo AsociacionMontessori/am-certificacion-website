@@ -7,6 +7,7 @@ import { useTranslation } from "react-i18next"
 import { buildWhatsAppUrl } from "../data/contactoWhatsApp"
 import { useLocalization } from "../i18n"
 import TrackedActionLink from "./TrackedActionLink"
+import AnalyticsConsent from "./AnalyticsConsent"
 
 const Layout = ({ children }) => {
   const [showWABtn, setShowWABtn] = React.useState(false)
@@ -75,9 +76,9 @@ const Layout = ({ children }) => {
 
             </TrackedActionLink>
           </div>
-
         </div>
       </div>
+      <AnalyticsConsent />
     </>
   )
 }

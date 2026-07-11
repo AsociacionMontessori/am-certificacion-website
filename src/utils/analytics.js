@@ -4,6 +4,9 @@ const {
   localizePath,
   normalizePath,
 } = require("../i18n/config")
+const { isAnalyticsGranted } = require("./analyticsConsent")
+
+const SITE_ORIGIN = "https://certificacionmontessori.com"
 
 const ALLOWED_EVENTS = new Set([
   "click_article",
@@ -191,9 +194,28 @@ const getTarget = target =>
 const trackEvent = (eventName, params = {}, target) => {
   if (!ALLOWED_EVENTS.has(eventName)) return false
   const runtime = getTarget(target)
-  if (!runtime || typeof runtime.gtag !== "function") return false
+  if (!runtime || !isAnalyticsGranted(runtime)) return false
   try {
+    if (typeof runtime.gtag !== "function") return false
     runtime.gtag("event", eventName, buildSafeParams(params))
+    return true
+  } catch (_error) {
+    return false
+  }
+}
+
+const trackPageView = (location, target) => {
+  const runtime = getTarget(target)
+  if (!runtime || !isAnalyticsGranted(runtime)) return false
+  const pathname = validateLandingPath(location?.pathname)
+  if (!pathname) return false
+
+  try {
+    if (typeof runtime.gtag !== "function") return false
+    runtime.gtag("event", "page_view", {
+      page_path: pathname,
+      page_location: `${SITE_ORIGIN}${pathname}`,
+    })
     return true
   } catch (_error) {
     return false
@@ -275,4 +297,5 @@ module.exports = {
   getAttribution,
   trackAttributedArrival,
   trackEvent,
+  trackPageView,
 }

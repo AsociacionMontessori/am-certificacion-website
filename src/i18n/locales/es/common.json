@@ -15,6 +15,14 @@
   "breadcrumb": {
     "inicio": "Inicio"
   },
+  "analyticsConsent": {
+    "title": "Privacidad y analítica",
+    "body": "Usamos Google Analytics solo si lo aceptas para entender qué contenido resulta útil. Tu decisión no limita el sitio.",
+    "privacy": "Aviso de privacidad",
+    "reject": "No aceptar",
+    "accept": "Aceptar analítica",
+    "settings": "Preferencias de privacidad"
+  },
   "schema": {
     "siteName": "Certificación Montessori",
     "description": "Formación y certificaciones Montessori internacionales. La Asociación Montessori de México A.C. (AMMAC), fundada en 1965, forma Guías Montessori en línea para estudiantes de todo el mundo y coordina diplomados en México, América Latina, Estados Unidos, España, Europa, Israel y la India.",

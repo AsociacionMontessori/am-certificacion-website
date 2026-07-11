@@ -6,34 +6,47 @@
     },
     "intro": {
       "titulo": "<rojo>Sua Privacidade</rojo> é Importante<rojo>!</rojo>",
-      "p1": "<blanco>Na Associação Montessori do México (Asociación Montessori de México A.C.), </blanco>nós nos preocupamos com a privacidade dos nossos usuários e nos comprometemos a proteger as informações pessoais que você nos fornece. Conheça nosso aviso de privacidade e os termos e condições de uso do nosso site."
+      "p1": "<blanco>Na Associação Montessori do México (Asociación Montessori de México A.C.), </blanco>protegemos os dados pessoais que você fornece e explicamos aqui como os tratamos."
     },
     "titulo": "Aviso de Privacidade",
+    "actualizacion": "Última atualização: 11 de julho de 2026.",
+    "responsable": {
+      "titulo": "Responsável pelo tratamento",
+      "p1": "Asociación Montessori de México A.C. (AMMAC), associação civil privada, é a responsável pelo tratamento dos dados pessoais. Seu endereço é Avenida Dos 48, San Pedro de los Pinos, Benito Juárez, 03800 Ciudad de México, CDMX, México."
+    },
     "fundamento": {
       "titulo": "Fundamento para o tratamento de dados pessoais",
-      "p1": "Os artigos 6º, Base A, frações II e III, e 16, segundo parágrafo, da Constituição Política dos Estados Unidos Mexicanos; e os artigos 3º, fração XXXIII, 16, 17, 18, 19, 20, 21, 22, 23, 26, 27, 28, 48, 49, 51, 52 e 86 da Ley General de Protección de Datos Personales en Posesión de Sujetos Obligados (LGPDPPSO, lei geral mexicana de proteção de dados pessoais em posse de entes obrigados);"
+      "p1": "Este aviso é regido pela Ley Federal de Protección de Datos Personales en Posesión de los Particulares (lei federal mexicana sobre dados pessoais em posse de particulares), publicada no DOF em 20-03-2025 e com última reforma publicada em 14-11-2025, e pelas demais disposições aplicáveis a responsáveis privados."
     },
     "recopilamos": {
       "titulo": "Quais informações coletamos?",
-      "p1": "Para fins de análise estatística e para melhorar a experiência do usuário, a Associação Montessori se reserva o direito de coletar e tratar os seguintes dados: Informações fornecidas voluntariamente: informações pessoais fornecidas por meio dos formulários do Site, como, por exemplo: nome, e-mail, número de telefone e endereço postal, bem como informações adicionais, como seus interesses e preferências. Informações automáticas: ao utilizar o site https://certificacionmontessori.com/, podem ser coletados automaticamente dados sobre o seu dispositivo e o seu uso do Site, como o seu endereço IP, o tipo de navegador que você utiliza, as páginas do Site que você visita e as datas e os horários de acesso, bem como informações sobre seus hábitos de navegação e preferências, por meio de cookies e outras tecnologias de rastreamento."
+      "p1": "Quando você solicita informações, se inscreve, realiza um pagamento ou entra em contato, podemos tratar os dados fornecidos, como nome, e-mail, telefone, mensagem, endereço postal e dados acadêmicos ou administrativos necessários. A Stripe trata os dados do meio de pagamento; a AMMAC não armazena números completos de cartão. A análise opcional é descrita separadamente."
     },
     "uso": {
-      "titulo": "Uso das informações",
-      "p1": "As informações coletadas por meio do Site são utilizadas com o propósito de fornecer e melhorar os serviços, bem como para realizar as seguintes atividades: Fornecimento de informações sobre produtos e serviços: as informações coletadas são utilizadas para enviar informações sobre os produtos e serviços, com a possibilidade de cancelamento desse serviço quando desejado. A experiência no Site também é personalizada de acordo com os interesses e as preferências do usuário. Comunicações de marketing: em caso de inscrição na lista de e-mails ou de consentimento concedido de outra forma, as informações coletadas são utilizadas para enviar comunicações de marketing e promocionais. Sempre é oferecida a opção de não receber essas comunicações. Análise e melhoria do Site: as informações coletadas são utilizadas para analisar e melhorar o desempenho do Site e dos serviços oferecidos. Resolução de problemas: as informações são coletadas com o objetivo de resolver problemas e esclarecer quaisquer dúvidas ou questões que possam surgir."
+      "titulo": "Finalidades do tratamento",
+      "p1": "As finalidades necessárias são responder a solicitações e contatos, administrar inscrições e programas, processar e conciliar pagamentos, entregar publicações ou serviços, manter registros, prestar suporte e cumprir obrigações legais. Essas operações não dependem da aceitação da análise. Comunicações promocionais e o Google Analytics são finalidades opcionais e exigem o consentimento aplicável."
+    },
+    "analytics": {
+      "titulo": "Análise opcional e sua escolha",
+      "p1": "O Google Analytics (GA4, medição G-P0CNEGW276) é carregado somente quando você escolhe Aceitar análise. O Google atua como fornecedor e pode tratar informações técnicas e de uso, como páginas visitadas, data e hora, navegador, dispositivo, referência e localização aproximada.",
+      "p2": "Sua escolha é armazenada no armazenamento local do navegador com a chave ammac-analytics-consent-v1. Você pode recusar, revogar ou aceitar novamente a qualquer momento em Preferências de privacidade no rodapé. Recusar ou revogar não limita programas, formulários, pagamentos nem contato. A revogação bloqueia eventos posteriores e procura remover cookies próprios do GA, mas não tem efeito retroativo sobre o tratamento já realizado.",
+      "exclusiones": "A AMMAC não envia ao GA4 nomes, e-mails, telefones, mensagens, endereços postais, identificadores de pedido nem tokens de acesso.",
+      "proveedor": "Consulte a política de privacidade do Google.",
+      "proveedorUrl": "https://policies.google.com/privacy"
     },
     "compartimos": {
       "titulo": "Quando compartilhamos informações?",
-      "p1": "Entidades pertencentes à Associação Montessori do México (Asociación Montessori de México A.C. — AMMAC): as informações coletadas podem ser compartilhadas com entidades pertencentes à AMMAC, com o objetivo de fornecer serviços e melhorar a experiência do usuário. A Associação Montessori só compartilha informações com terceiros nas seguintes circunstâncias: Com nossos prestadores de serviços: podemos compartilhar as informações com terceiros que nos prestam serviços, como processadores de pagamento (por exemplo, o <strong>Stripe</strong>, para pagamentos online de taxas de inscrição e publicações) e provedores de serviços de análise.",
-      "nota": "Nota: todos os terceiros com os quais compartilhamos informações são obrigados a cumprir as leis de privacidade e de segurança de dados aplicáveis. Não permitimos que nossos prestadores de serviços utilizem suas informações pessoais para fins próprios e só permitimos que tratem suas informações pessoais para fins específicos e de acordo com as nossas instruções.",
-      "p2": "Para fins legais: podemos compartilhar as informações se acreditarmos de boa-fé que isso é necessário para cumprir a lei ou para proteger os nossos direitos ou os de terceiros. Em caso de fusão ou aquisição: se vendermos ou adquirirmos uma empresa ou ativos, podemos compartilhar as informações com o comprador ou o vendedor."
+      "p1": "Podemos compartilhar dados estritamente necessários com fornecedores que atuam para a AMMAC, como a <strong>Stripe</strong> para pagamentos e o Google para análise somente após o consentimento, e com autoridades quando houver obrigação legal.",
+      "nota": "Os fornecedores devem tratar os dados para finalidades específicas e sob medidas de privacidade e segurança aplicáveis.",
+      "p2": "Não vendemos dados pessoais. Qualquer transferência adicional seguirá a legislação aplicável e, quando necessário, o consentimento correspondente."
     },
     "modificaciones": {
       "titulo": "Alterações no Aviso de Privacidade",
-      "p1": "O presente aviso de privacidade pode sofrer alterações ou atualizações. Essas atualizações ou alterações estarão disponíveis ao público, e o Titular poderá consultá-las no site https://certificacionmontessori.com/, na seção Aviso de Privacidade. Recomenda-se e solicita-se ao Titular que consulte o Aviso de Privacidade pelo menos semestralmente, para se manter atualizado sobre suas condições e seus termos."
+      "p1": "Alterações ou atualizações deste aviso serão publicadas nesta mesma URL: https://certificacionmontessori.com/pt-br/privacy/. A data visível da última atualização identifica a versão vigente."
     },
     "arco": {
-      "titulo": "Exercício dos direitos ARCO (acesso, retificação, cancelamento ou oposição ao uso de seus dados pessoais)",
-      "p1": "Você tem o direito de saber quais dados pessoais temos sobre você, para que os utilizamos e as condições desse uso (Acesso). Também é seu direito solicitar a correção das suas informações pessoais caso estejam desatualizadas, inexatas ou incompletas (Retificação); pedir que as eliminemos de nossos registros ou bancos de dados quando considerar que não estão sendo utilizadas adequadamente (Cancelamento); bem como se opor ao uso de seus dados pessoais para fins específicos (Oposição). Esses são os chamados direitos ARCO, previstos na legislação mexicana de proteção de dados pessoais. Para exercer seus direitos de acesso, retificação, cancelamento e oposição (direitos ARCO), você pode comparecer aos escritórios da Associação Montessori, com endereço em Av. Dos 48, San Pedro de los Pinos, Benito Juárez, 03800, Cidade do México, México. A decisão adotada será comunicada a você em um prazo máximo de 30 dias úteis, contados a partir da data de recebimento da solicitação, para que, se procedente, seja efetivada dentro dos quinze dias úteis seguintes à comunicação da resposta. Você pode revogar o consentimento que, eventualmente, nos tenha concedido para o tratamento de seus dados pessoais. No entanto, é importante ter em conta que nem em todos os casos poderemos atender à sua solicitação ou encerrar o uso de forma imediata, já que alguma obrigação legal pode exigir que continuemos a tratar seus dados pessoais. Da mesma forma, você deve considerar que, para determinados fins, a revogação do seu consentimento implicará que não possamos continuar prestando o serviço do sistema online que você solicitou, ou o encerramento da sua relação conosco."
+      "titulo": "Direitos ARCO, revogação e limitação",
+      "p1": "Você pode solicitar acesso, retificação, cancelamento ou oposição (direitos ARCO), revogar um consentimento ou limitar o uso dos seus dados enviando a solicitação para admin@certificacionmontessori.com ou apresentando-a em Avenida Dos 48, San Pedro de los Pinos, Benito Juárez, 03800 Ciudad de México, CDMX, México. Informe seu nome e um meio de contato, os documentos que comprovem sua identidade ou representação quando aplicável, a descrição clara do direito que deseja exercer e os dados ou elementos que ajudem a localizar a informação. A AMMAC comunicará sua decisão em no máximo 20 dias após o recebimento e, se procedente, a implementará nos 15 dias seguintes. Cada prazo pode ser prorrogado uma única vez por período igual quando houver motivo justificado."
     }
   },
   "reembolsos": {

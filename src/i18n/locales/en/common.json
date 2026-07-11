@@ -15,6 +15,14 @@
   "breadcrumb": {
     "inicio": "Home"
   },
+  "analyticsConsent": {
+    "title": "Privacy and analytics",
+    "body": "We use Google Analytics only with your permission to understand which content is useful. Your choice does not limit the site.",
+    "privacy": "Privacy notice",
+    "reject": "Decline",
+    "accept": "Allow analytics",
+    "settings": "Privacy preferences"
+  },
   "schema": {
     "siteName": "Montessori Certification",
     "description": "International Montessori training and certification. The Montessori Association of Mexico (Asociación Montessori de México A.C. — AMMAC), founded in 1965, trains Montessori Guides online for students all over the world and coordinates diploma courses in Mexico, Latin America, the United States, Spain, Europe, Israel, and India.",

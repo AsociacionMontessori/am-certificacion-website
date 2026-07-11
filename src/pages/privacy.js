@@ -25,6 +25,9 @@ const Privacy = () => {
                 </div>
                 <div className="max-w-auto mx-auto mb-10 text-left dark:text-gray-300 text-white">
                     <h1 className="text-3xl text-white pt-3">{t("privacy.titulo")}</h1>
+                    <p className="pt-2 text-sm font-semibold">{t("privacy.actualizacion")}</p>
+                    <h2 className="text-2xl dark:text-white pt-3">{t("privacy.responsable.titulo")}</h2>
+                    <p>{t("privacy.responsable.p1")}</p>
                     <h2 className="text-2xl dark:text-white pt-3">{t("privacy.fundamento.titulo")}</h2>
                     <p>{t("privacy.fundamento.p1")}</p>
 
@@ -32,6 +35,19 @@ const Privacy = () => {
                     <p>{t("privacy.recopilamos.p1")}</p>
                     <h2 className="text-2xl text-white pt-3">{t("privacy.uso.titulo")}</h2>
                     <p>{t("privacy.uso.p1")}</p>
+
+                    <h2 className="text-2xl text-white pt-3">{t("privacy.analytics.titulo")}</h2>
+                    <p>{t("privacy.analytics.p1")}</p>
+                    <p className="pt-2">{t("privacy.analytics.p2")}</p>
+                    <p className="pt-2">{t("privacy.analytics.exclusiones")}</p>
+                    <a
+                        href={t("privacy.analytics.proveedorUrl")}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-block pt-2 font-semibold underline decoration-red"
+                    >
+                        {t("privacy.analytics.proveedor")}
+                    </a>
 
                     <h2 className="text-2xl text-white pt-3">{t("privacy.compartimos.titulo")}</h2>
                     <Trans i18nKey="privacy.compartimos.p1" ns="legal" />
