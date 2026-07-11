@@ -252,6 +252,32 @@ for (const search of [
   assert.strictEqual(getAttribution(search), null, search)
 }
 
+for (const [parameter, expected, unexpected] of [
+  ["utm_source", "montessorimexico.org", "montessorimexico.org.evil.example"],
+  ["utm_medium", "referral", "organic"],
+  ["utm_campaign", "guia_montessori", "otra-campana"],
+]) {
+  const search = attributionSearch(opaqueId(50)).replace(
+    `${parameter}=${expected}`,
+    `${parameter}=${unexpected}`
+  )
+  assert.strictEqual(getAttribution(search), null, `${parameter} mismatch`)
+
+  const { calls, target } = createTarget()
+  assert.strictEqual(
+    trackAttributedArrival(
+      {
+        pathname: "/diplomados/casa-de-ninos/",
+        search,
+      },
+      target
+    ),
+    false,
+    `${parameter} mismatch`
+  )
+  assert.strictEqual(calls.length, 0, `${parameter} mismatch reached gtag`)
+}
+
 for (const content of [
   "observacion-casa",
   "ana-garcia-lopez",
