@@ -8,7 +8,13 @@ const {
 } = require("../src/utils/analytics")
 const { LANGUAGE_CODES, LOCALIZED_PATHS, localizePath } = require("../src/i18n/config")
 
-const attributionSearch = (content = "observacion-casa", term = "casa") =>
+const VALID_SOURCE_CONTENT_IDS = [
+  "post_d95119f319861cea",
+  "post_0123456789abcdef",
+]
+const opaqueId = suffix => `post_${suffix.toString(16).padStart(16, "0")}`
+
+const attributionSearch = (content = VALID_SOURCE_CONTENT_IDS[0], term = "casa") =>
   `?utm_source=montessorimexico.org&utm_medium=referral&utm_campaign=guia_montessori&utm_content=${content}&utm_term=${term}`
 
 const createStorage = () => ({
@@ -118,11 +124,11 @@ assert.deepStrictEqual(buildSafeParams({ landing_path: "/contact" }), {
 assert.deepStrictEqual(
   buildSafeParams({
     source_hostname: "montessorimexico.org",
-    source_post_slug: "orden-en-el-ambiente",
+    source_content_id: VALID_SOURCE_CONTENT_IDS[0],
   }),
   {
     source_hostname: "montessorimexico.org",
-    source_post_slug: "orden-en-el-ambiente",
+    source_content_id: VALID_SOURCE_CONTENT_IDS[0],
   }
 )
 
@@ -131,13 +137,25 @@ assert.deepStrictEqual(
   { source_hostname: "certificacionmontessori.com" }
 )
 
-for (const source_post_slug of [
-  "observacion-casa",
-  "formacion-montessori",
-  "el-ambiente-preparado-montessori",
-  "desarrollo-del-lenguaje-en-casa-de-ninos",
-]) {
-  assert.deepStrictEqual(buildSafeParams({ source_post_slug }), { source_post_slug })
+for (const source_content_id of VALID_SOURCE_CONTENT_IDS) {
+  assert.deepStrictEqual(buildSafeParams({ source_content_id }), { source_content_id })
+}
+
+assert.deepStrictEqual(
+  buildSafeParams({ source_post_slug: VALID_SOURCE_CONTENT_IDS[0] }),
+  {}
+)
+{
+  const { calls, target } = createTarget()
+  assert.strictEqual(
+    trackEvent(
+      "click_article",
+      { source_post_slug: VALID_SOURCE_CONTENT_IDS[0] },
+      target
+    ),
+    true
+  )
+  assert.deepStrictEqual(calls[0][2], {})
 }
 
 const rejectedValues = [
@@ -147,24 +165,14 @@ const rejectedValues = [
   ["source_hostname", "certificacionmontessori.com.evil.example"],
   ["source_hostname", "user@certificacionmontessori.com"],
   ["source_hostname", "certificacionmontessori.com:443"],
-  ["source_post_slug", "ana-garcia"],
-  ["source_post_slug", "persona@example.com"],
-  ["source_post_slug", "llama-55-1234-5678"],
-  ["source_post_slug", "5501234567"],
-  ["source_post_slug", "550e8400-e29b-41d4-a716-446655440000"],
-  ["source_post_slug", "orden-abc123def456"],
-  ["source_post_slug", "order-abc-123456"],
-  ["source_post_slug", "orden-2026"],
-  ["source_post_slug", "transaction-id-1234"],
-  ["source_post_slug", "transaccion-abc-9876"],
-  ["source_post_slug", "pedido-cliente-42"],
-  ["source_post_slug", "payment-abcdefabcdef"],
-  ["source_post_slug", "checkout-550e8400-e29b-41d4-a716-446655440000"],
-  ["source_post_slug", "tema-1234567890123456"],
-  ["source_post_slug", "tema-abcdefabcdefabcd"],
-  ["source_post_slug", "observacion%2Fcasa"],
-  ["source_post_slug", "observacion%ZZcasa"],
-  ["source_post_slug", "observacion_casa"],
+  ["source_content_id", "observacion-casa"],
+  ["source_content_id", "ana-garcia-lopez"],
+  ["source_content_id", "order-id-abcde"],
+  ["source_content_id", "post_D95119F319861CEA"],
+  ["source_content_id", "post_d95119f319861ce"],
+  ["source_content_id", "post_d95119f319861ceaa"],
+  ["source_content_id", "xpost_d95119f319861cea"],
+  ["source_content_id", "post_d95119f319861ceax"],
   ["book_id", "buyer@example.com"],
   ["book_id", "order-987654321"],
   ["cta_position", "contact_persona@example.com"],
@@ -177,7 +185,7 @@ const rejectedValues = [
 for (const [key, value] of rejectedValues) {
   assert.deepStrictEqual(buildSafeParams({ [key]: value }), {}, `${key}: ${value}`)
 
-  if (key === "source_hostname" || key === "source_post_slug") {
+  if (key === "source_hostname" || key === "source_content_id") {
     const { calls, target } = createTarget()
     assert.strictEqual(trackEvent("click_article", { [key]: value }, target), true)
     assert.strictEqual(calls.length, 1)
@@ -192,7 +200,7 @@ for (const [key, value] of rejectedValues) {
       "click_article",
       {
         source_hostname: "certificacionmontessori.com",
-        source_post_slug: "observacion-montessori",
+        source_content_id: VALID_SOURCE_CONTENT_IDS[1],
         landing_path: "/publicaciones/",
         cta_position: "article_card",
       },
@@ -202,7 +210,7 @@ for (const [key, value] of rejectedValues) {
   )
   assert.deepStrictEqual(calls[0][2], {
     source_hostname: "certificacionmontessori.com",
-    source_post_slug: "observacion-montessori",
+    source_content_id: VALID_SOURCE_CONTENT_IDS[1],
     landing_path: "/publicaciones/",
     cta_position: "article_card",
   })
@@ -210,7 +218,7 @@ for (const [key, value] of rejectedValues) {
 
 assert.deepStrictEqual(getAttribution(attributionSearch()), {
   source_hostname: "montessorimexico.org",
-  source_post_slug: "observacion-casa",
+  source_content_id: VALID_SOURCE_CONTENT_IDS[0],
   program_id: "casa",
 })
 
@@ -223,32 +231,36 @@ for (const programId of [
   "general_training",
 ]) {
   assert.strictEqual(
-    getAttribution(attributionSearch("formacion-montessori", programId)).program_id,
+    getAttribution(attributionSearch(VALID_SOURCE_CONTENT_IDS[1], programId)).program_id,
     programId
   )
 }
 
 for (const search of [
-  attributionSearch("persona@example.com"),
-  attributionSearch("ana-garcia"),
-  attributionSearch("llama-55-1234-5678"),
-  attributionSearch("orden-abc123def456"),
-  attributionSearch("pedido-cliente-42"),
-  attributionSearch("tema-abcdefabcdefabcd"),
-  attributionSearch("observacion%ZZcasa"),
-  attributionSearch("observacion-casa", "unknown"),
-  attributionSearch("observacion-casa", "orden-12345678"),
-  "?utm_source=montessorimexico.org&utm_medium=referral&utm_campaign=guia_montessori&utm_content=observacion-casa",
+  attributionSearch("observacion-casa"),
+  attributionSearch("ana-garcia-lopez"),
+  attributionSearch("order-id-abcde"),
+  attributionSearch("post_D95119F319861CEA"),
+  attributionSearch("post_d95119f319861ce"),
+  attributionSearch("post_d95119f319861ceaa"),
+  attributionSearch("xpost_d95119f319861cea"),
+  attributionSearch("post_d95119f319861ceax"),
+  attributionSearch(VALID_SOURCE_CONTENT_IDS[0], "unknown"),
+  attributionSearch(VALID_SOURCE_CONTENT_IDS[0], "orden-12345678"),
+  `?utm_source=montessorimexico.org&utm_medium=referral&utm_campaign=guia_montessori&utm_content=${VALID_SOURCE_CONTENT_IDS[0]}`,
 ]) {
   assert.strictEqual(getAttribution(search), null, search)
 }
 
 for (const content of [
-  "ana-garcia",
-  "pedido-cliente-42",
-  "tema-abcdefabcdefabcd",
-  "persona%40example.com",
-  "observacion%ZZcasa",
+  "observacion-casa",
+  "ana-garcia-lopez",
+  "order-id-abcde",
+  "post_D95119F319861CEA",
+  "post_d95119f319861ce",
+  "post_d95119f319861ceaa",
+  "xpost_d95119f319861cea",
+  "post_d95119f319861ceax",
 ]) {
   const { calls, target } = createTarget()
   assert.strictEqual(
@@ -274,7 +286,7 @@ for (const content of [
   assert.strictEqual(trackAttributedArrival(location, target), true)
   assert.strictEqual(calls.length, 1)
   assert.strictEqual(calls[0][1], "click_program_cta")
-  assert.strictEqual(calls[0][2].source_post_slug, "observacion-casa")
+  assert.strictEqual(calls[0][2].source_content_id, VALID_SOURCE_CONTENT_IDS[0])
   assert.strictEqual(trackAttributedArrival(location, target), false)
   assert.strictEqual(calls.length, 1)
 }
@@ -289,6 +301,7 @@ const expectedIntentLandingPaths = {
 }
 assert.deepStrictEqual(INTENT_LANDING_PATHS, expectedIntentLandingPaths)
 
+let attributionCase = 100
 for (const [programId, path] of Object.entries(expectedIntentLandingPaths)) {
   for (const language of LANGUAGE_CODES) {
     const { calls, target } = createTarget()
@@ -296,10 +309,7 @@ for (const [programId, path] of Object.entries(expectedIntentLandingPaths)) {
       trackAttributedArrival(
         {
           pathname: localizePath(language, path),
-          search: attributionSearch(
-            `guia-${programId.replace(/_/g, "-")}-montessori`,
-            programId
-          ),
+          search: attributionSearch(opaqueId(attributionCase++), programId),
         },
         target
       ),
@@ -310,6 +320,7 @@ for (const [programId, path] of Object.entries(expectedIntentLandingPaths)) {
   }
 }
 
+let mismatchCase = 200
 for (const [programId, pathname] of [
   ["casa", "/diplomados/neuroeducacion/"],
   ["general_training", "/pt-br/diplomados/casa-de-ninos/"],
@@ -319,10 +330,7 @@ for (const [programId, pathname] of [
     trackAttributedArrival(
       {
         pathname,
-        search: attributionSearch(
-          `mismatch-${programId.replace(/_/g, "-")}-montessori`,
-          programId
-        ),
+        search: attributionSearch(opaqueId(mismatchCase++), programId),
       },
       target
     ),
@@ -331,6 +339,7 @@ for (const [programId, pathname] of [
   assert.strictEqual(calls.length, 0)
 }
 
+let referrerCase = 300
 for (const [referrer, expected, label] of [
   ["", false, "missing referrer"],
   ["https://montessorimexico.org/observacion/", true, "canonical referrer"],
@@ -346,7 +355,7 @@ for (const [referrer, expected, label] of [
     trackAttributedArrival(
       {
         pathname: "/diplomados/casa-de-ninos/",
-        search: attributionSearch(`referrer-${label.replace(/\s+/g, "-")}-montessori`),
+        search: attributionSearch(opaqueId(referrerCase++)),
       },
       target
     ),
@@ -362,7 +371,7 @@ for (const [referrer, expected, label] of [
     trackAttributedArrival(
       {
         pathname: "/checkout/success/orden-12345678/",
-        search: attributionSearch("invalid-arrival-path"),
+        search: attributionSearch(opaqueId(400)),
       },
       target
     ),
@@ -382,7 +391,7 @@ for (const [referrer, expected, label] of [
   })
   const location = {
     pathname: "/diplomados/taller-i-ii/",
-    search: attributionSearch("lectura-taller", "taller"),
+    search: attributionSearch(opaqueId(401), "taller"),
   }
   assert.strictEqual(trackAttributedArrival(location, target), true)
   assert.strictEqual(trackAttributedArrival(location, target), false)
@@ -404,7 +413,7 @@ for (const [referrer, expected, label] of [
   })
   const location = {
     pathname: "/diplomados/neuroeducacion/",
-    search: attributionSearch("cerebro-neuroeducacion", "neuro"),
+    search: attributionSearch(opaqueId(402), "neuro"),
   }
   assert.strictEqual(trackAttributedArrival(location, target), true)
   assert.strictEqual(trackAttributedArrival(location, target), false)
@@ -416,7 +425,7 @@ for (const [referrer, expected, label] of [
   const { calls, target } = createTarget({ sessionStorage: undefined })
   const location = {
     pathname: "/diplomados/nido-comunidad-infantil/",
-    search: attributionSearch("desarrollo-del-nido", "nido"),
+    search: attributionSearch(opaqueId(403), "nido"),
   }
   assert.strictEqual(trackAttributedArrival(location, target), true)
   assert.strictEqual(trackAttributedArrival(location, target), false)
@@ -435,7 +444,7 @@ for (const [referrer, expected, label] of [
   }
   const location = {
     pathname: "/diplomados/educacion-cosmica/",
-    search: attributionSearch("universo-y-vida", "cosmica"),
+    search: attributionSearch(opaqueId(404), "cosmica"),
   }
   assert.strictEqual(trackAttributedArrival(location, target), false)
   assert.strictEqual(trackAttributedArrival(location, target), false)

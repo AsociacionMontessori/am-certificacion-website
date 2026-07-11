@@ -65,11 +65,11 @@ assert.deepStrictEqual(
 
 assert.deepStrictEqual(
   getAttribution(
-    "?utm_source=montessorimexico.org&utm_medium=referral&utm_campaign=guia_montessori&utm_content=observacion-casa&utm_term=casa"
+    "?utm_source=montessorimexico.org&utm_medium=referral&utm_campaign=guia_montessori&utm_content=post_d95119f319861cea&utm_term=casa"
   ),
   {
     source_hostname: "montessorimexico.org",
-    source_post_slug: "observacion-casa",
+    source_content_id: "post_d95119f319861cea",
     program_id: "casa",
   }
 )
@@ -88,7 +88,7 @@ assert.strictEqual(
   trackAttributedArrival(
     {
       pathname: "/diplomados/casa-de-ninos/",
-      search: "?utm_source=montessorimexico.org&utm_medium=referral&utm_campaign=guia_montessori&utm_content=observacion-casa&utm_term=casa",
+      search: "?utm_source=montessorimexico.org&utm_medium=referral&utm_campaign=guia_montessori&utm_content=post_d95119f319861cea&utm_term=casa",
     },
     target
   ),
@@ -96,13 +96,13 @@ assert.strictEqual(
 )
 assert.strictEqual(calls.length, 1)
 assert.strictEqual(calls[0][1], "click_program_cta")
-assert.strictEqual(calls[0][2].source_post_slug, "observacion-casa")
+assert.strictEqual(calls[0][2].source_content_id, "post_d95119f319861cea")
 
 assert.strictEqual(
   trackAttributedArrival(
     {
       pathname: "/diplomados/casa-de-ninos/",
-      search: "?utm_source=montessorimexico.org&utm_medium=referral&utm_campaign=guia_montessori&utm_content=observacion-casa&utm_term=casa",
+      search: "?utm_source=montessorimexico.org&utm_medium=referral&utm_campaign=guia_montessori&utm_content=post_d95119f319861cea&utm_term=casa",
     },
     target
   ),
@@ -141,7 +141,7 @@ const ALLOWED_PARAMS = new Set([
   "language",
   "program_id",
   "source_hostname",
-  "source_post_slug",
+  "source_content_id",
   "landing_path",
   "cta_position",
   "lead_channel",
@@ -149,6 +149,7 @@ const ALLOWED_PARAMS = new Set([
 ])
 
 const SAFE_VALUE_MAX_LENGTH = 120
+const SOURCE_CONTENT_ID_PATTERN = /^post_[0-9a-f]{16}$/
 
 const normalizeValue = value => {
   if (typeof value === "number" || typeof value === "boolean") return value
@@ -185,9 +186,11 @@ const getAttribution = search => {
   ) {
     return null
   }
+  const sourceContentId = params.get("utm_content")
+  if (!SOURCE_CONTENT_ID_PATTERN.test(sourceContentId || "")) return null
   return buildSafeParams({
     source_hostname: params.get("utm_source"),
-    source_post_slug: params.get("utm_content"),
+    source_content_id: sourceContentId,
     program_id: params.get("utm_term"),
   })
 }
@@ -200,7 +203,7 @@ const trackAttributedArrival = (location, target) => {
   const dedupeKey = [
     "ammac-cta-arrival",
     location.pathname,
-    attribution.source_post_slug,
+    attribution.source_content_id,
     attribution.program_id,
   ].join(":")
   if (runtime.sessionStorage.getItem(dedupeKey)) return false
@@ -996,7 +999,7 @@ Create event-scoped dimensions for:
 ```text
 program_id
 source_hostname
-source_post_slug
+source_content_id
 landing_path
 cta_position
 lead_channel

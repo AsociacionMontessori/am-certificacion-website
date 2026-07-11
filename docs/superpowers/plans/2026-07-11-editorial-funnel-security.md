@@ -389,6 +389,7 @@ git commit -m "feat(editorial): classify training intent with closed enums"
 
 **Interfaces:**
 - Produces: `ConversionDecision` dataclass.
+- Produces: `build_source_content_id(post_slug: str) -> str`, exactamente `post_` más los primeros 16 caracteres hexadecimales minúsculos del SHA-256 sobre bytes UTF-8.
 - Produces: `resolve_conversion_decision(intent: str, relevance: str, post_slug: str, post_title: str) -> ConversionDecision`.
 - Produces: `strip_uncontrolled_commercial_links(html: str) -> tuple[str, int]`.
 - Produces: `apply_conversion_funnel(html: str, decision: ConversionDecision) -> tuple[str, dict[str, object]]`.
@@ -424,7 +425,8 @@ class ConversionFunnelTests(unittest.TestCase):
         self.assertEqual(query["utm_source"], ["montessorimexico.org"])
         self.assertEqual(query["utm_medium"], ["referral"])
         self.assertEqual(query["utm_campaign"], ["guia_montessori"])
-        self.assertEqual(query["utm_content"], ["observacion-casa"])
+        self.assertEqual(query["utm_content"], ["post_d95119f319861cea"])
+        self.assertNotIn("observacion-casa", decision.attributed_url)
         self.assertEqual(query["utm_term"], ["casa"])
 
     def test_general_training_routes_to_the_hub(self):
@@ -596,6 +598,11 @@ class ConversionDecision:
     cta_level: str
 
 
+def build_source_content_id(post_slug: str) -> str:
+    digest = hashlib.sha256(post_slug.encode("utf-8")).hexdigest()
+    return f"post_{digest[:16]}"
+
+
 def resolve_conversion_decision(
     intent: str,
     relevance: str,
@@ -626,7 +633,7 @@ def resolve_conversion_decision(
             "utm_source": "montessorimexico.org",
             "utm_medium": "referral",
             "utm_campaign": "guia_montessori",
-            "utm_content": post_slug,
+            "utm_content": build_source_content_id(post_slug),
             "utm_term": clean_intent,
         }
     )

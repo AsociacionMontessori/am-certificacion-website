@@ -313,9 +313,12 @@ La URL de destino añadirá:
 utm_source=montessorimexico.org
 utm_medium=referral
 utm_campaign=guia_montessori
-utm_content=<slug-del-articulo>
+utm_content=post_<16-hex-sha256-del-slug>
 utm_term=<intent>
 ```
+
+`utm_content` nunca expondrá el slug: será `post_` más los primeros 16
+caracteres hexadecimales minúsculos del SHA-256 de los bytes UTF-8 del slug.
 
 El mensaje prellenado de WhatsApp puede incluir programa y artículo de origen,
 pero su texto completo y los datos del usuario nunca se enviarán a GA4.
@@ -376,7 +379,7 @@ Parámetros comunes:
 - `language`;
 - `program_id`;
 - `source_hostname`;
-- `source_post_slug`;
+- `source_content_id` (formato exacto `^post_[0-9a-f]{16}$`);
 - `landing_path`;
 - `cta_position`;
 - `lead_channel`.

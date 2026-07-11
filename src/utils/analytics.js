@@ -20,7 +20,7 @@ const ALLOWED_PARAMS = new Set([
   "language",
   "program_id",
   "source_hostname",
-  "source_post_slug",
+  "source_content_id",
   "landing_path",
   "cta_position",
   "lead_channel",
@@ -99,35 +99,7 @@ const ORDER_ID_PATTERN =
 const ORDER_MARKER_PATTERN =
   /(?:^|-)(?:transaction|transaccion|order|orden|pedido|checkout|payment|pago|stripe|session)(?:-|$)/i
 const LONG_HEX_SEGMENT_PATTERN = /(?:^|-)[0-9a-f]{12,}(?:-|$)/i
-const EDITORIAL_TWO_TOKEN_SIGNALS = new Set([
-  "ambiente",
-  "aprendizaje",
-  "autonomia",
-  "casa",
-  "cerebro",
-  "cosmica",
-  "crianza",
-  "cultura",
-  "desarrollo",
-  "educacion",
-  "escritura",
-  "formacion",
-  "guia",
-  "infancia",
-  "lenguaje",
-  "lectura",
-  "matematicas",
-  "materiales",
-  "montessori",
-  "neuroeducacion",
-  "nido",
-  "observacion",
-  "pedagogia",
-  "sensorial",
-  "taller",
-  "universo",
-  "vida",
-])
+const SOURCE_CONTENT_ID_PATTERN = /^post_[0-9a-f]{16}$/
 const sessionDedupe = new Set()
 
 const cleanString = value => {
@@ -160,18 +132,8 @@ const validateSafeToken = (value, maxLength) => {
   return clean
 }
 
-const validateEditorialSlug = value => {
-  const clean = validateSafeToken(value, 100)
-  if (!clean) return undefined
-  const tokens = clean.split("-")
-  if (
-    tokens.length === 2 &&
-    !tokens.some(token => EDITORIAL_TWO_TOKEN_SIGNALS.has(token))
-  ) {
-    return undefined
-  }
-  return clean
-}
+const validateSourceContentId = value =>
+  typeof value === "string" && SOURCE_CONTENT_ID_PATTERN.test(value) ? value : undefined
 
 const hasTrustedReferrer = runtime => {
   let referrer
@@ -208,7 +170,7 @@ const PARAM_VALIDATORS = {
   program_id: value => validateClosedValue(value, ALLOWED_PROGRAM_IDS),
   source_hostname: value =>
     validateClosedValue(value, ALLOWED_SOURCE_HOSTNAMES),
-  source_post_slug: validateEditorialSlug,
+  source_content_id: validateSourceContentId,
   landing_path: validateLandingPath,
   cta_position: value => validateClosedValue(value, ALLOWED_CTA_POSITIONS),
   lead_channel: value => validateClosedValue(value, ALLOWED_LEAD_CHANNELS),
@@ -248,13 +210,13 @@ const getAttribution = search => {
     return null
   }
 
-  const sourcePostSlug = validateEditorialSlug(params.get("utm_content"))
+  const sourceContentId = validateSourceContentId(params.get("utm_content"))
   const programId = validateClosedValue(params.get("utm_term"), ATTRIBUTION_PROGRAM_IDS)
-  if (!sourcePostSlug || !programId) return null
+  if (!sourceContentId || !programId) return null
 
   return {
     source_hostname: "montessorimexico.org",
-    source_post_slug: sourcePostSlug,
+    source_content_id: sourceContentId,
     program_id: programId,
   }
 }
@@ -278,7 +240,7 @@ const trackAttributedArrival = (location, target) => {
   const dedupeKey = [
     "ammac-cta-arrival",
     landingPath,
-    attribution.source_post_slug,
+    attribution.source_content_id,
     attribution.program_id,
   ].join(":")
 

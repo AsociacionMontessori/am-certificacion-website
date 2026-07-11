@@ -6,7 +6,7 @@
 
 **Architecture:** Un cliente WordPress normaliza y sanea hasta 12 posts. Gatsby crea nodos desde la REST API y cae a una instantánea versionada si la red falla; el navegador intenta un refresco no bloqueante. Headless UI mantiene ambos paneles montados y accesibles. Los artículos siguen enlazando al canonical WordPress y el Head genera `ItemList`/`Book` desde datos visibles.
 
-**Tech Stack:** Gatsby 5, React 18, Headless UI 1.7, i18next, WordPress REST API, `sanitize-html`, `he`, Node.js contract tests, Playwright.
+**Tech Stack:** Gatsby 5, React 18, Headless UI 1.7, i18next, WordPress REST API, `sanitize-html`, `he`, `@noble/hashes` 1.8, Node.js contract tests, Playwright.
 
 ## Global Constraints
 
@@ -23,6 +23,7 @@
 - No se muestran precio, stock, rating o reseña en JSON-LD.
 - Un fallo WordPress nunca deja la sección vacía si existe una instantánea válida.
 - Usar `trackEvent` del plan de analítica; no llamar `gtag` directamente.
+- La instrumentación usa `source_content_id` con formato exacto `^post_[0-9a-f]{16}$`; el slug WordPress nunca cruza al payload GA4.
 
 ---
 
@@ -39,7 +40,7 @@
 **Interfaces:**
 - Produces `normalizeWordPressPost(raw: object) -> NormalizedPost | null`.
 - Produces `fetchRecentWordPressPosts({ fetchImpl?: Function, limit?: number }) -> Promise<NormalizedPost[]>`.
-- `NormalizedPost`: `id`, `slug`, `url`, `title`, `excerpt`, `date`, `modified`, `author`, `imageUrl`, `imageAlt`, `imageWidth`, `imageHeight`.
+- `NormalizedPost`: `id`, `slug`, `sourceContentId`, `url`, `title`, `excerpt`, `date`, `modified`, `author`, `imageUrl`, `imageAlt`, `imageWidth`, `imageHeight`.
 
 - [ ] **Step 1: Add a representative REST fixture**
 
@@ -102,6 +103,7 @@ assert.strictEqual(post.author, "Roxana Muñoz")
 assert.strictEqual(post.imageWidth, 1200)
 assert.strictEqual(post.imageHeight, 630)
 assert.strictEqual(post.url, "https://montessorimexico.org/observacion-montessori/")
+assert.strictEqual(post.sourceContentId, "post_3cdd538282a5c53b")
 
 assert.strictEqual(normalizeWordPressPost(fixture[1]), null)
 assert.strictEqual(normalizeWordPressPost(fixture[2]), null)
@@ -109,10 +111,10 @@ assert.strictEqual(normalizeWordPressPosts(fixture).length, 1)
 console.log("WordPress post contract ok")
 ```
 
-- [ ] **Step 3: Install the two focused sanitation dependencies**
+- [ ] **Step 3: Install the focused sanitation and hashing dependencies**
 
 ```bash
-npm install sanitize-html he
+npm install sanitize-html he @noble/hashes@1.8.0
 node scripts/test-wordpress-posts.js
 ```
 
@@ -124,9 +126,14 @@ Expected: dependencies install; test still fails because the service module is a
 // src/services/wordpressPosts.js
 const sanitizeHtml = require("sanitize-html")
 const he = require("he")
+const { sha256 } = require("@noble/hashes/sha256")
+const { bytesToHex, utf8ToBytes } = require("@noble/hashes/utils")
 
 const WORDPRESS_ORIGIN = "https://montessorimexico.org"
 const WORDPRESS_POSTS_ENDPOINT = `${WORDPRESS_ORIGIN}/wp-json/wp/v2/posts`
+
+const buildSourceContentId = slug =>
+  `post_${bytesToHex(sha256(utf8ToBytes(slug))).slice(0, 16)}`
 
 const plainText = value =>
   he.decode(
@@ -180,6 +187,7 @@ const normalizeWordPressPost = raw => {
   return {
     id,
     slug,
+    sourceContentId: buildSourceContentId(slug),
     url,
     title,
     excerpt: plainText(raw?.excerpt?.rendered),
@@ -346,6 +354,7 @@ exports.createSchemaCustomization = ({ actions }) => {
     type WordpressEditorialPost implements Node {
       wordpressId: String!
       slug: String!
+      sourceContentId: String!
       url: String!
       title: String!
       excerpt: String!
@@ -478,7 +487,7 @@ const ArticleCard = ({ post }) => {
           onClick={() => trackEvent("click_article", {
             language,
             source_hostname: "certificacionmontessori.com",
-            source_post_slug: post.slug,
+            source_content_id: post.sourceContentId,
             landing_path: typeof window === "undefined" ? "" : window.location.pathname,
             cta_position: "article_card",
           })}
@@ -622,6 +631,7 @@ export const query = graphql`
         id
         wordpressId
         slug
+        sourceContentId
         url
         title
         excerpt
