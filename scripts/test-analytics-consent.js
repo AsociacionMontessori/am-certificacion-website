@@ -357,6 +357,73 @@ for (const [failedCommand, expectedSequence] of [
   assert.strictEqual(scripts.length, 1)
 }
 
+{
+  const successful = []
+  let defaultFailures = 0
+  const { scripts, target } = createTarget({
+    gtag(...args) {
+      if (args[0] === "consent" && args[1] === "default" && defaultFailures < 1) {
+        defaultFailures += 1
+        throw new Error("default queue failed")
+      }
+      successful.push(args)
+    },
+  })
+
+  assert.strictEqual(setAnalyticsConsent("granted", target), true)
+  assert.strictEqual(setAnalyticsConsent("denied", target), true)
+  assert.strictEqual(setAnalyticsConsent("granted", target), true)
+  assert.deepStrictEqual(
+    successful.map(args =>
+      args[0] === "consent"
+        ? `${args[0]}:${args[1]}:${args[2].analytics_storage}`
+        : args[0]
+    ),
+    [
+      "consent:default:denied",
+      "consent:update:denied",
+      "consent:update:granted",
+      "js",
+      "config",
+    ],
+    "a revoke must retry a failed default before it queues denied update"
+  )
+  assert.strictEqual(scripts.length, 1)
+}
+
+{
+  const successful = []
+  let defaultFailures = 0
+  const { scripts, target } = createTarget({
+    gtag(...args) {
+      if (args[0] === "consent" && args[1] === "default" && defaultFailures < 2) {
+        defaultFailures += 1
+        throw new Error("default queue failed")
+      }
+      successful.push(args)
+    },
+  })
+
+  assert.strictEqual(setAnalyticsConsent("granted", target), true)
+  assert.strictEqual(setAnalyticsConsent("denied", target), true)
+  assert.strictEqual(setAnalyticsConsent("granted", target), true)
+  assert.deepStrictEqual(
+    successful.map(args =>
+      args[0] === "consent"
+        ? `${args[0]}:${args[1]}:${args[2].analytics_storage}`
+        : args[0]
+    ),
+    [
+      "consent:default:denied",
+      "consent:update:granted",
+      "js",
+      "config",
+    ],
+    "a failed revoke retry must not queue denied update before regrant retries default"
+  )
+  assert.strictEqual(scripts.length, 1)
+}
+
 for (const failedCommand of ["js", "config"]) {
   const successful = []
   let failedOnce = false

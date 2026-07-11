@@ -281,7 +281,15 @@ const setAnalyticsConsent = (state, target) => {
     loadGoogleTag(runtime)
   } else if (previous === "granted") {
     const loaderState = getLoaderState(runtime)
-    queueGtag(runtime, "consent", "update", consentPayload("denied"))
+    if (
+      !loaderState.defaultQueued &&
+      queueGtag(runtime, "consent", "default", consentPayload("denied"))
+    ) {
+      loaderState.defaultQueued = true
+    }
+    if (loaderState.defaultQueued) {
+      queueGtag(runtime, "consent", "update", consentPayload("denied"))
+    }
     loaderState.grantedUpdateRequired = true
     removeGoogleAnalyticsCookies(runtime)
   }
