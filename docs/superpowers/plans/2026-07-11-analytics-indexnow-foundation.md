@@ -492,7 +492,7 @@ git commit -m "feat(analytics): add privacy-safe funnel events"
 Create `scripts/test-analytics-instrumentation.js` and add the `test:analytics-instrumentation` package script. The executable Node contract must:
 
 - Exercise `TrackedActionLink` and source-parse every Task 2 event call site.
-- Require each payload expression to match its closed source: localization `language`; the SSR-safe `typeof window === "undefined" ? "" : window.location.pathname`; exact CTA position and lead channel; the closed `getAnalyticsProgramIdByNivelLabel(nivelElegido)` lead mapping; the existing full-checkout catalog lookup with `"inscripcion"` fallback; and the reservation `"inscripcion"` literal.
+- Require each payload expression to match its closed source: resolve each localization `language` identifier to its lexical binding, destructured directly from zero-argument `useLocalization()` in the component scope; the SSR-safe `typeof window === "undefined" ? "" : window.location.pathname`; exact CTA position and lead channel; the closed `getAnalyticsProgramIdByNivelLabel(nivelElegido)` lead mapping; the existing full-checkout catalog lookup with `"inscripcion"` fallback; and the reservation `"inscripcion"` literal.
 - Require WhatsApp event names and layout, footer, and contact CTA positions exactly. Include negative source mutations proving user-derived `program_id` values such as `userValue`, `message`, `nombreCompleto`, and `emailContacto` fail.
 - Mock `fetch` for `createPublicCheckoutSession` and cover one valid Stripe Checkout URL plus absent, non-string, relative, malformed, HTTP, credential-bearing, suffix-host, other-host, and non-standard-port responses.
 

@@ -94,33 +94,67 @@ const assertSingleTrackedEvent = (node, eventName, message) => {
   return calls[0]
 }
 
-const assertLocalizationLanguageBinding = (ast, relativePath) => {
-  let found = false
-  traverse(ast, {
-    VariableDeclarator(nodePath) {
-      const { id, init } = nodePath.node
-      if (
-        id.type !== "ObjectPattern" ||
-        init?.type !== "CallExpression" ||
-        init.callee?.type !== "Identifier" ||
-        init.callee.name !== "useLocalization"
-      ) {
-        return
-      }
-      for (const property of id.properties) {
-        if (
-          property.type === "ObjectProperty" &&
-          property.key.type === "Identifier" &&
-          property.key.name === "language" &&
-          property.value.type === "Identifier" &&
-          property.value.name === "language"
-        ) {
-          found = true
-        }
-      }
-    },
-  })
-  assert(found, `${relativePath} must bind language from useLocalization`)
+const assertLocalizationLanguageBinding = (languagePath, sourceName) => {
+  assertIdentifier(
+    languagePath.node,
+    "language",
+    `${sourceName} language must be an identifier`
+  )
+  const binding = languagePath.scope.getBinding("language")
+  assert(binding, `${sourceName} language must resolve to a lexical binding`)
+
+  const { id, init } = binding.path.node
+  assert.strictEqual(
+    binding.path.node.type,
+    "VariableDeclarator",
+    `${sourceName} language must be declared by useLocalization`
+  )
+  assert.strictEqual(
+    id?.type,
+    "ObjectPattern",
+    `${sourceName} language must be destructured from useLocalization`
+  )
+  assert.strictEqual(
+    init?.type,
+    "CallExpression",
+    `${sourceName} language must be initialized by useLocalization()`
+  )
+  assertIdentifier(
+    init?.callee,
+    "useLocalization",
+    `${sourceName} language must be initialized by useLocalization()`
+  )
+  assert.strictEqual(
+    init.arguments.length,
+    0,
+    `${sourceName} language must use zero-argument useLocalization()`
+  )
+
+  const languageProperty = id.properties.find(
+    property =>
+      property.type === "ObjectProperty" &&
+      property.key.type === "Identifier" &&
+      property.key.name === "language" &&
+      property.value.type === "Identifier" &&
+      property.value.name === "language"
+  )
+  assert(languageProperty, `${sourceName} language must destructure the language property`)
+  assert.strictEqual(
+    binding.identifier,
+    languageProperty.value,
+    `${sourceName} language payload must use the destructured localization binding`
+  )
+
+  let componentPath
+  for (let ancestor = languagePath.parentPath; ancestor; ancestor = ancestor.parentPath) {
+    if (ancestor.isFunction()) componentPath = ancestor
+  }
+  const bindingComponentPath = binding.path.findParent(path => path.isFunction())
+  assert.strictEqual(
+    bindingComponentPath?.node,
+    componentPath?.node,
+    `${sourceName} language must bind in the component scope`
+  )
 }
 
 const statementIndex = (statements, predicate, message) => {
@@ -138,6 +172,20 @@ const getPayloadProperty = (payload, key, eventName) => {
   assert(property, `${eventName} must include ${key}`)
   return property.value
 }
+
+const getPayloadPropertyPath = (payloadPath, key, eventName) => {
+  const propertyPath = payloadPath.get("properties").find(
+    candidate => (candidate.node.key.name || candidate.node.key.value) === key
+  )
+  assert(propertyPath, `${eventName} must include ${key}`)
+  return propertyPath.get("value")
+}
+
+const assertPayloadLanguageBinding = (payloadPath, sourceName) =>
+  assertLocalizationLanguageBinding(
+    getPayloadPropertyPath(payloadPath, "language", sourceName),
+    sourceName
+  )
 
 const assertIdentifier = (node, identifier, message) => {
   assert.strictEqual(node?.type, "Identifier", message)
@@ -267,7 +315,6 @@ const assertExactPayload = (call, options) => {
 
 const assertTrackedActionLinkPayload = (relativePath, ctaPosition) => {
   const ast = parseSource(relativePath)
-  assertLocalizationLanguageBinding(ast, relativePath)
   const trackedLinks = []
   traverse(ast, {
     JSXOpeningElement(nodePath) {
@@ -287,10 +334,41 @@ const assertTrackedActionLinkPayload = (relativePath, ctaPosition) => {
         ctaPosition,
         leadChannel: "whatsapp",
       })
+      const eventParamsPath = nodePath.get("attributes").find(
+        attributePath =>
+          attributePath.node.type === "JSXAttribute" &&
+          attributePath.node.name.name === "eventParams"
+      )
+      assertPayloadLanguageBinding(
+        eventParamsPath.get("value").get("expression"),
+        `${relativePath} click_whatsapp`
+      )
       trackedLinks.push(nodePath.node)
     },
   })
   assert.strictEqual(trackedLinks.length, 1, `${relativePath} must have one tracked WhatsApp link`)
+}
+
+const assertTrackedEventLanguageBinding = (relativePath, eventName) => {
+  const ast = parseSource(relativePath)
+  let eventCount = 0
+  traverse(ast, {
+    CallExpression(nodePath) {
+      if (
+        !isCallNamed(nodePath.node, "trackEvent") ||
+        nodePath.node.arguments[0]?.type !== "StringLiteral" ||
+        nodePath.node.arguments[0].value !== eventName
+      ) {
+        return
+      }
+      assertPayloadLanguageBinding(
+        nodePath.get("arguments")[1],
+        `${relativePath} ${eventName}`
+      )
+      eventCount += 1
+    },
+  })
+  assert.strictEqual(eventCount, 1, `${relativePath} must have one ${eventName} language payload`)
 }
 
 const trackedActionLinkPath = sourcePath("src/components/TrackedActionLink.js")
@@ -383,7 +461,7 @@ for (const [relativePath, ctaPosition] of [
 
 {
   const relativePath = "src/components/inscripcion/InscripcionParte1Form.js"
-  assertLocalizationLanguageBinding(parseSource(relativePath), relativePath)
+  assertTrackedEventLanguageBinding(relativePath, "generate_lead")
   const tryStatement = findHandleSubmitTry(
     relativePath
   )
@@ -432,7 +510,7 @@ for (const { relativePath, ctaPosition, assertProgramId } of [
     assertProgramId: node => assertStringLiteral(node, "inscripcion", "reservation checkout program_id must be inscripcion"),
   },
 ]) {
-  assertLocalizationLanguageBinding(parseSource(relativePath), relativePath)
+  assertTrackedEventLanguageBinding(relativePath, "begin_checkout")
   const tryStatement = findHandleSubmitTry(relativePath)
   const statements = tryStatement.block.body
   const checkoutIndex = statementIndex(
@@ -476,6 +554,48 @@ const getSyntheticEventPayload = source => {
     "generate_lead"
   )
   return event.arguments[1]
+}
+
+const getSyntheticEventLanguagePath = source => {
+  const ast = parse(source, { sourceType: "module" })
+  let languagePath
+  traverse(ast, {
+    CallExpression(nodePath) {
+      if (!isCallNamed(nodePath.node, "trackEvent") || nodePath.node.arguments[0]?.value !== "generate_lead") {
+        return
+      }
+      const payloadPath = nodePath.get("arguments")[1]
+      const languagePropertyPath = payloadPath.get("properties").find(
+        propertyPath => (propertyPath.node.key.name || propertyPath.node.key.value) === "language"
+      )
+      languagePath = languagePropertyPath.get("value")
+    },
+  })
+  assert(languagePath, "synthetic generate_lead event must include language")
+  return languagePath
+}
+
+{
+  const languagePath = getSyntheticEventLanguagePath(`
+    function EnrollmentForm(form) {
+      const { language } = useLocalization()
+      function submit() {
+        const language = form.emailContacto
+        trackEvent("generate_lead", {
+          language,
+          program_id: getAnalyticsProgramIdByNivelLabel(nivelElegido),
+          landing_path: typeof window === "undefined" ? "" : window.location.pathname,
+          cta_position: "inscripcion_part_1",
+          lead_channel: "form",
+        })
+      }
+    }
+  `)
+  assert.throws(
+    () => assertLocalizationLanguageBinding(languagePath, "synthetic shadowed language"),
+    /synthetic shadowed language/,
+    "language payloads must reject a user-derived shadowing binding"
+  )
 }
 
 for (const unsafeProgramId of ["userValue", "message", "nombreCompleto", "emailContacto"]) {
