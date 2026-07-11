@@ -19,6 +19,8 @@ import {
   getCheckoutLabelFromProgramaId,
 } from "../../data/programasOferta"
 
+const { trackEvent } = require("../../utils/analytics")
+
 const formatMonto = (n) =>
   Number(n).toLocaleString("es-MX", { maximumFractionDigits: 0 })
 
@@ -192,6 +194,13 @@ const InscriptionCheckoutForm = ({
       }
 
       const { url } = await createPublicCheckoutSession(payload)
+      trackEvent("begin_checkout", {
+        language,
+        program_id: getProgramaByCheckoutLabel(programa)?.id || "inscripcion",
+        landing_path: typeof window === "undefined" ? "" : window.location.pathname,
+        cta_position: "checkout_form",
+        lead_channel: "stripe",
+      })
       if (stripeTab && !stripeTab.closed) {
         stripeTab.location = url
         setCheckoutUrl(url)

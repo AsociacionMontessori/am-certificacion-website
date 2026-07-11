@@ -50,6 +50,7 @@
     "clean": "gatsby clean",
     "test": "echo \"Write tests! -> https://gatsby.dev/unit-testing\" && exit 1",
     "test:analytics": "node scripts/test-analytics.js",
+    "test:analytics-instrumentation": "node scripts/test-analytics-instrumentation.js",
     "test:seo-redirects": "node scripts/test-seo-redirects.js",
     "test:seo-sitemap": "node scripts/test-sitemap-seo.js",
     "deploy": "npm run build && npx firebase deploy --only hosting",

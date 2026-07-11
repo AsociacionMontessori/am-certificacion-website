@@ -562,7 +562,7 @@ const ContactMethod = ({ icon, title, link, description, methodKey }) => {
       eventName="click_whatsapp"
       eventParams={{
         language,
-        landing_path: "/contact/",
+        landing_path: typeof window === "undefined" ? "" : window.location.pathname,
         cta_position: `contact_${methodKey}`,
         lead_channel: methodKey,
       }}
@@ -578,10 +578,10 @@ Do not emit an event for email, map or telephone in this task because those acti
 
 - [ ] **Step 4: Emit a lead only after part-one acceptance**
 
-In `InscripcionParte1Form.js`, import `getProgramaByCheckoutLabel`, `useLocalization` and `trackEvent`; add `const { language } = useLocalization()`. Immediately after `submitInscripcionParte1(...)` resolves and before `onSuccess`:
+In `InscripcionParte1Form.js`, import `getAnalyticsProgramIdByNivelLabel`, `useLocalization` and `trackEvent`; add `const { language } = useLocalization()`. `getAnalyticsProgramIdByNivelLabel` resolves the form label through `getNivelByLabel`, accepts only `nido`, `casa`, `taller`, `cosmica` and `neuro`, and returns `unknown` for `filosofia`, `otro`, missing or unknown labels. Immediately after `submitInscripcionParte1(...)` resolves and before `onSuccess`:
 
 ```javascript
-const programId = getProgramaByCheckoutLabel(nivelElegido)?.id || "unknown"
+const programId = getAnalyticsProgramIdByNivelLabel(nivelElegido)
 trackEvent("generate_lead", {
   language,
   program_id: programId,
@@ -627,10 +627,11 @@ Do not pass `ordenId`, Stripe URL, name, email or telephone. Do not add `purchas
 rg -n "trackEvent\(" src
 rg -n "trackEvent\([^\n]*(email|telefono|nombre|message|orden)" src
 npm run test:analytics
+npm run test:analytics-instrumentation
 npm run build
 ```
 
-Expected: the first command lists intended call sites; the second prints nothing; tests and build pass.
+Expected: the first command lists intended call sites; the second prints nothing; the source/AST instrumentation contract, analytics contract and build pass.
 
 - [ ] **Step 7: Commit**
 

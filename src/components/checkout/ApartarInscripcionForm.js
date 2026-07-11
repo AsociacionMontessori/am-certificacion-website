@@ -9,6 +9,8 @@ import { getCuentaContableId } from "../../data/datosBancarios"
 import ComprobanteFiscalMexico from "./ComprobanteFiscalMexico"
 import { useVisitorGeo } from "../../hooks/useVisitorGeo"
 
+const { trackEvent } = require("../../utils/analytics")
+
 /**
  * Formulario para apartar el lugar pagando solo la inscripción con tarjeta.
  * Siempre cobra `inscripcion_diplomado` (no expone programas/colegiaturas, que
@@ -49,6 +51,13 @@ const ApartarInscripcionForm = ({ coin = "MXN", price, cancelHref = "/" }) => {
         cuentaContable: getCuentaContableId(permiteFacturaFiscal && requiereFacturaFiscal),
         language,
         cliente: { nombre: nombre.trim(), email: email.trim(), telefono: telefono.trim() },
+      })
+      trackEvent("begin_checkout", {
+        language,
+        program_id: "inscripcion",
+        landing_path: typeof window === "undefined" ? "" : window.location.pathname,
+        cta_position: "enrollment_reservation_form",
+        lead_channel: "stripe",
       })
       if (stripeTab && !stripeTab.closed) {
         stripeTab.location = url

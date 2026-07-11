@@ -3,10 +3,11 @@ import { StaticImage } from "gatsby-plugin-image"
 import { useTranslation } from "react-i18next"
 import { useLocalization } from "../i18n"
 import { buildWhatsAppUrl } from "../data/contactoWhatsApp"
+import TrackedActionLink from "./TrackedActionLink"
 
 export default function Footer() {
     const { t } = useTranslation("footer")
-    const { localizedPath } = useLocalization()
+    const { language, localizedPath } = useLocalization()
     const whatsappInformesUrl = buildWhatsAppUrl(t("whatsapp.mensajeInformes"))
     return (
         <footer className="bg-gray-700 text-white pb-8 flex flex-col justify-center items-center max-w-full">
@@ -72,7 +73,20 @@ export default function Footer() {
                         <br />
                         <a href="tel:5555152701" target="_blank" rel="noopener noreferrer">{t("escuelas.telefono")}</a>
                         <br />
-                        <a href={whatsappInformesUrl} target="_blank" rel="noopener noreferrer">{t("escuelas.whatsapp")}</a>
+                        <TrackedActionLink
+                            href={whatsappInformesUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            eventName="click_whatsapp"
+                            eventParams={{
+                                language,
+                                landing_path: typeof window === "undefined" ? "" : window.location.pathname,
+                                cta_position: "footer",
+                                lead_channel: "whatsapp",
+                            }}
+                        >
+                            {t("escuelas.whatsapp")}
+                        </TrackedActionLink>
                         <br />
                         <span className="text-white/70">{t("escuelas.atencionChat")}</span>
                         <br />

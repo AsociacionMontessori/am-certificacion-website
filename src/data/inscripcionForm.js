@@ -59,6 +59,19 @@ export const NIVELES_ESPECIALIZACION = [
 export const getNivelByLabel = (label) =>
   NIVELES_ESPECIALIZACION.find((n) => n.label === label) || null
 
+const ANALYTICS_PROGRAM_IDS = new Set([
+  "nido",
+  "casa",
+  "taller",
+  "cosmica",
+  "neuro",
+])
+
+export const getAnalyticsProgramIdByNivelLabel = (label) => {
+  const programId = getNivelByLabel(label)?.reglamentoKey
+  return ANALYTICS_PROGRAM_IDS.has(programId) ? programId : "unknown"
+}
+
 export const ESCOLARIDAD_OPCIONES = [
   "Secundaria",
   "Preparatoria / Bachillerato",

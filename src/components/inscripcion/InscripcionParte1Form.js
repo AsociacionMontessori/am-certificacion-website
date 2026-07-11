@@ -5,8 +5,12 @@ import {
   DOMINIO_INSTITUCIONAL,
   MODALIDAD_INSCRIPCION,
   NIVELES_ESPECIALIZACION,
+  getAnalyticsProgramIdByNivelLabel,
 } from "../../data/inscripcionForm"
+import { useLocalization } from "../../i18n"
 import { submitInscripcionParte1 } from "../../utils/inscripcionApi"
+
+const { trackEvent } = require("../../utils/analytics")
 
 const emptyForm = {
   nombreCompleto: "",
@@ -32,6 +36,7 @@ const InscripcionParte1Form = ({
   onSuccess,
 }) => {
   const { t } = useTranslation("checkout")
+  const { language } = useLocalization()
   const nivelFijo = nivelEspecializacionFijo || ""
   const [form, setForm] = useState({
     ...emptyForm,
@@ -69,6 +74,13 @@ const InscripcionParte1Form = ({
         emailContacto: form.emailContacto.trim(),
         usuarioInstitucional: form.usuarioInstitucional.trim().toLowerCase(),
       }, accessToken)
+      trackEvent("generate_lead", {
+        language,
+        program_id: getAnalyticsProgramIdByNivelLabel(nivelElegido),
+        landing_path: typeof window === "undefined" ? "" : window.location.pathname,
+        cta_position: "inscripcion_part_1",
+        lead_channel: "form",
+      })
       onSuccess?.(result)
     } catch (err) {
       setError(err.message || t("part1.submitError"))

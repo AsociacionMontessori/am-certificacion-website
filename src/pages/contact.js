@@ -7,7 +7,8 @@ import Layout from "../components/layout"
 import Seo from "../components/seo"
 import Nav from "../components/nav"
 import Questions, { getFaqItems } from "../components/questions"
-import { getT } from "../i18n"
+import { getT, useLocalization } from "../i18n"
+import TrackedActionLink from "../components/TrackedActionLink"
 
 import '../styles/publications.css'
 import '../styles/wordpress_publications.css'
@@ -40,6 +41,7 @@ const contact = () => {
                                         link={method.link}
                                         title={t(`methods.${method.key}.title`)}
                                         description={t(`methods.${method.key}.description`)}
+                                        methodKey={method.key}
                                     />
                                 ))}
                             </div>
@@ -71,18 +73,42 @@ const contact = () => {
     )
 }
 
-const ContactMethod = ({ icon, title, link, description }) => (
-    <a href={link} target="_blank" rel="noopener noreferrer" className="flex flex-col items-center justify-center text-center selection:text-white selection:bg-green selection:bg-opacity-20">
-    <div className="flex flex-col items-center justify-center text-center selection:text-white selection:bg-green selection:bg-opacity-20">
-        <span className={`md:p-3 text-blue-500 rounded-full bg-blue-100/80 dark:bg-gray-800 ${iconsSize}`}>
-            {icon}
-        </span>
-        <h2 className="mt-4 text-sm sm:font-medium md:text-lg text-gray-800 dark:text-white">{title}</h2>
-        <p className="mt-2">{description}</p>
-    </div>
+const ContactMethod = ({ icon, title, link, description, methodKey }) => {
+    const { language } = useLocalization()
+    const isWhatsApp = methodKey === "whatsapp"
+    const className = "flex flex-col items-center justify-center text-center selection:text-white selection:bg-green selection:bg-opacity-20"
+    const contents = (
+        <div className={className}>
+            <span className={`md:p-3 text-blue-500 rounded-full bg-blue-100/80 dark:bg-gray-800 ${iconsSize}`}>
+                {icon}
+            </span>
+            <h2 className="mt-4 text-sm sm:font-medium md:text-lg text-gray-800 dark:text-white">{title}</h2>
+            <p className="mt-2">{description}</p>
+        </div>
+    )
 
-    </a>
-);
+    if (!isWhatsApp) {
+        return <a href={link} target="_blank" rel="noopener noreferrer" className={className}>{contents}</a>
+    }
+
+    return (
+        <TrackedActionLink
+            href={link}
+            target="_blank"
+            rel="noopener noreferrer"
+            eventName="click_whatsapp"
+            eventParams={{
+                language,
+                landing_path: typeof window === "undefined" ? "" : window.location.pathname,
+                cta_position: "contact_whatsapp",
+                lead_channel: "whatsapp",
+            }}
+            className={className}
+        >
+            {contents}
+        </TrackedActionLink>
+    )
+}
 
 
 const contactMethods = [

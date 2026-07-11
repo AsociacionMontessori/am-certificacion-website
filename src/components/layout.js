@@ -5,10 +5,13 @@ import { Transition } from "@headlessui/react"
 import "../styles/fonts.css"
 import { useTranslation } from "react-i18next"
 import { buildWhatsAppUrl } from "../data/contactoWhatsApp"
+import { useLocalization } from "../i18n"
+import TrackedActionLink from "./TrackedActionLink"
 
 const Layout = ({ children }) => {
   const [showWABtn, setShowWABtn] = React.useState(false)
   const { t } = useTranslation("footer")
+  const { language } = useLocalization()
   const whatsappInformesUrl = buildWhatsAppUrl(t("whatsapp.mensajeInformes"))
 
   return (
@@ -28,7 +31,18 @@ const Layout = ({ children }) => {
           </section>
 
           <div id="wa" className="wa__widget_container">
-            <a target="_blank" rel="noreferrer" href={whatsappInformesUrl} >
+            <TrackedActionLink
+              target="_blank"
+              rel="noreferrer"
+              href={whatsappInformesUrl}
+              eventName="click_whatsapp"
+              eventParams={{
+                language,
+                landing_path: typeof window === "undefined" ? "" : window.location.pathname,
+                cta_position: "floating_widget",
+                lead_channel: "whatsapp",
+              }}
+            >
 
               <div className="wa__btn_popup" style={{ left: 'unset', right: '20px', bottom: '30px' }}>
                 <Transition
@@ -59,7 +73,7 @@ const Layout = ({ children }) => {
                 </div>
               </div>
 
-            </a>
+            </TrackedActionLink>
           </div>
 
         </div>
