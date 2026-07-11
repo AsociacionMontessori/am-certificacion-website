@@ -33,6 +33,12 @@ const AnalyticsConsent = () => {
     if (open) declineButton.current?.focus()
   }, [open])
 
+  React.useEffect(() => {
+    if (typeof document === "undefined") return undefined
+    document.body.classList.toggle("analytics-consent-open", open)
+    return () => document.body.classList.remove("analytics-consent-open")
+  }, [open])
+
   const choose = next => {
     if (!setAnalyticsConsent(next)) return
     setChoice(next)

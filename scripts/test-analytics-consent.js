@@ -227,6 +227,7 @@ const consentComponent = fs.readFileSync(
 )
 const gatsbyBrowser = fs.readFileSync(path.join(root, "gatsby-browser.js"), "utf8")
 const layout = fs.readFileSync(path.join(root, "src/components/layout.js"), "utf8")
+const whatsappStyles = fs.readFileSync(path.join(root, "src/styles/wa.css"), "utf8")
 const footer = fs.readFileSync(path.join(root, "src/components/footer.js"), "utf8")
 const privacyPage = fs.readFileSync(path.join(root, "src/pages/privacy.js"), "utf8")
 assert(!packageJson.includes("gatsby-plugin-google-gtag"))
@@ -236,6 +237,23 @@ assert(gatsbyBrowser.includes("initializeAnalyticsConsent()"))
 assert(gatsbyBrowser.includes("trackPageView(location)"))
 assert(layout.includes("<AnalyticsConsent />"))
 assert(footer.includes("openAnalyticsConsent()"))
+const consentOpenBodyClass = "analytics-consent-open"
+assert(
+  consentComponent.includes(`document.body.classList.toggle("${consentOpenBodyClass}", open)`),
+  "the open consent state must be reflected on body"
+)
+assert(
+  consentComponent.includes(`return () => document.body.classList.remove("${consentOpenBodyClass}")`),
+  "unmounting the consent panel must clean up the body state"
+)
+assert(
+  whatsappStyles.includes(`body.${consentOpenBodyClass} #wa`),
+  "WhatsApp must have an open-consent stylesheet rule"
+)
+assert(
+  new RegExp(`body\\.${consentOpenBodyClass} #wa\\s*\\{\\s*display:\\s*none`).test(whatsappStyles),
+  "open consent must remove WhatsApp visibility and interaction"
+)
 assert(privacyPage.includes('t("privacy.analytics.titulo")'))
 assert(privacyPage.includes('t("privacy.actualizacion")'))
 

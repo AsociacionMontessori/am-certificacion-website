@@ -690,6 +690,7 @@ git commit -m "feat(analytics): measure contact and enrollment intent"
 - Modify: `gatsby-browser.js`
 - Modify: `gatsby-config.js`
 - Modify: `src/components/layout.js`
+- Modify: `src/styles/wa.css`
 - Modify: `src/components/footer.js`
 - Modify: `src/pages/privacy.js`
 - Modify: `src/i18n/locales/{es,en,pt-br}/common.json`
@@ -776,6 +777,8 @@ Remove `gatsby-plugin-google-gtag` from config, package, and lock. Do not replac
 
 Call `initializeAnalyticsConsent()` before browser-language redirect and call `trackPageView(location)` before attributed-arrival tracking on route updates. Render one `<AnalyticsConsent />` outside layout content. The banner must be non-modal, keyboard accessible, focus-visible, responsive, and provide equally functional decline/allow buttons. The footer preference button must reopen after either choice; revoke and later regrant must work. Only analytics utilities may queue events.
 
+While the consent panel is open, reflect that state with an `analytics-consent-open` body class and use `src/styles/wa.css` to set `body.analytics-consent-open #wa { display: none; }`. This must remove the fixed WhatsApp widget from rendering, interaction, keyboard navigation, and the accessibility tree, restore it immediately after either consent choice, and clean up the class on unmount.
+
 Add complete `analyticsConsent` records to ES/EN/PT-BR `common.json`. Declining must not block links, programs, forms, payments, or contact.
 
 - [ ] **Step 4: Correct and render all privacy notices**
@@ -815,7 +818,7 @@ npm run build
 git diff --check
 ```
 
-Use Playwright CLI against the local Gatsby server. Before navigation, route and abort every request to `googletagmanager.com`, `google-analytics.com`, `analytics.google.com`, and `region1.google-analytics.com`; record attempted URLs without sending them. Verify unknown -> zero, decline -> zero, denied reload -> zero, footer reopen, grant -> one tag-script attempt, revoke -> later events blocked, regrant behavior, keyboard focus, console health, and no clipping/overlap at desktop and mobile widths. Store screenshots and temporary scripts outside tracked source.
+Use Playwright CLI against the local Gatsby server. Before navigation, route and abort every request to `googletagmanager.com`, `google-analytics.com`, `analytics.google.com`, and `region1.google-analytics.com`; record attempted URLs without sending them. Verify unknown -> zero, decline -> zero, denied reload -> zero, footer reopen, grant -> one tag-script attempt, revoke -> later events blocked, regrant behavior, keyboard focus, console health, and no clipping/overlap at desktop and mobile widths. While open, verify `#wa` is not visible, interactive, keyboard reachable, or exposed in the accessibility tree; verify it returns after each choice. Store screenshots and temporary scripts outside tracked source.
 
 Run secret/PII scans over the diff, verify `.superpowers` remains untracked, and do not deploy or read `.env`.
 

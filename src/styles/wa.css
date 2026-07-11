@@ -3,6 +3,9 @@ wa__btn_popup
 wa__btn_popup_txt
 wa__btn_popup_icon
 
+body.analytics-consent-open #wa {
+    display: none;
+}
 
 .wa__btn_popup,.wa__btn_popup *,.wa__btn_popup :after,.wa__btn_popup :before,.wa__button,.wa__button *,.wa__button :after,.wa__button :before,.wa__popup_chat_box,.wa__popup_chat_box *,.wa__popup_chat_box :after,.wa__popup_chat_box :before {
     box-sizing: border-box;
