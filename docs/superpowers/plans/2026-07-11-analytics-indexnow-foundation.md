@@ -472,16 +472,39 @@ git commit -m "feat(analytics): add privacy-safe funnel events"
 - Modify: `src/components/layout.js:7-63`
 - Modify: `src/components/footer.js:5-76`
 - Modify: `src/pages/contact.js:17-126`
+- Modify: `src/data/inscripcionForm.js`
 - Modify: `src/components/inscripcion/InscripcionParte1Form.js:4-77`
 - Modify: `src/components/checkout/InscriptionCheckoutForm.js:145-207`
 - Modify: `src/components/checkout/ApartarInscripcionForm.js:1-68`
+- Modify: `src/utils/stripeCheckout.js`
+- Create: `scripts/test-analytics-instrumentation.js`
+- Modify: `package.json`
+- Modify: `docs/superpowers/plans/2026-07-11-analytics-indexnow-foundation.md`
 
 **Interfaces:**
 - Produces React component: `TrackedActionLink({ eventName, eventParams, href, children, onClick, ...anchorProps })`.
 - Emits `generate_lead` only after the API accepted part one.
-- Emits `begin_checkout` only after Stripe returned a checkout URL.
+- Emits `begin_checkout` only after Stripe returned a validated hosted checkout URL.
+- Validates public Checkout URLs as credential-free `https://checkout.stripe.com` URLs before returning them to either checkout consumer.
 
-- [ ] **Step 1: Add the reusable tracked anchor**
+- [ ] **Step 1: Write the failing instrumentation and Checkout URL contract**
+
+Create `scripts/test-analytics-instrumentation.js` and add the `test:analytics-instrumentation` package script. The executable Node contract must:
+
+- Exercise `TrackedActionLink` and source-parse every Task 2 event call site.
+- Require each payload expression to match its closed source: localization `language`; the SSR-safe `typeof window === "undefined" ? "" : window.location.pathname`; exact CTA position and lead channel; the closed `getAnalyticsProgramIdByNivelLabel(nivelElegido)` lead mapping; the existing full-checkout catalog lookup with `"inscripcion"` fallback; and the reservation `"inscripcion"` literal.
+- Require WhatsApp event names and layout, footer, and contact CTA positions exactly. Include negative source mutations proving user-derived `program_id` values such as `userValue`, `message`, `nombreCompleto`, and `emailContacto` fail.
+- Mock `fetch` for `createPublicCheckoutSession` and cover one valid Stripe Checkout URL plus absent, non-string, relative, malformed, HTTP, credential-bearing, suffix-host, other-host, and non-standard-port responses.
+
+- [ ] **Step 2: Run the contract and verify RED**
+
+```bash
+npm run test:analytics-instrumentation
+```
+
+Expected before implementation: exit `1` because the required source instrumentation and/or Checkout URL validation does not yet exist.
+
+- [ ] **Step 3: Add the reusable tracked anchor**
 
 ```javascript
 // src/components/TrackedActionLink.js
@@ -511,7 +534,7 @@ const TrackedActionLink = ({
 export default TrackedActionLink
 ```
 
-- [ ] **Step 2: Instrument the floating and footer WhatsApp links**
+- [ ] **Step 4: Instrument the floating and footer WhatsApp links**
 
 Replace the floating widget anchor in `layout.js` with `TrackedActionLink`:
 
@@ -536,7 +559,7 @@ Import `useLocalization` and add `const { language } = useLocalization()` inside
 
 Apply the same component to the footer WhatsApp link with its existing `useLocalization().language` and `cta_position: "footer"`.
 
-- [ ] **Step 3: Instrument the contact page by method key**
+- [ ] **Step 5: Instrument the contact page by method key**
 
 Pass `methodKey={method.key}` to `ContactMethod`. Import `useLocalization` and `TrackedActionLink`. Inside the component, keep a normal anchor for non-WhatsApp methods and instrument only WhatsApp:
 
@@ -576,7 +599,7 @@ const ContactMethod = ({ icon, title, link, description, methodKey }) => {
 
 Do not emit an event for email, map or telephone in this task because those actions do not match the approved funnel event meanings.
 
-- [ ] **Step 4: Emit a lead only after part-one acceptance**
+- [ ] **Step 6: Emit a lead only after part-one acceptance**
 
 In `InscripcionParte1Form.js`, import `getAnalyticsProgramIdByNivelLabel`, `useLocalization` and `trackEvent`; add `const { language } = useLocalization()`. `getAnalyticsProgramIdByNivelLabel` resolves the form label through `getNivelByLabel`, accepts only `nido`, `casa`, `taller`, `cosmica` and `neuro`, and returns `unknown` for `filosofia`, `otro`, missing or unknown labels. Immediately after `submitInscripcionParte1(...)` resolves and before `onSuccess`:
 
@@ -593,9 +616,11 @@ trackEvent("generate_lead", {
 
 Never pass any field from `form`.
 
-- [ ] **Step 5: Emit checkout only after Stripe returns a URL**
+- [ ] **Step 7: Validate Checkout URLs and emit checkout only after Stripe returns one**
 
-In `InscriptionCheckoutForm.js`, immediately after a successful `createPublicCheckoutSession` response:
+In `src/utils/stripeCheckout.js`, validate the successful `data.url` before returning it. Accept only a string that parses as an absolute HTTPS URL with no username or password, exact hostname `checkout.stripe.com`, and the default HTTPS origin. Reject absent, malformed, relative, HTTP, credential-bearing, suffix-host, other-host, and non-standard-port values with the existing `Respuesta de pago incompleta` boundary. Return the normalized validated URL so both existing Checkout consumers are protected without changing their payloads or navigation.
+
+In `InscriptionCheckoutForm.js`, immediately after a successful validated `createPublicCheckoutSession` response:
 
 ```javascript
 trackEvent("begin_checkout", {
@@ -621,22 +646,32 @@ trackEvent("begin_checkout", {
 
 Do not pass `ordenId`, Stripe URL, name, email or telephone. Do not add `purchase` to `checkout/success.js`.
 
-- [ ] **Step 6: Verify no disallowed parameter reaches source calls**
+- [ ] **Step 8: Run the contract and verify GREEN**
+
+```bash
+npm run test:analytics-instrumentation
+```
+
+Expected: exit `0` with `analytics instrumentation contract ok`.
+
+- [ ] **Step 9: Verify no disallowed parameter reaches source calls**
 
 ```bash
 rg -n "trackEvent\(" src
 rg -n "trackEvent\([^\n]*(email|telefono|nombre|message|orden)" src
 npm run test:analytics
 npm run test:analytics-instrumentation
+npm run test:seo-redirects
+npm run test:seo-sitemap
 npm run build
 ```
 
-Expected: the first command lists intended call sites; the second prints nothing; the source/AST instrumentation contract, analytics contract and build pass.
+Expected: the first command lists intended call sites; the second prints nothing; the source/AST instrumentation contract, analytics contract, SEO contracts and build pass.
 
-- [ ] **Step 7: Commit**
+- [ ] **Step 10: Commit**
 
 ```bash
-git add src/components/TrackedActionLink.js src/components/layout.js src/components/footer.js src/pages/contact.js src/components/inscripcion/InscripcionParte1Form.js src/components/checkout/InscriptionCheckoutForm.js src/components/checkout/ApartarInscripcionForm.js
+git add docs/superpowers/plans/2026-07-11-analytics-indexnow-foundation.md package.json scripts/test-analytics-instrumentation.js src/components/TrackedActionLink.js src/components/layout.js src/components/footer.js src/pages/contact.js src/data/inscripcionForm.js src/components/inscripcion/InscripcionParte1Form.js src/components/checkout/InscriptionCheckoutForm.js src/components/checkout/ApartarInscripcionForm.js src/utils/stripeCheckout.js
 git commit -m "feat(analytics): measure contact and enrollment intent"
 ```
 

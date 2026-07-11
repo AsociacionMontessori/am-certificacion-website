@@ -4,11 +4,33 @@ const DEFAULT_CHECKOUT_URL =
 const DEFAULT_DIGITAL_DOWNLOAD_URL =
   "https://us-central1-certificacionmontessori.cloudfunctions.net/getDigitalBookDownloadUrl"
 
+const STRIPE_CHECKOUT_ORIGIN = "https://checkout.stripe.com"
+
 export const getCheckoutApiUrl = () =>
   process.env.GATSBY_CHECKOUT_API_URL || DEFAULT_CHECKOUT_URL
 
 export const getDigitalDownloadApiUrl = () =>
   process.env.GATSBY_DIGITAL_DOWNLOAD_API_URL || DEFAULT_DIGITAL_DOWNLOAD_URL
+
+const getPublicStripeCheckoutUrl = value => {
+  if (typeof value !== "string") return undefined
+
+  try {
+    const url = new URL(value)
+    if (
+      url.protocol !== "https:" ||
+      url.hostname !== "checkout.stripe.com" ||
+      url.username ||
+      url.password ||
+      url.origin !== STRIPE_CHECKOUT_ORIGIN
+    ) {
+      return undefined
+    }
+    return url.href
+  } catch (_error) {
+    return undefined
+  }
+}
 
 /**
  * @param {object} payload
@@ -21,17 +43,18 @@ export async function createPublicCheckoutSession(payload) {
     body: JSON.stringify(payload),
   })
 
-  const data = await response.json().catch(() => ({}))
+  const data = (await response.json().catch(() => ({}))) || {}
 
   if (!response.ok) {
     throw new Error(data.error || "No se pudo iniciar el pago")
   }
 
-  if (!data.url) {
+  const url = getPublicStripeCheckoutUrl(data.url)
+  if (!url) {
     throw new Error("Respuesta de pago incompleta")
   }
 
-  return data
+  return { ...data, url }
 }
 
 function getFileNameFromDisposition(disposition) {

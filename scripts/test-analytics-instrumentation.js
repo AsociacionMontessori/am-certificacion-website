@@ -77,14 +77,51 @@ const isCallNamed = (node, name) =>
   node.callee?.type === "Identifier" &&
   node.callee.name === name
 
-const findTrackedEvent = (node, eventName) =>
+const findTrackedEvents = (node, eventName) =>
   findNodes(
     node,
     candidate =>
       isCallNamed(candidate, "trackEvent") &&
       candidate.arguments[0]?.type === "StringLiteral" &&
       candidate.arguments[0].value === eventName
-  )[0]
+  )
+
+const findTrackedEvent = (node, eventName) => findTrackedEvents(node, eventName)[0]
+
+const assertSingleTrackedEvent = (node, eventName, message) => {
+  const calls = findTrackedEvents(node, eventName)
+  assert.strictEqual(calls.length, 1, message)
+  return calls[0]
+}
+
+const assertLocalizationLanguageBinding = (ast, relativePath) => {
+  let found = false
+  traverse(ast, {
+    VariableDeclarator(nodePath) {
+      const { id, init } = nodePath.node
+      if (
+        id.type !== "ObjectPattern" ||
+        init?.type !== "CallExpression" ||
+        init.callee?.type !== "Identifier" ||
+        init.callee.name !== "useLocalization"
+      ) {
+        return
+      }
+      for (const property of id.properties) {
+        if (
+          property.type === "ObjectProperty" &&
+          property.key.type === "Identifier" &&
+          property.key.name === "language" &&
+          property.value.type === "Identifier" &&
+          property.value.name === "language"
+        ) {
+          found = true
+        }
+      }
+    },
+  })
+  assert(found, `${relativePath} must bind language from useLocalization`)
+}
 
 const statementIndex = (statements, predicate, message) => {
   const index = statements.findIndex(statement =>
@@ -94,7 +131,100 @@ const statementIndex = (statements, predicate, message) => {
   return index
 }
 
-const assertSafeObjectPayload = (payload, eventName) => {
+const getPayloadProperty = (payload, key, eventName) => {
+  const property = payload.properties.find(
+    candidate => (candidate.key.name || candidate.key.value) === key
+  )
+  assert(property, `${eventName} must include ${key}`)
+  return property.value
+}
+
+const assertIdentifier = (node, identifier, message) => {
+  assert.strictEqual(node?.type, "Identifier", message)
+  assert.strictEqual(node.name, identifier, message)
+}
+
+const assertStringLiteral = (node, value, message) => {
+  assert.strictEqual(node?.type, "StringLiteral", message)
+  assert.strictEqual(node.value, value, message)
+}
+
+const assertBrowserLandingPath = (node, eventName) => {
+  assert.strictEqual(
+    node?.type,
+    "ConditionalExpression",
+    `${eventName} landing_path must branch for SSR`
+  )
+  const test = node.test
+  assert.strictEqual(test?.type, "BinaryExpression", `${eventName} landing_path must test window`)
+  assert.strictEqual(test.operator, "===", `${eventName} landing_path must test window exactly`)
+  assert.strictEqual(test.left?.type, "UnaryExpression", `${eventName} landing_path must use typeof window`)
+  assert.strictEqual(test.left.operator, "typeof", `${eventName} landing_path must use typeof window`)
+  assertIdentifier(test.left.argument, "window", `${eventName} landing_path must use window`)
+  assertStringLiteral(test.right, "undefined", `${eventName} landing_path must test undefined`)
+  assertStringLiteral(node.consequent, "", `${eventName} landing_path must be empty during SSR`)
+  assert.strictEqual(
+    node.alternate?.type,
+    "MemberExpression",
+    `${eventName} landing_path must read window.location.pathname in the browser`
+  )
+  assert.strictEqual(node.alternate.computed, false, `${eventName} landing_path must use pathname directly`)
+  assertIdentifier(node.alternate.property, "pathname", `${eventName} landing_path must read pathname`)
+  assert.strictEqual(
+    node.alternate.object?.type,
+    "MemberExpression",
+    `${eventName} landing_path must read window.location`
+  )
+  assert.strictEqual(node.alternate.object.computed, false, `${eventName} landing_path must use location directly`)
+  assertIdentifier(node.alternate.object.object, "window", `${eventName} landing_path must use window.location`)
+  assertIdentifier(node.alternate.object.property, "location", `${eventName} landing_path must use window.location`)
+}
+
+const assertLeadProgramId = node => {
+  assert.strictEqual(node?.type, "CallExpression", "generate_lead program_id must use the closed level mapping")
+  assertIdentifier(
+    node.callee,
+    "getAnalyticsProgramIdByNivelLabel",
+    "generate_lead program_id must use the closed level mapping"
+  )
+  assert.strictEqual(node.arguments.length, 1, "generate_lead program_id must map one level label")
+  assertIdentifier(
+    node.arguments[0],
+    "nivelElegido",
+    "generate_lead program_id must map nivelElegido"
+  )
+}
+
+const assertFullCheckoutProgramId = node => {
+  assert.strictEqual(
+    node?.type,
+    "LogicalExpression",
+    "full checkout program_id must use the catalog lookup with its fallback"
+  )
+  assert.strictEqual(node.operator, "||", "full checkout program_id must retain its fallback")
+  assertStringLiteral(node.right, "inscripcion", "full checkout fallback must be inscripcion")
+  assert.strictEqual(
+    node.left?.type,
+    "OptionalMemberExpression",
+    "full checkout program_id must read the optional catalog result"
+  )
+  assert.strictEqual(node.left.computed, false, "full checkout program_id must read id directly")
+  assert.strictEqual(node.left.optional, true, "full checkout program_id must use optional catalog access")
+  assertIdentifier(node.left.property, "id", "full checkout program_id must read catalog id")
+  assert.strictEqual(node.left.object?.type, "CallExpression", "full checkout program_id must call the catalog lookup")
+  assertIdentifier(
+    node.left.object.callee,
+    "getProgramaByCheckoutLabel",
+    "full checkout program_id must call the catalog lookup"
+  )
+  assert.strictEqual(node.left.object.arguments.length, 1, "full checkout catalog lookup must use one label")
+  assertIdentifier(node.left.object.arguments[0], "programa", "full checkout catalog lookup must use programa")
+}
+
+const assertExactObjectPayload = (
+  payload,
+  { eventName, ctaPosition, leadChannel, assertProgramId }
+) => {
   assert(payload?.type === "ObjectExpression", `${eventName} must use an object payload`)
   const expectedKeys = [
     "language",
@@ -108,31 +238,36 @@ const assertSafeObjectPayload = (payload, eventName) => {
     expectedKeys,
     `${eventName} must use only its approved payload keys`
   )
-  const prohibitedIdentifiers = new Set([
-    "form",
-    "nombre",
-    "email",
-    "telefono",
-    "ordenId",
-    "accessToken",
-    "url",
-    "checkoutUrl",
-    "stripeTab",
-  ])
-  const leaked = findNodes(
-    payload,
-    node => node.type === "Identifier" && prohibitedIdentifiers.has(node.name)
-  ).map(node => node.name)
-  assert.deepStrictEqual(leaked, [], `${eventName} payload must not include personal or payment data`)
+  assertIdentifier(
+    getPayloadProperty(payload, "language", eventName),
+    "language",
+    `${eventName} language must use the closed localization language`
+  )
+  assertBrowserLandingPath(getPayloadProperty(payload, "landing_path", eventName), eventName)
+  assertStringLiteral(
+    getPayloadProperty(payload, "cta_position", eventName),
+    ctaPosition,
+    `${eventName} cta_position must be ${ctaPosition}`
+  )
+  assertStringLiteral(
+    getPayloadProperty(payload, "lead_channel", eventName),
+    leadChannel,
+    `${eventName} lead_channel must be ${leadChannel}`
+  )
+  if (assertProgramId) {
+    assertProgramId(getPayloadProperty(payload, "program_id", eventName))
+  }
 }
 
-const assertSafePayload = (call, eventName) => {
+const assertExactPayload = (call, options) => {
+  const { eventName } = options
   assert(call, `${eventName} must be tracked`)
-  assertSafeObjectPayload(call.arguments[1], eventName)
+  assertExactObjectPayload(call.arguments[1], options)
 }
 
-const assertTrackedActionLinkPayload = relativePath => {
+const assertTrackedActionLinkPayload = (relativePath, ctaPosition) => {
   const ast = parseSource(relativePath)
+  assertLocalizationLanguageBinding(ast, relativePath)
   const trackedLinks = []
   traverse(ast, {
     JSXOpeningElement(nodePath) {
@@ -147,7 +282,11 @@ const assertTrackedActionLinkPayload = relativePath => {
         attribute => attribute.type === "JSXAttribute" && attribute.name.name === "eventParams"
       )
       assert.strictEqual(eventName?.value?.value, "click_whatsapp")
-      assertSafeObjectPayload(eventParams?.value?.expression, "click_whatsapp")
+      assertExactObjectPayload(eventParams?.value?.expression, {
+        eventName: "click_whatsapp",
+        ctaPosition,
+        leadChannel: "whatsapp",
+      })
       trackedLinks.push(nodePath.node)
     },
   })
@@ -234,17 +373,19 @@ for (const landingPath of ["/contact/", "/en/contact/", "/pt-br/contact/"]) {
   assert.doesNotMatch(contactSource, /landing_path:\s*["']\/contact\//)
 }
 
-for (const relativePath of [
-  "src/components/layout.js",
-  "src/components/footer.js",
-  "src/pages/contact.js",
+for (const [relativePath, ctaPosition] of [
+  ["src/components/layout.js", "floating_widget"],
+  ["src/components/footer.js", "footer"],
+  ["src/pages/contact.js", "contact_whatsapp"],
 ]) {
-  assertTrackedActionLinkPayload(relativePath)
+  assertTrackedActionLinkPayload(relativePath, ctaPosition)
 }
 
 {
+  const relativePath = "src/components/inscripcion/InscripcionParte1Form.js"
+  assertLocalizationLanguageBinding(parseSource(relativePath), relativePath)
   const tryStatement = findHandleSubmitTry(
-    "src/components/inscripcion/InscripcionParte1Form.js"
+    relativePath
   )
   const statements = tryStatement.block.body
   const submitIndex = statementIndex(
@@ -266,14 +407,32 @@ for (const relativePath of [
   )
   assert(submitIndex < leadIndex, "generate_lead must follow API acceptance")
   assert(leadIndex < successIndex, "generate_lead must precede onSuccess")
-  assertSafePayload(findTrackedEvent(tryStatement.block, "generate_lead"), "generate_lead")
+  assertExactPayload(assertSingleTrackedEvent(
+    tryStatement.block,
+    "generate_lead",
+    "generate_lead must have exactly one successful call site"
+  ), {
+    eventName: "generate_lead",
+    ctaPosition: "inscripcion_part_1",
+    leadChannel: "form",
+    assertProgramId: assertLeadProgramId,
+  })
   assert.strictEqual(findTrackedEvent(tryStatement.handler, "generate_lead"), undefined)
 }
 
-for (const relativePath of [
-  "src/components/checkout/InscriptionCheckoutForm.js",
-  "src/components/checkout/ApartarInscripcionForm.js",
+for (const { relativePath, ctaPosition, assertProgramId } of [
+  {
+    relativePath: "src/components/checkout/InscriptionCheckoutForm.js",
+    ctaPosition: "checkout_form",
+    assertProgramId: assertFullCheckoutProgramId,
+  },
+  {
+    relativePath: "src/components/checkout/ApartarInscripcionForm.js",
+    ctaPosition: "enrollment_reservation_form",
+    assertProgramId: node => assertStringLiteral(node, "inscripcion", "reservation checkout program_id must be inscripcion"),
+  },
 ]) {
+  assertLocalizationLanguageBinding(parseSource(relativePath), relativePath)
   const tryStatement = findHandleSubmitTry(relativePath)
   const statements = tryStatement.block.body
   const checkoutIndex = statementIndex(
@@ -298,11 +457,94 @@ for (const relativePath of [
   )
   assert(checkoutIndex < eventIndex, `${relativePath} must track after Stripe returns a URL`)
   assert(eventIndex < navigationIndex, `${relativePath} must track before navigation`)
-  assertSafePayload(findTrackedEvent(tryStatement.block, "begin_checkout"), "begin_checkout")
+  assertExactPayload(assertSingleTrackedEvent(
+    tryStatement.block,
+    "begin_checkout",
+    `${relativePath} must have exactly one successful begin_checkout call site`
+  ), {
+    eventName: "begin_checkout",
+    ctaPosition,
+    leadChannel: "stripe",
+    assertProgramId,
+  })
   assert.strictEqual(findTrackedEvent(tryStatement.handler, "begin_checkout"), undefined)
+}
+
+const getSyntheticEventPayload = source => {
+  const event = findTrackedEvent(
+    parse(source, { sourceType: "module" }),
+    "generate_lead"
+  )
+  return event.arguments[1]
+}
+
+for (const unsafeProgramId of ["userValue", "message", "nombreCompleto", "emailContacto"]) {
+  assert.throws(
+    () =>
+      assertExactObjectPayload(
+        getSyntheticEventPayload(`trackEvent("generate_lead", {
+          language,
+          program_id: ${unsafeProgramId},
+          landing_path: typeof window === "undefined" ? "" : window.location.pathname,
+          cta_position: "inscripcion_part_1",
+          lead_channel: "form",
+        })`),
+        {
+          eventName: "generate_lead",
+          ctaPosition: "inscripcion_part_1",
+          leadChannel: "form",
+          assertProgramId: assertLeadProgramId,
+        }
+      ),
+    /generate_lead program_id/,
+    `generate_lead must reject ${unsafeProgramId} as a program_id source`
+  )
+}
+
+const runStripeCheckoutUrlTests = async () => {
+  const { createPublicCheckoutSession } = loadModule("src/utils/stripeCheckout.js")
+  const originalFetch = global.fetch
+  const responseFor = url => ({
+    ok: true,
+    json: async () => ({ url }),
+  })
+
+  try {
+    const validUrl = "https://checkout.stripe.com/c/pay/cs_test_123"
+    global.fetch = async () => responseFor(validUrl)
+    assert.deepStrictEqual(await createPublicCheckoutSession({ sku: "test" }), {
+      url: validUrl,
+    })
+
+    for (const [label, url] of [
+      ["absent", undefined],
+      ["non-string", 42],
+      ["relative", "/c/pay/cs_test_123"],
+      ["malformed", "https://"],
+      ["HTTP", "http://checkout.stripe.com/c/pay/cs_test_123"],
+      ["credentials", "https://user:secret@checkout.stripe.com/c/pay/cs_test_123"],
+      ["suffix host", "https://checkout.stripe.com.attacker.test/c/pay/cs_test_123"],
+      ["other host", "https://example.test/c/pay/cs_test_123"],
+      ["non-standard port", "https://checkout.stripe.com:444/c/pay/cs_test_123"],
+    ]) {
+      global.fetch = async () => responseFor(url)
+      await assert.rejects(
+        () => createPublicCheckoutSession({ sku: "test" }),
+        /Respuesta de pago incompleta/,
+        `createPublicCheckoutSession must reject a ${label} checkout URL`
+      )
+    }
+  } finally {
+    global.fetch = originalFetch
+  }
 }
 
 const successSource = fs.readFileSync(sourcePath("src/pages/checkout/success.js"), "utf8")
 assert.doesNotMatch(successSource, /trackEvent\(\s*["']purchase["']/)
 
-console.log("analytics instrumentation contract ok")
+runStripeCheckoutUrlTests()
+  .then(() => console.log("analytics instrumentation contract ok"))
+  .catch(error => {
+    console.error(error)
+    process.exitCode = 1
+  })
