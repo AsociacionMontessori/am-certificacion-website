@@ -7,12 +7,14 @@ const {
   CONSENT_OPEN_EVENT,
   getAnalyticsConsent,
   initializeAnalyticsConsent,
+  isAnalyticsReady,
   openAnalyticsConsent,
   setAnalyticsConsent,
 } = require("../src/utils/analyticsConsent")
 const {
   createAnalyticsConsentDomController,
 } = require("../src/utils/analyticsConsentDom")
+const { trackEvent, trackPageView } = require("../src/utils/analytics")
 
 const root = path.resolve(__dirname, "..")
 
@@ -355,6 +357,100 @@ for (const [failedCommand, expectedSequence] of [
   assert.strictEqual(scripts.length, 1)
 }
 
+for (const failedCommand of ["js", "config"]) {
+  const successful = []
+  let failedOnce = false
+  const { target } = createTarget({
+    gtag(...args) {
+      if (args[0] === failedCommand && !failedOnce) {
+        failedOnce = true
+        throw new Error(`${failedCommand} queue failed`)
+      }
+      successful.push(args)
+    },
+  })
+
+  assert.strictEqual(setAnalyticsConsent("granted", target), true)
+  assert.strictEqual(
+    isAnalyticsReady(target),
+    false,
+    `${failedCommand} failure must keep analytics unready`
+  )
+  assert.strictEqual(initializeAnalyticsConsent(target), true)
+  assert.strictEqual(
+    isAnalyticsReady(target),
+    true,
+    `${failedCommand} retry must complete analytics readiness`
+  )
+  assert.strictEqual(
+    successful.filter(args => args[0] === "consent" && args[1] === "default")
+      .length,
+    1
+  )
+  assert.strictEqual(successful.filter(args => args[0] === "js").length, 1)
+  assert.strictEqual(successful.filter(args => args[0] === "config").length, 1)
+}
+
+for (const failedCommand of ["js", "config"]) {
+  const successful = []
+  let failedOnce = false
+  const { target } = createTarget({
+    gtag(...args) {
+      if (args[0] === failedCommand && !failedOnce) {
+        failedOnce = true
+        throw new Error(`${failedCommand} queue failed`)
+      }
+      successful.push(args)
+    },
+  })
+
+  assert.strictEqual(setAnalyticsConsent("granted", target), true)
+  const commandsBeforeEvents = successful.length
+  assert.strictEqual(trackEvent("click_whatsapp", {}, target), false)
+  assert.strictEqual(
+    trackPageView(
+      { pathname: "/contact/", key: `failed-${failedCommand}` },
+      target
+    ),
+    false
+  )
+  assert.strictEqual(
+    successful.length,
+    commandsBeforeEvents,
+    `${failedCommand} failure must block application events`
+  )
+
+  assert.strictEqual(initializeAnalyticsConsent(target), true)
+  assert.strictEqual(trackEvent("click_whatsapp", {}, target), true)
+  assert.strictEqual(
+    trackPageView(
+      { pathname: "/contact/", key: `recovered-${failedCommand}` },
+      target
+    ),
+    true
+  )
+  const configIndex = successful.findIndex(args => args[0] === "config")
+  const eventIndexes = successful
+    .map((args, index) => (args[0] === "event" ? index : -1))
+    .filter(index => index >= 0)
+  assert.strictEqual(eventIndexes.length, 2)
+  assert(eventIndexes.every(index => index > configIndex))
+}
+
+{
+  const { scripts, target } = createTarget()
+  assert.strictEqual(setAnalyticsConsent("granted", target), true)
+  assert.strictEqual(isAnalyticsReady(target), true)
+  scripts[0].onerror()
+  assert.strictEqual(
+    isAnalyticsReady(target),
+    true,
+    "script network failure must not undo fully queued initialization"
+  )
+  assert.strictEqual(setAnalyticsConsent("denied", target), true)
+  assert.strictEqual(isAnalyticsReady(target), false)
+}
+
 {
   const { scripts, target } = createTarget()
   assert.strictEqual(setAnalyticsConsent("granted", target), true)
@@ -420,6 +516,39 @@ for (const [failedCommand, expectedSequence] of [
     "denied",
     "failed persistence must not revive stale granted consent"
   )
+}
+
+for (const [stored, explicit] of [
+  ["granted", "denied"],
+  ["denied", "granted"],
+]) {
+  const calls = []
+  const { target } = createTarget({
+    gtag: (...args) => calls.push(args),
+    localStorage: {
+      getItem: () => stored,
+      setItem() {
+        // Simulate a privacy wrapper that reports success without persisting.
+      },
+    },
+  })
+
+  assert.strictEqual(getAnalyticsConsent(target), stored)
+  assert.strictEqual(setAnalyticsConsent(explicit, target), true)
+  assert.strictEqual(
+    getAnalyticsConsent(target),
+    explicit,
+    `explicit ${explicit} must override stale stored ${stored} for this runtime`
+  )
+  if (explicit === "denied") {
+    const callsBeforeEvent = calls.length
+    assert.strictEqual(trackEvent("click_whatsapp", {}, target), false)
+    assert.strictEqual(
+      calls.length,
+      callsBeforeEvent,
+      "stale granted storage must not revive analytics after explicit denial"
+    )
+  }
 }
 
 {
@@ -495,7 +624,13 @@ assert(
   "components must not call gtag directly"
 )
 assert(gatsbyBrowser.includes("initializeAnalyticsConsent()"))
+assert(gatsbyBrowser.includes("registerAnalyticsNavigation(location)"))
 assert(gatsbyBrowser.includes("trackPageView(location)"))
+assert(
+  gatsbyBrowser.indexOf("registerAnalyticsNavigation(location)") <
+    gatsbyBrowser.indexOf("trackPageView(location)"),
+  "Gatsby must register each route update before attempting its page view"
+)
 assert(layout.includes("<AnalyticsConsent />"))
 assert(footer.includes("openAnalyticsConsent()"))
 const consentOpenBodyClass = "analytics-consent-open"
@@ -600,6 +735,9 @@ assert(operations.includes("pending_owner_review"))
 assert(operations.toLowerCase().includes("non-retroactive"))
 assert(operations.includes("Disable every Enhanced Measurement option"))
 assert(operations.includes("exactly one app-controlled `page_view` per route"))
+assert(operations.includes("fully queued initialization"))
+assert(operations.includes("per navigation instance"))
+assert(operations.includes("location.key"))
 
 const plan = fs.readFileSync(
   path.join(
@@ -622,6 +760,10 @@ for (const contractTerm of [
   "page_referrer",
   "Enhanced Measurement",
   "scripts/test-analytics-instrumentation.js",
+  "isAnalyticsReady",
+  "registerAnalyticsNavigation",
+  "location.key",
+  "per navigation instance",
 ]) {
   assert(taskThree.includes(contractTerm), contractTerm)
 }

@@ -3,6 +3,7 @@ const {
   buildSafeParams,
   getAttribution,
   INTENT_LANDING_PATHS,
+  registerAnalyticsNavigation,
   trackAttributedArrival,
   trackEvent,
   trackPageView,
@@ -12,6 +13,10 @@ const {
   LOCALIZED_PATHS,
   localizePath,
 } = require("../src/i18n/config")
+const {
+  initializeAnalyticsConsent,
+  setAnalyticsConsent,
+} = require("../src/utils/analyticsConsent")
 
 const VALID_SOURCE_CONTENT_IDS = [
   "post_d95119f319861cea",
@@ -38,7 +43,7 @@ const createStorage = () => ({
 const createTarget = (overrides = {}) => {
   const calls = []
   const consentValues = new Map([["ammac-analytics-consent-v1", "granted"]])
-  return {
+  const result = {
     calls,
     consentValues,
     target: {
@@ -55,6 +60,11 @@ const createTarget = (overrides = {}) => {
       ...overrides,
     },
   }
+  if (!("gtag" in overrides) && !("localStorage" in overrides)) {
+    initializeAnalyticsConsent(result.target)
+    calls.length = 0
+  }
+  return result
 }
 
 {
@@ -621,9 +631,104 @@ for (const [referrer, expected, label] of [
   }
   assert.strictEqual(trackAttributedArrival(location, target), false)
   assert.strictEqual(trackAttributedArrival(location, target), false)
-  assert.strictEqual(attempts, 2)
+  assert.strictEqual(attempts, 0)
   assert.strictEqual(trackEvent("click_whatsapp", {}, target), false)
-  assert.strictEqual(attempts, 3)
+  assert.strictEqual(attempts, 0)
+}
+
+{
+  const calls = []
+  const storedConsent = new Map()
+  const scripts = []
+  const target = {
+    gtag: (...args) => calls.push(args),
+    localStorage: {
+      getItem: key => storedConsent.get(key) || null,
+      setItem: (key, value) => storedConsent.set(key, value),
+    },
+    location: { pathname: "/contact/" },
+    document: {
+      referrer: "https://montessorimexico.org/",
+      querySelector: selector =>
+        scripts.find(script => `#${script.id}` === selector) || null,
+      createElement: tagName => ({ tagName }),
+      head: { appendChild: script => scripts.push(script) },
+    },
+  }
+  const appPageViews = () =>
+    calls.filter(args => args[0] === "event" && args[1] === "page_view")
+
+  const initial = { pathname: "/contact/", key: "initial-key" }
+  assert.strictEqual(registerAnalyticsNavigation(initial, target), true)
+  assert.strictEqual(trackPageView(initial, target), false)
+  assert.strictEqual(appPageViews().length, 0)
+
+  assert.strictEqual(setAnalyticsConsent("granted", target), true)
+  assert.strictEqual(trackPageView(target.location, target), true)
+  assert.strictEqual(appPageViews().length, 1)
+  assert.strictEqual(setAnalyticsConsent("granted", target), true)
+  assert.strictEqual(trackPageView(target.location, target), false)
+  assert.strictEqual(setAnalyticsConsent("denied", target), true)
+  assert.strictEqual(setAnalyticsConsent("granted", target), true)
+  assert.strictEqual(trackPageView(target.location, target), false)
+  assert.strictEqual(
+    appPageViews().length,
+    1,
+    "reaffirm and revoke/regrant must not resend the current navigation"
+  )
+
+  const next = { pathname: "/privacy/", key: "next-key" }
+  assert.strictEqual(registerAnalyticsNavigation(next, target), true)
+  assert.strictEqual(trackPageView(next, target), true)
+  assert.strictEqual(appPageViews().length, 2)
+
+  const samePathNewKey = { pathname: "/privacy/", key: "same-path-new-key" }
+  assert.strictEqual(registerAnalyticsNavigation(samePathNewKey, target), true)
+  assert.strictEqual(trackPageView(samePathNewKey, target), true)
+  assert.strictEqual(appPageViews().length, 3)
+
+  const intervening = { pathname: "/contact/", key: "intervening-key" }
+  assert.strictEqual(registerAnalyticsNavigation(intervening, target), true)
+  assert.strictEqual(trackPageView(intervening, target), true)
+  const browserBack = { pathname: "/privacy/", key: "next-key" }
+  assert.strictEqual(registerAnalyticsNavigation(browserBack, target), true)
+  assert.strictEqual(trackPageView(browserBack, target), true)
+  assert.strictEqual(appPageViews().length, 5)
+
+  const beforeInvalid = appPageViews().length
+  assert.strictEqual(
+    registerAnalyticsNavigation(
+      { pathname: "/checkout/success/?order=cs_secret", key: "invalid-key" },
+      target
+    ),
+    false
+  )
+  assert.strictEqual(
+    trackPageView(
+      { pathname: "/checkout/success/?order=cs_secret", key: "invalid-key" },
+      target
+    ),
+    false
+  )
+  assert.strictEqual(appPageViews().length, beforeInvalid)
+
+  const retry = { pathname: "/diplomados/", key: "retry-key" }
+  assert.strictEqual(registerAnalyticsNavigation(retry, target), true)
+  const workingGtag = target.gtag
+  target.gtag = () => {
+    throw new Error("page view queue failed")
+  }
+  assert.strictEqual(trackPageView(retry, target), false)
+  target.gtag = workingGtag
+  assert.strictEqual(trackPageView(retry, target), true)
+  assert.strictEqual(appPageViews().length, beforeInvalid + 1)
+  for (const pageView of appPageViews()) {
+    assert.strictEqual("key" in pageView[2], false)
+    assert.doesNotMatch(
+      JSON.stringify(pageView[2]),
+      /initial-key|next-key|retry-key/
+    )
+  }
 }
 
 {

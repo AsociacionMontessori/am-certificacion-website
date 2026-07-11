@@ -5,9 +5,12 @@
 - Gatsby uses Google Basic Consent Mode for measurement ID `G-P0CNEGW276`.
 - Until `ammac-analytics-consent-v1` is explicitly `granted`, the site creates no Google tag queue, script, request, event, or page view. A fresh denial also sends nothing to Google.
 - The first grant queues consent default denied, consent update with analytics granted, `js`, and `config` with `send_page_view: false`, then appends the tag script.
+- An explicit grant or denial remains authoritative in memory for the current page runtime even when local storage throws, silently ignores the write, or returns a stale opposite value. A new page runtime may read valid persisted consent normally.
+- Application events require fully queued initialization: current granted consent plus successful default-denied, granted-update, `js`, and config commands. A failed `js` or config blocks custom events, page views, and attributed arrival until retry. A script network failure after those commands are queued does not roll readiness back.
 - `ad_storage`, `ad_user_data`, and `ad_personalization` remain denied. Only `analytics_storage` can be granted.
 - Revocation immediately queues a denied update when `gtag` exists, blocks later app events and page views, and best-effort removes first-party `_ga` and `_ga_*` cookies. Revocation is non-retroactive for processing already performed.
 - Regrant sends a new granted update without duplicating script or config. Script/network failures remain retryable.
+- Gatsby registers each valid route update before delivery and deduplicates page views per navigation instance. It uses `location.key` when available and a normalized pathname fallback otherwise. First grant backfills the current unsent navigation once; reaffirm and revoke/regrant do not resend it. A next route, same pathname under a new key, or browser-history return after an intervening navigation may send once. Invalid paths do not register, and failed sends remain retryable.
 - If local storage is unavailable, the choice remains effective in memory for the current page session. A reload may ask again.
 - Event parameters are closed. GA config, every custom event, and every manual page view include only a normalized allowlisted pathname, the fixed page origin `https://certificacionmontessori.com`, and a safe referrer origin.
 - Invalid or missing runtime paths fall back to `/` for config and custom events; explicit invalid manual page-view paths fail closed. Page query strings, hashes, arbitrary origins, credentials, PII, order identifiers, and access tokens are excluded.
@@ -19,7 +22,7 @@
 
 In the GA4 web stream, **Disable every Enhanced Measurement option**, especially page views on browser-history changes. `send_page_view: false` disables the automatic config page view but does not supersede Enhanced Measurement history settings.
 
-With every Enhanced Measurement option disabled, navigate each localized route in an intercepted clean browser context and verify exactly one app-controlled `page_view` per route. Do not release while GA4 or the application produces a duplicate route page view.
+With every Enhanced Measurement option disabled, navigate each localized route in an intercepted clean browser context and verify exactly one app-controlled `page_view` per route and per navigation instance. Include initial unknown then grant, grant reaffirmation, revoke/regrant, a genuine next route, same pathname with a new `location.key`, browser back, invalid paths, and a failed-send retry. Do not release while GA4 or the application produces a duplicate route page view.
 
 Run from the Gatsby repository root:
 

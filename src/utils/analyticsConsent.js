@@ -87,6 +87,18 @@ const getLoaderState = runtime => {
   return state
 }
 
+const isAnalyticsReady = target => {
+  const runtime = getRuntime(target)
+  if (!isRuntime(runtime) || !isAnalyticsGranted(runtime)) return false
+  const state = loaderStates.get(runtime)
+  return Boolean(
+    state?.defaultQueued &&
+      !state.grantedUpdateRequired &&
+      state.jsQueued &&
+      state.configQueued
+  )
+}
+
 const queueInitialCommands = (runtime, state) => {
   if (!state.defaultQueued) {
     if (!queueGtag(runtime, "consent", "default", consentPayload("denied"))) {
@@ -256,19 +268,16 @@ const setAnalyticsConsent = (state, target) => {
   if (!isRuntime(runtime)) return false
 
   const previous = getAnalyticsConsent(runtime)
-  let persisted = false
   try {
     if (typeof runtime.localStorage?.setItem === "function") {
       runtime.localStorage.setItem(CONSENT_KEY, state)
-      persisted = true
     }
   } catch (_error) {
     // Consent remains effective in memory for the current page session.
   }
-  memoryConsent.set(runtime, { state, authoritative: !persisted })
+  memoryConsent.set(runtime, { state, authoritative: true })
 
   if (state === "granted") {
-    const loaderState = getLoaderState(runtime)
     loadGoogleTag(runtime)
   } else if (previous === "granted") {
     const loaderState = getLoaderState(runtime)
@@ -296,6 +305,7 @@ module.exports = {
   getAnalyticsConsent,
   initializeAnalyticsConsent,
   isAnalyticsGranted,
+  isAnalyticsReady,
   loadGoogleTag,
   openAnalyticsConsent,
   removeGoogleAnalyticsCookies,

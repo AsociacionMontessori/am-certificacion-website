@@ -704,13 +704,15 @@ git commit -m "feat(analytics): measure contact and enrollment intent"
 
 **Interfaces:**
 - Produce `getAnalyticsConsent(target?) -> "unknown" | "granted" | "denied"`.
-- Produce `setAnalyticsConsent(state, target?) -> boolean`, `initializeAnalyticsConsent(target?) -> boolean`, `openAnalyticsConsent(target?) -> boolean`, and `isAnalyticsGranted(target?) -> boolean`.
+- Produce `setAnalyticsConsent(state, target?) -> boolean`, `initializeAnalyticsConsent(target?) -> boolean`, `openAnalyticsConsent(target?) -> boolean`, `isAnalyticsGranted(target?) -> boolean`, and `isAnalyticsReady(target?) -> boolean`.
 - Produce `trackPageView(location, target?) -> boolean` using only a closed normalized certification pathname and `https://certificacionmontessori.com`.
+- Produce the internal Gatsby boundary `registerAnalyticsNavigation(location, target?) -> boolean`; it registers a valid navigation before `trackPageView` attempts delivery.
 - Keep all A1/A2 event, attribution, payment, and navigation contracts unchanged.
 
 **Binding contract:**
 - Use Basic Consent Mode globally. Unknown and fresh denial create no Google queue, tag script, request, event, or page view.
 - First grant queues exactly: consent default denied, consent update with analytics granted, `js`, then `config` with `send_page_view: false`; append the script only afterward.
+- Every successful explicit grant or denial is authoritative in memory for that page runtime. A no-op or throwing setter, stale or throwing getter, and absent storage cannot replace the current explicit choice; a new runtime may read valid persisted consent normally.
 - Keep `ad_storage`, `ad_user_data`, and `ad_personalization` denied. Only `analytics_storage` may be granted.
 - Revocation queues denied when `gtag` exists, blocks later app events, best-effort removes `_ga`/`_ga_*` cookies, and is documented as non-retroactive. A regrant sends a new granted update without duplicate script/config.
 - Throwing storage, DOM, gtag, CustomEvent, dispatch, cookies, and script insertion never break functional flows. Storage failure uses in-memory session consent; script failure is retryable without a false initialized marker.
@@ -718,13 +720,14 @@ git commit -m "feat(analytics): measure contact and enrollment intent"
 - One shared `analyticsPageContext.js` boundary supplies `page_path`, `page_location`, and `page_referrer` to GA config, every allowed custom event, and manual `page_view` events. These internal fields are appended only after public caller parameters are validated and are not public allowlisted parameters.
 - Page context accepts only the existing closed normalized certification paths and fixed page origin. Invalid or missing runtime paths fall back to `/` for config/custom events; explicit invalid `trackPageView` paths fail closed.
 - Safe referrers accept only HTTPS URLs on the exact closed funnel hostname allowlist, discard path/query/hash to `https://hostname/`, and reject credentials, explicit ports, HTTP, suffix-host attacks, and unlisted hosts to the fixed certification fallback.
-- Partial initialization keeps default, granted-update, `js`, and config state separate. Revoke/regrant after a failed `js` or config queues a fresh granted update before unfinished initialization without duplicating successful one-time commands.
+- Partial initialization keeps default, granted-update, `js`, and config state separate. `isAnalyticsReady` is true only with current granted consent after all four commands have queued successfully. `trackEvent`, `trackPageView`, and attributed arrival require this fully queued initialization. A failed `js` or config blocks application events until retry; a later script/network failure does not undo already queued readiness. Revoke/regrant after a failed `js` or config queues a fresh granted update before unfinished initialization without duplicating successful one-time commands.
+- Page views are deduplicated per navigation instance in runtime memory. Gatsby registers the current valid navigation before sending, using `location.key` when available and a normalized pathname fallback otherwise. First grant backfills the current unsent navigation once; reaffirm, revoke/regrant, and repeated sends do not duplicate it. A next route, same pathname with a new key, or browser-history return after an intervening navigation may send once. Invalid paths never register, failed `gtag` calls remain retryable, and navigation identities never enter GA payloads.
 - Known-failed canonical scripts are ignored even if both id reassignment and removal throw. Pending or loaded replacements do not duplicate.
 - Event subscription/removal, body-class toggling/removal, active-element capture, and focus calls use executable fail-safe helpers. Footer reopen captures its active element, entry focuses decline, and either choice restores the opener.
 
 - [ ] **Step 1: Write the failing lifecycle and privacy-boundary tests**
 
-Create `scripts/test-analytics-consent.js` before production code. It must assert unknown/deny/grant/revoke/regrant, v2 payloads and command order, safe config context before script append, failures at both `js` and config followed by revoke/regrant, one successful default/`js`/config, dual-failure script cleanup retry, pending replacement deduplication, in-memory consent, executable throwing/absent event/body/focus helpers, opener focus restoration, cookie cleanup, no eager plugin, Gatsby/UI wiring, Article 30 rectification details in every locale, legal review status, operations sources, and this binding Task 3.
+Create `scripts/test-analytics-consent.js` before production code. It must assert unknown/deny/grant/revoke/regrant, no-op writes with stale opposite values, v2 payloads and command order, safe config context before script append, failures at both `js` and config followed by blocked immediate events and successful retry/regrant, one successful default/`js`/config, dual-failure script cleanup retry, pending replacement deduplication, in-memory consent, executable throwing/absent event/body/focus helpers, opener focus restoration, cookie cleanup, no eager plugin, Gatsby/UI wiring, Article 30 rectification details in every locale, legal review status, operations sources, and this binding Task 3.
 
 Extend `scripts/test-analytics.js` before changing `src/utils/analytics.js`:
 
@@ -744,7 +747,7 @@ assert.strictEqual(trackEvent("click_whatsapp", {}, deniedTarget), false)
 assert.strictEqual(trackPageView({ pathname: "/contact/" }, throwingStorageTarget), false)
 ```
 
-Also assert that every allowed custom event receives non-overridable internal `page_path`, `page_location`, and `page_referrer`; invalid runtime paths fall back to `/`; manual page views include the same safe context; page context never exposes caller URL material; exact allowlisted HTTPS referrers such as `https://montessorimexico.org/articulo/?email=x#token` and `https://www.google.com.mx/search?q=montessori` reduce to their fixed origins; and HTTP, credentials, explicit ports, suffix-host attacks, and unlisted hosts use the certification fallback.
+Also assert that every allowed custom event receives non-overridable internal `page_path`, `page_location`, and `page_referrer`; invalid runtime paths fall back to `/`; manual page views include the same safe context; page context never exposes caller URL material; exact allowlisted HTTPS referrers such as `https://montessorimexico.org/articulo/?email=x#token` and `https://www.google.com.mx/search?q=montessori` reduce to their fixed origins; and HTTP, credentials, explicit ports, suffix-host attacks, and unlisted hosts use the certification fallback. Cover unknown-route registration then grant, same-route reaffirm, revoke/regrant, a next route, the same pathname with a new `location.key`, a browser-back key, invalid paths, and failed-send retry. Assert at most one app page view per navigation instance and no navigation key in any GA payload.
 
 Run:
 
@@ -775,7 +778,7 @@ The first-grant sequence is binding:
 ]
 ```
 
-Gate `trackEvent`, `trackAttributedArrival` through `trackEvent`, and `trackPageView` with `isAnalyticsGranted`. Implement page views as:
+Gate `trackEvent`, `trackAttributedArrival` through `trackEvent`, and `trackPageView` with `isAnalyticsReady`. Register and resolve the current navigation before the readiness check so an unknown or denied route remains available for first-grant backfill. Set its sent marker only after the page-view `gtag` call succeeds. Implement the payload as:
 
 ```javascript
 const pathname = validateLandingPath(location?.pathname)
@@ -790,7 +793,7 @@ Remove `gatsby-plugin-google-gtag` from config, package, and lock. Do not replac
 
 - [ ] **Step 3: Wire Gatsby and reversible localized UI**
 
-Call `initializeAnalyticsConsent()` before browser-language redirect and call `trackPageView(location)` before attributed-arrival tracking on route updates. Render one `<AnalyticsConsent />` outside layout content. The banner must be non-modal, keyboard accessible, focus-visible, responsive, and provide equally functional decline/allow buttons. The footer preference button must reopen after either choice; revoke and later regrant must work. Only analytics utilities may queue events.
+Call `initializeAnalyticsConsent()` before browser-language redirect. On every route update call `registerAnalyticsNavigation(location)` before `trackPageView(location)`, then run attributed-arrival tracking. Render one `<AnalyticsConsent />` outside layout content. The banner must be non-modal, keyboard accessible, focus-visible, responsive, and provide equally functional decline/allow buttons. The footer preference button must reopen after either choice; revoke and later regrant must work without resending the current navigation. Only analytics utilities may queue events.
 
 While the consent panel is open, reflect that state with an `analytics-consent-open` body class and use `src/styles/wa.css` to set `body.analytics-consent-open #wa { display: none; }`. This must remove the fixed WhatsApp widget from rendering, interaction, keyboard navigation, and the accessibility tree, restore it immediately after either consent choice, and clean up the class on unmount.
 
@@ -821,7 +824,7 @@ https://support.google.com/analytics/answer/9216061
 https://developers.google.com/tag-platform/gtagjs/reference
 ```
 
-Before production, disable every GA4 Enhanced Measurement option for the web stream, especially browser-history page views, and verify exactly one app-controlled `page_view` per route.
+Before production, disable every GA4 Enhanced Measurement option for the web stream, especially browser-history page views, and verify exactly one app-controlled `page_view` per navigation instance, including first-grant backfill, revoke/regrant, next-route, same-path/new-key, and browser-back cases.
 
 - [ ] **Step 6: Verify GREEN and rendered behavior without live analytics**
 

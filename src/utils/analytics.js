@@ -1,5 +1,5 @@
 const { LANGUAGE_CODES, localizePath } = require("../i18n/config")
-const { isAnalyticsGranted } = require("./analyticsConsent")
+const { isAnalyticsReady } = require("./analyticsConsent")
 const {
   buildSafePageContext,
   validatePagePath,
@@ -89,6 +89,7 @@ const ORDER_MARKER_PATTERN =
 const LONG_HEX_SEGMENT_PATTERN = /(?:^|-)[0-9a-f]{12,}(?:-|$)/i
 const SOURCE_CONTENT_ID_PATTERN = /^post_[0-9a-f]{16}$/
 const sessionDedupe = new Set()
+const navigationStates = new WeakMap()
 
 const cleanString = value => {
   if (typeof value !== "string") return undefined
@@ -175,10 +176,65 @@ const buildSafeParams = params =>
 const getTarget = target =>
   target || (typeof window !== "undefined" ? window : undefined)
 
+const isRuntime = runtime =>
+  (typeof runtime === "object" && runtime !== null) ||
+  typeof runtime === "function"
+
+const getNavigationPath = location => {
+  try {
+    return validateLandingPath(location?.pathname)
+  } catch (_error) {
+    return undefined
+  }
+}
+
+const getNavigationIdentity = (location, pathname) => {
+  try {
+    return typeof location?.key === "string" && location.key
+      ? `key:${location.key}`
+      : `path:${pathname}`
+  } catch (_error) {
+    return `path:${pathname}`
+  }
+}
+
+const registerAnalyticsNavigation = (location, target) => {
+  const runtime = getTarget(target)
+  if (!isRuntime(runtime)) return false
+  const pathname = getNavigationPath(location)
+  if (!pathname) return false
+  const identity = getNavigationIdentity(location, pathname)
+  const current = navigationStates.get(runtime)
+  if (current?.identity === identity && current.pathname === pathname) {
+    return true
+  }
+  navigationStates.set(runtime, { identity, pathname, sent: false })
+  return true
+}
+
+const getNavigation = (runtime, location, pathname) => {
+  const current = navigationStates.get(runtime)
+  let hasKey = false
+  try {
+    hasKey = typeof location?.key === "string" && Boolean(location.key)
+  } catch (_error) {
+    // A safe pathname remains usable when Gatsby's key is unavailable.
+  }
+  if (!hasKey && current?.pathname === pathname) return current
+
+  const identity = getNavigationIdentity(location, pathname)
+  if (current?.identity === identity && current.pathname === pathname) {
+    return current
+  }
+  const navigation = { identity, pathname, sent: false }
+  navigationStates.set(runtime, navigation)
+  return navigation
+}
+
 const trackEvent = (eventName, params = {}, target) => {
   if (!ALLOWED_EVENTS.has(eventName)) return false
   const runtime = getTarget(target)
-  if (!runtime || !isAnalyticsGranted(runtime)) return false
+  if (!runtime || !isAnalyticsReady(runtime)) return false
   try {
     if (typeof runtime.gtag !== "function") return false
     runtime.gtag("event", eventName, {
@@ -193,13 +249,16 @@ const trackEvent = (eventName, params = {}, target) => {
 
 const trackPageView = (location, target) => {
   const runtime = getTarget(target)
-  if (!runtime || !isAnalyticsGranted(runtime)) return false
-  const pathname = validateLandingPath(location?.pathname)
+  if (!isRuntime(runtime)) return false
+  const pathname = getNavigationPath(location)
   if (!pathname) return false
+  const navigation = getNavigation(runtime, location, pathname)
+  if (navigation.sent || !isAnalyticsReady(runtime)) return false
 
   try {
     if (typeof runtime.gtag !== "function") return false
     runtime.gtag("event", "page_view", buildSafePageContext(runtime, pathname))
+    navigation.sent = true
     return true
   } catch (_error) {
     return false
@@ -284,6 +343,7 @@ module.exports = {
   INTENT_LANDING_PATHS,
   buildSafeParams,
   getAttribution,
+  registerAnalyticsNavigation,
   trackAttributedArrival,
   trackEvent,
   trackPageView,
