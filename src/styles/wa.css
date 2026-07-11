@@ -1,7 +1,4 @@
-wa__widget_container
-wa__btn_popup
-wa__btn_popup_txt
-wa__btn_popup_icon
+/* WhatsApp widget: container, popup, label and icon styles. */
 
 body.analytics-consent-open #wa {
     display: none;

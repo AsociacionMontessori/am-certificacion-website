@@ -251,7 +251,9 @@ assert(
   "WhatsApp must have an open-consent stylesheet rule"
 )
 assert(
-  new RegExp(`body\\.${consentOpenBodyClass} #wa\\s*\\{\\s*display:\\s*none`).test(whatsappStyles),
+  new RegExp(`(?:^|})\\s*body\\.${consentOpenBodyClass} #wa\\s*\\{\\s*display:\\s*none`).test(
+    whatsappStyles.replace(/\/\*[\s\S]*?\*\//g, "")
+  ),
   "open consent must remove WhatsApp visibility and interaction"
 )
 assert(privacyPage.includes('t("privacy.analytics.titulo")'))
