@@ -150,6 +150,18 @@ For rendered QA, use a clean browser context and intercept and abort requests wh
 
 Expected request-attempt counts in one clean context: unknown `0`; fresh decline `0`; denied reload `0`; first grant exactly one tag-script attempt; revoke and later navigation no additional analytics event request. Because Google endpoints are aborted, a script-load retry is expected only when the application deliberately retries initialization.
 
+## IndexNow submissions
+
+Use IndexNow only after the changed commercial pages are publicly available. The public key file is intentionally deployed at `/indexnow-key.txt`; it is not an unrelated credential.
+
+1. Run the complete build and SEO suite.
+2. Deploy Firebase Hosting successfully.
+3. Pass only changed public paths to `npm run indexnow:submit`.
+4. Verify receipt in Bing Webmaster Tools.
+5. Do not resubmit unchanged URLs or treat receipt as an indexing guarantee.
+
+For a no-network validation, use `INDEXNOW_DRY_RUN=1 npm run indexnow:submit -- /public/path/`. The CLI rejects non-public, redirect, and protected paths, and accepts no more than 10,000 URLs in one request.
+
 ## Privacy and release gate
 
 The localized privacy wording is an evidence-based draft, not legal advice. The historical status for `es`, `en`, and `pt-BR` remains `pending_owner_review` in `docs/i18n/PRIVACY_REVIEW_2026-07-11.md`; that file is intentionally not changed by this runbook. For this operations runbook, the AMMAC owner approval is recorded as **approved by the AMMAC responsible owner on 2026-07-11**, based on the explicit production approval in the project conversation. Evidence: this approval record plus the rendered banner and policy captures to be attached after deployment. This does not represent independent legal counsel review.
