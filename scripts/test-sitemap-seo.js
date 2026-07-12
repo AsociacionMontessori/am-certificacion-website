@@ -28,14 +28,16 @@ const transactionalPaths = [
 const transactionalPages = LANGUAGE_CODES.flatMap(language =>
   transactionalPaths.map(path => ({ path: localizePath(language, path) }))
 )
-const publicPages = [
-  { path: "/diplomados/" },
-  { path: "/en/diplomados/" },
-  { path: "/pt-br/diplomados/" },
-]
+const legacyCertificatePaths = LANGUAGE_CODES.map(language =>
+  localizePath(language, "/certificate/")
+)
+const legacyCertificatePages = legacyCertificatePaths.map(path => ({ path }))
+const publicPages = LANGUAGE_CODES.map(language => ({
+  path: localizePath(language, "/diplomados/"),
+}))
 
 const { filteredPages } = pageFilter({
-  allPages: [...transactionalPages, ...publicPages],
+  allPages: [...transactionalPages, ...legacyCertificatePages, ...publicPages],
   filterPages: defaultFilterPages,
   excludes: sitemapPlugin.options.excludes,
 })
@@ -43,7 +45,7 @@ const { filteredPages } = pageFilter({
 assert.deepStrictEqual(
   filteredPages,
   publicPages,
-  "Expected every localized transaction page to be excluded while public pages remain"
+  "Expected every localized transaction and /certificate/ page to be excluded while public /diplomados/ pages remain"
 )
 
 const llmsGuides = [
@@ -65,8 +67,7 @@ const llmsGuides = [
       "https://certificacionmontessori.com/en/diplomados/#certificacion_internacional",
     informationalPattern: /\bthis llms\.txt file is informational\b/iu,
     noRankingPattern: /\bis not a ranking signal\b/iu,
-    htmlSourceOfTruthPattern:
-      /\bpublic HTML pages are the source of truth\b/iu,
+    htmlSourceOfTruthPattern: /\bpublic HTML pages are the source of truth\b/iu,
   },
   {
     locale: "Portuguese (Brazil)",
@@ -81,8 +82,49 @@ const llmsGuides = [
   },
 ]
 
-const legacyCertificateRecommendationPattern =
-  /^\s*-\s+[^:\n]+:\s+https:\/\/certificacionmontessori\.com(?:\/(?:en|pt-br))?\/certificate\/\s*$/imu
+const escapeRegExp = value => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+const legacyCertificatePathPattern = legacyCertificatePaths
+  .map(certificatePath => certificatePath.replace(/\/$/, ""))
+  .map(escapeRegExp)
+  .join("|")
+const legacyCertificateUrlPattern = new RegExp(
+  "(?:https?:\\/\\/(?:www\\.)?certificacionmontessori\\.com|(?<![/\\w.-]))" +
+    `(?:${legacyCertificatePathPattern})/?` +
+    "(?=$|[\\s#?.,;:!'\"`<>{}\\[\\]()])",
+  "iu"
+)
+
+const legacyCertificateUrlFixtures = legacyCertificatePaths.flatMap(path => {
+  const withoutTrailingSlash = path.replace(/\/$/, "")
+
+  return [
+    `Legacy URL: https://certificacionmontessori.com${withoutTrailingSlash}`,
+    `* [Old canonical](https://certificacionmontessori.com${path})`,
+    `Use ${withoutTrailingSlash} instead`,
+    `> \`${path}\``,
+    `Legacy:${withoutTrailingSlash}`,
+  ]
+})
+
+for (const fixture of legacyCertificateUrlFixtures) {
+  assert.match(
+    fixture,
+    legacyCertificateUrlPattern,
+    `Expected legacy certificate URL detector to match ${fixture}`
+  )
+}
+
+for (const fixture of [
+  "https://example.com/en/certificate/",
+  "https://certificacionmontessori.com/en/certificate-program/",
+  "/pt-br/certificate-program/",
+]) {
+  assert.doesNotMatch(
+    fixture,
+    legacyCertificateUrlPattern,
+    `Expected legacy certificate URL detector not to match ${fixture}`
+  )
+}
 
 for (const guide of llmsGuides) {
   const contents = fs.readFileSync(guide.filePath, "utf8")
@@ -91,9 +133,10 @@ for (const guide of llmsGuides) {
     contents.includes(guide.certificationUrl),
     `Expected ${guide.locale} llms guide to recommend ${guide.certificationUrl}`
   )
-  assert(
-    !legacyCertificateRecommendationPattern.test(contents),
-    `Expected ${guide.locale} llms guide not to recommend a /certificate/ canonical URL`
+  assert.doesNotMatch(
+    contents,
+    legacyCertificateUrlPattern,
+    `Expected ${guide.locale} llms guide not to contain a same-site /certificate URL`
   )
   assert.match(
     contents,

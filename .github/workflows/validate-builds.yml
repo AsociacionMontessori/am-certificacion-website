@@ -32,6 +32,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Run foundation contracts
+        run: npm run test:foundation
+
       - name: Build website
         run: npm run build
 
