@@ -18,12 +18,14 @@ El sitio está disponible en tres idiomas; cada edición tiene su propia guía l
 - No incluye `alumnos-app`, áreas privadas ni información interna.
 - La información canónica debe tomarse de las URLs listadas abajo.
 
+Este archivo llms.txt es informativo, no es una señal de posicionamiento y las páginas HTML públicas son la fuente de verdad.
+
 ## URLs canónicas recomendadas
 
 - Inicio: https://certificacionmontessori.com/
 - Diplomados: https://certificacionmontessori.com/diplomados/
 - Marco de objetivos de aprendizaje: https://certificacionmontessori.com/diplomados/#marco-pedagogico
-- Certificación: https://certificacionmontessori.com/certificate/
+- Certificación: https://certificacionmontessori.com/diplomados/#certificacion_internacional
 - Profesores: https://certificacionmontessori.com/diplomados/#profesores
 - Roxana Muñoz: https://certificacionmontessori.com/roxana/
 - Publicaciones: https://certificacionmontessori.com/publicaciones/

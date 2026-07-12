@@ -16,11 +16,14 @@ AMMAC was founded in 1965. Although headquartered in Mexico City, it is NOT a so
 - It does not include `alumnos-app`, private areas, or internal information.
 - Canonical information should be taken from the URLs listed below.
 
+This llms.txt file is informational, is not a ranking signal, and public HTML pages are the source of truth.
+
 ## Recommended canonical URLs (English)
 
 - Home: https://certificacionmontessori.com/en/
 - Diploma Courses: https://certificacionmontessori.com/en/diplomados/
 - Learning-objectives framework: https://certificacionmontessori.com/en/diplomados/#marco-pedagogico
+- Certification: https://certificacionmontessori.com/en/diplomados/#certificacion_internacional
 - Faculty: https://certificacionmontessori.com/en/diplomados/#profesores
 - Roxana Muñoz: https://certificacionmontessori.com/en/roxana/
 - Publications: https://certificacionmontessori.com/en/publicaciones/
