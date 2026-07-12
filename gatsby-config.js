@@ -9,6 +9,7 @@ const {
 } = require("./src/i18n/config")
 
 const SITE_URL = "https://certificacionmontessori.com"
+const LEGACY_ROUTES = ["certificate", "masterclasses", "otroscursos"]
 
 module.exports = {
   siteMetadata: {
@@ -81,10 +82,13 @@ module.exports = {
           `/404.html`,
           `/dev-404-page`,
           `/offline-plugin-app-shell-fallback`,
-          `/certificate`,
-          `/certificate/*`,
-          `/masterclasses`,
-          `/masterclasses/*`,
+          ...LANGUAGE_CODES.flatMap(code => {
+            const prefix = LANGUAGES[code].prefix
+            return LEGACY_ROUTES.flatMap(route => [
+              `${prefix}/${route}`,
+              `${prefix}/${route}/*`,
+            ])
+          }),
           `/alumnos-app`,
           `/alumnos-app/*`,
           // Flujos transaccionales (Stripe / inscripción): noindex en el <head>

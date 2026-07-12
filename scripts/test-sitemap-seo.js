@@ -28,16 +28,30 @@ const transactionalPaths = [
 const transactionalPages = LANGUAGE_CODES.flatMap(language =>
   transactionalPaths.map(path => ({ path: localizePath(language, path) }))
 )
+const legacyRoutes = ["certificate", "masterclasses", "otroscursos"]
+const legacySitemapPaths = LANGUAGE_CODES.flatMap(language =>
+  legacyRoutes.flatMap(route =>
+    [`/${route}/`, `/${route}/archive/`].map(path =>
+      localizePath(language, path)
+    )
+  )
+)
+const legacySitemapPages = legacySitemapPaths.map(path => ({ path }))
 const legacyCertificatePaths = LANGUAGE_CODES.map(language =>
   localizePath(language, "/certificate/")
 )
-const legacyCertificatePages = legacyCertificatePaths.map(path => ({ path }))
 const publicPages = LANGUAGE_CODES.map(language => ({
   path: localizePath(language, "/diplomados/"),
 }))
 
+assert.strictEqual(
+  new Set(legacySitemapPaths).size,
+  18,
+  "Expected an exact and wildcard fixture for every localized legacy route"
+)
+
 const { filteredPages } = pageFilter({
-  allPages: [...transactionalPages, ...legacyCertificatePages, ...publicPages],
+  allPages: [...transactionalPages, ...legacySitemapPages, ...publicPages],
   filterPages: defaultFilterPages,
   excludes: sitemapPlugin.options.excludes,
 })
@@ -45,7 +59,7 @@ const { filteredPages } = pageFilter({
 assert.deepStrictEqual(
   filteredPages,
   publicPages,
-  "Expected every localized transaction and /certificate/ page to be excluded while public /diplomados/ pages remain"
+  "Expected every localized transaction and legacy page to be excluded while public /diplomados/ pages remain"
 )
 
 const llmsGuides = [
