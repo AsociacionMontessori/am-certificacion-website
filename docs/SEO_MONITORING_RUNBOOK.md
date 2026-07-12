@@ -130,15 +130,21 @@ fechadas, sin inferir acceso a partir de archivos locales:
 | Control | Estado | Fecha de evidencia | Responsable | Evidencia/resultado requerido |
 | --- | --- | --- | --- | --- |
 | `robots.txt` vivo | `COMPLETADO_CON_EVIDENCIA` | `2026-07-12` | `AMMAC / Codex` | Se obtuvieron correctamente `https://certificacionmontessori.com/robots.txt` y `https://montessorimexico.org/robots.txt` desde produccion. |
-| OAI-SearchBot | `COMPLETADO_CON_EVIDENCIA` | `2026-07-12` | `AMMAC / Codex` | Certificacion tiene grupo explicito con `Allow: /`. WordPress lo cubre con `User-agent: *`: permite contenido publico, bloquea solo `/wp-admin/` y permite `/wp-admin/admin-ajax.php`. |
-| GPTBot | `COMPLETADO_CON_EVIDENCIA` | `2026-07-12` | `AMMAC / Codex` | Certificacion tiene grupo explicito con `Allow: /`. WordPress aplica el mismo grupo generico que permite el contenido publico; el acceso para entrenamiento se decide independientemente de OAI-SearchBot. |
-| ChatGPT-User | `COMPLETADO_CON_EVIDENCIA` | `2026-07-12` | `AMMAC / Codex` | Certificacion tiene grupo explicito con `Allow: /`; WordPress permite contenido publico mediante `User-agent: *`. Es un agente activado por la persona usuaria y `robots.txt` puede no aplicar en ese contexto. |
+| OAI-SearchBot | `COMPLETADO_CON_EVIDENCIA` | `2026-07-12` | `AMMAC / Codex` | Prueba HTTP en vivo con el UA oficial `OAI-SearchBot/1.4`: HTTP `200` tanto en `certificacionmontessori.com` como en `montessorimexico.org`. Ademas, Certificacion tiene grupo explicito con `Allow: /`; WordPress lo cubre con `User-agent: *`, que permite contenido publico, bloquea solo `/wp-admin/` y permite `/wp-admin/admin-ajax.php`. |
+| GPTBot | `COMPLETADO_CON_EVIDENCIA` | `2026-07-12` | `AMMAC / Codex` | Prueba HTTP en vivo con el UA oficial `GPTBot/1.4`: `certificacionmontessori.com` respondio HTTP `200`; SiteGround cerro/restablecio la conexion a `montessorimexico.org`, incluso para `robots.txt`. El contenido de `robots.txt` permite GPTBot mediante `User-agent: *`, pero la capa de hosting de WordPress bloquea este bot de entrenamiento. El diagnostico queda completo; este bloqueo no impide ChatGPT Search y no se recomienda cambiarlo automaticamente. Desbloquear acceso para entrenamiento seria una decision separada de AMMAC y, en su caso, de soporte de hosting. |
+| ChatGPT-User | `COMPLETADO_CON_EVIDENCIA` | `2026-07-12` | `AMMAC / Codex` | Prueba HTTP en vivo con el UA oficial `ChatGPT-User/1.0`: HTTP `200` tanto en `certificacionmontessori.com` como en `montessorimexico.org`. Ademas, Certificacion tiene grupo explicito con `Allow: /`; WordPress permite contenido publico mediante `User-agent: *`. Es un agente activado por la persona usuaria y `robots.txt` puede no aplicar en ese contexto. |
+| Googlebot y bingbot: smoke HTTP | `COMPLETADO_CON_EVIDENCIA` | `2026-07-12` | `AMMAC / Codex` | Solicitudes en vivo con `Googlebot/2.1` y `bingbot/2.0` recibieron HTTP `200` de `certificacionmontessori.com` y `montessorimexico.org`. Esta es una comprobacion de acceso HTTP, no evidencia de indexacion. |
 | `llms.txt` localizado | `PENDIENTE_CONTROLADO` | `2026-07-12` | `AMMAC / Codex` | `/llms.txt`, `/en/llms.txt` y `/pt-br/llms.txt` respondieron HTTP `200` y `text/plain`. El espanol de produccion aun recomienda la redireccion heredada `/certificate/`. El commit `0e7a0eb` corrige los canonicos localizados a `/{locale}/diplomados/#certificacion_internacional` y marca `llms.txt` como informativo; faltan despliegue y verificacion en produccion. |
 | Interpretacion | `COMPLETADO_CON_EVIDENCIA` | `2026-07-12` | `AMMAC / Codex` | Permitir acceso a un crawler no garantiza ranking, indexacion, aparicion en resultados ni citacion. Base oficial: controles de acceso de [OpenAI](https://developers.openai.com/api/docs/bots), estado de indexacion de [Google](https://support.google.com/webmasters/answer/7440203) e IndexNow de [Bing](https://www.bing.com/webmasters/help/indexnow-0z209wby). |
 
 No cambie reglas de `OAI-SearchBot`, `GPTBot` o `ChatGPT-User` como si fueran
 intercambiables. El acceso de busqueda, el acceso de entrenamiento y las
-solicitudes iniciadas por usuarios son controles independientes.
+solicitudes iniciadas por usuarios son controles independientes. OpenAI define
+`OAI-SearchBot` como el control de aparicion en ChatGPT Search y `GPTBot` como el
+bot para contenido que puede usarse en entrenamiento. El resultado de WordPress
+coincide con la politica de SiteGround: permite crawlers de chat/busqueda y
+bloquea bots de entrenamiento en el servidor. Por ello, el bloqueo observado de
+`GPTBot` no es un impedimento para atraer visitas desde ChatGPT Search.
 
 ## Fuentes operativas oficiales
 
@@ -146,3 +152,4 @@ solicitudes iniciadas por usuarios son controles independientes.
 - Bing Webmaster Tools, [URL Inspection](https://www.bing.com/webmasters/help/URL-Inspection-55a30305), [Site Explorer](https://www.bing.com/webmasters/help/site-explorer-c680da37), [Site Scan](https://www.bing.com/webmasters/help/site-scan-623520c9) e [IndexNow](https://www.bing.com/webmasters/help/indexnow-0z209wby).
 - WordPress, [IndexNow Plugin](https://wordpress.org/plugins/indexnow/).
 - OpenAI, [bots y crawlers](https://developers.openai.com/api/docs/bots).
+- SiteGround, [crawlers de IA permitidos](https://www.siteground.com/kb/allowed-ai-crawlers/) y [politica de crawling de bots de IA](https://eu.siteground.com/blog/ai-bot-crawling/).
