@@ -40,9 +40,10 @@ eliminados, respeta `noindex` renderizado y `X-Robots-Tag`, y ofrece exclusion,
 historial y reintentos. Por ello no se solicita ni se agrega una credencial de
 automatizacion en `.env` para esta integracion.
 
-AIOSEO Lite ya esta instalado, pero su complemento IndexNow requiere un plan
-AIOSEO de pago. No se habilita esa segunda integracion ni cualquier otra fuente
-duplicada de IndexNow.
+Si AIOSEO Lite esta instalado, su estado debe confirmarse con evidencia antes
+de registrarlo como hecho. En cualquier caso, no se habilita su complemento
+IndexNow ni cualquier otra fuente duplicada de IndexNow junto al plugin
+autorizado.
 
 | Control externo de WordPress | Estado | Fecha de evidencia | Responsable | Evidencia requerida |
 | --- | --- | --- | --- | --- |
@@ -93,18 +94,18 @@ Los **42 URLs canonicos** son un objetivo futuro del plan aprobado, no un
 recuento declarado de produccion en la fecha de este documento. Completar esta
 lista solo contra una exportacion fechada de la propiedad correcta.
 
-| Control | Estado | Fecha de evidencia | Evidencia/resultado requerido |
-| --- | --- | --- | --- |
-| Sitemaps | `PENDIENTE_CONTROLADO` | `AAAA-MM-DD` | `sitemap-index.xml` aparece como `Success` y sus informes hijos muestran 42 URLs canonicas enviadas/descubiertas. |
-| Contrato de produccion | `PENDIENTE_CONTROLADO` | `AAAA-MM-DD` | Las 42 URLs enviadas responden `200`, son autocanonicas, indexables y tienen `hreflang` reciproco. |
-| Page indexing | `PENDIENTE_CONTROLADO` | `AAAA-MM-DD` | Filtrar por el sitemap enviado; exportar y clasificar cada URL enviada no indexada por motivo. La indexacion se observa, no se fuerza. |
-| Validacion existente | `PENDIENTE_CONTROLADO` | `AAAA-MM-DD` | Registrar el estado de validacion de `2026-07-11` para `Crawled - currently not indexed`; nunca reiniciarla mientras siga activa. |
-| HTTPS | `PENDIENTE_CONTROLADO` | `AAAA-MM-DD` | Ninguna URL enviada aparece como no HTTPS. |
-| Core Web Vitals | `PENDIENTE_CONTROLADO` | `AAAA-MM-DD` | Registrar estado movil/escritorio y p75 de LCP, INP y CLS cuando haya datos de campo; `insufficient data` es valido. |
-| Mejoras/datos estructurados | `PENDIENTE_CONTROLADO` | `AAAA-MM-DD` | Investigar cada informe que Google realmente exponga; la ausencia de un informe Course no es error. |
-| Acciones manuales | `PENDIENTE_CONTROLADO` | `AAAA-MM-DD` | Ninguna. |
-| Problemas de seguridad | `PENDIENTE_CONTROLADO` | `AAAA-MM-DD` | Ninguno. |
-| Rendimiento | `PENDIENTE_CONTROLADO` | `AAAA-MM-DD` | Exportar clics, impresiones, CTR y posicion por pagina, consulta, pais y dispositivo; segmentar `/en/`, `/pt-br/` y raiz espanola, ademas de consultas de marca/no marca. |
+| Control | Estado | Fecha de evidencia | Responsable | Evidencia/resultado requerido |
+| --- | --- | --- | --- | --- |
+| Sitemaps | `PENDIENTE_CONTROLADO` | `AAAA-MM-DD` | `pendiente` | `sitemap-index.xml` aparece como `Success` y sus informes hijos muestran 42 URLs canonicas enviadas/descubiertas. |
+| Contrato de produccion | `PENDIENTE_CONTROLADO` | `AAAA-MM-DD` | `pendiente` | Las 42 URLs enviadas responden `200`, son autocanonicas, indexables y tienen `hreflang` reciproco. |
+| Page indexing | `PENDIENTE_CONTROLADO` | `AAAA-MM-DD` | `pendiente` | Filtrar por el sitemap enviado; exportar y clasificar cada URL enviada no indexada por motivo. La indexacion se observa, no se fuerza. |
+| Validacion existente | `PENDIENTE_CONTROLADO` | `AAAA-MM-DD` | `pendiente` | Registrar el estado de validacion de `2026-07-11` para `Crawled - currently not indexed`; nunca reiniciarla mientras siga activa. |
+| HTTPS | `PENDIENTE_CONTROLADO` | `AAAA-MM-DD` | `pendiente` | Ninguna URL enviada aparece como no HTTPS. |
+| Core Web Vitals | `PENDIENTE_CONTROLADO` | `AAAA-MM-DD` | `pendiente` | Registrar estado movil/escritorio y p75 de LCP, INP y CLS cuando haya datos de campo; `insufficient data` es valido. |
+| Mejoras/datos estructurados | `PENDIENTE_CONTROLADO` | `AAAA-MM-DD` | `pendiente` | Investigar cada informe que Google realmente exponga; la ausencia de un informe Course no es error. |
+| Acciones manuales | `PENDIENTE_CONTROLADO` | `AAAA-MM-DD` | `pendiente` | Ninguna. |
+| Problemas de seguridad | `PENDIENTE_CONTROLADO` | `AAAA-MM-DD` | `pendiente` | Ninguno. |
+| Rendimiento | `PENDIENTE_CONTROLADO` | `AAAA-MM-DD` | `pendiente` | Exportar clics, impresiones, CTR y posicion por pagina, consulta, pais y dispositivo; segmentar `/en/`, `/pt-br/` y raiz espanola, ademas de consultas de marca/no marca. |
 
 ## Bing Webmaster Tools: checklist de terminacion controlada
 
@@ -112,28 +113,28 @@ Los **17 URLs comerciales modificados** son un objetivo futuro de terminacion
 controlada del plan aprobado, no una afirmacion de que hoy existan 17 cambios
 en produccion.
 
-| Control | Estado | Fecha de evidencia | Evidencia/resultado requerido |
-| --- | --- | --- | --- |
-| Sitemaps | `PENDIENTE_CONTROLADO` | `AAAA-MM-DD` | El indice y los hijos terminan de procesar sin error y contienen el inventario publico esperado. |
-| URL Inspection | `PENDIENTE_CONTROLADO` | `AAAA-MM-DD` | Una URL de hub/programa por locale pasa las comprobaciones Index, SEO, Markup y Live URL. |
-| Site Scan | `PENDIENTE_CONTROLADO` | `AAAA-MM-DD` | Ejecutar despues del despliegue un escaneo de alcance `Website`; objetivo: cero Errors y clasificar cada Warning/Notice antes de cambiar codigo. |
-| Site Explorer | `PENDIENTE_CONTROLADO` | `AAAA-MM-DD` | Revisar filtros Indexed, Error, Warning, Excluded, redirects, noindex y robots; las URLs antiguas redirigidas se esperan fuera del inventario canonico. |
-| IndexNow Insights | `PENDIENTE_CONTROLADO` | `AAAA-MM-DD` | Confirmar los 17 URLs comerciales modificados y las transiciones publicas de WordPress; los borradores nunca aparecen. |
-| Rendimiento de busqueda | `PENDIENTE_CONTROLADO` | `AAAA-MM-DD` | Registrar movimiento de consulta/pagina/pais por separado de Google. |
+| Control | Estado | Fecha de evidencia | Responsable | Evidencia/resultado requerido |
+| --- | --- | --- | --- | --- |
+| Sitemaps | `PENDIENTE_CONTROLADO` | `AAAA-MM-DD` | `pendiente` | El indice y los hijos terminan de procesar sin error y contienen el inventario publico esperado. |
+| URL Inspection | `PENDIENTE_CONTROLADO` | `AAAA-MM-DD` | `pendiente` | Una URL de hub/programa por locale pasa las comprobaciones Index, SEO, Markup y Live URL. |
+| Site Scan | `PENDIENTE_CONTROLADO` | `AAAA-MM-DD` | `pendiente` | Ejecutar despues del despliegue un escaneo de alcance `Website`; objetivo: cero Errors y clasificar cada Warning/Notice antes de cambiar codigo. |
+| Site Explorer | `PENDIENTE_CONTROLADO` | `AAAA-MM-DD` | `pendiente` | Revisar filtros Indexed, Error, Warning, Excluded, redirects, noindex y robots; las URLs antiguas redirigidas se esperan fuera del inventario canonico. |
+| IndexNow Insights | `PENDIENTE_CONTROLADO` | `AAAA-MM-DD` | `pendiente` | Confirmar los 17 URLs comerciales modificados y las transiciones publicas de WordPress; los borradores nunca aparecen. |
+| Rendimiento de busqueda | `PENDIENTE_CONTROLADO` | `AAAA-MM-DD` | `pendiente` | Registrar movimiento de consulta/pagina/pais por separado de Google. |
 
 ## Acceso de crawlers e IA
 
 Ejecute esta comprobacion contra el sitio en vivo y guarde las respuestas
 fechadas, sin inferir acceso a partir de archivos locales:
 
-| Control | Estado | Fecha de evidencia | Evidencia/resultado requerido |
-| --- | --- | --- | --- |
-| `robots.txt` vivo | `PENDIENTE_CONTROLADO` | `AAAA-MM-DD` | Obtener `https://certificacionmontessori.com/robots.txt` y la version publica aplicable de WordPress; archivar respuesta y codigo HTTP. |
-| OAI-SearchBot | `PENDIENTE_CONTROLADO` | `AAAA-MM-DD` | Verificar una regla separada para `OAI-SearchBot`, que controla el acceso de ChatGPT Search. |
-| GPTBot | `PENDIENTE_CONTROLADO` | `AAAA-MM-DD` | Verificar una regla separada para `GPTBot`, que controla el acceso para entrenamiento y se decide independientemente de OAI-SearchBot. |
-| ChatGPT-User | `PENDIENTE_CONTROLADO` | `AAAA-MM-DD` | Verificar una regla/grupo separado. Es un agente activado por la persona usuaria; las reglas de `robots.txt` pueden no aplicar en ese contexto. |
-| `llms.txt` localizado | `PENDIENTE_CONTROLADO` | `AAAA-MM-DD` | Comprobar `/llms.txt`, `/en/llms.txt` y `/pt-br/llms.txt`; permanecen informativos y no son una senal de ranking. |
-| Interpretacion | `PENDIENTE_CONTROLADO` | `AAAA-MM-DD` | Registrar que permitir un crawler no garantiza ranking, indexacion, aparicion en resultados ni citacion. |
+| Control | Estado | Fecha de evidencia | Responsable | Evidencia/resultado requerido |
+| --- | --- | --- | --- | --- |
+| `robots.txt` vivo | `PENDIENTE_CONTROLADO` | `AAAA-MM-DD` | `pendiente` | Obtener `https://certificacionmontessori.com/robots.txt` y la version publica aplicable de WordPress; archivar respuesta y codigo HTTP. |
+| OAI-SearchBot | `PENDIENTE_CONTROLADO` | `AAAA-MM-DD` | `pendiente` | Verificar una regla separada para `OAI-SearchBot`, que controla el acceso de ChatGPT Search. |
+| GPTBot | `PENDIENTE_CONTROLADO` | `AAAA-MM-DD` | `pendiente` | Verificar una regla separada para `GPTBot`, que controla el acceso para entrenamiento y se decide independientemente de OAI-SearchBot. |
+| ChatGPT-User | `PENDIENTE_CONTROLADO` | `AAAA-MM-DD` | `pendiente` | Verificar una regla/grupo separado. Es un agente activado por la persona usuaria; las reglas de `robots.txt` pueden no aplicar en ese contexto. |
+| `llms.txt` localizado | `PENDIENTE_CONTROLADO` | `AAAA-MM-DD` | `pendiente` | Comprobar `/llms.txt`, `/en/llms.txt` y `/pt-br/llms.txt`; permanecen informativos y no son una senal de ranking. |
+| Interpretacion | `PENDIENTE_CONTROLADO` | `AAAA-MM-DD` | `pendiente` | Registrar que permitir un crawler no garantiza ranking, indexacion, aparicion en resultados ni citacion. |
 
 No cambie reglas de `OAI-SearchBot`, `GPTBot` o `ChatGPT-User` como si fueran
 intercambiables. El acceso de busqueda, el acceso de entrenamiento y las
@@ -141,7 +142,7 @@ solicitudes iniciadas por usuarios son controles independientes.
 
 ## Fuentes operativas oficiales
 
-- Google Search Console, [Page Indexing report](https://support.google.com/webmasters/answer/7440203), [sitemaps](https://support.google.com/webmasters/answer/9012289) y [validacion de correcciones](https://support.google.com/webmasters/answer/10268906).
+- Google Search Console, [Page Indexing](https://support.google.com/webmasters/answer/7440203), [Sitemaps](https://support.google.com/webmasters/answer/7451001), [URL Inspection](https://support.google.com/webmasters/answer/9012289), [Validation](https://support.google.com/webmasters/answer/9216203), [Search Console operations](https://support.google.com/webmasters/answer/10351509) y [Performance](https://support.google.com/webmasters/answer/10268906).
 - Bing Webmaster Tools, [URL Inspection](https://www.bing.com/webmasters/help/URL-Inspection-55a30305), [Site Explorer](https://www.bing.com/webmasters/help/site-explorer-c680da37), [Site Scan](https://www.bing.com/webmasters/help/site-scan-623520c9) e [IndexNow](https://www.bing.com/webmasters/help/indexnow-0z209wby).
 - WordPress, [IndexNow Plugin](https://wordpress.org/plugins/indexnow/).
 - OpenAI, [bots y crawlers](https://developers.openai.com/api/docs/bots).
