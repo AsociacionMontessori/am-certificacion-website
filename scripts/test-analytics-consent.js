@@ -800,7 +800,9 @@ for (const reference of [
 }
 assert(operations.includes("pending_owner_review"))
 assert(operations.toLowerCase().includes("non-retroactive"))
-assert(operations.includes("Disable every Enhanced Measurement option"))
+assert(
+  operations.includes("disable **Page changes based on browser history events**")
+)
 assert(operations.includes("exactly one app-controlled `page_view` per route"))
 assert(operations.includes("fully queued initialization"))
 assert(operations.includes("per navigation instance"))

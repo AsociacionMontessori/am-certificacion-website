@@ -131,7 +131,7 @@ Do not release the cross-domain funnel configuration until all of the following 
 
 In the GA4 web stream, keep Enhanced Measurement enabled but open the advanced Page views settings and disable **Page changes based on browser history events**. Keep ordinary page-load measurement and the other useful enhanced events enabled. `send_page_view: false` disables Gatsby's automatic config page view, while this stream setting prevents a competing history-change view.
 
-Verified on 2026-07-12: the history-event option is disabled, ordinary page-load measurement remains enabled, and a clean consented load of `certificacionmontessori.com` produced exactly one `204 collect` request for `G-P0CNEGW276`. The intercepted Gatsby suite separately verifies one app-controlled `page_view` per route and navigation instance across initial grant, reaffirmation, revoke/regrant, next route, repeated pathname under a new key, browser back, invalid paths, and failed-send retry. Do not release if GA4 or the application later produces a duplicate route page view.
+Verified on 2026-07-12: the history-event option is disabled, ordinary page-load measurement remains enabled, and a clean consented load of `certificacionmontessori.com` produced exactly one `204 collect` request for `G-P0CNEGW276`. The intercepted Gatsby suite separately verifies exactly one app-controlled `page_view` per route and navigation instance across initial grant, reaffirmation, revoke/regrant, next route, repeated pathname under a new key, browser back, invalid paths, and failed-send retry. Do not release if GA4 or the application later produces a duplicate route page view.
 
 Run from the Gatsby repository root:
 
