@@ -71,10 +71,13 @@ const normalizePublicPaths = paths => {
     if (isRedirectPath(normalized)) continue
     accepted.add(normalized)
   }
-  return [...accepted]
+  return [...accepted].sort()
 }
 
 const buildIndexNowPayload = (paths, key) => {
+  if (typeof key !== "string" || !/^[A-Za-z0-9-]{8,128}$/.test(key)) {
+    throw new Error("IndexNow key must be 8-128 characters using only A-Za-z0-9-")
+  }
   const publicPaths = normalizePublicPaths(paths)
   if (publicPaths.length > MAX_URLS_PER_BATCH) {
     throw new Error(`IndexNow accepts at most ${MAX_URLS_PER_BATCH} URLs per batch`)
