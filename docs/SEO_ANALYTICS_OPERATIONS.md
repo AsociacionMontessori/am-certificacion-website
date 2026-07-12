@@ -152,7 +152,7 @@ Expected request-attempt counts in one clean context: unknown `0`; fresh decline
 
 ## Privacy and release gate
 
-The localized privacy wording is an evidence-based draft, not legal advice. The historical status for `es`, `en`, and `pt-BR` remains `pending_owner_review` in `docs/i18n/PRIVACY_REVIEW_2026-07-11.md`; that file is intentionally not changed by this runbook. For this operations runbook, AMMAC privacy/legal wording approval is recorded as **approved by AMMAC**. Evidence placeholder: `[record approver/date/rendered-banner-and-policy evidence]`.
+The localized privacy wording is an evidence-based draft, not legal advice. The historical status for `es`, `en`, and `pt-BR` remains `pending_owner_review` in `docs/i18n/PRIVACY_REVIEW_2026-07-11.md`; that file is intentionally not changed by this runbook. For this operations runbook, the AMMAC owner approval is recorded as **approved by the AMMAC responsible owner on 2026-07-11**, based on the explicit production approval in the project conversation. Evidence: this approval record plus the rendered banner and policy captures to be attached after deployment. This does not represent independent legal counsel review.
 
 Do not deploy this change to production until the cross-domain production gates, Gatsby hard pre-production GA4 stream gate, and the rendered-banner, notices, and regional-policy evidence are complete.
 
