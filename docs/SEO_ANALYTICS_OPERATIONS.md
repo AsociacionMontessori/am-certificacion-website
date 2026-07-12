@@ -46,14 +46,14 @@ Record the administered configuration and evidence in this runbook before the se
 
 | Item | Required record |
 | --- | --- |
-| CookieYes plugin version | `[record installed version]` |
-| Cookie scan date | `[YYYY-MM-DD]` |
-| Connected domain | `montessorimexico.org` `[record connection evidence]` |
-| Consent configuration | `Google Consent Mode v2: Basic; Necessary + Analytics; advertising disabled` |
-| Banner languages | `Spanish primary; English and Brazilian Portuguese enabled` |
-| Tag classification | `MonsterInsights/Google tag: Analytics` |
-| Privacy/legal wording approval | `approved by AMMAC` `[record approver/date/evidence]` |
-| Clean-profile consent evidence | `[.superpowers/sdd/evidence/A4-cross-domain/cookieyes-consent-checks/]` |
+| CookieYes plugin version | `3.5.2` |
+| Cookie scan date | `Not performed: free plugin scan requires CookieYes web-app connection` |
+| Connected domain | `montessorimexico.org`; native WordPress plugin configuration |
+| Consent configuration | `Basic gate; Necessary + Analytics; advertising disabled` |
+| Banner languages | `Spanish primary; free plugin language add-on not enabled` |
+| Tag classification | `Custom GA4 editorial snippet: Analytics; MonsterInsights frontend tracking disabled` |
+| Privacy/legal wording approval | `approved by AMMAC responsible owner on 2026-07-11`; independent legal review not represented |
+| Clean-profile consent evidence | `2026-07-12 manual DevTools Network checks: reject/revoke produced no Google tag or collect requests; accept produced one gtag.js load and one 204 collect request` |
 
 ### 2. Add the shared destination without duplicating tags
 
