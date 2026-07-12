@@ -52,6 +52,66 @@
         "source": "/otroscursos/**",
         "destination": "/diplomados/",
         "type": 301
+      },
+      {
+        "source": "/en/certificate",
+        "destination": "/en/diplomados/#certificacion_internacional",
+        "type": 301
+      },
+      {
+        "source": "/en/certificate/**",
+        "destination": "/en/diplomados/#certificacion_internacional",
+        "type": 301
+      },
+      {
+        "source": "/en/masterclasses",
+        "destination": "/en/diplomados/",
+        "type": 301
+      },
+      {
+        "source": "/en/masterclasses/**",
+        "destination": "/en/diplomados/",
+        "type": 301
+      },
+      {
+        "source": "/en/otroscursos",
+        "destination": "/en/diplomados/",
+        "type": 301
+      },
+      {
+        "source": "/en/otroscursos/**",
+        "destination": "/en/diplomados/",
+        "type": 301
+      },
+      {
+        "source": "/pt-br/certificate",
+        "destination": "/pt-br/diplomados/#certificacion_internacional",
+        "type": 301
+      },
+      {
+        "source": "/pt-br/certificate/**",
+        "destination": "/pt-br/diplomados/#certificacion_internacional",
+        "type": 301
+      },
+      {
+        "source": "/pt-br/masterclasses",
+        "destination": "/pt-br/diplomados/",
+        "type": 301
+      },
+      {
+        "source": "/pt-br/masterclasses/**",
+        "destination": "/pt-br/diplomados/",
+        "type": 301
+      },
+      {
+        "source": "/pt-br/otroscursos",
+        "destination": "/pt-br/diplomados/",
+        "type": 301
+      },
+      {
+        "source": "/pt-br/otroscursos/**",
+        "destination": "/pt-br/diplomados/",
+        "type": 301
       }
     ],
     "rewrites": [
