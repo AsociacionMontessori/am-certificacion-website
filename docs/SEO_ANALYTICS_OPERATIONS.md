@@ -16,6 +16,115 @@
 - Invalid or missing runtime paths fall back to `/` for config and custom events; explicit invalid manual page-view paths fail closed. Page query strings, hashes, arbitrary origins, credentials, PII, order identifiers, and access tokens are excluded.
 - Referrers are accepted only over HTTPS on the closed funnel-source hostname allowlist and reduced to `https://hostname/`. Their path, query, and hash are discarded. HTTP, credentials, explicit ports, suffix-host attacks, and unlisted hosts fall back to `https://certificacionmontessori.com/`.
 
+## Cross-domain funnel runbook
+
+### GA4 topology
+
+| Role | Measurement ID | Hosts |
+| --- | --- | --- |
+| Shared funnel source of truth | `G-P0CNEGW276` | `certificacionmontessori.com`, `montessorimexico.org` |
+| Editorial historical property | `G-075JTS42RZ` | `montessorimexico.org` only |
+
+Keep the editorial historical property. On a WordPress page after Analytics consent, each property may receive one `page_view`: one for `G-075JTS42RZ` and one for `G-P0CNEGW276`. The same property must never receive two `page_view` events for one page load. On a Certificacion Montessori page, only `G-P0CNEGW276` may receive the one app-controlled `page_view`.
+
+### 1. Gate WordPress analytics with CookieYes Basic consent
+
+In WordPress Admin for `montessorimexico.org`, install the official CookieYes WordPress plugin (`cookie-law-info`), connect the domain, and enable Google Consent Mode v2 in **Basic** mode. Configure only the Necessary and Analytics categories; keep advertising consent disabled. Configure Spanish as the primary banner language and enable the maintained English and Brazilian Portuguese translations.
+
+Classify the existing MonsterInsights/Google tag as **Analytics**. Basic mode must block the tag and analytics requests until Analytics consent is accepted. Consent is independent for the two registrable domains: a choice on `montessorimexico.org` does not grant, deny, or revoke consent on `certificacionmontessori.com`, and the reverse is also true.
+
+In a clean browser profile, verify the following before continuing:
+
+```text
+Before any choice: no request to googletagmanager.com or google-analytics.com.
+After Reject: still no Google analytics/tag request.
+After accepting Analytics: one Google tag loads and the editorial property receives one page_view.
+Cookie settings can reopen and revoke Analytics.
+```
+
+Record the administered configuration and evidence in this runbook before the second destination is added:
+
+| Item | Required record |
+| --- | --- |
+| CookieYes plugin version | `[record installed version]` |
+| Cookie scan date | `[YYYY-MM-DD]` |
+| Connected domain | `montessorimexico.org` `[record connection evidence]` |
+| Consent configuration | `Google Consent Mode v2: Basic; Necessary + Analytics; advertising disabled` |
+| Banner languages | `Spanish primary; English and Brazilian Portuguese enabled` |
+| Tag classification | `MonsterInsights/Google tag: Analytics` |
+| Privacy/legal wording approval | `approved by AMMAC` `[record approver/date/evidence]` |
+| Clean-profile consent evidence | `[.superpowers/sdd/evidence/A4-cross-domain/cookieyes-consent-checks/]` |
+
+### 2. Add the shared destination without duplicating tags
+
+Proceed only after the CookieYes gate passes. Add `G-P0CNEGW276` as a second destination through MonsterInsights or the site's Google tag integration, preserving `G-075JTS42RZ`. Both destinations remain classified as Analytics and blocked by CookieYes until Analytics consent is accepted.
+
+After saving, check page source and Network. The source must contain each destination exactly once:
+
+```text
+G-075JTS42RZ appears once as the editorial destination.
+G-P0CNEGW276 appears once as the shared funnel destination.
+```
+
+If the installed MonsterInsights tier cannot add a second destination without duplicating scripts, configure the second destination with Google's native Google tag destination configuration instead. Do not add another page-level snippet. Repeat the pre-consent, reject, accept, and revoke Network checks after adding the destination. A duplicate tag, a request before consent, or more than one `page_view` for either property on one WordPress load blocks production.
+
+### 3. Configure cross-domain measurement in GA4 Admin
+
+In the GA4 property containing `G-P0CNEGW276`, use Google's Admin configuration:
+
+```text
+Admin -> Data streams -> Web -> Configure tag settings -> Configure your domains
+```
+
+Add and save exact-match conditions for:
+
+```text
+certificacionmontessori.com
+montessorimexico.org
+```
+
+This GA4 Admin configuration is the preferred method. Do not add a conflicting manual linker override. Record the property, stream, operator, date, and screenshot placeholder at `[.superpowers/sdd/evidence/A4-cross-domain/ga4-domain-configuration/]`.
+
+### 4. Register event-scoped dimensions
+
+In the shared `G-P0CNEGW276` property, register the following as event-scoped custom dimensions before reporting on the funnel:
+
+```text
+program_id
+source_hostname
+source_content_id
+landing_path
+cta_position
+lead_channel
+book_id
+language
+```
+
+Record the display name, parameter name, scope, reporting type, operator, date, and evidence placeholder at `[.superpowers/sdd/evidence/A4-cross-domain/ga4-custom-dimensions/]`. Do not register or send form values, contact details, order identifiers, or other personal data.
+
+### 5. Verify linker, events, and page-view deduplication
+
+Use a clean browser session. Accept Analytics separately on `montessorimexico.org` and `certificacionmontessori.com`; do not infer one domain's consent from the other. Open a Montessori Mexico CTA link with `utm_*` parameters and perform this sequence:
+
+1. Confirm the source WordPress page has one page view in `G-075JTS42RZ` and one in `G-P0CNEGW276`, with no duplicate for either property.
+2. Click the CTA and immediately capture the destination URL. It must retain every `utm_*` parameter and include `_gl` immediately after the click.
+3. Confirm the destination page loads correctly and that `G-P0CNEGW276` receives exactly one page view for that visited page.
+4. In the shared property's GA4 DebugView, confirm exactly one `click_program_cta` and inspect its permitted event parameters.
+5. Reopen settings on each registrable domain and revoke Analytics. In a clean repeat, confirm revocation blocks later analytics/tag requests on that domain.
+
+Save source, destination, Network, URL, DebugView, and page-view screenshots under `[.superpowers/sdd/evidence/A4-cross-domain/linker-and-deduplication/]`. The evidence record must identify the test date, operator, source URL, destination URL, consent choice on each domain, property/stream, observed event counts, and any failed gate. Do not place live consent logs, credentials, or personal data in the repository.
+
+### Cross-domain production gates
+
+Do not release the cross-domain funnel configuration until all of the following are evidenced:
+
+- CookieYes is connected to `montessorimexico.org`, runs Google Consent Mode v2 in Basic mode, classifies both Google destinations as Analytics, and passes the clean-profile pre-consent, reject, accept, reopen, and revoke checks.
+- WordPress contains `G-075JTS42RZ` once and `G-P0CNEGW276` once; each property receives at most one `page_view` per WordPress load.
+- The GA4 Admin domain configuration contains both exact-match domains and has no competing manual linker configuration.
+- All eight required custom dimensions are event-scoped in the shared property.
+- A consented, clean-session CTA traversal preserves `utm_*`, shows `_gl`, produces one `click_program_cta` in DebugView, preserves the editorial WordPress page view, and produces only one shared-property page view per visited page.
+- The Gatsby hard pre-production GA4 stream gate below passes, and the AMMAC privacy/legal wording approval and all required evidence placeholders are completed.
+
 ## Operator checks
 
 ### Hard pre-production GA4 stream gate
@@ -43,7 +152,9 @@ Expected request-attempt counts in one clean context: unknown `0`; fresh decline
 
 ## Privacy and release gate
 
-The localized privacy wording is an evidence-based draft, not legal advice. Status for `es`, `en`, and `pt-BR` is `pending_owner_review` in `docs/i18n/PRIVACY_REVIEW_2026-07-11.md`. Do not deploy this change to production until AMMAC's privacy owner approves the rendered banner, notices, and regional policy.
+The localized privacy wording is an evidence-based draft, not legal advice. The historical status for `es`, `en`, and `pt-BR` remains `pending_owner_review` in `docs/i18n/PRIVACY_REVIEW_2026-07-11.md`; that file is intentionally not changed by this runbook. For this operations runbook, AMMAC privacy/legal wording approval is recorded as **approved by AMMAC**. Evidence placeholder: `[record approver/date/rendered-banner-and-policy evidence]`.
+
+Do not deploy this change to production until the cross-domain production gates, Gatsby hard pre-production GA4 stream gate, and the rendered-banner, notices, and regional-policy evidence are complete.
 
 The notice aligns the implementation with AMMAC as a private civil association, the current private-sector LFPDPPP, required versus optional purposes, GA4 behavior after consent, the 20-day response and following 15-day implementation periods, one justified extension, electronic and office ARCO intake, and publication of changes at the same localized URL.
 
@@ -57,7 +168,12 @@ The notice aligns the implementation with AMMAC as a private civil association, 
 - Google Analytics, config reference: https://developers.google.com/analytics/devguides/collection/ga4/reference/config
 - Google Analytics, page-view measurement: https://developers.google.com/analytics/devguides/collection/ga4/views
 - Google Analytics, Enhanced Measurement: https://support.google.com/analytics/answer/9216061
+- Google Analytics, Set up cross-domain measurement: https://support.google.com/analytics/answer/10071811
+- Google Analytics, Monitor events in DebugView: https://support.google.com/analytics/answer/7201382
+- Google Analytics, About custom dimensions and metrics: https://support.google.com/analytics/answer/14240153
 - Google tag API reference: https://developers.google.com/tag-platform/gtagjs/reference
+- CookieYes, official WordPress plugin (`cookie-law-info`): https://wordpress.org/plugins/cookie-law-info/
+- CookieYes, Basic and advanced consent mode: https://www.cookieyes.com/documentation/basic-and-advanced-consent-mode/
 
 ## Legal sources
 
