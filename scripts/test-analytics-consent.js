@@ -775,11 +775,22 @@ const privacyReview = fs.readFileSync(
   path.join(root, "docs/i18n/PRIVACY_REVIEW_2026-07-11.md"),
   "utf8"
 )
+for (const locale of ["es", "en", "pt-BR"]) {
+  assert(
+    privacyReview.includes(
+      `| ${locale} | AMMAC responsible owner | 2026-07-11 | \`approved_for_production\` |`
+    ),
+    `${locale} privacy approval record`
+  )
+}
 assert.strictEqual(
-  (privacyReview.match(/pending_owner_review/g) || []).length,
+  (privacyReview.match(/`approved_for_production`/g) || []).length,
   3
 )
-assert(!privacyReview.match(/\|\s*approved\s*\|/i))
+assert.strictEqual(
+  (privacyReview.match(/pending_owner_review/g) || []).length,
+  0
+)
 
 const operations = fs.readFileSync(
   path.join(root, "docs/SEO_ANALYTICS_OPERATIONS.md"),
@@ -798,7 +809,8 @@ for (const reference of [
 ]) {
   assert(operations.includes(reference), reference)
 }
-assert(operations.includes("pending_owner_review"))
+assert(!operations.includes("pending_owner_review"))
+assert(operations.includes("approved_for_production"))
 assert(operations.toLowerCase().includes("non-retroactive"))
 assert(
   operations.includes("disable **Page changes based on browser history events**")
@@ -820,7 +832,6 @@ const taskThree = plan.slice(
   plan.indexOf("### Task 4:")
 )
 for (const contractTerm of [
-  "pending_owner_review",
   "regrant",
   "20 days",
   "Playwright",
@@ -843,6 +854,15 @@ const parsedPackage = JSON.parse(packageJson)
 assert.strictEqual(
   parsedPackage.scripts["test:analytics-consent"],
   "node scripts/test-analytics-consent.js"
+)
+assert.strictEqual(
+  parsedPackage.scripts["test:wordpress-analytics"],
+  "node scripts/test-wordpress-analytics-snippet.js"
+)
+assert(
+  parsedPackage.scripts["test:foundation"].includes(
+    "npm run test:wordpress-analytics"
+  )
 )
 
 console.log("analytics consent contract ok")

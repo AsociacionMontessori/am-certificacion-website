@@ -31,7 +31,7 @@ Keep the editorial historical property. On a WordPress page after Analytics cons
 
 In WordPress Admin for `montessorimexico.org`, install the official CookieYes WordPress plugin (`cookie-law-info`) and use its native free configuration. Configure only the Necessary and Analytics categories; keep advertising consent disabled. Use Spanish as the banner language. The paid CookieYes web-app connection, scanner, and language add-on are intentionally not enabled; the multilingual Gatsby consent panel remains independent.
 
-Disable MonsterInsights frontend tracking and deploy `docs/snippets/montessorimexico-ga4-cookieyes.php` through Code Snippets. The snippet must block both Google destinations until Analytics consent is accepted, keep every advertising consent state denied, and disable Google Signals and ad-personalization signals. Consent is independent for the two registrable domains: a choice on `montessorimexico.org` does not grant, deny, or revoke consent on `certificacionmontessori.com`, and the reverse is also true.
+Disable MonsterInsights frontend tracking and deploy `docs/snippets/montessorimexico-ga4-cookieyes.php` through Code Snippets. The snippet must block both Google destinations until Analytics consent is accepted, keep every advertising consent state denied, and disable Google Signals and ad-personalization signals. It must continue reconciling the CookieYes state after load and synchronize it in the capture phase before a click: revocation disables both measurement IDs and sends an Analytics denied update, while regrant enables both IDs without loading another tag. The snippet never emits a business event. Consent is independent for the two registrable domains: a choice on `montessorimexico.org` does not grant, deny, or revoke consent on `certificacionmontessori.com`, and the reverse is also true.
 
 In a clean browser profile, verify the following before continuing:
 
@@ -52,7 +52,7 @@ Record the administered configuration and evidence in this runbook before the se
 | Consent configuration | `Basic gate; Necessary + Analytics; advertising disabled` |
 | Banner languages | `Spanish primary; free plugin language add-on not enabled` |
 | Tag classification | `Custom GA4 editorial snippet: Analytics; MonsterInsights frontend tracking disabled` |
-| Privacy/legal wording approval | `approved by AMMAC responsible owner on 2026-07-11`; independent legal review not represented |
+| Privacy/legal wording approval | `approved_for_production` for `es`, `en`, and `pt-BR` by the AMMAC responsible owner on `2026-07-11`; independent legal review not represented |
 | Clean-profile consent evidence | `2026-07-12 manual DevTools Network checks: reject/revoke produced no Google tag or collect requests; accept produced one gtag.js load and one 204 collect request` |
 
 ### 2. Add the shared destination without duplicating tags
@@ -109,10 +109,10 @@ Use a clean browser session. Accept Analytics separately on `montessorimexico.or
 1. Confirm the source WordPress page has one page view in `G-075JTS42RZ` and one in `G-P0CNEGW276`, with no duplicate for either property.
 2. Click the CTA and immediately capture the destination URL. It must include `_gl` immediately after the click. Do not add campaign parameters to an internal cross-domain CTA merely for testing because they can overwrite acquisition attribution.
 3. Confirm the destination page loads correctly and that `G-P0CNEGW276` receives exactly one page view for that visited page.
-4. In the shared property's GA4 DebugView, confirm exactly one `click_program_cta` and inspect its permitted event parameters.
+4. In the shared property's GA4 DebugView, confirm the attributed destination emitted exactly one `click_program_cta` and inspect its permitted event parameters. The WordPress source snippet must emit no business event.
 5. Reopen settings on each registrable domain and revoke Analytics. In a clean repeat, confirm revocation blocks later analytics/tag requests on that domain.
 
-Verified on 2026-07-12: the destination URL included `_gl`; the source emitted one page view to each destination; `click_program_cta` appeared exactly once in DebugView with the allowlisted funnel parameters; the destination emitted one `G-P0CNEGW276` page view; and revocation independently blocked later requests on each domain. No credentials or personal data were captured.
+Verified on 2026-07-12: the destination URL included `_gl`; the source emitted one page view to each destination and no business event; the attributed destination emitted `click_program_cta` exactly once with the allowlisted funnel parameters; the destination emitted one `G-P0CNEGW276` page view; and revocation independently blocked later requests on each domain. No credentials or personal data were captured.
 
 ### Cross-domain production gates
 
@@ -122,7 +122,7 @@ Do not release the cross-domain funnel configuration until all of the following 
 - WordPress contains `G-075JTS42RZ` once and `G-P0CNEGW276` once; each property receives at most one `page_view` per WordPress load.
 - The GA4 Admin domain configuration contains both exact-match domains and has no competing manual linker configuration.
 - All eight required custom dimensions are event-scoped in the shared property.
-- A consented, clean-session CTA traversal shows `_gl`, produces one `click_program_cta` in DebugView, preserves the editorial WordPress page view, and produces only one shared-property page view per visited page.
+- A consented, clean-session CTA traversal shows `_gl`, produces no source business event and exactly one destination `click_program_cta` in DebugView, preserves the editorial WordPress page view, and produces only one shared-property page view per visited page.
 - The Gatsby hard pre-production GA4 stream gate below passes, and the AMMAC privacy/legal wording approval and all required evidence placeholders are completed.
 
 ## Operator checks
@@ -164,7 +164,7 @@ For a no-network validation, use `INDEXNOW_DRY_RUN=1 npm run indexnow:submit -- 
 
 ## Privacy and release gate
 
-The localized privacy wording is an evidence-based draft, not legal advice. The historical status for `es`, `en`, and `pt-BR` remains `pending_owner_review` in `docs/i18n/PRIVACY_REVIEW_2026-07-11.md`; that file is intentionally not changed by this runbook. For this operations runbook, the AMMAC owner approval is recorded as **approved by the AMMAC responsible owner on 2026-07-11**, based on the explicit production approval in the project conversation. Evidence: this approval record plus the rendered banner and policy captures to be attached after deployment. This does not represent independent legal counsel review.
+The localized privacy wording is evidence-based and is not independent legal advice. The AMMAC responsible owner approved `es`, `en`, and `pt-BR` for production on `2026-07-11`; `docs/i18n/PRIVACY_REVIEW_2026-07-11.md` records all three as `approved_for_production`. Evidence consists of that responsible-owner approval record plus the rendered banner and policy captures to be attached after deployment. This approval does not represent independent legal counsel review.
 
 Do not deploy this change to production until the cross-domain production gates, Gatsby hard pre-production GA4 stream gate, and the rendered-banner, notices, and regional-policy evidence are complete.
 

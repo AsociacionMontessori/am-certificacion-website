@@ -1,11 +1,11 @@
 # Privacy notice review - 2026-07-11
 
-This evidence-based draft implements the current technical behavior but is not legal advice. Production remains blocked until AMMAC's privacy owner reviews the rendered notice and banner for each locale and records explicit approval.
+This evidence-based review records the AMMAC responsible owner's production approval for the current rendered notice and banner in all supported locales. It is not independent legal advice or an independent legal review.
 
 | Locale | Reviewer | Review date | Status |
 | --- | --- | --- | --- |
-| es | AMMAC privacy owner (unassigned) | Pending | `pending_owner_review` |
-| en | AMMAC privacy owner (unassigned) | Pending | `pending_owner_review` |
-| pt-BR | AMMAC privacy owner (unassigned) | Pending | `pending_owner_review` |
+| es | AMMAC responsible owner | 2026-07-11 | `approved_for_production` |
+| en | AMMAC responsible owner | 2026-07-11 | `approved_for_production` |
+| pt-BR | AMMAC responsible owner | 2026-07-11 | `approved_for_production` |
 
-Approval must cover the controller identity and address, private-sector LFPDPPP basis, required versus optional purposes, GA4 categories and exclusions, consent and revocation wording, ARCO intake and periods, and semantic alignment across all three locales.
+The approval covers the controller identity and address, private-sector LFPDPPP basis, required versus optional purposes, GA4 categories and exclusions, consent and revocation wording, ARCO intake and periods, and semantic alignment across all three locales. It documents responsible-owner approval only and does not represent advice from independent legal counsel.
