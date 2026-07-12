@@ -10,9 +10,10 @@ Google o Bing mediante reenvios repetidos, solicitudes repetidas o la
 reanudacion de validaciones que sigan activas.
 
 Las verificaciones de WordPress, borrador y publicacion se realizan fuera de
-este repositorio por la persona propietaria. Este archivo no afirma que esten
-instaladas, ejecutadas ni aprobadas. Para cada control externo registre el
-estado y evidencia antes de marcarlo como completado.
+este repositorio por la persona propietaria u operadora autorizada. Este archivo
+puede registrar un estado externo cuando una comprobacion autorizada, incluida
+una consulta autenticada, deja evidencia fechada y verificable. No registre
+claves, contrasenas de aplicacion, tokens ni otros secretos.
 
 | Estado permitido | Significado |
 | --- | --- |
@@ -31,26 +32,24 @@ Plantilla de evidencia para cada item externo:
 
 ### Integracion unica mantenida
 
-El unico candidato autorizado para este sitio WordPress es **IndexNow Plugin**
-por `bingwebmastertools`, version **1.0.4** segun el contexto verificado de
-esta tarea. Su ficha oficial de WordPress es
+La unica integracion autorizada y verificada para este sitio WordPress es
+**IndexNow Plugin** por `bingwebmastertools`, version **1.0.4**. Su ficha oficial
+de WordPress es
 [IndexNow Plugin](https://wordpress.org/plugins/indexnow/). El plugin genera y
 aloja su propia clave, notifica cambios de URL publicados, actualizados y
 eliminados, respeta `noindex` renderizado y `X-Robots-Tag`, y ofrece exclusion,
 historial y reintentos. Por ello no se solicita ni se agrega una credencial de
 automatizacion en `.env` para esta integracion.
 
-Si AIOSEO Lite esta instalado, su estado debe confirmarse con evidencia antes
-de registrarlo como hecho. En cualquier caso, no se habilita su complemento
-IndexNow ni cualquier otra fuente duplicada de IndexNow junto al plugin
-autorizado.
+AIOSEO base permanece activo. No se habilita un complemento IndexNow de AIOSEO
+ni cualquier otra fuente duplicada de IndexNow junto al plugin autorizado.
 
 | Control externo de WordPress | Estado | Fecha de evidencia | Responsable | Evidencia requerida |
 | --- | --- | --- | --- | --- |
-| Instalar/confirmar `IndexNow Plugin` de `bingwebmastertools` version 1.0.4. | `PENDIENTE_CONTROLADO` | `AAAA-MM-DD` | `pendiente` | Captura de Plugins y version. |
-| Confirmar pagina de diagnostico disponible y envio automatico para publicaciones, actualizaciones y eliminaciones. | `PENDIENTE_CONTROLADO` | `AAAA-MM-DD` | `pendiente` | Captura de diagnostico/configuracion. |
-| Confirmar que el plugin creo/aloja su clave y que no se solicito una credencial `.env`. | `PENDIENTE_CONTROLADO` | `AAAA-MM-DD` | `pendiente` | URL de clave y captura sin secretos. |
-| Confirmar que AIOSEO Lite no tiene habilitado IndexNow ni existe otra integracion duplicada. | `PENDIENTE_CONTROLADO` | `AAAA-MM-DD` | `pendiente` | Captura de AIOSEO y lista de plugins. |
+| Instalar/confirmar `IndexNow Plugin` de `bingwebmastertools` version 1.0.4. | `COMPLETADO_CON_EVIDENCIA` | `2026-07-12` | `AMMAC / Codex` | Inventario autenticado previo: AIOSEO activo y plugin oficial ausente. Instalado mediante `POST /wp/v2/plugins`: `indexnow/indexnow-url-submission`, activo, version `1.0.4`, autor Microsoft Bing, HTTP `201`. |
+| Confirmar configuracion/diagnostico y envio automatico para publicaciones, actualizaciones y eliminaciones. | `COMPLETADO_CON_EVIDENCIA` | `2026-07-12` | `AMMAC / Codex` | API autenticada del plugin inicializada: formato de clave valido, envio automatico activo y rutas excluidas vacias. |
+| Confirmar que el plugin creo/aloja su clave y que no se solicito una credencial `.env`. | `COMPLETADO_CON_EVIDENCIA` | `2026-07-12` | `AMMAC / Codex` | El archivo publico de clave respondio HTTP `200` y su contenido coincidio exactamente con la clave configurada; no se agrego ninguna credencial a `.env`. No se registra el valor de la clave. |
+| Confirmar que AIOSEO no tiene habilitado IndexNow ni existe otra integracion duplicada. | `COMPLETADO_CON_EVIDENCIA` | `2026-07-12` | `AMMAC / Codex` | Inventario autenticado: 5 Code Snippets y cero coincidencias para IndexNow, `api.indexnow` o Bing IndexNow; no hay una segunda integracion en plugins. AIOSEO base sigue activo y no se instalo un complemento/plugin IndexNow duplicado. |
 
 ### Aislamiento del borrador y permalink final
 
@@ -68,10 +67,11 @@ autorizado.
 
 | Control externo de transicion | Estado | Fecha de evidencia | Responsable | Evidencia requerida |
 | --- | --- | --- | --- | --- |
-| Borrador privado creado; historial de IndexNow sin URL enviada mientras es `draft`. | `PENDIENTE_CONTROLADO` | `AAAA-MM-DD` | `pendiente` | ID interno, captura del estado y captura/registro de historial. |
-| Articulo revisado y publicado mediante el flujo normal; URL recibida con permalink bonito. | `PENDIENTE_CONTROLADO` | `AAAA-MM-DD` | `pendiente` | URL final y recibo/registro de IndexNow. |
-| Confirmar que la URL recibida no usa `?p=123`. | `PENDIENTE_CONTROLADO` | `AAAA-MM-DD` | `pendiente` | URL final copiada literalmente. |
-| Estado editorial final restaurado sin borrar contenido de produccion. | `PENDIENTE_CONTROLADO` | `AAAA-MM-DD` | `pendiente` | Historial de revisiones/captura. |
+| Borrador privado creado; historial de IndexNow sin URL enviada mientras es `draft`. | `COMPLETADO_CON_EVIDENCIA` | `2026-07-12` | `AMMAC / Codex` | Post `1630`, slug `control-indexnow-draft-2026-07-12`, estado `draft`; historial local `0` antes y `0` despues, sin coincidencias del slug. |
+| Control independiente de actualizacion publica segura; no sustituye la prueba natural de alta programada. | `COMPLETADO_CON_EVIDENCIA` | `2026-07-12` | `AMMAC / Codex` | Post `1338` guardado de nuevo como `publish`, con hash de titulo/contenido/extracto/slug sin cambios. Historial `0` a `1`, recibo `Success` para la URL exacta y contadores locales `1` exitoso/`0` fallidos. `https://montessorimexico.org/desarrollo-motor-grueso-asociacion-montessori-de-mexico/` respondio HTTP `200` con canonical coincidente y sin `?p=`. |
+| Articulo revisado y publicado mediante el flujo normal; URL recibida con permalink bonito. | `PENDIENTE_CONTROLADO` | `2026-07-12` | `AMMAC / Codex` | Post `1345`, titulo Educar en la era digital: &iquest;personas o procesadores?, estado `future`, programado para `2026-07-12 22:24:29` hora del sitio. No publicar antes; falta observar la transicion natural `future` a `publish` y su recibo. |
+| Confirmar que la URL recibida no usa `?p=123`. | `PENDIENTE_CONTROLADO` | `2026-07-12` | `AMMAC / Codex` | Slug previsto `educar-en-la-era-digital-asociacion-montessori-de-mexico`; falta verificar el permalink publico despues de la transicion natural. |
+| Estado editorial final restaurado sin borrar contenido de produccion. | `PENDIENTE_CONTROLADO` | `2026-07-12` | `AMMAC / Codex` | Falta confirmar el estado editorial final del post `1345` despues de su publicacion programada. No borrar contenido ni repetir/forzar la prueba. |
 
 ## Cadencia posterior a cada release
 
@@ -129,12 +129,12 @@ fechadas, sin inferir acceso a partir de archivos locales:
 
 | Control | Estado | Fecha de evidencia | Responsable | Evidencia/resultado requerido |
 | --- | --- | --- | --- | --- |
-| `robots.txt` vivo | `PENDIENTE_CONTROLADO` | `AAAA-MM-DD` | `pendiente` | Obtener `https://certificacionmontessori.com/robots.txt` y la version publica aplicable de WordPress; archivar respuesta y codigo HTTP. |
-| OAI-SearchBot | `PENDIENTE_CONTROLADO` | `AAAA-MM-DD` | `pendiente` | Verificar una regla separada para `OAI-SearchBot`, que controla el acceso de ChatGPT Search. |
-| GPTBot | `PENDIENTE_CONTROLADO` | `AAAA-MM-DD` | `pendiente` | Verificar una regla separada para `GPTBot`, que controla el acceso para entrenamiento y se decide independientemente de OAI-SearchBot. |
-| ChatGPT-User | `PENDIENTE_CONTROLADO` | `AAAA-MM-DD` | `pendiente` | Verificar una regla/grupo separado. Es un agente activado por la persona usuaria; las reglas de `robots.txt` pueden no aplicar en ese contexto. |
-| `llms.txt` localizado | `PENDIENTE_CONTROLADO` | `AAAA-MM-DD` | `pendiente` | Comprobar `/llms.txt`, `/en/llms.txt` y `/pt-br/llms.txt`; permanecen informativos y no son una senal de ranking. |
-| Interpretacion | `PENDIENTE_CONTROLADO` | `AAAA-MM-DD` | `pendiente` | Registrar que permitir un crawler no garantiza ranking, indexacion, aparicion en resultados ni citacion. |
+| `robots.txt` vivo | `COMPLETADO_CON_EVIDENCIA` | `2026-07-12` | `AMMAC / Codex` | Se obtuvieron correctamente `https://certificacionmontessori.com/robots.txt` y `https://montessorimexico.org/robots.txt` desde produccion. |
+| OAI-SearchBot | `COMPLETADO_CON_EVIDENCIA` | `2026-07-12` | `AMMAC / Codex` | Certificacion tiene grupo explicito con `Allow: /`. WordPress lo cubre con `User-agent: *`: permite contenido publico, bloquea solo `/wp-admin/` y permite `/wp-admin/admin-ajax.php`. |
+| GPTBot | `COMPLETADO_CON_EVIDENCIA` | `2026-07-12` | `AMMAC / Codex` | Certificacion tiene grupo explicito con `Allow: /`. WordPress aplica el mismo grupo generico que permite el contenido publico; el acceso para entrenamiento se decide independientemente de OAI-SearchBot. |
+| ChatGPT-User | `COMPLETADO_CON_EVIDENCIA` | `2026-07-12` | `AMMAC / Codex` | Certificacion tiene grupo explicito con `Allow: /`; WordPress permite contenido publico mediante `User-agent: *`. Es un agente activado por la persona usuaria y `robots.txt` puede no aplicar en ese contexto. |
+| `llms.txt` localizado | `PENDIENTE_CONTROLADO` | `2026-07-12` | `AMMAC / Codex` | `/llms.txt`, `/en/llms.txt` y `/pt-br/llms.txt` respondieron HTTP `200` y `text/plain`. El espanol de produccion aun recomienda la redireccion heredada `/certificate/`. El commit `0e7a0eb` corrige los canonicos localizados a `/{locale}/diplomados/#certificacion_internacional` y marca `llms.txt` como informativo; faltan despliegue y verificacion en produccion. |
+| Interpretacion | `COMPLETADO_CON_EVIDENCIA` | `2026-07-12` | `AMMAC / Codex` | Permitir acceso a un crawler no garantiza ranking, indexacion, aparicion en resultados ni citacion. Base oficial: controles de acceso de [OpenAI](https://developers.openai.com/api/docs/bots), estado de indexacion de [Google](https://support.google.com/webmasters/answer/7440203) e IndexNow de [Bing](https://www.bing.com/webmasters/help/indexnow-0z209wby). |
 
 No cambie reglas de `OAI-SearchBot`, `GPTBot` o `ChatGPT-User` como si fueran
 intercambiables. El acceso de busqueda, el acceso de entrenamiento y las
