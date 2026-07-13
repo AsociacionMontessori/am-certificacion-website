@@ -139,7 +139,7 @@ en produccion.
 
 | Control | Estado | Fecha de evidencia | Responsable | Evidencia/resultado requerido |
 | --- | --- | --- | --- | --- |
-| Sitemaps | `PENDIENTE_CONTROLADO` | `AAAA-MM-DD` | `pendiente` | El indice y los hijos terminan de procesar sin error y contienen el inventario publico esperado. |
+| Sitemaps | `COMPLETADO_CON_EVIDENCIA` | `2026-07-13` | `AMMAC / Codex` | Bing muestra `2` mapas conocidos, `0` con errores y `0` con advertencias. `sitemap-0.xml` fue leido el `2026-07-11`, tiene estado `Exito` y `27` URLs descubiertas; `sitemap-index.xml` tiene estado `Exito` y cuenta como `1` recurso descubierto. El resumen de `28` es la suma del indice y las `27` URLs, no una pagina canonica adicional. No se reenvio. |
 | URL Inspection | `PENDIENTE_CONTROLADO` | `AAAA-MM-DD` | `pendiente` | Una URL de hub/programa por locale pasa las comprobaciones Index, SEO, Markup y Live URL. |
 | Site Scan | `PENDIENTE_CONTROLADO` | `AAAA-MM-DD` | `pendiente` | Ejecutar despues del despliegue un escaneo de alcance `Website`; objetivo: cero Errors y clasificar cada Warning/Notice antes de cambiar codigo. |
 | Site Explorer | `PENDIENTE_CONTROLADO` | `AAAA-MM-DD` | `pendiente` | Revisar filtros Indexed, Error, Warning, Excluded, redirects, noindex y robots; las URLs antiguas redirigidas se esperan fuera del inventario canonico. |
