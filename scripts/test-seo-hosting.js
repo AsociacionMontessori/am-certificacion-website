@@ -92,6 +92,22 @@ for (const expectedLink of [
   )
 }
 
+const socialSectionSource = contactSource.match(
+  /<section className="bg-white">[\s\S]*?<\/section>/
+)?.[0]
+assert(socialSectionSource, "Contact page must include the social profile section")
+assert.doesNotMatch(
+  socialSectionSource,
+  /(?:text|border|bg|ring)-(?:blue|gray)-\d+/,
+  "Contact social section must use colors that exist in the custom Tailwind palette"
+)
+for (const expectedClass of ["text-gray", "text-gray/80", "text-blue", "border-blue"]) {
+  assert(
+    socialSectionSource.includes(expectedClass),
+    `Contact social section must include ${expectedClass}`
+  )
+}
+
 for (const locale of ["es", "en", "pt-br"]) {
   const contact = require(`../src/i18n/locales/${locale}/contact.json`)
   assert(contact.social?.title, `${locale} contact social title`)

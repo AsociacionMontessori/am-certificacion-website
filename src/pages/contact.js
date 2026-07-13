@@ -47,8 +47,8 @@ const contact = () => {
                     </section>
                     <section className="bg-white">
                         <div className="container px-6 py-12 mx-auto text-center">
-                            <h2 className="text-2xl font-semibold text-gray-800">{t("social.title")}</h2>
-                            <p className="max-w-2xl mx-auto mt-3 text-gray-600">{t("social.description")}</p>
+                            <h2 className="text-2xl font-semibold text-gray">{t("social.title")}</h2>
+                            <p className="max-w-2xl mx-auto mt-3 text-gray/80">{t("social.description")}</p>
                             <div className="flex flex-wrap justify-center gap-3 mt-6">
                                 {socialProfiles.map(profile => (
                                     <a
@@ -56,7 +56,7 @@ const contact = () => {
                                         href={profile.href}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="px-5 py-3 font-medium text-blue-700 border border-blue-700 rounded-sm hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        className="px-5 py-3 font-medium text-blue border border-blue rounded-sm hover:bg-blue/10 focus:outline-none focus:ring-2 focus:ring-blue"
                                     >
                                         {t(`social.${profile.key}`)}
                                     </a>
