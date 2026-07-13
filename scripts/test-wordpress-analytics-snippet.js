@@ -15,18 +15,34 @@ const embeddedScript = php.match(/<script>\s*([\s\S]*?)\s*<\/script>/)
 assert(embeddedScript, "WordPress snippet must contain an executable script")
 
 const appendedScripts = []
+const commandsAtScriptAppend = []
 const intervals = []
 const listeners = new Map()
+const revocationTimeline = []
+class CustomEvent {
+  constructor(type) {
+    this.type = type
+  }
+}
 const document = {
   cookie: "cookieyes-consent=consentid:test,analytics:no",
   body: { className: "post-template-default post-id-314" },
   documentElement: { lang: "es-MX" },
   createElement: tagName => ({ tagName }),
   head: {
-    appendChild: script => appendedScripts.push(script),
+    appendChild(script) {
+      commandsAtScriptAppend.push(sourceCommands())
+      appendedScripts.push(script)
+    },
   },
   addEventListener(type, handler, capture) {
     listeners.set(type, { capture, handler })
+  },
+  dispatchEvent(event) {
+    const listener = listeners.get(event.type)
+    if (listener) listener.handler(event)
+    revocationTimeline.push(`${event.type}:complete`)
+    return true
   },
 }
 const window = {
@@ -49,7 +65,7 @@ window.window = window
 
 vm.runInNewContext(
   embeddedScript[1],
-  { URL, URLSearchParams, document, window },
+  { CustomEvent, URL, URLSearchParams, document, window },
   { filename: snippetPath }
 )
 
@@ -61,6 +77,13 @@ const consentCommands = () =>
   )
 const sourceEvents = () =>
   sourceCommands().filter(command => command[0] === "event")
+const commandLabel = command => {
+  if (command[0] === "consent") {
+    return `consent:${command[1]}:${command[2].analytics_storage}`
+  }
+  if (command[0] === "config") return `config:${command[1]}`
+  return command[0]
+}
 
 assert.strictEqual(
   appendedScripts.length,
@@ -82,8 +105,19 @@ assert.strictEqual(intervals.length, 1, "consent must have one polling loop")
 document.cookie = "cookieyes-consent=consentid:test,analytics:yes"
 intervals[0].handler()
 assert.strictEqual(appendedScripts.length, 1, "first grant loads one script")
+assert.deepStrictEqual(
+  commandsAtScriptAppend[0].map(commandLabel).concat("script:append"),
+  [
+    "consent:default:denied",
+    "consent:update:granted",
+    "js",
+    "config:G-075JTS42RZ",
+    "config:G-P0CNEGW276",
+    "script:append",
+  ],
+  "first grant must fully queue both destinations before script append"
+)
 
-document.cookie = "cookieyes-consent=consentid:test,analytics:no"
 const destinationSearch =
   "?utm_source=montessorimexico.org&utm_medium=referral" +
   "&utm_campaign=guia_montessori" +
@@ -98,15 +132,53 @@ const link = {
 const clickListener = listeners.get("click")
 assert(clickListener, "consent must synchronize immediately before clicks")
 assert.strictEqual(clickListener.capture, true)
+const consentUpdatesBeforeRevocationClick = consentCommands().length
+assert(
+  document.cookie.includes("analytics:yes"),
+  "CookieYes capture ordering must expose the previous consent value"
+)
 clickListener.handler({
   target: {
     closest: selector => (selector === "a[href]" ? link : null),
   },
 })
+assert.strictEqual(
+  consentCommands().length,
+  consentUpdatesBeforeRevocationClick,
+  "capture fallback cannot revoke while CookieYes still exposes analytics:yes"
+)
+
+document.cookie = "cookieyes-consent=consentid:test,analytics:no"
+const cookieYesConsentListener = listeners.get("cookieyes_consent_update")
+assert(
+  cookieYesConsentListener,
+  "consent must synchronize on CookieYes' post-write document event"
+)
+document.dispatchEvent(new CustomEvent("cookieyes_consent_update"))
 const disabledAfterRevoke = [
   window["ga-disable-G-075JTS42RZ"],
   window["ga-disable-G-P0CNEGW276"],
 ]
+const consentAfterRevoke = consentCommands().at(-1)[2].analytics_storage
+assert.deepStrictEqual(
+  {
+    consent: consentAfterRevoke,
+    disabled: disabledAfterRevoke,
+    timeline: revocationTimeline.slice(),
+  },
+  {
+    consent: "denied",
+    disabled: [true, true],
+    timeline: ["cookieyes_consent_update:complete"],
+  },
+  "revocation must be applied synchronously before navigation or reload"
+)
+revocationTimeline.push("navigation/reload")
+assert.deepStrictEqual(
+  revocationTimeline,
+  ["cookieyes_consent_update:complete", "navigation/reload"],
+  "CookieYes update handling must finish before navigation or reload"
+)
 
 document.cookie = "cookieyes-consent=consentid:test,analytics:yes"
 intervals[0].handler()

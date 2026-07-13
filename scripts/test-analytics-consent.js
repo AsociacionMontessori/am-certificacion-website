@@ -796,6 +796,23 @@ const operations = fs.readFileSync(
   path.join(root, "docs/SEO_ANALYTICS_OPERATIONS.md"),
   "utf8"
 )
+for (const [documentName, documentText] of [
+  ["privacy review", privacyReview],
+  ["analytics operations", operations],
+]) {
+  assert(
+    /AMMAC responsible owner(?:'s)?(?: production)? approval|AMMAC responsible owner approved|by the AMMAC responsible owner/i.test(
+      documentText
+    ),
+    `${documentName} must identify the AMMAC responsible owner as approver`
+  )
+  assert(
+    /not independent legal (?:advice|review)|independent legal review not represented|does not represent independent legal counsel review/i.test(
+      documentText
+    ),
+    `${documentName} must disclaim independent legal review or advice`
+  )
+}
 for (const reference of [
   "https://developers.google.com/analytics/devguides/collection/ga4/reference/config",
   "https://developers.google.com/analytics/devguides/collection/ga4/views",

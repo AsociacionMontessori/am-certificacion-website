@@ -105,6 +105,10 @@ add_action('wp_head', function () {
         window.__ammacAnalyticsConsent = granted;
       }
 
+      document.addEventListener(
+        'cookieyes_consent_update',
+        synchronizeAnalyticsConsent
+      );
       document.addEventListener('click', synchronizeAnalyticsConsent, true);
       synchronizeAnalyticsConsent();
       window.setInterval(synchronizeAnalyticsConsent, 2000);
