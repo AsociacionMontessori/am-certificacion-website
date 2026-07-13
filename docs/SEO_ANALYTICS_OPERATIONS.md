@@ -68,6 +68,17 @@ G-P0CNEGW276 appears once as the shared funnel destination.
 
 MonsterInsights Lite cannot provide the required consent integration, so its frontend tracking remains disabled. Do not add another page-level snippet. Repeat the pre-consent, reject, accept, and revoke Network checks after adding the destination. A duplicate destination, a request before consent, or more than one `page_view` for either property on one WordPress load blocks production. Verified on 2026-07-12: one `204 collect` request for each ID after consent and none after reject or revoke; `npa=1` confirmed advertising personalization is disabled.
 
+Current release control on 2026-07-13: the maintained local snippet now also
+synchronizes CookieYes updates in the capture phase so revocation wins before
+later click handlers and regrant remains idempotent. Its local contract passes,
+but the authenticated update of active Code Snippet `5` is `BLOQUEADO` because
+`WP_APP_PASSWORD` is empty in
+`/home/carlos/montessori-blog-automation/.env`. The evidence from 2026-07-12
+applies to the earlier deployed revision and does not clear this release gate.
+Restore a valid WordPress application password, update only the code of snippet
+`5`, and repeat the clean-profile pre-consent, accept, revoke, and regrant
+checks before production release. Never record the password in this runbook.
+
 ### 3. Configure cross-domain measurement in GA4 Admin
 
 In the GA4 property containing `G-P0CNEGW276`, use Google's Admin configuration:
