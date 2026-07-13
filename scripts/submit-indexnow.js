@@ -1,6 +1,7 @@
 const fs = require("fs")
 const path = require("path")
 const { Readable } = require("stream")
+const sax = require("sax")
 const firebaseConfig = require("../firebase.json")
 const { parseSitemap } = require("sitemap")
 
@@ -12,6 +13,7 @@ const DEFAULT_SITEMAP_PATH = path.join(
   "public",
   "sitemap-0.xml"
 )
+const SITEMAP_NAMESPACE = "http://www.sitemaps.org/schemas/sitemap/0.9"
 const MAX_URLS_PER_BATCH = 10000
 const LOCALE_PREFIXES = new Set(["en", "pt-br"])
 const BLOCKED_SEGMENTS = new Set([
@@ -88,11 +90,35 @@ const normalizeCanonicalPath = pathname => {
   return isRedirectPath(normalized) ? null : normalized
 }
 
+const validateSitemapDocument = sitemapText => {
+  let root = null
+  const parser = sax.parser(true, {
+    xmlns: true,
+    strictEntities: true,
+    trim: true,
+  })
+  parser.onopentag = tag => {
+    if (!root) root = tag
+  }
+  parser.write(sitemapText).close()
+
+  if (
+    !root ||
+    root.local !== "urlset" ||
+    root.uri !== SITEMAP_NAMESPACE
+  ) {
+    throw new Error(
+      `Generated sitemap root must be urlset in ${SITEMAP_NAMESPACE}`
+    )
+  }
+}
+
 const parseSitemapCanonicalPaths = async sitemapText => {
   if (typeof sitemapText !== "string" || !sitemapText.trim()) {
     throw new Error("Generated sitemap XML is empty")
   }
 
+  validateSitemapDocument(sitemapText)
   const entries = await parseSitemap(Readable.from([sitemapText]))
   const canonicalPaths = new Set()
   for (const entry of entries) {
@@ -239,7 +265,7 @@ const run = async ({
           .trim()
       : key
   const effectiveSitemapPath =
-    sitemapPath || env.INDEXNOW_SITEMAP_PATH || DEFAULT_SITEMAP_PATH
+    sitemapPath === undefined ? DEFAULT_SITEMAP_PATH : sitemapPath
   const canonicalPaths = await loadSitemapCanonicalPaths(effectiveSitemapPath)
   const payload = buildIndexNowPayload(argv, effectiveKey, canonicalPaths)
   if (!payload.urlList.length) throw new Error("No valid public URLs supplied")

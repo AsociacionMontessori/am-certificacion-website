@@ -14,6 +14,10 @@ const {
 const ORIGIN = "https://certificacionmontessori.com"
 const KEY = "abc12345"
 const FABRICATED_PATH = "/definitely-not-a-public-page-review-probe/"
+const submitSource = fs.readFileSync(
+  path.join(__dirname, "submit-indexnow.js"),
+  "utf8"
+)
 
 const sitemapXml = locations =>
   `<?xml version="1.0" encoding="UTF-8"?>` +
@@ -179,6 +183,11 @@ async function testCanonicalAllowlist() {
 }
 
 async function testSitemapParsingAndCli() {
+  assert(
+    !submitSource.includes("env.INDEXNOW_SITEMAP_PATH"),
+    "production CLI must not allow an environment-controlled sitemap allowlist"
+  )
+
   const controlledXml = sitemapXml([
     `${ORIGIN}/publicaciones`,
     `${ORIGIN}/en/diplomados/casa-de-ninos/`,
@@ -202,6 +211,8 @@ async function testSitemapParsingAndCli() {
   const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "indexnow-sitemap-"))
   const validPath = path.join(tempDir, "sitemap.xml")
   const malformedPath = path.join(tempDir, "malformed.xml")
+  const wrongRootPath = path.join(tempDir, "wrong-root.xml")
+  const foreignNamespacePath = path.join(tempDir, "foreign-namespace.xml")
   const foreignOnlyPath = path.join(tempDir, "foreign.xml")
   const missingPath = path.join(tempDir, "missing.xml")
 
@@ -212,6 +223,15 @@ async function testSitemapParsingAndCli() {
       `<urlset><url><loc>${ORIGIN}/publicaciones/</urlset>`
     )
     fs.writeFileSync(
+      wrongRootPath,
+      `<root><url><loc>${ORIGIN}/publicaciones/</loc></url></root>`
+    )
+    fs.writeFileSync(
+      foreignNamespacePath,
+      `<urlset xmlns="https://example.com/not-a-sitemap">` +
+        `<url><loc>${ORIGIN}/publicaciones/</loc></url></urlset>`
+    )
+    fs.writeFileSync(
       foreignOnlyPath,
       sitemapXml(["https://evil.example/foreign/"])
     )
@@ -220,7 +240,13 @@ async function testSitemapParsingAndCli() {
       [...(await loadSitemapCanonicalPaths(validPath))].sort(),
       [...canonicalPaths].sort()
     )
-    for (const unusablePath of [missingPath, malformedPath, foreignOnlyPath]) {
+    for (const unusablePath of [
+      missingPath,
+      malformedPath,
+      wrongRootPath,
+      foreignNamespacePath,
+      foreignOnlyPath,
+    ]) {
       await assert.rejects(
         loadSitemapCanonicalPaths(unusablePath),
         /Generated sitemap is missing or unusable.*Run npm run build/
@@ -233,7 +259,6 @@ async function testSitemapParsingAndCli() {
       argv: [FABRICATED_PATH, "/publicaciones/"],
       env: {
         INDEXNOW_DRY_RUN: "1",
-        INDEXNOW_SITEMAP_PATH: validPath,
       },
       fetchImpl: async () => {
         fetchCalls += 1
@@ -241,6 +266,7 @@ async function testSitemapParsingAndCli() {
       },
       key: KEY,
       log: message => logs.push(message),
+      sitemapPath: validPath,
     })
     assert.strictEqual(fetchCalls, 0)
     assert.strictEqual(logs.length, 1)
@@ -258,10 +284,10 @@ async function testSitemapParsingAndCli() {
           argv: ["/publicaciones/"],
           env: {
             INDEXNOW_DRY_RUN: "1",
-            INDEXNOW_SITEMAP_PATH: unusablePath,
           },
           key: KEY,
           log: () => {},
+          sitemapPath: unusablePath,
         }),
         /Generated sitemap is missing or unusable.*Run npm run build/
       )
