@@ -4,15 +4,30 @@ const path = require("path")
 
 const root = path.resolve(__dirname, "..")
 const robots = fs.readFileSync(path.join(root, "static", "robots.txt"), "utf8")
-const groups = robots
-  .split(/\n\s*\n/)
-  .map(group =>
-    group
-      .split("\n")
-      .map(line => line.replace(/\s*#.*$/, "").trim())
-      .filter(Boolean)
-  )
-  .filter(lines => lines.some(line => /^user-agent:/i.test(line)))
+const parseRobotsGroups = contents => {
+  const groups = []
+  let agents = []
+  let rules = []
+  const commitGroup = () => {
+    if (agents.length) groups.push([...agents, ...rules])
+    agents = []
+    rules = []
+  }
+
+  for (const rawLine of contents.split("\n")) {
+    const line = rawLine.replace(/\s*#.*$/, "").trim()
+    if (!line) continue
+    if (/^user-agent:/i.test(line)) {
+      if (rules.length) commitGroup()
+      agents.push(line)
+    } else if (agents.length) {
+      rules.push(line)
+    }
+  }
+  commitGroup()
+  return groups
+}
+const groups = parseRobotsGroups(robots)
 
 for (const agent of [
   "*",

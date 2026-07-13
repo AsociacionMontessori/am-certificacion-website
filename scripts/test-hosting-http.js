@@ -4,7 +4,10 @@ const cheerio = require("cheerio")
 const baseUrl = process.env.FIREBASE_HOSTING_TEST_ORIGIN || "http://127.0.0.1:5000"
 
 async function request(pathname) {
-  return fetch(`${baseUrl}${pathname}`, { redirect: "manual" })
+  return fetch(`${baseUrl}${pathname}`, {
+    redirect: "manual",
+    signal: AbortSignal.timeout(5000),
+  })
 }
 
 async function main() {

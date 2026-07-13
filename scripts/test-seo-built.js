@@ -3,7 +3,7 @@ const fs = require("fs")
 const path = require("path")
 const { Readable } = require("stream")
 const cheerio = require("cheerio")
-const { parseSitemap } = require("sitemap")
+const { parseSitemap, parseSitemapIndex } = require("sitemap")
 const {
   DEFAULT_LANGUAGE,
   LANGUAGES,
@@ -42,7 +42,10 @@ async function main() {
     path.join(publicDir, "sitemap-index.xml"),
     "utf8"
   )
-  assert.match(indexXml, /<loc>https:\/\/certificacionmontessori\.com\/sitemap-0\.xml<\/loc>/)
+  const sitemapIndex = await parseSitemapIndex(Readable.from([indexXml]))
+  assert.deepStrictEqual(sitemapIndex, [
+    { url: `${origin}/sitemap-0.xml` },
+  ])
 
   const sitemapXml = fs.readFileSync(
     path.join(publicDir, "sitemap-0.xml"),
@@ -76,6 +79,12 @@ async function main() {
     const { language, originalPath } = parsePath(pathname)
     const html = readHtml(pathname)
     const $ = cheerio.load(html)
+    const sitemapAlternates = new Map(
+      (entries.find(entry => entry.url === absoluteUrl)?.links || []).map(link => [
+        link.lang,
+        link.url,
+      ])
+    )
 
     assert.strictEqual($("html").attr("lang"), LANGUAGES[language].htmlLang)
     assert.strictEqual($("link[rel='canonical']").attr("href"), absoluteUrl)
@@ -98,19 +107,36 @@ async function main() {
         `${absoluteUrl} hreflang ${LANGUAGES[code].hreflang}`
       )
       assert(urlSet.has(expectedUrl), `${expectedUrl} must be reciprocal in sitemap`)
+      assert.strictEqual(
+        sitemapAlternates.get(LANGUAGES[code].hreflang),
+        expectedUrl,
+        `${absoluteUrl} sitemap hreflang ${LANGUAGES[code].hreflang}`
+      )
     }
     assert.strictEqual(
       alternates.get("x-default"),
       `${origin}${localizePath(DEFAULT_LANGUAGE, originalPath)}`
     )
     assert.strictEqual(alternates.size, 4, `${absoluteUrl} alternate count`)
+    assert.strictEqual(
+      sitemapAlternates.get("x-default"),
+      `${origin}${localizePath(DEFAULT_LANGUAGE, originalPath)}`
+    )
+    assert.strictEqual(
+      sitemapAlternates.size,
+      4,
+      `${absoluteUrl} sitemap alternate count`
+    )
 
     const schemas = $("script[type='application/ld+json']").toArray()
     assert(schemas.length > 0, `${absoluteUrl} must expose JSON-LD`)
     for (const schema of schemas) {
-      assert.doesNotThrow(
-        () => JSON.parse($(schema).html()),
-        `${absoluteUrl} JSON-LD must parse`
+      const contents = String($(schema).html() || "").trim()
+      assert(contents, `${absoluteUrl} JSON-LD must not be empty`)
+      const parsed = JSON.parse(contents)
+      assert(
+        parsed && typeof parsed === "object",
+        `${absoluteUrl} JSON-LD must be an object or array`
       )
     }
   }
