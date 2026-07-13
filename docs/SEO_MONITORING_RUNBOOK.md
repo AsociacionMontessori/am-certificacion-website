@@ -73,6 +73,21 @@ ni cualquier otra fuente duplicada de IndexNow junto al plugin autorizado.
 | Confirmar que la URL recibida no usa `?p=123`. | `PENDIENTE_CONTROLADO` | `2026-07-12` | `AMMAC / Codex` | Slug previsto `educar-en-la-era-digital-asociacion-montessori-de-mexico`; falta verificar el permalink publico despues de la transicion natural. |
 | Estado editorial final restaurado sin borrar contenido de produccion. | `PENDIENTE_CONTROLADO` | `2026-07-12` | `AMMAC / Codex` | Falta confirmar el estado editorial final del post `1345` despues de su publicacion programada. No borrar contenido ni repetir/forzar la prueba. |
 
+## Verificacion del hosting desplegado
+
+Despues de cada vista previa y despliegue de produccion, ejecute el contrato
+HTTP contra el origen HTTPS exacto, sin una barra final:
+
+```bash
+npm run test:deployed-hosting -- https://ORIGEN-DESPLEGADO
+```
+
+La prueba comprueba respuestas `404` con `noindex`, redirecciones heredadas
+localizadas, archivos para buscadores y sistemas de IA, canonicales y
+`hreflang`, ausencia de los embeds externos retirados de Contacto y el archivo
+publico de verificacion de IndexNow. Pasar esta prueba confirma el contrato
+tecnico observado en ese origen; no confirma por si solo indexacion ni ranking.
+
 ## Cadencia posterior a cada release
 
 | Momento | Revisar y registrar |

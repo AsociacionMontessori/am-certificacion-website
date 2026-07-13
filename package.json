@@ -58,6 +58,7 @@
     "test:seo-hosting": "node scripts/test-seo-hosting.js",
     "test:seo-built": "node scripts/test-seo-built.js",
     "test:hosting-http": "firebase emulators:exec --only hosting --project certificacionmontessori \"node scripts/test-hosting-http.js\"",
+    "test:deployed-hosting": "node scripts/test-deployed-hosting.js",
     "indexnow:init": "node scripts/init-indexnow-key.js",
     "indexnow:submit": "node scripts/submit-indexnow.js",
     "test:indexnow": "node scripts/test-indexnow.js",
