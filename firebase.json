@@ -15,12 +15,12 @@
     "redirects": [
       {
         "source": "/buscador",
-        "destination": "/directorio",
+        "destination": "/directorio/",
         "type": 301
       },
       {
         "source": "/buscador/**",
-        "destination": "/directorio",
+        "destination": "/directorio/",
         "type": 301
       },
       {

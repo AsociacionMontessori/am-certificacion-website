@@ -42,4 +42,12 @@ expectedRedirects.forEach(expectedRedirect => {
   )
 })
 
+for (const source of ["/buscador", "/buscador/**"]) {
+  assert.deepStrictEqual(
+    redirectBySource.get(source),
+    { source, destination: "/directorio/", type: 301 },
+    `Expected ${source} to redirect permanently and directly to /directorio/`
+  )
+}
+
 console.log("SEO redirects contract ok")
