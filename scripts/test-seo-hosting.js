@@ -108,6 +108,25 @@ for (const expectedClass of ["text-gray", "text-gray/80", "text-blue", "border-b
   )
 }
 
+const navSource = fs.readFileSync(
+  path.join(root, "src", "components", "nav.js"),
+  "utf8"
+)
+const mobileMenuClasses = navSource.match(
+  /<Disclosure\.Button className="([^"]+)"/
+)?.[1]
+assert(mobileMenuClasses, "Navigation must include the mobile menu button")
+assert.match(
+  mobileMenuClasses,
+  /(?:^|\s)text-gray(?:\s|$)/,
+  "Mobile menu icon must contrast with its white button background"
+)
+assert.match(
+  mobileMenuClasses,
+  /(?:^|\s)hover:bg-gray(?:\s|$)/,
+  "Mobile menu hover color must exist in the custom Tailwind palette"
+)
+
 for (const locale of ["es", "en", "pt-br"]) {
   const contact = require(`../src/i18n/locales/${locale}/contact.json`)
   assert(contact.social?.title, `${locale} contact social title`)

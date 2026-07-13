@@ -34,12 +34,12 @@ export default function Nav({ textColor }) {
                     <div className="mx-auto max-w-7x1 px-3 sm:px-4 lg:px-6 min-w-fit dark:text-white pt-5" >
                         <div className="relative flex h-16 items-center justify-between sm:justify-center">
                             <div className="absolute inset-y-0 left-0 flex items-center lg:hidden">
-                                <Disclosure.Button className="bg-white dark:bg-red inline-flex items-center justify-center rounded-md p-2 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
+                                <Disclosure.Button className="bg-white text-gray inline-flex items-center justify-center rounded-md p-2 hover:bg-gray hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
                                     <span className="sr-only">{t('nav.abrirMenu')}</span>
                                     {open ? (
-                                        <XMarkIcon className="dark:bg-red block h-6 w-6" aria-hidden="true" />
+                                        <XMarkIcon className="block h-6 w-6" aria-hidden="true" />
                                     ) : (
-                                        <Bars3Icon className="dark:bg-red block h-6 w-6" aria-hidden="true" />
+                                        <Bars3Icon className="block h-6 w-6" aria-hidden="true" />
                                     )}
                                 </Disclosure.Button>
                             </div>
