@@ -25,6 +25,12 @@
       "description": "Atendimento das 9h às 18h (horário da Cidade do México).\nSomente por chat: 55 4888 5013"
     }
   },
+  "social": {
+    "title": "Siga-nos nas redes sociais",
+    "description": "Veja novidades e atividades da Associação Montessori do México em nossos perfis oficiais.",
+    "facebook": "Abrir Facebook",
+    "instagram": "Abrir Instagram"
+  },
   "schema": {
     "contactPage": {
       "name": "Contato",

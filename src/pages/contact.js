@@ -1,6 +1,4 @@
 import React from "react";
-import { FacebookProvider, Page } from 'react-facebook';
-import { Helmet } from "react-helmet";
 import { useTranslation } from "react-i18next";
 
 import Layout from "../components/layout"
@@ -47,20 +45,22 @@ const contact = () => {
                             </div>
                         </div>
                     </section>
-                    <section className="bg-white h-auto sm:min-h-[32rem] min-h-[20rem]">
-                        <div className="p-5 sm:mx-80">
-                            <div className="flex grid grid-cols-1 sm:grid-cols-2">
-                                <div className="w-full h-80 pt-10 hidden sm:block">
-                                    <FacebookProvider appId="1019625052802455" language="es_LA">
-                                        <Page height={450} adaptContainerWidth smallHeader href="https://www.facebook.com/asociacionmontessori/" tabs="timeline" />
-                                    </FacebookProvider>
-                                </div>
-                                <div className="w-full lg:pt-10 sm:pt-0 pt-5 h-70">
-                                    <figure data-behold-id="t81nL0eBOgOrLoxcaSek"></figure>
-                                    <Helmet>
-                                        <script src="https://w.behold.so/widget.js" type="module"></script>
-                                    </Helmet>
-                                </div>
+                    <section className="bg-white">
+                        <div className="container px-6 py-12 mx-auto text-center">
+                            <h2 className="text-2xl font-semibold text-gray-800">{t("social.title")}</h2>
+                            <p className="max-w-2xl mx-auto mt-3 text-gray-600">{t("social.description")}</p>
+                            <div className="flex flex-wrap justify-center gap-3 mt-6">
+                                {socialProfiles.map(profile => (
+                                    <a
+                                        key={profile.key}
+                                        href={profile.href}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="px-5 py-3 font-medium text-blue-700 border border-blue-700 rounded-sm hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    >
+                                        {t(`social.${profile.key}`)}
+                                    </a>
+                                ))}
                             </div>
                         </div>
                     </section>
@@ -150,6 +150,17 @@ const contactMethods = [
         link: "https://api.whatsapp.com/send?phone=5215548885013&text=Hola,%20Me%20gustar%C3%ADa%20informaci%C3%B3n%20sobre%20la%20certificaci%C3%B3n%20Montessori."
     },
 ];
+
+const socialProfiles = [
+    {
+        key: "facebook",
+        href: "https://www.facebook.com/asociacionmontessori/",
+    },
+    {
+        key: "instagram",
+        href: "https://www.instagram.com/asociacionmontessori/",
+    },
+]
 
 
 

@@ -25,6 +25,12 @@
       "description": "Atención de 9am a 6pm.\nSolo por chat: 55 4888 5013"
     }
   },
+  "social": {
+    "title": "Síguenos en redes sociales",
+    "description": "Consulta novedades y actividades de la Asociación Montessori de México en nuestros perfiles oficiales.",
+    "facebook": "Abrir Facebook",
+    "instagram": "Abrir Instagram"
+  },
   "schema": {
     "contactPage": {
       "name": "Contacto",

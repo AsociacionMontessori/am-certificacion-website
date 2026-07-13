@@ -25,6 +25,12 @@
       "description": "Available from 9:00 a.m. to 6:00 p.m.\nChat only: 55 4888 5013"
     }
   },
+  "social": {
+    "title": "Follow us on social media",
+    "description": "See news and activities from the Montessori Association of Mexico on our official profiles.",
+    "facebook": "Open Facebook",
+    "instagram": "Open Instagram"
+  },
   "schema": {
     "contactPage": {
       "name": "Contact",
