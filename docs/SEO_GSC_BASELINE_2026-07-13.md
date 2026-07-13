@@ -77,8 +77,8 @@ operativo contra el cual se medira el crecimiento internacional.
 La ruta antigua `/buscador/` no debe recuperarse como pagina competidora: se
 renombro deliberadamente a `/directorio/`. Sus `31` clics justifican preservar
 la senal mediante un `301` directo, sin cadenas intermedias. El contrato local
-ya exige ese unico salto y debe comprobarse de nuevo en produccion despues del
-despliegue.
+exige ese unico salto y la comprobacion posterior al despliegue confirmo
+exactamente una redireccion, destino final `/directorio/` y HTTP `200`.
 
 ## Demanda visible y oportunidades
 
@@ -152,4 +152,3 @@ snippets y resultados despues de acumular datos posteriores al release.
   inglesa y portuguesa.
 - `2026-08-10` (28 dias completos): comparar contra esta linea base por pagina,
   pais, dispositivo, locale y consulta de marca/no marca visible.
-

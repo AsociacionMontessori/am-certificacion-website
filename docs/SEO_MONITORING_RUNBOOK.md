@@ -93,6 +93,7 @@ tecnico observado en ese origen; no confirma por si solo indexacion ni ranking.
 | --- | --- | --- | --- | --- |
 | Despliegue de Firebase Hosting | `COMPLETADO_CON_EVIDENCIA` | `2026-07-13` | `AMMAC / Codex` | `npm run deploy` completo: contratos base, compilacion Gatsby y SEO construido pasaron; se generaron `27` URLs canonicas, `9` por idioma, y Firebase confirmo la liberacion de la version. |
 | Contrato HTTP del dominio publico | `COMPLETADO_CON_EVIDENCIA` | `2026-07-13` | `AMMAC / Codex` | `npm run test:deployed-hosting -- https://certificacionmontessori.com` paso despues del despliegue final. Valida `404` con `noindex`, redirecciones localizadas, archivos de robots/sitemap/IA, canonicales, `hreflang`, Contacto sin embeds retirados y la verificacion publica de IndexNow. |
+| Redireccion heredada de `/buscador/` | `COMPLETADO_CON_EVIDENCIA` | `2026-07-13` | `AMMAC / Codex` | La comprobacion HTTPS posterior al despliegue registro exactamente `1` redireccion desde `/buscador/` hasta `https://certificacionmontessori.com/directorio/`, con respuesta final HTTP `200`. Se elimino la cadena intermedia sin recuperar la ruta antigua como pagina indexable. |
 | QA visual responsive de Contacto | `COMPLETADO_CON_EVIDENCIA` | `2026-07-13` | `AMMAC / Codex` | Playwright verifico produccion en `1440x900` y `390x844`: enlaces sociales legibles, menu movil con icono visible y ancho movil sin desbordamiento horizontal. |
 
 ## Cadencia posterior a cada release
