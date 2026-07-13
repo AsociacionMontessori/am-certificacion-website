@@ -112,22 +112,23 @@ acelerarlo con reenvios reiterados.
 
 ## Google Search Console: checklist de terminacion controlada
 
-Los **42 URLs canonicos** son un objetivo futuro del plan aprobado, no un
-recuento declarado de produccion en la fecha de este documento. Completar esta
-lista solo contra una exportacion fechada de la propiedad correcta.
+El inventario desplegado y enviado en esta release contiene **27 URLs
+canonicas**, nueve por idioma. El objetivo futuro de 42 URLs solo se aplicara
+cuando ese contenido adicional exista en produccion y aparezca en una
+exportacion fechada de la propiedad correcta.
 
 | Control | Estado | Fecha de evidencia | Responsable | Evidencia/resultado requerido |
 | --- | --- | --- | --- | --- |
-| Sitemaps | `PENDIENTE_CONTROLADO` | `AAAA-MM-DD` | `pendiente` | `sitemap-index.xml` aparece como `Success` y sus informes hijos muestran 42 URLs canonicas enviadas/descubiertas. |
-| Contrato de produccion | `PENDIENTE_CONTROLADO` | `AAAA-MM-DD` | `pendiente` | Las 42 URLs enviadas responden `200`, son autocanonicas, indexables y tienen `hreflang` reciproco. |
-| Page indexing | `PENDIENTE_CONTROLADO` | `AAAA-MM-DD` | `pendiente` | Filtrar por el sitemap enviado; exportar y clasificar cada URL enviada no indexada por motivo. La indexacion se observa, no se fuerza. |
-| Validacion existente | `PENDIENTE_CONTROLADO` | `AAAA-MM-DD` | `pendiente` | Registrar el estado de validacion de `2026-07-11` para `Crawled - currently not indexed`; nunca reiniciarla mientras siga activa. |
-| HTTPS | `PENDIENTE_CONTROLADO` | `AAAA-MM-DD` | `pendiente` | Ninguna URL enviada aparece como no HTTPS. |
-| Core Web Vitals | `PENDIENTE_CONTROLADO` | `AAAA-MM-DD` | `pendiente` | Registrar estado movil/escritorio y p75 de LCP, INP y CLS cuando haya datos de campo; `insufficient data` es valido. |
+| Sitemaps | `COMPLETADO_CON_EVIDENCIA` | `2026-07-13` | `AMMAC / Codex` | Captura de la propiedad correcta: `/sitemap-index.xml`, tipo `Indice de sitemaps`, enviado `2026-07-09`, ultima lectura `2026-07-11`, estado `Correcto`, `27` paginas descubiertas y `0` videos. No se reenvio el sitemap. |
+| Contrato de produccion | `COMPLETADO_CON_EVIDENCIA` | `2026-07-13` | `AMMAC / Codex` | El contrato HTTP posterior al despliegue valido las `27` URLs canonicas, nueve por idioma: respuestas publicas correctas, canonicales, indexabilidad y `hreflang` reciproco. Este control tecnico no afirma que Google ya las haya indexado. |
+| Page indexing | `EN_PROCESAMIENTO` | `2026-07-13` | `AMMAC / Codex` | El informe, con ultima actualizacion `2026-06-29`, aun refleja solo `16` URLs conocidas: `6` indexadas y `10` sin indexar. Motivos: `3` paginas con redireccion, `7` rastreadas actualmente sin indexar y `0` alternativas con canonical adecuada. El informe es anterior al despliegue y al inventario actual de `27`; se revisara de nuevo en el control de 48 horas sin forzar indexacion. |
+| Validacion existente | `EN_PROCESAMIENTO` | `2026-07-13` | `AMMAC / Codex` | La validacion iniciada el `2026-07-11` para `Rastreada: actualmente sin indexar` sigue marcada `Iniciada` y abarca `7` URLs en el informe retrasado. No se reinicia ni se solicitan indexaciones repetidas mientras siga activa. |
+| HTTPS | `COMPLETADO_CON_EVIDENCIA` | `2026-07-13` | `AMMAC / Codex` | El informe HTTPS muestra `15` URLs HTTPS, `0` URLs no HTTPS, ningun problema critico y ninguna incidencia detectada en los ultimos 90 dias. El recuento retrasado de este informe no se interpreta como inventario total del sitemap. |
+| Core Web Vitals | `COMPLETADO_CON_EVIDENCIA` | `2026-07-13` | `AMMAC / Codex` | Chrome UX Report, actualizado `2026-07-11`: movil muestra `15` URLs rapidas, `0` deficientes y `0` que necesitan mejora. Ordenador indica datos de uso insuficientes durante los ultimos 90 dias; se registra como resultado valido, no como error. No existen grupos problematicos que validar. |
 | Mejoras/datos estructurados | `PENDIENTE_CONTROLADO` | `AAAA-MM-DD` | `pendiente` | Investigar cada informe que Google realmente exponga; la ausencia de un informe Course no es error. |
-| Acciones manuales | `PENDIENTE_CONTROLADO` | `AAAA-MM-DD` | `pendiente` | Ninguna. |
-| Problemas de seguridad | `PENDIENTE_CONTROLADO` | `AAAA-MM-DD` | `pendiente` | Ninguno. |
-| Rendimiento | `PENDIENTE_CONTROLADO` | `AAAA-MM-DD` | `pendiente` | Exportar clics, impresiones, CTR y posicion por pagina, consulta, pais y dispositivo; segmentar `/en/`, `/pt-br/` y raiz espanola, ademas de consultas de marca/no marca. |
+| Acciones manuales | `COMPLETADO_CON_EVIDENCIA` | `2026-07-13` | `AMMAC / Codex` | El informe de Acciones manuales de la propiedad muestra `No se ha detectado ningun problema`; no existe penalizacion manual activa. |
+| Problemas de seguridad | `COMPLETADO_CON_EVIDENCIA` | `2026-07-13` | `AMMAC / Codex` | El informe de Problemas de seguridad muestra `No se ha detectado ningun problema`; Google no reporta incidencias de seguridad activas en la propiedad. |
+| Rendimiento | `COMPLETADO_CON_EVIDENCIA` | `2026-07-13` | `AMMAC / Codex` | Exportacion CSV de los ultimos 28 dias, busqueda Web sin filtros, analizada en `docs/SEO_GSC_BASELINE_2026-07-13.md`: `288` clics, `5,417` impresiones, CTR `5.32 %`, posicion `7.39` y `221` consultas visibles. Incluye segmentacion por pagina, locale, pais, dispositivo, marca/no marca visible e intencion, con limites de privacidad y agregacion documentados. Es la linea base anterior al despliegue del `2026-07-13`. |
 
 ## Bing Webmaster Tools: checklist de terminacion controlada
 
