@@ -150,6 +150,15 @@ en produccion.
 | Rendimiento de busqueda | `COMPLETADO_CON_EVIDENCIA` | `2026-07-14` | `AMMAC / Codex` | Linea base inicial de Bing desde `2026-07-12`; las ventanas de `3 M` y `24 M` muestran el mismo inventario, por lo que no se importo historial anterior. Total: `6` impresiones, `0` clics y `0 %` CTR. Paginas: portada `3` impresiones/posicion media `4`, `/diplomados/` `2`/`6` y `/directorio/` `1`/`5`; aun no aparecen URLs EN o PT-BR. Dispositivos: escritorio `4` y movil `2`. Pais: las `6` se agrupan en `El resto del mundo`; la muestra no permite interpretar geografia ni CTR. Consultas visibles: `curso de guia montessori en el olivo` (`2`), `certificacion montessori`, `escuelas montessori en obispado`, `curso de guia montessori ami` y `asociacion montessori de mexico` (`1` cada una). Se monitorea por separado de la linea base de Google y no se cambia contenido con esta muestra minima. |
 | Rendimiento de IA | `COMPLETADO_CON_EVIDENCIA` | `2026-07-14` | `AMMAC / Codex` | La ventana maxima disponible de `6 M` muestra `0` citas y `0` paginas citadas en las fuentes declaradas por Bing como `Microsoft Copilots and Partners`; no existen consultas ni paginas para desglosar. Se registra como linea base cero, no como error tecnico ni como evidencia sobre ChatGPT. El crecimiento se medira desde esta fecha sin generar contenido o reenvios artificiales para alterar la muestra. |
 
+## Experimento SEO: intención «Guía Montessori»
+
+| Control | Estado | Fecha de evidencia | Evidencia/resultado |
+| --- | --- | --- | --- |
+| Línea base de Google | `COMPLETADO_CON_EVIDENCIA` | `2026-07-14` | Search Console, búsqueda Web, últimos 28 días y consulta que contiene `guia montessori`: `200` impresiones, `6` clics, CTR `3 %` y posición media `6,3`. La portada reúne `189` impresiones y los `6` clics; `/diplomados/` reúne `21` impresiones y `0` clics. La consulta exacta `guia montessori` aporta `153` impresiones y `2` clics. Las filas pueden solaparse por la agregación de Search Console. |
+| Decisión de intención | `COMPLETADO_CON_EVIDENCIA` | `2026-07-14` | La portada conserva la intención `Guía Montessori`; no se crea `/guia-montessori/`. `/diplomados/` conserva su intención específica. Se sustituyó la franja genérica por una respuesta localizada sobre el rol de la Guía y el título español pasó a `Certificación de Guía Montessori Online | AMMAC`. |
+| Producción e IndexNow | `COMPLETADO_CON_EVIDENCIA` | `2026-07-14` | Los contratos local y público validaron las tres portadas, un solo H1, H2 localizado, canonicales, `hreflang`, robots y JSON-LD. IndexNow aceptó una sola vez exactamente `/`, `/en/` y `/pt-br/`. No se reenvió el sitemap ni se repitieron solicitudes manuales en Google. |
+| Seguimiento | `PROGRAMADO` | `2026-07-21`, `2026-08-11`, `2026-10-12` | A 7 días: rastreo y títulos observados. A 28 días: impresiones, clics, CTR, posición y reparto por página. A 90 días: tendencia por idioma, consultas de formación y leads atribuidos en GA4. No se atribuye causalidad con muestras pequeñas. |
+
 ## Acceso de crawlers e IA
 
 Ejecute esta comprobacion contra el sitio en vivo y guarde las respuestas
