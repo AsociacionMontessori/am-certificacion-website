@@ -104,6 +104,11 @@ async function main() {
       (title.match(/\bAMMAC\b/g) || []).length <= 1,
       `${absoluteUrl} title must not repeat the AMMAC brand: ${title}`
     )
+    assert.strictEqual(
+      $("h1").length,
+      1,
+      `${absoluteUrl} must expose exactly one H1`
+    )
 
     $("img").each((_, image) => {
       const element = $(image)

@@ -14,9 +14,9 @@ const Reembolsos = () => {
         <main>
             <div className="max-w-screen-xl px-10 md:px-20 pb-8 mx-auto my-0 md:my-20">
                 <div className="text-white max-w-auto mx-auto mt-20 mb-10">
-                    <h2 className="text-2xl md:text-3xl xl:text-4xl font-bold ">
+                    <h1 className="text-2xl md:text-3xl xl:text-4xl font-bold ">
                         <Trans i18nKey="reembolsos.intro.titulo" ns="legal" components={{ rojo: <span className="text-red" /> }} />
-                    </h2>
+                    </h1>
                     <p className="text-lg md:text-xl xl:text-2xl pt-3">
                         {t("reembolsos.intro.p1")}
                     </p>
