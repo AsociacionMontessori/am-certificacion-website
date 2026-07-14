@@ -119,7 +119,9 @@ function Seo({
 
   const pageUrl = canonicalUrl || `${siteUrl}${normalizedPathname}`
   const imageUrl = image || `${siteUrl}${metadata?.defaultOgImage || "/og-default.svg"}`
-  const fullTitle = defaultTitle ? `${title} | ${defaultTitle}` : title
+  const titleHasBrand =
+    defaultTitle && title.toLocaleLowerCase().includes(defaultTitle.toLocaleLowerCase())
+  const fullTitle = defaultTitle && !titleHasBrand ? `${title} | ${defaultTitle}` : title
   const shouldIndex = !effectiveRobots.includes("noindex")
 
   // Textos del JSON-LD en el idioma de la página (el Head se renderiza fuera

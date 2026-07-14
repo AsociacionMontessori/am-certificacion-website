@@ -94,6 +94,33 @@ async function main() {
       `${absoluteUrl} must remain indexable`
     )
 
+    const title = $("title").text().trim()
+    assert(title, `${absoluteUrl} must expose a title`)
+    assert(
+      [...title].length <= 65,
+      `${absoluteUrl} title is too long (${[...title].length} characters): ${title}`
+    )
+    assert(
+      (title.match(/\bAMMAC\b/g) || []).length <= 1,
+      `${absoluteUrl} title must not repeat the AMMAC brand: ${title}`
+    )
+
+    $("img").each((_, image) => {
+      const element = $(image)
+      const hasAlt = Object.prototype.hasOwnProperty.call(image.attribs, "alt")
+      assert(hasAlt, `${absoluteUrl} image must expose an alt attribute`)
+
+      if (!String(element.attr("alt") || "").trim()) {
+        const isDecorative =
+          element.attr("aria-hidden") === "true" ||
+          element.parents("[aria-hidden='true']").length > 0
+        assert(
+          isDecorative,
+          `${absoluteUrl} empty alt is only valid for an aria-hidden decorative image`
+        )
+      }
+    })
+
     const alternates = new Map(
       $("link[rel='alternate'][hreflang]")
         .toArray()

@@ -13,7 +13,7 @@ const LEGACY_ROUTES = ["certificate", "masterclasses", "otroscursos"]
 
 module.exports = {
   siteMetadata: {
-    title: `Asociación Montessori de México A.C.`,
+    title: `AMMAC`,
     siteName: `Certificación Montessori`,
     description: `Formación y certificaciones Montessori internacionales. La Asociación Montessori de México A.C. (AMMAC), fundada en 1965, forma Guías Montessori en línea para estudiantes de todo el mundo y coordina diplomados en México, América Latina, Estados Unidos, España, Europa, Israel y la India.`,
     author: `@AsociacionMontessori`,
