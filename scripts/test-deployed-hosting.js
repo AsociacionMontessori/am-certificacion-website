@@ -15,6 +15,22 @@ const {
 const deploymentOrigin = String(process.argv[2] || "").replace(/\/+$/, "")
 const canonicalOrigin = "https://certificacionmontessori.com"
 assert.match(deploymentOrigin, /^https:\/\/[a-z0-9.-]+$/i, "HTTPS deployment origin required")
+const approvedOriginalCanonicalPaths = [
+  "/",
+  "/diplomados/",
+  "/publicaciones/",
+  "/contact/",
+  "/directorio/",
+  "/privacy/",
+  "/reembolsos/",
+  "/roxana/",
+  "/ia/",
+]
+const expectedCanonicalUrls = LANGUAGE_CODES.flatMap(language =>
+  approvedOriginalCanonicalPaths.map(
+    originalPath => `${canonicalOrigin}${localizePath(language, originalPath)}`
+  )
+).sort()
 
 async function request(pathname) {
   return fetch(`${deploymentOrigin}${pathname}`, {
@@ -94,6 +110,11 @@ async function main() {
     canonicalUrlSet.size,
     canonicalUrls.length,
     "Canonical sitemap URLs must be unique"
+  )
+  assert.deepStrictEqual(
+    [...canonicalUrlSet].sort(),
+    expectedCanonicalUrls,
+    "Canonical sitemap URLs must exactly match the approved localized canonical routes"
   )
   assert(canonicalUrls.every(url => new URL(url).origin === canonicalOrigin))
   for (const language of LANGUAGE_CODES) {

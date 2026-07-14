@@ -1,7 +1,7 @@
 # Optimización de la portada para la intención «Guía Montessori»
 
-**Fecha:** 2026-07-14  
-**Estado:** aprobado para planificación  
+**Fecha:** 2026-07-14<br>
+**Estado:** aprobado para planificación<br>
 **Superficie:** `/`, `/en/`, `/pt-br/`
 
 ## Evidencia de partida

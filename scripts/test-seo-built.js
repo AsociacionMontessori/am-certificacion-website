@@ -25,6 +25,22 @@ const transactionalPaths = [
   "/inscripcion/pagar/",
   "/inscripcion/transferencia/",
 ]
+const approvedOriginalCanonicalPaths = [
+  "/",
+  "/diplomados/",
+  "/publicaciones/",
+  "/contact/",
+  "/directorio/",
+  "/privacy/",
+  "/reembolsos/",
+  "/roxana/",
+  "/ia/",
+]
+const expectedCanonicalUrls = LANGUAGE_CODES.flatMap(language =>
+  approvedOriginalCanonicalPaths.map(
+    originalPath => `${origin}${localizePath(language, originalPath)}`
+  )
+).sort()
 
 const homeGuideIntent = [
   {
@@ -61,6 +77,15 @@ const readHtml = pathname => {
   return fs.readFileSync(htmlPath, "utf8")
 }
 
+const uniqueAlternates = (links, label) => {
+  const alternates = new Map()
+  for (const link of links) {
+    assert(!alternates.has(link.language), `${label} duplicate hreflang ${link.language}`)
+    alternates.set(link.language, link.url)
+  }
+  return alternates
+}
+
 async function main() {
   const indexXml = fs.readFileSync(
     path.join(publicDir, "sitemap-index.xml"),
@@ -81,6 +106,11 @@ async function main() {
 
   assert.strictEqual(urls.length, 27, "Expected 27 current canonical URLs")
   assert.strictEqual(urlSet.size, urls.length, "Sitemap URLs must be unique")
+  assert.deepStrictEqual(
+    [...urlSet].sort(),
+    expectedCanonicalUrls,
+    "Sitemap URLs must exactly match the approved localized canonical routes"
+  )
   assert(urls.every(url => url.startsWith(`${origin}/`)))
   assert(urls.every(url => !legacyPattern.test(new URL(url).pathname)))
 
@@ -103,11 +133,12 @@ async function main() {
     const { language, originalPath } = parsePath(pathname)
     const html = readHtml(pathname)
     const $ = cheerio.load(html)
-    const sitemapAlternates = new Map(
-      (entries.find(entry => entry.url === absoluteUrl)?.links || []).map(link => [
-        link.lang,
-        link.url,
-      ])
+    const sitemapAlternates = uniqueAlternates(
+      (entries.find(entry => entry.url === absoluteUrl)?.links || []).map(link => ({
+        language: link.lang,
+        url: link.url,
+      })),
+      `${absoluteUrl} sitemap`
     )
 
     assert.strictEqual($("html").attr("lang"), LANGUAGES[language].htmlLang)
@@ -150,10 +181,14 @@ async function main() {
       }
     })
 
-    const alternates = new Map(
+    const alternates = uniqueAlternates(
       $("link[rel='alternate'][hreflang]")
         .toArray()
-        .map(element => [$(element).attr("hreflang"), $(element).attr("href")])
+        .map(element => ({
+          language: $(element).attr("hreflang"),
+          url: $(element).attr("href"),
+        })),
+      absoluteUrl
     )
     for (const code of LANGUAGE_CODES) {
       const expectedUrl = `${origin}${localizePath(code, originalPath)}`
