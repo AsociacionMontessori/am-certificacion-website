@@ -26,6 +26,30 @@ const transactionalPaths = [
   "/inscripcion/transferencia/",
 ]
 
+const homeGuideIntent = [
+  {
+    pathname: "/",
+    title: "Certificación de Guía Montessori Online | AMMAC",
+    heading: "¿Qué hace una Guía Montessori?",
+    answer:
+      "Una Guía Montessori observa el desarrollo de cada niña y niño, prepara el ambiente y presenta los materiales en el momento adecuado.",
+  },
+  {
+    pathname: "/en/",
+    title: "Online Montessori Guide Certification | AMMAC",
+    heading: "What does a Montessori Guide do?",
+    answer:
+      "A Montessori Guide observes each child's development, prepares the learning environment, and presents materials at the appropriate moment.",
+  },
+  {
+    pathname: "/pt-br/",
+    title: "Certificação Montessori Online | Formação de Guias | AMMAC",
+    heading: "O que faz uma Guia Montessori?",
+    answer:
+      "Uma Guia Montessori observa o desenvolvimento de cada criança, prepara o ambiente e apresenta os materiais no momento adequado.",
+  },
+]
+
 const htmlPathFor = pathname =>
   pathname === "/"
     ? path.join(publicDir, "index.html")
@@ -171,6 +195,28 @@ async function main() {
         `${absoluteUrl} JSON-LD must be an object or array`
       )
     }
+  }
+
+  for (const expectation of homeGuideIntent) {
+    const $ = cheerio.load(readHtml(expectation.pathname))
+    const headings = $("main h2")
+      .toArray()
+      .map(element => $(element).text().replace(/\s+/g, " ").trim())
+    const mainText = $("main").text().replace(/\s+/g, " ").trim()
+
+    assert.strictEqual(
+      $("title").text().trim(),
+      expectation.title,
+      `${expectation.pathname} must expose the approved guide-intent title`
+    )
+    assert(
+      headings.includes(expectation.heading),
+      `${expectation.pathname} must expose the localized guide-role H2`
+    )
+    assert(
+      mainText.includes(expectation.answer),
+      `${expectation.pathname} must expose the localized guide-role answer`
+    )
   }
 
   for (const originalPath of transactionalPaths) {
