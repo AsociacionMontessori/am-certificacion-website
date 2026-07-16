@@ -5,6 +5,73 @@ const {
   localizePath,
   normalizePath,
 } = require("./src/i18n/config")
+const wordpressPostsSnapshot = require("./src/data/wordpressPostsSnapshot.json")
+const {
+  fetchRecentWordPressPosts,
+} = require("./src/services/wordpressPosts")
+
+exports.createSchemaCustomization = ({ actions }) => {
+  actions.createTypes(`
+    type WordpressEditorialPost implements Node {
+      wordpressId: String!
+      slug: String!
+      sourceContentId: String!
+      url: String!
+      title: String!
+      excerpt: String!
+      date: Date! @dateformat
+      modified: Date! @dateformat
+      author: String!
+      imageUrl: String
+      imageAlt: String!
+      imageWidth: Int
+      imageHeight: Int
+    }
+  `)
+}
+
+const loadWordPressPosts = async ({
+  fetchImpl = fetch,
+  snapshot = wordpressPostsSnapshot,
+  reporter,
+} = {}) => {
+  try {
+    const posts = await fetchRecentWordPressPosts({ fetchImpl, limit: 12 })
+    if (!posts.length) throw new Error("no valid posts")
+    reporter?.info(`Using ${posts.length} live WordPress posts`)
+    return { posts, source: "live" }
+  } catch (error) {
+    if (!Array.isArray(snapshot) || !snapshot.length) throw error
+    reporter?.warn(
+      `WordPress unavailable; using ${snapshot.length} snapshot posts`
+    )
+    return { posts: snapshot, source: "snapshot" }
+  }
+}
+
+exports.loadWordPressPosts = loadWordPressPosts
+
+exports.sourceNodes = async ({
+  actions,
+  createNodeId,
+  createContentDigest,
+  reporter,
+}) => {
+  const { posts } = await loadWordPressPosts({ reporter })
+  posts.forEach(post => {
+    actions.createNode({
+      ...post,
+      wordpressId: post.id,
+      id: createNodeId(`wordpress-editorial-${post.id}`),
+      parent: null,
+      children: [],
+      internal: {
+        type: "WordpressEditorialPost",
+        contentDigest: createContentDigest(post),
+      },
+    })
+  })
+}
 
 /**
  * Duplica las páginas públicas localizables en /en/… y /pt-br/….
