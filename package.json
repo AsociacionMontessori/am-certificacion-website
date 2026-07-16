@@ -75,6 +75,7 @@
     "test:wordpress-posts": "node scripts/test-wordpress-posts.js",
     "test:wordpress-source": "node scripts/test-wordpress-source.js",
     "test:publications-built": "node scripts/test-publications-built.js",
+    "test:publication-schemas": "node scripts/test-publication-schemas.js",
     "refresh:wordpress-posts": "node scripts/refresh-wordpress-posts.js",
     "test:foundation": "npm run test:analytics && npm run test:wordpress-analytics && npm run test:analytics-consent && npm run test:analytics-instrumentation && npm run test:indexnow && npm run test:seo-redirects && npm run test:seo-sitemap && npm run test:seo-hosting"
   },

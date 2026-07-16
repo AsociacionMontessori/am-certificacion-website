@@ -6,7 +6,9 @@ import Layout from "../components/layout"
 import Seo from "../components/seo"
 import Nav from "../components/nav"
 import PublicationsTabs from "../components/publications/PublicationsTabs"
+import { roxanaBooks } from "../data/roxanaBooks"
 import { getT } from "../i18n"
+import { buildPublicationSchemas } from "../utils/publicationSchemas"
 
 const PublicacionesPage = ({ data }) => {
   const { t } = useTranslation("publicaciones")
@@ -81,13 +83,37 @@ export const query = graphql`
   }
 `
 
-export const Head = ({ location }) => {
+export const Head = ({ data, location }) => {
   const t = getT(location.pathname, "publicaciones")
+  const localizedBooks = roxanaBooks.map(book => ({
+    ...book,
+    title: t(`libros.${book.id}.titulo`, { defaultValue: book.title }),
+    description: t(`libros.${book.id}.descripcion`, {
+      defaultValue: book.description,
+    }),
+    amazonUrl:
+      location.pathname.startsWith("/en/") && book.amazonUrlEn
+        ? book.amazonUrlEn
+        : book.amazonUrl,
+  }))
+  const pageUrl = `https://certificacionmontessori.com${location.pathname}`
+  const schemas = buildPublicationSchemas({
+    posts: data?.allWordpressEditorialPost?.nodes || [],
+    books: localizedBooks,
+    pageUrl,
+    language: location.pathname.startsWith("/pt-br/")
+      ? "pt-BR"
+      : location.pathname.startsWith("/en/")
+        ? "en"
+        : "es-MX",
+  })
+
   return (
     <Seo
       title={t("seo.title")}
       pathname={location.pathname}
       description={t("seo.description")}
+      schema={schemas}
     />
   )
 }

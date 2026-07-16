@@ -5,6 +5,8 @@ import { roxanaBooks } from "../data/roxanaBooks"
 import { roxanaBookBundles } from "../data/roxanaBookOffers"
 import { useLocalization } from "../i18n"
 
+const { trackEvent } = require("../utils/analytics")
+
 function BookCard({ book }) {
   const { t } = useTranslation("publicaciones")
   const { language, localizedPath } = useLocalization()
@@ -88,6 +90,15 @@ function BookCard({ book }) {
             href={amazonUrl}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={() =>
+              trackEvent("click_amazon", {
+                language,
+                book_id: book.id,
+                landing_path:
+                  typeof window === "undefined" ? "" : window.location.pathname,
+                cta_position: "book_card",
+              })
+            }
             className="inline-flex min-h-[48px] w-full items-center justify-center rounded-lg border border-blue/40 bg-white px-5 py-3 text-center text-sm font-semibold text-blue transition hover:bg-blue/5 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue"
             title={t("card.verEnAmazonTitle", { titulo: bookTitle })}
           >
