@@ -1,6 +1,14 @@
 const assert = require("assert")
 const fixture = require("./fixtures/wordpress-posts.json")
-const { loadWordPressPosts } = require("../gatsby-node")
+const gatsbyNode = require("../gatsby-node")
+
+assert.strictEqual(
+  gatsbyNode.loadWordPressPosts,
+  undefined,
+  "gatsby-node must only export recognized Gatsby APIs"
+)
+
+const { loadWordPressPosts } = require("../src/services/wordpressNodeSource")
 
 const reporter = { warn() {}, info() {} }
 

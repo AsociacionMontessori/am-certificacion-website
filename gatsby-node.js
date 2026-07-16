@@ -5,10 +5,7 @@ const {
   localizePath,
   normalizePath,
 } = require("./src/i18n/config")
-const wordpressPostsSnapshot = require("./src/data/wordpressPostsSnapshot.json")
-const {
-  fetchRecentWordPressPosts,
-} = require("./src/services/wordpressPosts")
+const { loadWordPressPosts } = require("./src/services/wordpressNodeSource")
 
 exports.createSchemaCustomization = ({ actions }) => {
   actions.createTypes(`
@@ -29,27 +26,6 @@ exports.createSchemaCustomization = ({ actions }) => {
     }
   `)
 }
-
-const loadWordPressPosts = async ({
-  fetchImpl = fetch,
-  snapshot = wordpressPostsSnapshot,
-  reporter,
-} = {}) => {
-  try {
-    const posts = await fetchRecentWordPressPosts({ fetchImpl, limit: 12 })
-    if (!posts.length) throw new Error("no valid posts")
-    reporter?.info(`Using ${posts.length} live WordPress posts`)
-    return { posts, source: "live" }
-  } catch (error) {
-    if (!Array.isArray(snapshot) || !snapshot.length) throw error
-    reporter?.warn(
-      `WordPress unavailable; using ${snapshot.length} snapshot posts`
-    )
-    return { posts: snapshot, source: "snapshot" }
-  }
-}
-
-exports.loadWordPressPosts = loadWordPressPosts
 
 exports.sourceNodes = async ({
   actions,
