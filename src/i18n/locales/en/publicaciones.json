@@ -6,9 +6,22 @@
   "hero": {
     "eyebrow": "Montessori Library",
     "title": "Publications of the Asociación Montessori de México",
-    "description": "A book series that brings Montessori philosophy, its foundations, and its Great Lessons to families, teachers, and school communities.",
+    "description": "Articles and books that bring Montessori philosophy, its foundations, and its Great Lessons to families, teachers, and school communities.",
+    "ctaArticulos": "See the articles",
     "ctaLibros": "See the books",
     "ctaAmazon": "Author page on Amazon"
+  },
+  "tabs": {
+    "label": "Publication type",
+    "articles": "Articles",
+    "books": "AMMAC books"
+  },
+  "articles": {
+    "title": "Recent articles",
+    "description": "Ideas, research, and educational practice published by Montessori México.",
+    "read": "Read article",
+    "all": "View all articles",
+    "spanishLabel": "Article in Spanish"
   },
   "catalogo": {
     "eyebrow": "Book catalog",

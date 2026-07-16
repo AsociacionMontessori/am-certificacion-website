@@ -1,16 +1,17 @@
 import * as React from "react"
+import { graphql } from "gatsby"
 import { useTranslation } from "react-i18next"
 
 import Layout from "../components/layout"
 import Seo from "../components/seo"
 import Nav from "../components/nav"
-import RoxanaBooksSection from "../components/RoxanaBooksSection"
+import PublicationsTabs from "../components/publications/PublicationsTabs"
 import { getT } from "../i18n"
 
-const BLOG_URL = "https://montessorimexico.org/"
-
-const PublicacionesPage = () => {
+const PublicacionesPage = ({ data }) => {
   const { t } = useTranslation("publicaciones")
+  const posts = data?.allWordpressEditorialPost?.nodes || []
+
   return (
     <Layout>
       <section
@@ -33,72 +34,52 @@ const PublicacionesPage = () => {
           </p>
           <div className="mt-6 flex flex-col gap-3 sm:flex-row">
             <a
-              href="#catalogo-libros"
+              href="#articulos"
               className="inline-flex min-h-[48px] items-center justify-center rounded-lg bg-white px-6 py-3 text-sm font-bold text-blue transition hover:bg-white/90"
+            >
+              {t("hero.ctaArticulos")}
+            </a>
+            <a
+              href="#libros"
+              className="inline-flex min-h-[48px] items-center justify-center rounded-lg border border-white/40 bg-white/10 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/20"
             >
               {t("hero.ctaLibros")}
             </a>
-            <a
-              href="https://www.amazon.com/author/montessori.mx"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex min-h-[48px] items-center justify-center rounded-lg border border-white/40 bg-white/10 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/20"
-            >
-              {t("hero.ctaAmazon")}
-            </a>
           </div>
         </div>
+      </section>
 
-        <RoxanaBooksSection
-          id="catalogo-libros"
-          headingId="publicaciones-libros-heading"
-          eyebrow={t("catalogo.eyebrow")}
-          title={t("catalogo.title")}
-          description={t("catalogo.description")}
-          className="pt-4"
-        />
-
-        <section
-          id="blog"
-          aria-labelledby="blog-heading"
-          className="bg-white px-4 py-10 sm:px-6 lg:px-12"
-        >
-          <div className="mx-auto max-w-6xl">
-            <div className="flex flex-col gap-4 pb-6 sm:flex-row sm:items-end sm:justify-between">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-wide text-green">
-                  {t("blog.eyebrow")}
-                </p>
-                <h2 id="blog-heading" className="mt-2 text-2xl font-bold text-blue md:text-3xl">
-                  {t("blog.title")}
-                </h2>
-                <p className="mt-2 max-w-2xl text-sm leading-relaxed text-gray md:text-base">
-                  {t("blog.description")}
-                </p>
-              </div>
-              <a
-                href={BLOG_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex min-h-[44px] items-center justify-center rounded-lg bg-blue px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue/90"
-              >
-                {t("blog.cta")}
-              </a>
-            </div>
-            <div className="h-[42rem] overflow-hidden rounded-lg border border-blue/15 bg-white shadow-xl sm:h-[36rem]">
-              <iframe
-                src={BLOG_URL}
-                title={t("blog.iframeTitle")}
-                className="h-full w-full"
-                loading="lazy"
-              />
-            </div>
-          </div>
-        </section>
+      <section className="bg-white px-4 py-10 sm:px-6 lg:px-12">
+        <div className="mx-auto max-w-6xl">
+          <PublicationsTabs posts={posts} />
+        </div>
       </section>
     </Layout>
   )
 }
+
+export const query = graphql`
+  query PublicacionesPageQuery {
+    allWordpressEditorialPost(sort: { date: DESC }, limit: 12) {
+      nodes {
+        id
+        wordpressId
+        slug
+        sourceContentId
+        url
+        title
+        excerpt
+        date
+        modified
+        author
+        imageUrl
+        imageAlt
+        imageWidth
+        imageHeight
+      }
+    }
+  }
+`
 
 export const Head = ({ location }) => {
   const t = getT(location.pathname, "publicaciones")

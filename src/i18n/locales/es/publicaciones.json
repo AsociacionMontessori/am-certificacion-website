@@ -6,9 +6,22 @@
   "hero": {
     "eyebrow": "Biblioteca Montessori",
     "title": "Publicaciones de la Asociación Montessori de México",
-    "description": "Una serie editorial para acercar la filosofía Montessori, sus fundamentos y sus grandes lecciones a familias, docentes y comunidades educativas.",
+    "description": "Artículos y libros para acercar la filosofía Montessori, sus fundamentos y sus grandes lecciones a familias, docentes y comunidades educativas.",
+    "ctaArticulos": "Ver artículos",
     "ctaLibros": "Ver libros",
     "ctaAmazon": "Página de autor en Amazon"
+  },
+  "tabs": {
+    "label": "Tipo de publicación",
+    "articles": "Artículos",
+    "books": "Libros AMMAC"
+  },
+  "articles": {
+    "title": "Artículos recientes",
+    "description": "Ideas, investigación y práctica educativa publicadas por Montessori México.",
+    "read": "Leer artículo",
+    "all": "Ver todos los artículos",
+    "spanishLabel": "Artículo en español"
   },
   "catalogo": {
     "eyebrow": "Catálogo editorial",
