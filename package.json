@@ -7,6 +7,7 @@
   "dependencies": {
     "@headlessui/react": "^1.7.15",
     "@heroicons/react": "^2.0.18",
+    "@noble/hashes": "^1.8.0",
     "axios": "^1.4.0",
     "d3-fetch": "^3.0.1",
     "gatsby": "^5.16.1",
@@ -19,11 +20,13 @@
     "gatsby-transformer-json": "^5.16.0",
     "gatsby-transformer-remark": "^6.16.0",
     "gatsby-transformer-sharp": "^5.16.0",
+    "he": "^1.2.0",
     "i18next": "^26.3.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-helmet": "^6.1.0",
-    "react-i18next": "^17.0.8"
+    "react-i18next": "^17.0.8",
+    "sanitize-html": "^2.17.6"
   },
   "devDependencies": {
     "autoprefixer": "^10.4.14",
@@ -69,6 +72,8 @@
     "firebase:use": "npx firebase use certificacionmontessori",
     "test:analytics-consent": "node scripts/test-analytics-consent.js",
     "test:wordpress-analytics": "node scripts/test-wordpress-analytics-snippet.js",
+    "test:wordpress-posts": "node scripts/test-wordpress-posts.js",
+    "refresh:wordpress-posts": "node scripts/refresh-wordpress-posts.js",
     "test:foundation": "npm run test:analytics && npm run test:wordpress-analytics && npm run test:analytics-consent && npm run test:analytics-instrumentation && npm run test:indexnow && npm run test:seo-redirects && npm run test:seo-sitemap && npm run test:seo-hosting"
   },
   "repository": {

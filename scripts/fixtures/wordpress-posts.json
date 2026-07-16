@@ -1,0 +1,42 @@
+[
+  {
+    "id": 101,
+    "slug": "observacion-montessori",
+    "link": "https://montessorimexico.org/observacion-montessori/",
+    "date": "2026-07-10T08:00:00",
+    "modified": "2026-07-10T09:00:00",
+    "title": { "rendered": "Observación &amp; ambiente preparado" },
+    "excerpt": {
+      "rendered": "<p>Una mirada <strong>práctica</strong> a la observación.</p><script>alert(1)</script>"
+    },
+    "_embedded": {
+      "author": [{ "name": "Roxana Muñoz" }],
+      "wp:featuredmedia": [
+        {
+          "source_url": "https://montessorimexico.org/wp-content/uploads/2026/07/observacion.jpg",
+          "alt_text": "Ambiente preparado Montessori",
+          "media_details": { "width": 1200, "height": 630 }
+        }
+      ]
+    }
+  },
+  {
+    "id": 102,
+    "slug": "host-invalido",
+    "link": "https://evil.example/copied-post/",
+    "date": "2026-07-09T08:00:00",
+    "modified": "2026-07-09T08:00:00",
+    "title": { "rendered": "Entrada inválida" },
+    "excerpt": { "rendered": "<p>No debe pasar.</p>" },
+    "_embedded": { "author": [], "wp:featuredmedia": [] }
+  },
+  {
+    "id": 103,
+    "slug": "fecha-invalida",
+    "link": "https://montessorimexico.org/fecha-invalida/",
+    "date": "not-a-date",
+    "title": { "rendered": "Fecha inválida" },
+    "excerpt": { "rendered": "<p>No debe romper el resto del lote.</p>" },
+    "_embedded": { "author": [], "wp:featuredmedia": [] }
+  }
+]

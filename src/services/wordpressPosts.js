@@ -1,0 +1,122 @@
+const sanitizeHtml = require("sanitize-html")
+const he = require("he")
+const { sha256 } = require("@noble/hashes/sha256")
+const { bytesToHex, utf8ToBytes } = require("@noble/hashes/utils")
+
+const WORDPRESS_ORIGIN = "https://montessorimexico.org"
+const WORDPRESS_POSTS_ENDPOINT = `${WORDPRESS_ORIGIN}/wp-json/wp/v2/posts`
+
+const buildSourceContentId = slug =>
+  `post_${bytesToHex(sha256(utf8ToBytes(slug))).slice(0, 16)}`
+
+const plainText = value =>
+  he
+    .decode(
+      sanitizeHtml(String(value || ""), {
+        allowedTags: [],
+        allowedAttributes: {},
+      })
+    )
+    .replace(/\s+/g, " ")
+    .trim()
+
+const validWordPressUrl = value => {
+  try {
+    const url = new URL(value)
+    return url.protocol === "https:" &&
+      url.hostname === "montessorimexico.org" &&
+      !url.username &&
+      !url.password &&
+      !url.port
+      ? url.toString()
+      : ""
+  } catch {
+    return ""
+  }
+}
+
+const positiveInteger = value => {
+  const parsed = Number(value)
+  return Number.isInteger(parsed) && parsed > 0 ? parsed : null
+}
+
+const isoDate = value => {
+  const date = new Date(value)
+  return Number.isNaN(date.getTime()) ? "" : date.toISOString()
+}
+
+const normalizeWordPressPost = raw => {
+  const url = validWordPressUrl(raw?.link)
+  const title = plainText(raw?.title?.rendered)
+  const id = String(raw?.id || "").trim()
+  const slug = String(raw?.slug || "").trim()
+  const date = isoDate(raw?.date)
+  if (!url || !title || !id || !slug || !date) return null
+
+  const author = Array.isArray(raw?._embedded?.author)
+    ? plainText(raw._embedded.author[0]?.name)
+    : ""
+  const media = Array.isArray(raw?._embedded?.["wp:featuredmedia"])
+    ? raw._embedded["wp:featuredmedia"][0]
+    : null
+  const imageUrl = validWordPressUrl(media?.source_url)
+
+  return {
+    id,
+    slug,
+    sourceContentId: buildSourceContentId(slug),
+    url,
+    title,
+    excerpt: plainText(raw?.excerpt?.rendered),
+    date,
+    modified: isoDate(raw.modified) || date,
+    author: author || "Asociación Montessori de México",
+    imageUrl,
+    imageAlt: plainText(media?.alt_text) || title,
+    imageWidth: positiveInteger(media?.media_details?.width),
+    imageHeight: positiveInteger(media?.media_details?.height),
+  }
+}
+
+const normalizeWordPressPosts = rows =>
+  (Array.isArray(rows) ? rows : [])
+    .map(normalizeWordPressPost)
+    .filter(Boolean)
+
+const fetchRecentWordPressPosts = async ({
+  fetchImpl = fetch,
+  limit = 12,
+  timeoutMs = 8000,
+} = {}) => {
+  const count = Math.max(1, Math.min(Number(limit) || 12, 12))
+  const url = new URL(WORDPRESS_POSTS_ENDPOINT)
+  url.searchParams.set("status", "publish")
+  url.searchParams.set("orderby", "date")
+  url.searchParams.set("order", "desc")
+  url.searchParams.set("per_page", String(count))
+  url.searchParams.set("_embed", "author,wp:featuredmedia")
+  const controller = new AbortController()
+  const timer = setTimeout(() => controller.abort(), timeoutMs)
+
+  try {
+    const response = await fetchImpl(url, {
+      headers: { accept: "application/json" },
+      signal: controller.signal,
+    })
+    if (!response.ok) {
+      throw new Error(`WordPress returned HTTP ${response.status}`)
+    }
+    return normalizeWordPressPosts(await response.json()).slice(0, count)
+  } finally {
+    clearTimeout(timer)
+  }
+}
+
+module.exports = {
+  WORDPRESS_ORIGIN,
+  WORDPRESS_POSTS_ENDPOINT,
+  fetchRecentWordPressPosts,
+  normalizeWordPressPost,
+  normalizeWordPressPosts,
+  plainText,
+}
