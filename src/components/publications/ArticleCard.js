@@ -19,11 +19,14 @@ const ArticleCard = ({ post }) => {
       {post.imageUrl ? (
         <div className="aspect-[16/9] overflow-hidden bg-blue/5">
           <img
-            src={post.imageUrl}
+            src={post.imageCardUrl || post.imageUrl}
+            srcSet={post.imageSrcSet || undefined}
+            sizes="(min-width: 1280px) 368px, (min-width: 768px) calc((100vw - 68px) / 2), calc(100vw - 34px)"
             alt={post.imageAlt}
             width={post.imageWidth || 1200}
             height={post.imageHeight || 630}
             loading="lazy"
+            decoding="async"
             className="h-full w-full object-cover"
           />
         </div>

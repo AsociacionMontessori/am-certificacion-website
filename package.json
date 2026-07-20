@@ -29,11 +29,13 @@
     "sanitize-html": "^2.17.6"
   },
   "devDependencies": {
+    "@playwright/test": "^1.61.1",
     "autoprefixer": "^10.4.14",
     "cheerio": "1.0.0-rc.12",
     "daisyui": "^3.2.1",
     "firebase-tools": "^15.18.0",
     "gatsby-plugin-postcss": "^6.16.0",
+    "lighthouse": "^13.4.0",
     "patch-package": "^8.0.1",
     "path-to-regexp": "0.1.13",
     "postcss": "^8.4.24",
@@ -52,6 +54,7 @@
     "postinstall": "patch-package",
     "start": "gatsby develop",
     "serve": "gatsby serve",
+    "serve:test": "gatsby serve -H 127.0.0.1 -p 9000",
     "clean": "gatsby clean",
     "test": "echo \"Write tests! -> https://gatsby.dev/unit-testing\" && exit 1",
     "test:analytics": "node scripts/test-analytics.js",
@@ -76,6 +79,8 @@
     "test:wordpress-source": "node scripts/test-wordpress-source.js",
     "test:publications-built": "node scripts/test-publications-built.js",
     "test:publication-schemas": "node scripts/test-publication-schemas.js",
+    "test:e2e": "playwright test",
+    "test:lighthouse-budget": "node scripts/test-lighthouse-budget.js output/lighthouse/publicaciones.json",
     "refresh:wordpress-posts": "node scripts/refresh-wordpress-posts.js",
     "test:foundation": "npm run test:analytics && npm run test:wordpress-analytics && npm run test:analytics-consent && npm run test:analytics-instrumentation && npm run test:indexnow && npm run test:seo-redirects && npm run test:seo-sitemap && npm run test:seo-hosting"
   },

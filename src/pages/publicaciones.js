@@ -16,13 +16,7 @@ const PublicacionesPage = ({ data }) => {
 
   return (
     <Layout>
-      <section
-        className="w-full overflow-x-hidden bg-cover bg-center bg-fixed"
-        style={{
-          backgroundImage:
-            "linear-gradient(to right, rgba(0,151,178,0.92), rgba(0,151,178,0.80), rgba(126,217,87,0.92)), url('/backgrounds/publicaciones.webp')",
-        }}
-      >
+      <section className="publications-hero w-full overflow-x-hidden bg-cover bg-center">
         <Nav textColor="text-white" />
         <div className="mx-auto max-w-6xl px-6 pb-10 pt-6 text-white lg:px-12 lg:pb-14">
           <p className="text-xs font-semibold uppercase tracking-wide text-yellow">
@@ -75,6 +69,8 @@ export const query = graphql`
         modified
         author
         imageUrl
+        imageCardUrl
+        imageSrcSet
         imageAlt
         imageWidth
         imageHeight
@@ -109,12 +105,28 @@ export const Head = ({ data, location }) => {
   })
 
   return (
-    <Seo
-      title={t("seo.title")}
-      pathname={location.pathname}
-      description={t("seo.description")}
-      schema={schemas}
-    />
+    <>
+      <Seo
+        title={t("seo.title")}
+        pathname={location.pathname}
+        description={t("seo.description")}
+        schema={schemas}
+      />
+      <link
+        rel="preload"
+        as="image"
+        href="/backgrounds/publicaciones-mobile.webp"
+        media="(max-width: 767px)"
+        fetchPriority="high"
+      />
+      <link
+        rel="preload"
+        as="image"
+        href="/backgrounds/publicaciones.webp"
+        media="(min-width: 768px)"
+        fetchPriority="high"
+      />
+    </>
   )
 }
 

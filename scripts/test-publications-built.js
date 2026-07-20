@@ -6,6 +6,14 @@ const cheerio = require("cheerio")
 const root = path.resolve(__dirname, "..")
 const publicDir = path.join(root, "public")
 const wordpressOrigin = "https://montessorimexico.org"
+const globalCss = fs.readFileSync(
+  path.join(root, "src/styles/global.css"),
+  "utf8"
+)
+const publicationHeroMobile = path.join(
+  root,
+  "static/backgrounds/publicaciones-mobile.webp"
+)
 const pages = [
   {
     pathname: "/publicaciones/",
@@ -36,7 +44,42 @@ for (const page of pages) {
   const articlesPosition = html.indexOf('id="articulos"')
   const booksPosition = html.indexOf('id="libros"')
 
-  assert.strictEqual($("iframe").length, 0, `${page.pathname} must not contain an iframe`)
+  assert.strictEqual(
+    $("iframe").length,
+    0,
+    `${page.pathname} must not contain an iframe`
+  )
+  assert.strictEqual(
+    html.includes("fonts.googleapis.com"),
+    false,
+    `${page.pathname} must not load unused remote fonts`
+  )
+  assert.strictEqual(
+    $(
+      "link[rel='preload'][as='image'][href='/backgrounds/publicaciones-mobile.webp']"
+    ).attr("fetchpriority"),
+    "high",
+    `${page.pathname} must preload the mobile publication hero with high priority`
+  )
+  assert.strictEqual(
+    $(
+      "link[rel='preload'][href='/backgrounds/publicaciones-mobile.webp']"
+    ).attr("media"),
+    "(max-width: 767px)",
+    `${page.pathname} must scope the mobile hero preload`
+  )
+  assert.strictEqual(
+    $("link[rel='preload'][href='/backgrounds/publicaciones.webp']").attr(
+      "media"
+    ),
+    "(min-width: 768px)",
+    `${page.pathname} must scope the desktop hero preload`
+  )
+  assert.strictEqual(
+    $("main > section").first().hasClass("bg-fixed"),
+    false,
+    `${page.pathname} hero must not use fixed backgrounds`
+  )
   assert(articlesPosition >= 0, `${page.pathname} must contain #articulos`)
   assert(booksPosition >= 0, `${page.pathname} must contain #libros`)
   assert(
@@ -62,12 +105,36 @@ for (const page of pages) {
 
   articleCards.each((_, card) => {
     const link = $(card).find("a[href]").last().attr("href")
+    const image = $(card).find("img")
+    const imageSrc = image.attr("src")
+    const imageSrcSet = image.attr("srcset")
     assert(link, `${page.pathname} article card must have a destination`)
     assert.strictEqual(
       new URL(link).origin,
       wordpressOrigin,
       `${page.pathname} article links must use the canonical WordPress origin`
     )
+    assert(imageSrc, `${page.pathname} article card must have an image`)
+    assert(
+      imageSrcSet?.split(", ").length >= 3,
+      `${page.pathname} article images must expose responsive sources`
+    )
+    assert.strictEqual(
+      image.attr("sizes"),
+      "(min-width: 1280px) 368px, (min-width: 768px) calc((100vw - 68px) / 2), calc(100vw - 34px)",
+      `${page.pathname} article images must describe their rendered size`
+    )
+    assert(
+      /-768x\d+\.(?:jpe?g|png|webp)$/i.test(new URL(imageSrc).pathname),
+      `${page.pathname} article images must use the medium-large fallback`
+    )
+    for (const candidate of imageSrcSet.split(", ")) {
+      assert.strictEqual(
+        new URL(candidate.replace(/\s+\d+w$/, "")).origin,
+        wordpressOrigin,
+        `${page.pathname} responsive article images must use the WordPress origin`
+      )
+    }
   })
 
   assert(
@@ -86,4 +153,19 @@ for (const page of pages) {
   )
 }
 
-console.log("Built publications contract ok: native articles precede AMMAC books")
+assert(
+  /@font-face\s*{[^}]*font-display:\s*swap;/s.test(globalCss),
+  "Local heading fonts must use font-display: swap"
+)
+assert(
+  fs.existsSync(publicationHeroMobile),
+  "A dedicated mobile publication hero must exist"
+)
+assert(
+  fs.statSync(publicationHeroMobile).size < 40000,
+  "The mobile publication hero must stay below 40 KB"
+)
+
+console.log(
+  "Built publications contract ok: native articles precede AMMAC books"
+)

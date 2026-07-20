@@ -20,6 +20,8 @@ exports.createSchemaCustomization = ({ actions }) => {
       modified: Date! @dateformat
       author: String!
       imageUrl: String
+      imageCardUrl: String
+      imageSrcSet: String
       imageAlt: String!
       imageWidth: Int
       imageHeight: Int

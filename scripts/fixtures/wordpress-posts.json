@@ -15,7 +15,42 @@
         {
           "source_url": "https://montessorimexico.org/wp-content/uploads/2026/07/observacion.jpg",
           "alt_text": "Ambiente preparado Montessori",
-          "media_details": { "width": 1200, "height": 630 }
+          "media_details": {
+            "width": 1200,
+            "height": 630,
+            "sizes": {
+              "medium": {
+                "width": 300,
+                "height": 158,
+                "source_url": "https://montessorimexico.org/wp-content/uploads/2026/07/observacion-300x158.jpg"
+              },
+              "thumbnail": {
+                "width": 150,
+                "height": 150,
+                "source_url": "https://montessorimexico.org/wp-content/uploads/2026/07/observacion-150x150.jpg"
+              },
+              "medium_large": {
+                "width": 768,
+                "height": 403,
+                "source_url": "https://montessorimexico.org/wp-content/uploads/2026/07/observacion-768x403.jpg"
+              },
+              "large": {
+                "width": 1024,
+                "height": 538,
+                "source_url": "https://montessorimexico.org/wp-content/uploads/2026/07/observacion-1024x538.jpg"
+              },
+              "neve-blog": {
+                "width": 930,
+                "height": 620,
+                "source_url": "https://montessorimexico.org/wp-content/uploads/2026/07/observacion-930x620.jpg"
+              },
+              "untrusted": {
+                "width": 640,
+                "height": 336,
+                "source_url": "https://evil.example/observacion-640x336.jpg"
+              }
+            }
+          }
         }
       ]
     }

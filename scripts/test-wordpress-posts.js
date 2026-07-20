@@ -12,6 +12,20 @@ assert.strictEqual(post.author, "Roxana Muñoz")
 assert.strictEqual(post.imageWidth, 1200)
 assert.strictEqual(post.imageHeight, 630)
 assert.strictEqual(
+  post.imageCardUrl,
+  "https://montessorimexico.org/wp-content/uploads/2026/07/observacion-768x403.jpg"
+)
+assert.strictEqual(
+  post.imageSrcSet,
+  [
+    "https://montessorimexico.org/wp-content/uploads/2026/07/observacion-300x158.jpg 300w",
+    "https://montessorimexico.org/wp-content/uploads/2026/07/observacion-768x403.jpg 768w",
+    "https://montessorimexico.org/wp-content/uploads/2026/07/observacion-1024x538.jpg 1024w",
+    "https://montessorimexico.org/wp-content/uploads/2026/07/observacion.jpg 1200w",
+  ].join(", ")
+)
+assert.strictEqual(post.imageSrcSet.includes("evil.example"), false)
+assert.strictEqual(
   post.url,
   "https://montessorimexico.org/observacion-montessori/"
 )

@@ -45,6 +45,64 @@ const isoDate = value => {
   return Number.isNaN(date.getTime()) ? "" : date.toISOString()
 }
 
+const normalizeImageCandidate = value => {
+  const url = validWordPressUrl(value?.source_url)
+  const width = positiveInteger(value?.width)
+  const height = positiveInteger(value?.height)
+  return url && width ? { url, width, height } : null
+}
+
+const responsiveImageData = media => {
+  const imageUrl = validWordPressUrl(media?.source_url)
+  if (!imageUrl) return { imageUrl: "", imageCardUrl: "", imageSrcSet: "" }
+
+  const sizes = media?.media_details?.sizes || {}
+  const full = normalizeImageCandidate({
+    source_url: imageUrl,
+    width: media?.media_details?.width,
+    height: media?.media_details?.height,
+  })
+  const reference =
+    full ||
+    normalizeImageCandidate(sizes.medium_large) ||
+    normalizeImageCandidate(sizes.large) ||
+    normalizeImageCandidate(sizes.medium)
+  const referenceRatio =
+    reference?.width && reference?.height
+      ? reference.width / reference.height
+      : null
+  const candidates = [
+    ...Object.values(sizes).map(normalizeImageCandidate),
+    full,
+  ]
+    .filter(Boolean)
+    .filter(candidate => {
+      if (!referenceRatio) return true
+      if (!candidate.height) return false
+      const ratioDifference = Math.abs(
+        candidate.width / candidate.height - referenceRatio
+      )
+      return ratioDifference / referenceRatio <= 0.03
+    })
+    .sort((left, right) => left.width - right.width)
+    .filter(
+      (candidate, index, rows) =>
+        rows.findIndex(row => row.width === candidate.width) === index
+    )
+  const preferred =
+    candidates.find(candidate => candidate.width >= 640) ||
+    candidates[candidates.length - 1] ||
+    full
+
+  return {
+    imageUrl,
+    imageCardUrl: preferred?.url || imageUrl,
+    imageSrcSet: candidates
+      .map(candidate => `${candidate.url} ${candidate.width}w`)
+      .join(", "),
+  }
+}
+
 const normalizeWordPressPost = raw => {
   const url = validWordPressUrl(raw?.link)
   const title = plainText(raw?.title?.rendered)
@@ -59,7 +117,7 @@ const normalizeWordPressPost = raw => {
   const media = Array.isArray(raw?._embedded?.["wp:featuredmedia"])
     ? raw._embedded["wp:featuredmedia"][0]
     : null
-  const imageUrl = validWordPressUrl(media?.source_url)
+  const { imageUrl, imageCardUrl, imageSrcSet } = responsiveImageData(media)
 
   return {
     id,
@@ -72,6 +130,8 @@ const normalizeWordPressPost = raw => {
     modified: isoDate(raw.modified) || date,
     author: author || "Asociación Montessori de México",
     imageUrl,
+    imageCardUrl,
+    imageSrcSet,
     imageAlt: plainText(media?.alt_text) || title,
     imageWidth: positiveInteger(media?.media_details?.width),
     imageHeight: positiveInteger(media?.media_details?.height),

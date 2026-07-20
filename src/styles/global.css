@@ -6,12 +6,23 @@
 @font-face {
     font-family: sansSerifBook;
     src: url(fonts/sansserifflf/SansSerifBookFLF.otf);
+    font-display: swap;
 }
 
 body {
   margin: 0;
   padding: 0;
     font-family: 'Helvetica', 'Arial', sans-serif;
+}
+
+.publications-hero {
+    background-image: linear-gradient(to right, rgba(0,151,178,0.92), rgba(0,151,178,0.80), rgba(126,217,87,0.92)), url('/backgrounds/publicaciones-mobile.webp');
+}
+
+@media (min-width: 768px) {
+    .publications-hero {
+        background-image: linear-gradient(to right, rgba(0,151,178,0.92), rgba(0,151,178,0.80), rgba(126,217,87,0.92)), url('/backgrounds/publicaciones.webp');
+    }
 }
 
 h1,

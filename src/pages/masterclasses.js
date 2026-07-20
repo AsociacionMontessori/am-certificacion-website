@@ -57,11 +57,19 @@ const masterclasses = () => {
 }
 
 export const Head = () => (
-  <Seo
-    title="MasterClasses"
-    pathname="/masterclasses/"
-    description="Explora las masterclasses y clases magistrales vinculadas con el método Montessori y la formación docente."
-  />
+  <>
+    <Seo
+      title="MasterClasses"
+      pathname="/masterclasses/"
+      description="Explora las masterclasses y clases magistrales vinculadas con el método Montessori y la formación docente."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Italianno&family=Libre+Caslon+Display&display=swap"
+    />
+  </>
 )
 
 export default masterclasses
