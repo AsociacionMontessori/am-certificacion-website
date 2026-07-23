@@ -62,7 +62,7 @@ const Graduacion = () => {
   const porcentaje = (completados / requisitos.length) * 100;
 
   const baseCertUrl = currentUser ? `${window.location.origin}/certificado/${currentUser.uid}` : '';
-  const tieneMultiplesNiveles = alumnoData?.niveles?.length > 1;
+  const tieneNiveles = alumnoData?.niveles?.length > 0;
 
   if (userData?.estado === 'Inactivo') {
     return (
@@ -188,8 +188,8 @@ const Graduacion = () => {
         </div>
       )}
 
-      {/* Certificados por nivel (solo si tiene más de un nivel) */}
-      {tieneMultiplesNiveles && currentUser && (
+      {/* Certificados y constancias por nivel */}
+      {tieneNiveles && currentUser && (
         <div className="mb-6 bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
           <div className="flex items-center mb-4">
             <LinkIcon className="w-6 h-6 text-blue mr-2" />
@@ -199,7 +199,8 @@ const Graduacion = () => {
           </div>
           <div className="space-y-3">
             {alumnoData.niveles.map((nivel) => {
-              const esCompletado = nivel.estado !== 'activo';
+              // Graduado: sin inscripción vigente, su documento es el certificado
+              const esCompletado = nivel.estado !== 'activo' || alumnoData?.estado === 'Graduado';
               const nivelUrl = esCompletado
                 ? `${baseCertUrl}?nivel=${nivel.id}`
                 : `${baseCertUrl}?nivel=${nivel.id}&tipo=constancia`;

@@ -183,20 +183,30 @@ export const obtenerCertificado = async (alumnoId, nivelId) => {
     if (nivelId) {
       nivelEspecifico = historialNiveles.find(n => n.id === nivelId);
       if (nivelEspecifico) {
-        const esCompletado = nivelEspecifico.estado === 'completado';
+        // Un alumno graduado ya no tiene inscripción vigente: su nivel actual se
+        // trata como completado aunque el historial (dato legado) lo marque activo
+        const esNivelVigenteGraduado = estadoActual === 'Graduado' &&
+          nivelEspecifico.nombre === alumnoData.nivel;
+        const esCompletado = nivelEspecifico.estado === 'completado' || esNivelVigenteGraduado;
+
+        // Si la entrada del historial no tiene fechaFin pero es el nivel vigente
+        // del alumno, usar la fecha estimada de egreso del documento principal
+        const esNivelVigente = nivelEspecifico.nombre === alumnoData.nivel;
+        const fechaFinNivel = ensureDate(nivelEspecifico.fechaFin) ||
+          (esNivelVigente ? ensureDate(alumnoData.fechaEgresoEstimada || alumnoData.fechaEgreso) : null);
 
         // Sobreescribir datos del nivel para el certificado/constancia
         nivelActual = nivelEspecifico.nombre;
         fechaIngresoActual = ensureDate(nivelEspecifico.fechaInicio);
-        fechaEgresoActual = ensureDate(nivelEspecifico.fechaFin);
+        fechaEgresoActual = fechaFinNivel;
 
         if (esCompletado) {
           // Nivel completado: tratar como graduado de ese nivel
           graduacionCompleta = true;
           nivelGraduacion = nivelEspecifico.nombre;
-          fechaGraduacion = ensureDate(nivelEspecifico.fechaFin);
+          fechaGraduacion = ensureDate(nivelEspecifico.fechaFin) || fechaGraduacion;
           fechaIngresoNivelGraduacion = ensureDate(nivelEspecifico.fechaInicio);
-          fechaEgresoNivelGraduacion = ensureDate(nivelEspecifico.fechaFin);
+          fechaEgresoNivelGraduacion = fechaFinNivel;
           estadoParaDocumento = 'Graduado';
         } else {
           // Nivel activo: tratar como constancia

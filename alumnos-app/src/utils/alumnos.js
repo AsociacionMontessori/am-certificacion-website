@@ -145,6 +145,13 @@ export const actualizarHistorialNiveles = ({
         ? { ...nivel, estado: 'completado', fechaFin: fin }
         : nivel
     );
+  } else {
+    // Sin nivel activo (p. ej. alumno graduado): si el último nivel del historial
+    // ya es el mismo, no crear un duplicado al guardar
+    const ultimoNivel = historialActualizado[historialActualizado.length - 1];
+    if (ultimoNivel && ultimoNivel.nombre === nombreNormalizado) {
+      return { historialActualizado, nivelActualId: null };
+    }
   }
 
   const nuevoNivel = buildNivelEntry({

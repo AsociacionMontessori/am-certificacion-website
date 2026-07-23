@@ -8,9 +8,10 @@ const esFechaPorDefecto = (fechaObj) => {
     return false;
   }
   // Verificar si es 1900-01-01 (fecha por defecto que representa "sin fecha")
-  const año = fechaObj.getFullYear();
-  const mes = fechaObj.getMonth() + 1; // getMonth() retorna 0-11
-  const dia = fechaObj.getDate();
+  // En UTC, igual que el formateo, para no recorrer el día por zona horaria
+  const año = fechaObj.getUTCFullYear();
+  const mes = fechaObj.getUTCMonth() + 1; // getUTCMonth() retorna 0-11
+  const dia = fechaObj.getUTCDate();
   return año === 1900 && mes === 1 && dia === 1;
 };
 
@@ -55,13 +56,15 @@ export const formatearFechaLarga = (fecha) => {
     return 'Fecha abierta';
   }
   
-  // Formatear en español
+  // Formatear en español. Las fechas se guardan a medianoche UTC, así que se
+  // formatean en UTC: en hora local (UTC-6) se mostraban un día antes
   const opciones = {
     year: 'numeric',
     month: 'long',
-    day: 'numeric'
+    day: 'numeric',
+    timeZone: 'UTC'
   };
-  
+
   return fechaObj.toLocaleDateString('es-MX', opciones);
 };
 

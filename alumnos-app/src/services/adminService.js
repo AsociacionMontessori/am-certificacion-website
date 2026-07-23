@@ -13,6 +13,7 @@ import {
 import { auth, db } from '../config/firebase';
 import { getMateriasPorNivel } from '../data/materiasPorNivel';
 import { buildNivelEntry } from '../utils/alumnos';
+import { generarFolio, generarCodigoVerificacion } from './certificadoService';
 
 /**
  * Crea un nuevo usuario en Firebase Authentication y su documento en Firestore
@@ -66,6 +67,13 @@ export const crearUsuarioAlumno = async (datosUsuario) => {
       fechaCreacion: serverTimestamp(),
       creadoPor: datosAdicionales.creadoPor || null,
     };
+
+    // Emitir folio y código de verificación desde la creación: sin ellos las
+    // reglas de Firestore bloquean el acceso público a certificado/constancia
+    const folioCertificado = generarFolio(user.uid);
+    alumnoData.folioCertificado = folioCertificado;
+    alumnoData.codigoVerificacion = generarCodigoVerificacion(user.uid, folioCertificado);
+    alumnoData.fechaEmisionCertificado = serverTimestamp();
 
     if (datosAdicionales.nivel) {
       const nivelInicial = buildNivelEntry({

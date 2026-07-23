@@ -451,6 +451,8 @@ const Dashboard = () => {
               </div>
               {/* Certificado Digital */}
               <div className="bg-white dark:bg-gray-700 rounded-lg p-3 border border-gray-200 dark:border-gray-600 space-y-3">
+                {/* Constancia solo con inscripción vigente: al graduado le corresponde el certificado */}
+                {userData?.estado !== 'Graduado' && (
                 <div className="flex items-center justify-between">
                   <div className="flex-1 min-w-0">
                     <label className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1 block">
@@ -479,9 +481,10 @@ const Dashboard = () => {
                     </a>
                   </div>
                 </div>
+                )}
 
                 {userData?.fechaGraduacion && (
-                  <div className="flex items-center justify-between border-t border-gray-200 dark:border-gray-600 pt-3">
+                  <div className={`flex items-center justify-between ${userData?.estado !== 'Graduado' ? 'border-t border-gray-200 dark:border-gray-600 pt-3' : ''}`}>
                     <div className="flex-1 min-w-0">
                       <label className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1 block">
                         Certificado de graduación

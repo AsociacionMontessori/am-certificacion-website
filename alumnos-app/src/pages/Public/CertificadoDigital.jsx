@@ -66,8 +66,10 @@ const CertificadoDigital = () => {
     );
   }
 
-  // Capa adicional: si el alumno está inactivo, bloquear visualización
-  if (certificado?.alumno?.estado === 'Inactivo') {
+  // Capa adicional: si el alumno está inactivo, bloquear visualización.
+  // Revisar estadoActual (estado real en Firestore) además de estado, porque
+  // este último se sobreescribe a «Graduado» cuando la graduación está completa
+  if (certificado?.alumno?.estado === 'Inactivo' || certificado?.alumno?.estadoActual === 'Inactivo') {
     return (
       <div className="min-h-screen flex items-center justify-center bg-red/10">
         <div className="bg-white rounded-xl shadow p-6 border border-red/30 max-w-md text-center">
@@ -89,7 +91,10 @@ const CertificadoDigital = () => {
   }
 
   const { folio, codigoVerificacion, promedio, alumno, graduacion } = certificado;
-  const mostrarCertificado = !forzarConstancia && graduacion?.completa;
+  // Un alumno graduado ya no está inscrito: no se le expide constancia,
+  // aunque la URL traiga tipo=constancia
+  const esGraduadoSinInscripcion = alumno.estadoActual === 'Graduado';
+  const mostrarCertificado = (!forzarConstancia || esGraduadoSinInscripcion) && graduacion?.completa;
   const nivelCertificado = graduacion?.nivel || alumno.nivelGraduacion || alumno.nivel;
   const nivelActual = alumno.nivelActual || alumno.nivel;
   const programaCertificado = graduacion?.programa || alumno.programa;
@@ -120,10 +125,13 @@ const CertificadoDigital = () => {
   const urlVerificacion = codigoVerificacion
     ? `${window.location.origin}/verificar/${folio}/${codigoVerificacion}`
     : `${window.location.origin}/verificar/${folio}/PENDIENTE`;
-  const fechaIngresoCertificado = formatearFechaLarga(graduacion?.fechaIngresoNivel || alumno.fechaIngreso);
-  const fechaEgresoCertificado = formatearFechaLarga(graduacion?.fechaEgresoNivel || alumno.fechaEgreso);
-  const fechaIngresoActual = formatearFechaLarga(alumno.fechaIngresoActual || alumno.fechaIngreso);
-  const fechaEgresoEstimadaActual = formatearFechaLarga(alumno.fechaEgresoEstimadaActual);
+  const formatearFechaSiExiste = (fecha) => (fecha ? formatearFechaLarga(fecha) : null);
+  const fechaIngresoCertificado = formatearFechaSiExiste(graduacion?.fechaIngresoNivel || alumno.fechaIngreso);
+  const fechaEgresoCertificado = formatearFechaSiExiste(graduacion?.fechaEgresoNivel || alumno.fechaEgreso);
+  const fechaIngresoActual = formatearFechaSiExiste(alumno.fechaIngresoActual || alumno.fechaIngreso);
+  // formatearFechaLarga(null) devuelve 'N/A' (truthy), lo que mostraba
+  // «Fecha estimada de egreso: N/A» en vez de ocultar la línea
+  const fechaEgresoEstimadaActual = formatearFechaSiExiste(alumno.fechaEgresoEstimadaActual);
   const fechaEmision = formatearFechaLarga(mostrarCertificado ? (graduacion?.fechaGraduacion || new Date()) : new Date());
   const lugarEmision = 'Ciudad de México, México';
   const basePath = `/certificado/${id}${nivelIdParam ? `?nivel=${nivelIdParam}` : ''}`;
@@ -153,7 +161,7 @@ const CertificadoDigital = () => {
             </div>
           </div>
 
-          {graduacion?.completa && alumno?.tieneMultiplesNiveles && (
+          {graduacion?.completa && !esGraduadoSinInscripcion && (
             <div className="bg-blue/10 border-b border-blue/30 px-6 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 text-sm text-blue/90">
               <div>
                 {mostrarCertificado ? (

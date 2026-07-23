@@ -657,7 +657,18 @@ const AlumnoDetail = () => {
                                   />
                                   <select
                                     value={nivelItem?.estado || 'activo'}
-                                    onChange={(e) => handleFieldChange('estado', e.target.value)}
+                                    onChange={(e) => {
+                                      const nuevoEstado = e.target.value;
+                                      handleFieldChange('estado', nuevoEstado);
+                                      // Un nivel completado necesita fecha de fin: prellenar
+                                      // con la fecha estimada de egreso o la fecha de hoy
+                                      if (nuevoEstado === 'completado' && !nivelItem?.fechaFin) {
+                                        handleFieldChange(
+                                          'fechaFin',
+                                          formData.fechaEgresoEstimada || new Date().toISOString().slice(0, 10)
+                                        );
+                                      }
+                                    }}
                                     className="w-full px-3 py-2 text-xs border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200"
                                   >
                                     <option value="activo">Activo</option>
@@ -1164,6 +1175,8 @@ const AlumnoDetail = () => {
               const urlCompletaConstancia = `${window.location.origin}${urlConstancia}`;
               return (
                 <>
+                  {/* Constancia solo con inscripción vigente: al graduado le corresponde el certificado */}
+                  {alumno?.estado !== 'Graduado' && (
                   <div>
                     <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
                       {nivelSeleccionado
@@ -1202,6 +1215,7 @@ const AlumnoDetail = () => {
                       </div>
                     </div>
                   </div>
+                  )}
 
                   {alumno.fechaGraduacion && (
                     <div>
