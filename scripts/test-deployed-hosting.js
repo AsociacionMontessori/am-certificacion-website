@@ -11,10 +11,15 @@ const {
   localizePath,
   parsePath,
 } = require("../src/i18n/config")
+const { PROGRAM_LANDING_ROUTES } = require("../src/data/programLandingRoutes")
 
 const deploymentOrigin = String(process.argv[2] || "").replace(/\/+$/, "")
 const canonicalOrigin = "https://certificacionmontessori.com"
-assert.match(deploymentOrigin, /^https:\/\/[a-z0-9.-]+$/i, "HTTPS deployment origin required")
+assert.match(
+  deploymentOrigin,
+  /^https:\/\/[a-z0-9.-]+$/i,
+  "HTTPS deployment origin required"
+)
 const approvedOriginalCanonicalPaths = [
   "/",
   "/diplomados/",
@@ -25,6 +30,7 @@ const approvedOriginalCanonicalPaths = [
   "/reembolsos/",
   "/roxana/",
   "/ia/",
+  ...PROGRAM_LANDING_ROUTES.map(route => `/diplomados/${route.slug}/`),
 ]
 const expectedCanonicalUrls = LANGUAGE_CODES.flatMap(language =>
   approvedOriginalCanonicalPaths.map(
@@ -41,7 +47,11 @@ async function request(pathname) {
 
 const sitemapPathFor = absoluteUrl => {
   const url = new URL(absoluteUrl)
-  assert.strictEqual(url.origin, canonicalOrigin, `Unexpected sitemap origin: ${absoluteUrl}`)
+  assert.strictEqual(
+    url.origin,
+    canonicalOrigin,
+    `Unexpected sitemap origin: ${absoluteUrl}`
+  )
   return `${url.pathname}${url.search}`
 }
 
@@ -63,7 +73,10 @@ const sitemapLanguageCount = (urls, language) => {
 const uniqueAlternates = (links, label) => {
   const alternates = new Map()
   for (const link of links) {
-    assert(!alternates.has(link.language), `${label} duplicate hreflang ${link.language}`)
+    assert(
+      !alternates.has(link.language),
+      `${label} duplicate hreflang ${link.language}`
+    )
     alternates.set(link.language, link.url)
   }
   return alternates
@@ -85,7 +98,12 @@ async function main() {
     assert.strictEqual(response.headers.get("location"), destination, pathname)
   }
 
-  for (const pathname of ["/robots.txt", "/llms.txt", "/en/llms.txt", "/pt-br/llms.txt"]) {
+  for (const pathname of [
+    "/robots.txt",
+    "/llms.txt",
+    "/en/llms.txt",
+    "/pt-br/llms.txt",
+  ]) {
     const response = await request(pathname)
     assert.strictEqual(response.status, 200, pathname)
   }
@@ -95,7 +113,9 @@ async function main() {
   const sitemapIndex = await parseSitemapIndex(
     Readable.from([await sitemapIndexResponse.text()])
   )
-  assert.deepStrictEqual(sitemapIndex, [{ url: `${canonicalOrigin}/sitemap-0.xml` }])
+  assert.deepStrictEqual(sitemapIndex, [
+    { url: `${canonicalOrigin}/sitemap-0.xml` },
+  ])
 
   const sitemapResponse = await request(sitemapPathFor(sitemapIndex[0].url))
   assert.strictEqual(sitemapResponse.status, 200, sitemapIndex[0].url)
@@ -105,7 +125,11 @@ async function main() {
   const canonicalUrls = sitemapEntries.map(entry => entry.url).sort()
   const canonicalUrlSet = new Set(canonicalUrls)
 
-  assert.strictEqual(canonicalUrls.length, 27, "Expected 27 canonical sitemap URLs")
+  assert.strictEqual(
+    canonicalUrls.length,
+    42,
+    "Expected 42 canonical sitemap URLs"
+  )
   assert.strictEqual(
     canonicalUrlSet.size,
     canonicalUrls.length,
@@ -120,7 +144,7 @@ async function main() {
   for (const language of LANGUAGE_CODES) {
     assert.strictEqual(
       sitemapLanguageCount(canonicalUrls, language),
-      9,
+      14,
       `${language} sitemap count`
     )
   }
@@ -135,7 +159,12 @@ async function main() {
       `${pathname} expected a successful response, received ${response.status}`
     )
 
-    const $ = cheerio.load(await response.text())
+    const responseHtml = await response.text()
+    assert(
+      !responseHtml.includes("\0"),
+      `${pathname} must not contain NUL bytes`
+    )
+    const $ = cheerio.load(responseHtml)
     assert.strictEqual(
       $("link[rel='canonical']").attr("href"),
       absoluteUrl,
@@ -168,9 +197,19 @@ async function main() {
 
     for (const language of LANGUAGE_CODES) {
       const hreflang = LANGUAGES[language].hreflang
-      const expectedUrl = `${canonicalOrigin}${localizePath(language, originalPath)}`
-      assert.strictEqual(pageAlternates.get(hreflang), expectedUrl, `${pathname} ${hreflang}`)
-      assert(canonicalUrlSet.has(expectedUrl), `${expectedUrl} missing from sitemap`)
+      const expectedUrl = `${canonicalOrigin}${localizePath(
+        language,
+        originalPath
+      )}`
+      assert.strictEqual(
+        pageAlternates.get(hreflang),
+        expectedUrl,
+        `${pathname} ${hreflang}`
+      )
+      assert(
+        canonicalUrlSet.has(expectedUrl),
+        `${expectedUrl} missing from sitemap`
+      )
       assert.strictEqual(
         sitemapAlternates.get(hreflang),
         expectedUrl,
@@ -178,25 +217,102 @@ async function main() {
       )
     }
 
-    const defaultUrl = `${canonicalOrigin}${localizePath(DEFAULT_LANGUAGE, originalPath)}`
-    assert.strictEqual(pageAlternates.get("x-default"), defaultUrl, `${pathname} x-default`)
+    const defaultUrl = `${canonicalOrigin}${localizePath(
+      DEFAULT_LANGUAGE,
+      originalPath
+    )}`
+    assert.strictEqual(
+      pageAlternates.get("x-default"),
+      defaultUrl,
+      `${pathname} x-default`
+    )
     assert.strictEqual(
       sitemapAlternates.get("x-default"),
       defaultUrl,
       `${pathname} sitemap x-default`
     )
-    assert.strictEqual(pageAlternates.size, 4, `${pathname} page hreflang count`)
-    assert.strictEqual(sitemapAlternates.size, 4, `${pathname} sitemap hreflang count`)
+    assert.strictEqual(
+      pageAlternates.size,
+      4,
+      `${pathname} page hreflang count`
+    )
+    assert.strictEqual(
+      sitemapAlternates.size,
+      4,
+      `${pathname} sitemap hreflang count`
+    )
 
-    const schemas = $("script[type='application/ld+json']").toArray()
-    assert(schemas.length > 0, `${pathname} JSON-LD required`)
-    for (const schema of schemas) {
-      const contents = String($(schema).html() || "").trim()
+    const schemaElements = $("script[type='application/ld+json']").toArray()
+    assert(schemaElements.length > 0, `${pathname} JSON-LD required`)
+    const schemas = []
+    for (const schemaElement of schemaElements) {
+      const contents = String($(schemaElement).html() || "").trim()
       assert(contents, `${pathname} JSON-LD must not be empty`)
       const parsed = JSON.parse(contents)
       assert(
         parsed && typeof parsed === "object",
         `${pathname} JSON-LD must be an object or array`
+      )
+      schemas.push(...(Array.isArray(parsed) ? parsed : [parsed]))
+    }
+
+    const schemaTypes = schemas.map(schema => schema["@type"])
+    assert(
+      schemaTypes.includes("EducationalOrganization"),
+      `${pathname} organization schema`
+    )
+    assert(schemaTypes.includes("WebSite"), `${pathname} website schema`)
+    assert(schemaTypes.includes("WebPage"), `${pathname} webpage schema`)
+    assert(
+      schemas.some(
+        schema => schema["@id"] === `${canonicalOrigin}/#organization`
+      )
+    )
+    assert(
+      schemas.some(schema => schema["@id"] === `${canonicalOrigin}/#website`)
+    )
+    assert(schemas.some(schema => schema["@id"] === `${absoluteUrl}#webpage`))
+    if (originalPath !== "/") {
+      assert(
+        schemaTypes.includes("BreadcrumbList"),
+        `${pathname} breadcrumb schema`
+      )
+    }
+
+    const programRoute = PROGRAM_LANDING_ROUTES.find(
+      route => originalPath === `/diplomados/${route.slug}/`
+    )
+    if (programRoute) {
+      const courses = schemas.filter(schema => schema["@type"] === "Course")
+      assert.strictEqual(courses.length, 1, `${pathname} Course schema count`)
+      assert.strictEqual(courses[0]["@id"], `${absoluteUrl}#course`)
+      assert.strictEqual(
+        courses[0].provider?.["@id"],
+        `${canonicalOrigin}/#organization`
+      )
+      for (const unsupported of [
+        "hasCourseInstance",
+        "offers",
+        "aggregateRating",
+        "review",
+      ]) {
+        assert.strictEqual(
+          courses[0][unsupported],
+          undefined,
+          `${pathname} ${unsupported}`
+        )
+      }
+    }
+
+    if (originalPath === "/publicaciones/") {
+      assert(schemaTypes.filter(type => type === "ItemList").length >= 2)
+      assert.strictEqual(schemaTypes.filter(type => type === "Book").length, 5)
+    }
+    if (originalPath === "/roxana/") {
+      assert(
+        schemas.some(
+          schema => schema["@id"] === `${canonicalOrigin}/roxana/#person`
+        )
       )
     }
   }
@@ -209,19 +325,24 @@ async function main() {
     /w\.behold\.so|connect\.facebook\.net|data-behold-id/
   )
   assert(contactHtml.includes("https://www.facebook.com/asociacionmontessori/"))
-  assert(contactHtml.includes("https://www.instagram.com/asociacionmontessori/"))
+  assert(
+    contactHtml.includes("https://www.instagram.com/asociacionmontessori/")
+  )
 
   const keyResponse = await request("/indexnow-key.txt")
   assert.strictEqual(keyResponse.status, 200)
   assert.strictEqual(
     (await keyResponse.text()).trim(),
     fs
-      .readFileSync(path.join(__dirname, "..", "static", "indexnow-key.txt"), "utf8")
+      .readFileSync(
+        path.join(__dirname, "..", "static", "indexnow-key.txt"),
+        "utf8"
+      )
       .trim()
   )
 
   console.log(
-    `Deployed Hosting contract ok: ${deploymentOrigin} (27 canonical URLs, 9 per language)`
+    `Deployed Hosting contract ok: ${deploymentOrigin} (42 canonical URLs, 14 per language)`
   )
 }
 

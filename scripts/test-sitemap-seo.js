@@ -8,6 +8,7 @@ const {
   pageFilter,
 } = require("gatsby-plugin-sitemap/internals")
 const { LANGUAGE_CODES, localizePath } = require("../src/i18n/config")
+const { PROGRAM_LANDING_ROUTES } = require("../src/data/programLandingRoutes")
 
 const sitemapPlugin = gatsbyConfig.plugins.find(
   plugin => plugin?.resolve === "gatsby-plugin-sitemap"
@@ -40,9 +41,23 @@ const legacySitemapPages = legacySitemapPaths.map(path => ({ path }))
 const legacyCertificatePaths = LANGUAGE_CODES.map(language =>
   localizePath(language, "/certificate/")
 )
-const publicPages = LANGUAGE_CODES.map(language => ({
-  path: localizePath(language, "/diplomados/"),
-}))
+const publicOriginalPaths = [
+  "/",
+  "/diplomados/",
+  "/publicaciones/",
+  "/contact/",
+  "/directorio/",
+  "/privacy/",
+  "/reembolsos/",
+  "/roxana/",
+  "/ia/",
+  ...PROGRAM_LANDING_ROUTES.map(route => `/diplomados/${route.slug}/`),
+]
+const publicPages = LANGUAGE_CODES.flatMap(language =>
+  publicOriginalPaths.map(publicPath => ({
+    path: localizePath(language, publicPath),
+  }))
+)
 
 assert.strictEqual(
   new Set(legacySitemapPaths).size,
@@ -65,6 +80,7 @@ assert.deepStrictEqual(
 const llmsGuides = [
   {
     locale: "Spanish",
+    language: "es",
     filePath: path.join(__dirname, "..", "static", "llms.txt"),
     certificationUrl:
       "https://certificacionmontessori.com/diplomados/#certificacion_internacional",
@@ -76,6 +92,7 @@ const llmsGuides = [
   },
   {
     locale: "English",
+    language: "en",
     filePath: path.join(__dirname, "..", "static", "en", "llms.txt"),
     certificationUrl:
       "https://certificacionmontessori.com/en/diplomados/#certificacion_internacional",
@@ -85,6 +102,7 @@ const llmsGuides = [
   },
   {
     locale: "Portuguese (Brazil)",
+    language: "pt-br",
     filePath: path.join(__dirname, "..", "static", "pt-br", "llms.txt"),
     certificationUrl:
       "https://certificacionmontessori.com/pt-br/diplomados/#certificacion_internacional",
@@ -167,6 +185,16 @@ for (const guide of llmsGuides) {
     guide.htmlSourceOfTruthPattern,
     `Expected ${guide.locale} llms guide to identify public HTML pages as the source of truth`
   )
+  for (const route of PROGRAM_LANDING_ROUTES) {
+    const programUrl = `https://certificacionmontessori.com${localizePath(
+      guide.language,
+      `/diplomados/${route.slug}/`
+    )}`
+    assert(
+      contents.includes(programUrl),
+      `Expected ${guide.locale} llms guide to list ${programUrl}`
+    )
+  }
 }
 
 console.log("sitemap SEO contract ok")

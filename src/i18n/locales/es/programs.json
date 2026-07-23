@@ -1,0 +1,108 @@
+{
+  "common": {
+    "back": "Todos los diplomados",
+    "online": "100% en línea",
+    "duration": "Duración",
+    "currentPrice": "Costo actual",
+    "focusTitle": "Qué trabajarás",
+    "audienceTitle": "Para quién es",
+    "foundationTitle": "Base formativa",
+    "foundation": [
+      "Filosofía Montessori y métodos de observación",
+      "Psicología educativa, neuroeducación y psicomotricidad",
+      "Educación inclusiva, creatividad y acompañamiento docente"
+    ],
+    "requirementsTitle": "Requisitos e inscripción",
+    "requirements": "No hay requisito de nivel educativo para cursar. Algunas escuelas establecen requisitos propios para estar frente a grupo; consulta las condiciones de cada institución.",
+    "details": "Ver programa",
+    "detailsFor": "Ver programa: {{program}}",
+    "checkout": "Inscribirme en línea",
+    "checkoutFor": "Inscribirme en línea: {{program}}",
+    "whatsapp": "Resolver dudas por WhatsApp",
+    "otherPrograms": "Explora todas las formaciones",
+    "priceNoteMonthly": "Colegiatura mensual. La inscripción institucional se paga una sola vez; el checkout confirma las condiciones vigentes.",
+    "priceNoteProgram": "Costo del programa. La inscripción institucional se cobra solo con el primer programa; el checkout confirma las condiciones vigentes.",
+    "priceNotePromoIncluded": "Promoción vigente: el programa y la inscripción institucional están incluidos; el checkout confirma el importe antes del pago.",
+    "credentialTitle": "Certificación y finalización",
+    "guideCredential": "La oferta pública de esta formación incluye certificación internacional emitida por AMMAC. Revisa las condiciones vigentes antes de inscribirte.",
+    "diplomaCredential": "AMMAC confirma el documento de finalización y sus condiciones vigentes durante el proceso de inscripción.",
+    "faqTitle": "Preguntas frecuentes",
+    "faqOnlineQuestion": "¿La formación es en línea?",
+    "faqOnlineAnswer": "Sí. El programa se cursa en línea, con contenido a tu ritmo y acompañamiento docente.",
+    "faqDurationQuestion": "¿Cuánto dura este programa?",
+    "faqDurationAnswer": "La duración pública actual es de {{duration}}.",
+    "faqCostQuestion": "¿Dónde consulto el costo vigente?",
+    "faqCostAnswer": "El panel de esta página toma el costo del catálogo público y el checkout lo confirma antes del pago.",
+    "whatsappMessage": "Hola, me interesa {{program}}. ¿Me pueden orientar sobre la formación y la inscripción?"
+  },
+  "nido": {
+    "shortTitle": "Nido y Comunidad Infantil",
+    "seoTitle": "Certificación Guía Montessori en Nido",
+    "seoDescription": "Fórmate en línea como Guía Montessori en Nido y Comunidad Infantil con acompañamiento docente y certificación internacional AMMAC.",
+    "eyebrow": "Certificación internacional · Guía Montessori",
+    "title": "Guía Montessori en Nido y Comunidad Infantil",
+    "intro": "Una formación profesional para comprender y acompañar los primeros ambientes Montessori con observación, preparación y respeto por el desarrollo.",
+    "audience": "Personas que trabajan o desean trabajar en ambientes de primera infancia y buscan una formación Montessori estructurada, flexible y acompañada.",
+    "focus": [
+      "Observación y comprensión de las necesidades de desarrollo",
+      "Preparación del ambiente y función del adulto",
+      "Materiales y presentaciones correspondientes al nivel"
+    ]
+  },
+  "casa": {
+    "shortTitle": "Casa de Niños",
+    "seoTitle": "Certificación Guía Montessori Casa de Niños",
+    "seoDescription": "Estudia en línea la formación de Guía Montessori en Casa de Niños con acompañamiento docente y certificación internacional AMMAC.",
+    "eyebrow": "Certificación internacional · Guía Montessori",
+    "title": "Guía Montessori en Casa de Niños",
+    "intro": "Una formación para acompañar el ambiente de Casa de Niños mediante observación, materiales Montessori y una práctica educativa consciente.",
+    "audience": "Educadores y personas interesadas en formarse profesionalmente para acompañar un ambiente Montessori de Casa de Niños.",
+    "focus": [
+      "Observación, independencia y ambiente preparado",
+      "Papel de la Guía y acompañamiento respetuoso",
+      "Materiales y presentaciones correspondientes al nivel"
+    ]
+  },
+  "taller": {
+    "shortTitle": "Taller I y II",
+    "seoTitle": "Certificación Guía Montessori Taller I y II",
+    "seoDescription": "Fórmate en línea como Guía Montessori de Taller I y II con acompañamiento docente y certificación internacional AMMAC.",
+    "eyebrow": "Certificación internacional · Guía Montessori",
+    "title": "Guía Montessori en Taller I y II",
+    "intro": "Una formación profesional orientada al acompañamiento Montessori de Taller, la exploración cultural y el desarrollo de una mirada integral del aprendizaje.",
+    "audience": "Educadores y personas que desean prepararse para acompañar el nivel de Taller I y II dentro de una comunidad Montessori.",
+    "focus": [
+      "Observación y necesidades del segundo plano de desarrollo",
+      "Ambiente preparado, autonomía e investigación",
+      "Materiales, presentaciones y conexiones culturales del nivel"
+    ]
+  },
+  "cosmica": {
+    "shortTitle": "Educación Cósmica",
+    "seoTitle": "Diplomado en Educación Cósmica Montessori",
+    "seoDescription": "Estudia en línea Educación Cósmica y Grandes Lecciones Montessori con la AMMAC, acompañamiento docente y una ruta formativa organizada.",
+    "eyebrow": "Diplomado Montessori · Grandes Lecciones",
+    "title": "Diplomado en Educación Cósmica",
+    "intro": "Un recorrido por la Educación Cósmica y las Grandes Lecciones para comprender sus conexiones y llevarlas a una práctica educativa organizada.",
+    "audience": "Guías, docentes y personas interesadas en profundizar en Educación Cósmica y en las Grandes Lecciones Montessori.",
+    "focus": [
+      "Sentido y estructura de la Educación Cósmica",
+      "Grandes Lecciones y conexiones entre áreas",
+      "Narración, preparación y continuidad del trabajo"
+    ]
+  },
+  "neuro": {
+    "shortTitle": "Neuroeducación",
+    "seoTitle": "Diplomado en Neuroeducación en línea",
+    "seoDescription": "Profundiza en aprendizaje y desarrollo con el diplomado en Neuroeducación de AMMAC, 100% en línea y a tu ritmo.",
+    "eyebrow": "Diplomado · Aprendizaje y desarrollo",
+    "title": "Diplomado en Neuroeducación",
+    "intro": "Una formación breve para relacionar desarrollo, aprendizaje, emoción y movimiento con decisiones educativas más conscientes.",
+    "audience": "Docentes, Guías Montessori, familias y profesionales de la educación que buscan una introducción aplicada a la neuroeducación.",
+    "focus": [
+      "Desarrollo cerebral y procesos de aprendizaje",
+      "Emoción, movimiento y experiencia educativa",
+      "Aplicación responsable y prevención de neuromitos"
+    ]
+  }
+}

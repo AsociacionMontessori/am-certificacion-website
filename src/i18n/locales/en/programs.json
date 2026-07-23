@@ -1,0 +1,108 @@
+{
+  "common": {
+    "back": "All diploma courses",
+    "online": "100% online",
+    "duration": "Duration",
+    "currentPrice": "Current cost",
+    "focusTitle": "What you will study",
+    "audienceTitle": "Who it is for",
+    "foundationTitle": "Training foundation",
+    "foundation": [
+      "Montessori philosophy and observation methods",
+      "Educational psychology, neuroeducation, and psychomotor development",
+      "Inclusive education, creativity, and faculty guidance"
+    ],
+    "requirementsTitle": "Requirements and enrollment",
+    "requirements": "There is no educational-level requirement to take the program. Some schools set their own requirements for classroom positions; check each institution's conditions.",
+    "details": "View program",
+    "detailsFor": "View program: {{program}}",
+    "checkout": "Enroll online",
+    "checkoutFor": "Enroll online: {{program}}",
+    "whatsapp": "Ask questions on WhatsApp",
+    "otherPrograms": "Explore all training programs",
+    "priceNoteMonthly": "Monthly tuition. Institutional enrollment is charged once; checkout confirms the current conditions.",
+    "priceNoteProgram": "Program cost. Institutional enrollment is charged only with the first program; checkout confirms the current conditions.",
+    "priceNotePromoIncluded": "Current promotion: the program and institutional enrollment are included; checkout confirms the amount before payment.",
+    "credentialTitle": "Certificate and completion",
+    "guideCredential": "The public offer for this training includes an international certificate issued by AMMAC. Review the current conditions before enrolling.",
+    "diplomaCredential": "AMMAC confirms the completion document and its current conditions during the enrollment process.",
+    "faqTitle": "Frequently asked questions",
+    "faqOnlineQuestion": "Is the training online?",
+    "faqOnlineAnswer": "Yes. The program is online, with self-paced content and faculty guidance.",
+    "faqDurationQuestion": "How long is this program?",
+    "faqDurationAnswer": "The current published duration is {{duration}}.",
+    "faqCostQuestion": "Where can I check the current cost?",
+    "faqCostAnswer": "The panel on this page reads from the public catalog, and checkout confirms the amount before payment.",
+    "whatsappMessage": "Hello, I am interested in {{program}}. Could you guide me through the training and enrollment process?"
+  },
+  "nido": {
+    "shortTitle": "Nido and Infant Community",
+    "seoTitle": "Montessori Guide Training for Nido",
+    "seoDescription": "Train online as a Montessori Guide for Nido and Infant Community with faculty support and an international AMMAC certificate.",
+    "eyebrow": "International certificate · Montessori Guide",
+    "title": "Montessori Guide for Nido and Infant Community",
+    "intro": "Professional training to understand and support the earliest Montessori environments through observation, preparation, and respect for development.",
+    "audience": "People who work or want to work in early-childhood environments and seek structured, flexible Montessori training with faculty guidance.",
+    "focus": [
+      "Observation and understanding of developmental needs",
+      "Environment preparation and the adult's role",
+      "Materials and presentations for this level"
+    ]
+  },
+  "casa": {
+    "shortTitle": "Children's House",
+    "seoTitle": "Montessori Children's House Guide Training",
+    "seoDescription": "Study online to become a Montessori Children's House Guide with faculty support and an international AMMAC certificate.",
+    "eyebrow": "International certificate · Montessori Guide",
+    "title": "Montessori Guide for Children's House",
+    "intro": "Training to support a Children's House environment through observation, Montessori materials, and thoughtful educational practice.",
+    "audience": "Educators and people interested in professional training to support a Montessori Children's House environment.",
+    "focus": [
+      "Observation, independence, and the prepared environment",
+      "The Guide's role and respectful support",
+      "Materials and presentations for this level"
+    ]
+  },
+  "taller": {
+    "shortTitle": "Elementary I and II",
+    "seoTitle": "Montessori Elementary I and II Guide Training",
+    "seoDescription": "Train online as a Montessori Elementary I and II Guide with faculty support and an international AMMAC certificate.",
+    "eyebrow": "International certificate · Montessori Guide",
+    "title": "Montessori Guide for Elementary I and II",
+    "intro": "Professional training focused on the Montessori elementary environment, cultural exploration, and an integrated view of learning.",
+    "audience": "Educators and people preparing to support Elementary I and II within a Montessori community.",
+    "focus": [
+      "Observation and the needs of the second plane of development",
+      "Prepared environment, autonomy, and research",
+      "Materials, presentations, and cultural connections"
+    ]
+  },
+  "cosmica": {
+    "shortTitle": "Cosmic Education",
+    "seoTitle": "Montessori Cosmic Education Diploma Course",
+    "seoDescription": "Study Cosmic Education and the Montessori Great Lessons online with AMMAC, faculty guidance, and an organized training path.",
+    "eyebrow": "Montessori diploma course · Great Lessons",
+    "title": "Diploma Course in Cosmic Education",
+    "intro": "A journey through Cosmic Education and the Great Lessons to understand their connections and bring them into organized educational practice.",
+    "audience": "Guides, teachers, and people seeking deeper knowledge of Cosmic Education and the Montessori Great Lessons.",
+    "focus": [
+      "Purpose and structure of Cosmic Education",
+      "Great Lessons and connections across subject areas",
+      "Storytelling, preparation, and continuity of work"
+    ]
+  },
+  "neuro": {
+    "shortTitle": "Neuroeducation",
+    "seoTitle": "Online Diploma Course in Neuroeducation",
+    "seoDescription": "Explore learning and development in AMMAC's self-paced online Neuroeducation diploma course with faculty guidance.",
+    "eyebrow": "Diploma course · Learning and development",
+    "title": "Diploma Course in Neuroeducation",
+    "intro": "A short program connecting development, learning, emotion, and movement with more thoughtful educational decisions.",
+    "audience": "Teachers, Montessori Guides, families, and education professionals seeking an applied introduction to neuroeducation.",
+    "focus": [
+      "Brain development and learning processes",
+      "Emotion, movement, and educational experience",
+      "Responsible application and prevention of neuromyths"
+    ]
+  }
+}

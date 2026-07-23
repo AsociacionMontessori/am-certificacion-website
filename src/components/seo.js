@@ -25,7 +25,15 @@ const formatBreadcrumbName = segment =>
 // El breadcrumb se construye sobre la ruta canónica en español (sin el prefijo
 // de idioma) y luego se localiza cada URL: así /en/diplomados/ produce
 // «Home › Diploma Courses» y no «Home › En › Diplomados».
-const buildBreadcrumbSchema = ({ siteUrl, language, originalPath, canonicalUrl, title, homeName }) => {
+const buildBreadcrumbSchema = ({
+  siteUrl,
+  language,
+  originalPath,
+  canonicalUrl,
+  title,
+  homeName,
+  pathLabels,
+}) => {
   if (originalPath === "/") return null
 
   const segments = originalPath.split("/").filter(Boolean)
@@ -45,8 +53,13 @@ const buildBreadcrumbSchema = ({ siteUrl, language, originalPath, canonicalUrl, 
     items.push({
       "@type": "ListItem",
       position: index + 2,
-      name: isLast && title ? title : formatBreadcrumbName(segment),
-      item: isLast ? canonicalUrl : `${siteUrl}${localizePath(language, `${currentPath}/`)}`,
+      name:
+        isLast && title
+          ? title
+          : pathLabels?.[segment] || formatBreadcrumbName(segment),
+      item: isLast
+        ? canonicalUrl
+        : `${siteUrl}${localizePath(language, `${currentPath}/`)}`,
     })
   })
 
@@ -106,7 +119,11 @@ function Seo({
   const metadata = site.siteMetadata
   const metaDescription = description || site.siteMetadata.description
   const defaultTitle = metadata?.title
-  const siteUrl = metadata?.siteUrl?.replace(/\/$/, "") || "https://certificacionmontessori.com"
+  const siteUrl =
+    metadata?.siteUrl?.replace(/\/$/, "") ||
+    "https://certificacionmontessori.com"
+  const organizationId = `${siteUrl}/#organization`
+  const websiteId = `${siteUrl}/#website`
   const normalizedPathname = normalizePathname(pathname)
 
   // Idioma y ruta canónica en español derivados del pathname (/en/…, /pt-br/…)
@@ -115,13 +132,21 @@ function Seo({
   const hasTranslations = isLocalizedPath(originalPath)
   // Las versiones EN/PT-BR quedan en noindex hasta que la traducción humana esté lista
   const effectiveRobots =
-    language !== DEFAULT_LANGUAGE && !INDEX_TRANSLATIONS ? "noindex,follow" : robots
+    language !== DEFAULT_LANGUAGE && !INDEX_TRANSLATIONS
+      ? "noindex,follow"
+      : robots
 
   const pageUrl = canonicalUrl || `${siteUrl}${normalizedPathname}`
-  const imageUrl = image || `${siteUrl}${metadata?.defaultOgImage || "/og-default.svg"}`
+  const imageUrl =
+    image || `${siteUrl}${metadata?.defaultOgImage || "/og-default.svg"}`
   const titleHasBrand =
-    defaultTitle && title.toLocaleLowerCase().includes(defaultTitle.toLocaleLowerCase())
-  const fullTitle = defaultTitle && !titleHasBrand ? `${title} | ${defaultTitle}` : title
+    defaultTitle &&
+    title.toLocaleLowerCase().includes(defaultTitle.toLocaleLowerCase())
+  const titleWithSuffix = `${title} | ${defaultTitle}`
+  const fullTitle =
+    !defaultTitle || titleHasBrand || [...titleWithSuffix].length > 65
+      ? title
+      : titleWithSuffix
   const shouldIndex = !effectiveRobots.includes("noindex")
 
   // Textos del JSON-LD en el idioma de la página (el Head se renderiza fuera
@@ -129,16 +154,20 @@ function Seo({
   const tc = getT(normalizedPathname, "common")
   const countries = tc("schema.paises", { returnObjects: true })
   const whatsappUrl = buildWhatsAppUrl(tc("schema.whatsappMensaje"))
-  const areaServed = (Array.isArray(countries) ? countries : []).map(country => ({
-    "@type": "Country",
-    name: country,
-  }))
+  const areaServed = (Array.isArray(countries) ? countries : []).map(
+    country => ({
+      "@type": "Country",
+      name: country,
+    })
+  )
 
   const organizationSchema = {
     "@context": "https://schema.org",
     "@type": "EducationalOrganization",
+    "@id": organizationId,
     name: metadata?.organizationName || defaultTitle,
-    legalName: metadata?.legalName || metadata?.organizationName || defaultTitle,
+    legalName:
+      metadata?.legalName || metadata?.organizationName || defaultTitle,
     url: siteUrl,
     description: tc("schema.description"),
     slogan: tc("schema.slogan"),
@@ -186,24 +215,23 @@ function Seo({
   const websiteSchema = {
     "@context": "https://schema.org",
     "@type": "WebSite",
+    "@id": websiteId,
     name: tc("schema.siteName"),
     alternateName: metadata?.organizationName || defaultTitle,
     url: siteUrl,
     inLanguage: lang.htmlLang,
+    publisher: { "@id": organizationId },
   }
 
   const webpageSchema = {
     "@context": "https://schema.org",
     "@type": "WebPage",
+    "@id": `${pageUrl}#webpage`,
     name: title,
     description: metaDescription,
     url: pageUrl,
     inLanguage: lang.htmlLang,
-    isPartOf: {
-      "@type": "WebSite",
-      url: siteUrl,
-      name: tc("schema.siteName"),
-    },
+    isPartOf: { "@id": websiteId },
   }
 
   const breadcrumbSchema = buildBreadcrumbSchema({
@@ -213,10 +241,17 @@ function Seo({
     canonicalUrl: pageUrl,
     title,
     homeName: tc("breadcrumb.inicio"),
+    pathLabels: tc("breadcrumb.paths", { returnObjects: true }),
   })
 
   const schemas = shouldIndex
-    ? [organizationSchema, websiteSchema, webpageSchema, breadcrumbSchema, ...schema].filter(Boolean)
+    ? [
+        organizationSchema,
+        websiteSchema,
+        webpageSchema,
+        breadcrumbSchema,
+        ...schema,
+      ].filter(Boolean)
     : schema.filter(Boolean)
 
   return (
@@ -225,9 +260,15 @@ function Seo({
       <title>{fullTitle}</title>
       <meta name="description" content={metaDescription} />
       <meta name="robots" content={effectiveRobots} />
-      <meta name="google-site-verification" content="qR4NlpCyKRj2wf5mCfzwaVhpjFHCaqBGwCgaSO8oans" />
+      <meta
+        name="google-site-verification"
+        content="qR4NlpCyKRj2wf5mCfzwaVhpjFHCaqBGwCgaSO8oans"
+      />
       <meta name="language" content={lang.htmlLang} />
-      <meta name="author" content={metadata?.organizationName || "Asociación Montessori"} />
+      <meta
+        name="author"
+        content={metadata?.organizationName || "Asociación Montessori"}
+      />
       <link rel="canonical" href={pageUrl} />
       {hasTranslations &&
         LANGUAGE_CODES.map(code => (
@@ -249,7 +290,10 @@ function Seo({
       <meta property="og:description" content={metaDescription} />
       <meta property="og:type" content={type} />
       <meta property="og:url" content={pageUrl} />
-      <meta property="og:site_name" content={metadata?.siteName || defaultTitle} />
+      <meta
+        property="og:site_name"
+        content={metadata?.siteName || defaultTitle}
+      />
       <meta property="og:locale" content={lang.ogLocale} />
       {hasTranslations &&
         LANGUAGE_CODES.filter(code => code !== language).map(code => (
@@ -260,7 +304,10 @@ function Seo({
           />
         ))}
       <meta property="og:image" content={imageUrl} />
-      <meta property="og:image:alt" content={metadata?.organizationName || defaultTitle} />
+      <meta
+        property="og:image:alt"
+        content={metadata?.organizationName || defaultTitle}
+      />
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:creator" content={metadata?.author || ``} />
       <meta name="twitter:title" content={title} />

@@ -96,6 +96,29 @@ tecnico observado en ese origen; no confirma por si solo indexacion ni ranking.
 | Redireccion heredada de `/buscador/` | `COMPLETADO_CON_EVIDENCIA` | `2026-07-13` | `AMMAC / Codex` | La comprobacion HTTPS posterior al despliegue registro exactamente `1` redireccion desde `/buscador/` hasta `https://certificacionmontessori.com/directorio/`, con respuesta final HTTP `200`. Se elimino la cadena intermedia sin recuperar la ruta antigua como pagina indexable. |
 | QA visual responsive de Contacto | `COMPLETADO_CON_EVIDENCIA` | `2026-07-13` | `AMMAC / Codex` | Playwright verifico produccion en `1440x900` y `390x844`: enlaces sociales legibles, menu movil con icono visible y ancho movil sin desbordamiento horizontal. |
 
+### Release de paginas comerciales por programa: 2026-07-22
+
+| Control | Estado | Fecha de evidencia | Responsable | Evidencia/resultado |
+| --- | --- | --- | --- | --- |
+| Ventana de despliegue y version | `COMPLETADO_CON_EVIDENCIA` | `2026-07-22` | `AMMAC / Codex` | Build final generado entre `15:08` y `15:10 CST`; el contenido desplegado quedo registrado en Git como `c42a5ef` (`feat(programs): add localized SEO landing pages`) sobre la rama `feat/program-pages-seo`. |
+| Release de Firebase Hosting | `COMPLETADO_CON_EVIDENCIA` | `2026-07-22` | `AMMAC / Codex` | `npm run deploy` termino correctamente para el proyecto `certificacionmontessori`; Firebase activo la release en `https://certificacionmontessori.com`. El CLI no guardo un identificador opaco adicional en el repositorio, por lo que la evidencia reproducible es proyecto, dominio, commit y contrato HTTP posterior. |
+| Inventario canonico desplegado | `COMPLETADO_CON_EVIDENCIA` | `2026-07-22` | `AMMAC / Codex` | `npm run test:seo-production` paso contra produccion con `42` URLs canonicas: `14` en espanol, `14` en ingles y `14` en portugues brasileno. Incluye cinco paginas de programa por idioma: Nido/Comunidad Infantil, Casa de Ninos, Taller I-II, Educacion Cosmica y Neuroeducacion. |
+| Acceso desde `/diplomados/` | `COMPLETADO_CON_EVIDENCIA` | `2026-07-22` | `AMMAC / Codex` | El directorio de programas enlaza primero a la pagina informativa localizada de cada nivel; el pago queda como una accion posterior explicita. Las rutas, copias y schemas pasaron `npm run test:program-pages`. |
+| Consentimiento y experiencia | `COMPLETADO_CON_EVIDENCIA` | `2026-07-22` | `AMMAC / Codex` | El panel conserva aceptar, rechazar y personalizar; permite cerrar o minimizar sin interpretar silencio como consentimiento. Analitica opcional permanece bloqueada hasta consentimiento afirmativo. |
+| GA4 y atribucion editorial | `COMPLETADO_CON_EVIDENCIA` | `2026-07-22` | `AMMAC / Codex` | DebugView confirmo exactamente un `click_program_cta` en el destino atribuido, con parametros permitidos como `program_id`, `cta_position`, `landing_path`, `lead_channel`, `source_content_id` y `source_hostname`; la fuente WordPress no emitio el evento comercial y la navegacion multidominio conservo `_gl`. No se capturo PII. |
+| IndexNow del cambio | `COMPLETADO_CON_EVIDENCIA` | `2026-07-22` | `AMMAC / Codex` | El lote diferencial incluyo exclusivamente `17` URLs canonicas modificadas y `api.indexnow.org` lo acepto (`IndexNow accepted 17 URL(s)`). No se reenvio el sitemap completo ni se incluyeron rutas de pago, privadas o redirigidas. |
+| Geolocalizacion de moneda | `PENDIENTE_CONTROLADO` | `2026-07-22` | `AMMAC / Codex` | `ipapi.co/json` respondio `429` durante QA. El checkout conserva el fallback seguro a MXN, por lo que no es una caida ni un bloqueo SEO. Antes de campanas pagadas se evaluara cache, proveedor alterno o eliminacion de esta dependencia para evitar clasificacion incorrecta de moneda. |
+| Automatizacion editorial | `PENDIENTE_CONTROLADO` | `2026-07-22` | `AMMAC / Codex` | `montessori-blog-automation` quedo en `6b9f620`: modelos de texto Gemini 3.5 validados, evaluador espaciado a `4.1 s`, `90` pruebas aprobadas y cuatro articulos generados en seco sin crear borradores. El flujo de cuadernillos se ejecuto en seco y no tenia pendientes (`0/0`). La API confirmo cuota gratuita `0` tanto para `gemini-2.5-flash-image` como para `gemini-3.1-flash-lite-image`; `REQUIRE_FEATURED_IMAGE=1` impide crear o consumir un borrador si falla la generacion o la subida de portada. Los temporizadores `montessori-blog.timer` y `montessori-cuadernillos.timer` quedaron detenidos, no deshabilitados, hasta acordar una portada gratuita o aprobar expresamente borradores sin imagen. |
+
+Controles de esta release:
+
+| Momento | Fecha objetivo | Estado | Evidencia requerida |
+| --- | --- | --- | --- |
+| 48 horas | `2026-07-24` | `PROGRAMADO` | Procesamiento del sitemap de `42` URL en Google/Bing, inspeccion de una URL de programa por idioma y smoke HTTP sin reenvios repetidos. |
+| 7 dias | `2026-07-29` | `PROGRAMADO` | Rastreo/indexacion observados, titulos elegidos por buscadores, errores de cobertura y primeras impresiones por pagina/programa. |
+| 28 dias | `2026-08-19` | `PROGRAMADO` | Clics, impresiones, CTR, posicion, idioma, pais y eventos `click_program_cta`/lead frente a la linea base. |
+| 90 dias | `2026-10-20` | `PROGRAMADO` | Leads calificados, conversion por programa e idioma, rendimiento editorial y decision separada sobre publicidad, email y colaboraciones. |
+
 ## Cadencia posterior a cada release
 
 | Momento | Revisar y registrar |
@@ -113,15 +136,18 @@ acelerarlo con reenvios reiterados.
 
 ## Google Search Console: checklist de terminacion controlada
 
-El inventario desplegado y enviado en esta release contiene **27 URLs
-canonicas**, nueve por idioma. El objetivo futuro de 42 URLs solo se aplicara
-cuando ese contenido adicional exista en produccion y aparezca en una
-exportacion fechada de la propiedad correcta.
+La release historica del `2026-07-13` contenia **27 URLs canonicas**, nueve por
+idioma. Desde el despliegue del `2026-07-22`, el contrato publico contiene
+**42 URLs canonicas**, catorce por idioma. Los informes retrasados de Search
+Console pueden conservar temporalmente recuentos anteriores; solo se actualiza
+su estado cuando la propiedad muestre evidencia fechada.
 
 | Control | Estado | Fecha de evidencia | Responsable | Evidencia/resultado requerido |
 | --- | --- | --- | --- | --- |
 | Sitemaps | `COMPLETADO_CON_EVIDENCIA` | `2026-07-13` | `AMMAC / Codex` | Captura de la propiedad correcta: `/sitemap-index.xml`, tipo `Indice de sitemaps`, enviado `2026-07-09`, ultima lectura `2026-07-11`, estado `Correcto`, `27` paginas descubiertas y `0` videos. No se reenvio el sitemap. |
+| Contrato de sitemap actual | `EN_PROCESAMIENTO` | `2026-07-22` | `AMMAC / Codex` | Produccion y el contrato HTTP exponen `42` canonicas (`14` por idioma). Search Console debe descubrir el nuevo inventario en su siguiente lectura natural; no se vuelve a presentar el sitemap mientras su estado sea correcto. |
 | Contrato de produccion | `COMPLETADO_CON_EVIDENCIA` | `2026-07-13` | `AMMAC / Codex` | El contrato HTTP posterior al despliegue valido las `27` URLs canonicas, nueve por idioma: respuestas publicas correctas, canonicales, indexabilidad y `hreflang` reciproco. Este control tecnico no afirma que Google ya las haya indexado. |
+| Muestra manual de programas | `PENDIENTE_CONTROLADO` | `2026-07-22` | `AMMAC` | Inspeccionar una vez y solicitar indexacion, si la cuota lo permite, para `/diplomados/casa-de-ninos/`, `/en/diplomados/casa-de-ninos/` y `/pt-br/diplomados/casa-de-ninos/`. Registrar resultado sin repetir solicitudes. |
 | Page indexing | `EN_PROCESAMIENTO` | `2026-07-13` | `AMMAC / Codex` | El informe, con ultima actualizacion `2026-06-29`, aun refleja solo `16` URLs conocidas: `6` indexadas y `10` sin indexar. Motivos: `3` paginas con redireccion, `7` rastreadas actualmente sin indexar y `0` alternativas con canonical adecuada. El informe es anterior al despliegue y al inventario actual de `27`; se revisara de nuevo en el control de 48 horas sin forzar indexacion. |
 | Validacion existente | `EN_PROCESAMIENTO` | `2026-07-13` | `AMMAC / Codex` | La validacion iniciada el `2026-07-11` para `Rastreada: actualmente sin indexar` sigue marcada `Iniciada` y abarca `7` URLs en el informe retrasado. No se reinicia ni se solicitan indexaciones repetidas mientras siga activa. |
 | HTTPS | `COMPLETADO_CON_EVIDENCIA` | `2026-07-13` | `AMMAC / Codex` | El informe HTTPS muestra `15` URLs HTTPS, `0` URLs no HTTPS, ningun problema critico y ninguna incidencia detectada en los ultimos 90 dias. El recuento retrasado de este informe no se interpreta como inventario total del sitemap. |
@@ -133,13 +159,15 @@ exportacion fechada de la propiedad correcta.
 
 ## Bing Webmaster Tools: checklist de terminacion controlada
 
-Los **17 URLs comerciales modificados** son un objetivo futuro de terminacion
-controlada del plan aprobado, no una afirmacion de que hoy existan 17 cambios
-en produccion.
+Los **17 URLs comerciales modificados** de la release del `2026-07-22` ya
+existen en produccion y fueron aceptados en un unico lote diferencial por
+IndexNow. Aceptacion, rastreo, indexacion y posicionamiento siguen siendo
+estados distintos.
 
 | Control | Estado | Fecha de evidencia | Responsable | Evidencia/resultado requerido |
 | --- | --- | --- | --- | --- |
 | Sitemaps | `COMPLETADO_CON_EVIDENCIA` | `2026-07-13` | `AMMAC / Codex` | Bing muestra `2` mapas conocidos, `0` con errores y `0` con advertencias. `sitemap-0.xml` fue leido el `2026-07-11`, tiene estado `Exito` y `27` URLs descubiertas; `sitemap-index.xml` tiene estado `Exito` y cuenta como `1` recurso descubierto. El resumen de `28` es la suma del indice y las `27` URLs, no una pagina canonica adicional. No se reenvio. |
+| Release de programas e IndexNow | `EN_PROCESAMIENTO` | `2026-07-22` | `AMMAC / Codex` | El contrato publico contiene `42` canonicas y el lote diferencial de `17` URLs fue aceptado una sola vez. Bing debe poblar Site Explorer, rastreo e indexacion de forma asincrona; no se repite el lote sin cambios nuevos. |
 | URL Inspection | `EN_PROCESAMIENTO` | `2026-07-13` | `AMMAC / Codex` | La portada espanola esta `Indexado con exito`: descubierta `2022-08-16`, ultimo rastreo exitoso `2026-07-11 23:25`, fetch correcto y rastreo/indexacion permitidos. `/en/` y `/pt-br/` fueron descubiertas `2026-07-09`, pero aun figuran `Descubierto pero no arrastrado`. Las tres pruebas `URL en vivo` indican que pueden ser indexadas; Bing reconoce JSON-LD y OpenGraph. El error de titulo ingles desaparecio tras reducir todos los titulos canonicos a un maximo de `63` caracteres. El aviso restante cuenta `20` separadores de Gatsby con `alt=""`, `role="presentation"` y `aria-hidden="true"`; el contrato confirma cero imagenes de contenido sin `alt`, por lo que se registra como falso positivo de accesibilidad y no se modifica. El control sigue en procesamiento hasta que Bing rastree e indexe las portadas internacionales. |
 | Site Scan | `COMPLETADO_CON_EVIDENCIA` | `2026-07-14` | `AMMAC / Codex` | `Auditoria SEO completa - 2026-07-14` finalizo sobre `56` paginas con `0` errores, `51` advertencias por `alt` y `3` avisos por H1. El CSV de las `51` URLs se contrasto con los HTML construidos: `1,461` imagenes, `0` sin atributo `alt` y `672` con `alt=""`, todas decorativas dentro de `aria-hidden="true"`; tres muestras en produccion confirmaron el mismo resultado, por lo que se clasifica como falso positivo de Bing y no se agrega texto alternativo artificial. El unico hallazgo real eran `/reembolsos/`, `/en/reembolsos/` y `/pt-br/reembolsos/` sin H1: el titulo introductorio cambio de `h2` a `h1`, el contrato exige ahora exactamente un H1 en las `27` canonicas y las tres versiones se verificaron en produccion con canonical e `index,follow` correctos. El informe original queda como fotografia historica; no se repite el escaneo solo para alterar su contador. |
 | Site Explorer | `EN_PROCESAMIENTO` | `2026-07-14` | `AMMAC / Codex` | La vista `URLs indexadas` y la vista `Todas las URLs` aun muestran `No hay datos disponibles`. Esto se registra como informe agregado pendiente, no como cero indexacion: la inspeccion individual confirma la portada espanola indexada y Sitemaps confirma `27` URLs canonicas descubiertas. No se prueban repetidamente los filtros vacios; se revisara de nuevo cuando Bing termine de poblar la propiedad. |

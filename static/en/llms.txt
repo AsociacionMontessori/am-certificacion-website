@@ -31,6 +31,14 @@ This llms.txt file is informational, is not a ranking signal, and public HTML pa
 - Privacy Notice: https://certificacionmontessori.com/en/privacy/
 - Public AI index: https://certificacionmontessori.com/en/ia/
 
+### Training programs
+
+- Montessori Guide for Nido and Infant Community: https://certificacionmontessori.com/en/diplomados/nido-comunidad-infantil/ — online professional training for Montessori infant environments.
+- Montessori Guide for Children's House: https://certificacionmontessori.com/en/diplomados/casa-de-ninos/ — online training in observation, the prepared environment, and Children's House materials.
+- Montessori Guide for Elementary I and II: https://certificacionmontessori.com/en/diplomados/taller-i-ii/ — professional training for the second plane of development and cultural exploration.
+- Diploma Course in Cosmic Education: https://certificacionmontessori.com/en/diplomados/educacion-cosmica/ — an online path through Cosmic Education and the Montessori Great Lessons.
+- Diploma Course in Neuroeducation: https://certificacionmontessori.com/en/diplomados/neuroeducacion/ — a short program about development, learning, emotion, and movement.
+
 ## Machine-readable resources
 
 - Sitemap (all languages, with hreflang alternates): https://certificacionmontessori.com/sitemap-index.xml

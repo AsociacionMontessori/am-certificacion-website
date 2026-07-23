@@ -13,15 +13,21 @@
     "ariaLabel": "Select language"
   },
   "breadcrumb": {
-    "inicio": "Home"
+    "inicio": "Home",
+    "paths": {
+      "diplomados": "Diploma courses"
+    }
   },
   "analyticsConsent": {
     "title": "Privacy and analytics",
-    "body": "We use Google Analytics only with your permission to understand which content is useful. Your choice does not limit the site.",
+    "body": "The site works with required cookies. Google Analytics is enabled only if you allow it.",
     "privacy": "Privacy notice",
     "reject": "Decline",
     "accept": "Allow analytics",
-    "settings": "Privacy preferences"
+    "settings": "Privacy preferences",
+    "close": "Minimize privacy notice",
+    "expand": "Open privacy preferences",
+    "minimized": "Privacy"
   },
   "schema": {
     "siteName": "Montessori Certification",

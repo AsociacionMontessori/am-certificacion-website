@@ -22,7 +22,7 @@ module.exports = defineConfig({
   },
   webServer: {
     command: "npm run serve:test",
-    port: 9000,
+    url: "http://127.0.0.1:9000",
     reuseExistingServer: true,
   },
   projects: [

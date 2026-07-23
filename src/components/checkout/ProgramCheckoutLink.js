@@ -1,5 +1,6 @@
 import * as React from "react"
 import { Link } from "gatsby"
+import { useTranslation } from "react-i18next"
 import { useLocalization } from "../../i18n"
 import { getInscripcionPagarUrl } from "../../data/programasOferta"
 
@@ -13,6 +14,7 @@ const ProgramCheckoutLink = ({
   className = "",
   disabled = false,
 }) => {
+  const { t } = useTranslation("programs")
   const { localizedPath } = useLocalization()
 
   if (disabled || !programaId) {
@@ -20,19 +22,17 @@ const ProgramCheckoutLink = ({
   }
 
   const to = localizedPath(getInscripcionPagarUrl(programaId))
-  const label = title ? `Inscribirte a ${title}` : "Ir al pago en línea"
+  const label = title
+    ? t("common.checkoutFor", { program: title })
+    : t("common.checkout")
 
   return (
     <Link
       to={to}
-      className={`group block rounded-3xl transition duration-150 ease-in-out hover:scale-[1.02] hover:shadow-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow focus-visible:ring-offset-2 focus-visible:ring-offset-transparent ${className}`}
+      className={`group transition duration-150 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow focus-visible:ring-offset-2 focus-visible:ring-offset-transparent ${className}`}
       aria-label={label}
     >
       {children}
-      <span className="sr-only">{label}</span>
-      <p className="mt-2 text-center text-xs font-semibold text-white/90 group-hover:text-white">
-        Toca para inscribirte en línea →
-      </p>
     </Link>
   )
 }

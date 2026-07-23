@@ -11,7 +11,12 @@ import { storeLanguageChoice } from "../i18n/browser-language"
  * rounded-full + overflow-hidden; preserveAspectRatio "slice" llena la burbuja.
  */
 const FlagMX = () => (
-  <svg viewBox="0 0 24 24" preserveAspectRatio="xMidYMid slice" className="h-full w-full" aria-hidden="true">
+  <svg
+    viewBox="0 0 24 24"
+    preserveAspectRatio="xMidYMid slice"
+    className="h-full w-full"
+    aria-hidden="true"
+  >
     <rect width="8" height="24" fill="#006847" />
     <rect x="8" width="8" height="24" fill="#ffffff" />
     <rect x="16" width="8" height="24" fill="#CE1126" />
@@ -20,17 +25,34 @@ const FlagMX = () => (
 )
 
 const FlagUS = () => (
-  <svg viewBox="0 0 24 24" preserveAspectRatio="xMidYMid slice" className="h-full w-full" aria-hidden="true">
+  <svg
+    viewBox="0 0 24 24"
+    preserveAspectRatio="xMidYMid slice"
+    className="h-full w-full"
+    aria-hidden="true"
+  >
     <rect width="24" height="24" fill="#ffffff" />
     {[0, 2, 4, 6].map(i => (
-      <rect key={i} y={i * (24 / 7)} width="24" height={24 / 7} fill="#B22234" />
+      <rect
+        key={i}
+        y={i * (24 / 7)}
+        width="24"
+        height={24 / 7}
+        fill="#B22234"
+      />
     ))}
     <rect width="11" height={24 * (4 / 7)} fill="#3C3B6E" />
     {[
-      [2.2, 2.6], [5.5, 2.6], [8.8, 2.6],
-      [3.85, 5.4], [7.15, 5.4],
-      [2.2, 8.2], [5.5, 8.2], [8.8, 8.2],
-      [3.85, 11], [7.15, 11],
+      [2.2, 2.6],
+      [5.5, 2.6],
+      [8.8, 2.6],
+      [3.85, 5.4],
+      [7.15, 5.4],
+      [2.2, 8.2],
+      [5.5, 8.2],
+      [8.8, 8.2],
+      [3.85, 11],
+      [7.15, 11],
     ].map(([cx, cy], i) => (
       <circle key={i} cx={cx} cy={cy} r="0.7" fill="#ffffff" />
     ))}
@@ -38,11 +60,21 @@ const FlagUS = () => (
 )
 
 const FlagBR = () => (
-  <svg viewBox="0 0 24 24" preserveAspectRatio="xMidYMid slice" className="h-full w-full" aria-hidden="true">
+  <svg
+    viewBox="0 0 24 24"
+    preserveAspectRatio="xMidYMid slice"
+    className="h-full w-full"
+    aria-hidden="true"
+  >
     <rect width="24" height="24" fill="#009C3B" />
     <polygon points="12,3.5 20.5,12 12,20.5 3.5,12" fill="#FEDF00" />
     <circle cx="12" cy="12" r="3.7" fill="#002776" />
-    <path d="M8.6 11.2 C 10.8 10.4, 13.6 10.9, 15.4 12.6" stroke="#ffffff" strokeWidth="0.7" fill="none" />
+    <path
+      d="M8.6 11.2 C 10.8 10.4, 13.6 10.9, 15.4 12.6"
+      stroke="#ffffff"
+      strokeWidth="0.7"
+      fill="none"
+    />
   </svg>
 )
 
@@ -57,7 +89,10 @@ const FLAGS = {
  * Lleva a la misma página en el otro idioma y guarda la elección explícita:
  * a partir de ahí no se vuelve a auto-redirigir por idioma del navegador.
  */
-export default function LanguageSelector({ textColor = "text-black", className = "" }) {
+export default function LanguageSelector({
+  textColor = "text-black",
+  className = "",
+}) {
   const { t } = useTranslation()
   const { language, originalPath, localizedPath } = useLocalization()
 
@@ -77,7 +112,7 @@ export default function LanguageSelector({ textColor = "text-black", className =
             lang={lang.htmlLang}
             hrefLang={lang.htmlLang}
             title={lang.name}
-            aria-label={lang.name}
+            aria-label={`${lang.label} - ${lang.name}`}
             aria-current={isCurrent ? "true" : undefined}
             onClick={() => storeLanguageChoice(code)}
             className={`inline-flex h-8 items-center gap-1 rounded-full border px-1.5 shadow-md transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue focus-visible:ring-offset-2 ${
