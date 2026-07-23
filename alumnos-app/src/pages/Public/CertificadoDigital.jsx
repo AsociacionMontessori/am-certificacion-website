@@ -103,6 +103,12 @@ const CertificadoDigital = () => {
   ]);
   const esNivelGuia = nivelesGuia.has(mostrarCertificado ? nivelCertificado : nivelActual);
 
+  // Niveles tipo curso (p. ej. «Curso de Filosofía Montessori y Psicología Educativa»):
+  // el nombre del nivel ya describe el programa completo, sin redacción de «programa de formación»
+  const esCurso = (nivel) => typeof nivel === 'string' && /^curso\b/i.test(nivel.trim());
+  const esCursoCertificado = esCurso(nivelCertificado);
+  const esCursoActual = esCurso(nivelActual);
+
   // Asegurar que el código esté presente antes de generar la URL
   if (!codigoVerificacion) {
     console.error('⚠️ No hay código de verificación disponible');
@@ -193,11 +199,23 @@ const CertificadoDigital = () => {
               {mostrarCertificado ? (
                 <>
                   <p className="text-lg font-semibold text-center my-6">
-                    <strong>CERTIFICAN</strong> que <strong>{alumno.nombreCompleto}</strong> ha
-                    cumplido satisfactoriamente con los requisitos académicos y prácticos del
-                    programa de formación <strong>{descripcionProgramaCertificado}</strong> en el nivel <strong>{nivelCertificado}</strong>,
-                    con fecha de ingreso <strong>{fechaIngresoCertificado || 'Sin registro'}</strong> y fecha de egreso{' '}
-                    <strong>{fechaEgresoCertificado || 'Sin registro'}</strong>.
+                    {esCursoCertificado ? (
+                      <>
+                        <strong>CERTIFICAN</strong> que <strong>{alumno.nombreCompleto}</strong> ha
+                        cumplido satisfactoriamente con los requisitos académicos del{' '}
+                        <strong>{nivelCertificado}</strong>,
+                        con fecha de ingreso <strong>{fechaIngresoCertificado || 'Sin registro'}</strong> y fecha de egreso{' '}
+                        <strong>{fechaEgresoCertificado || 'Sin registro'}</strong>.
+                      </>
+                    ) : (
+                      <>
+                        <strong>CERTIFICAN</strong> que <strong>{alumno.nombreCompleto}</strong> ha
+                        cumplido satisfactoriamente con los requisitos académicos y prácticos del
+                        programa de formación <strong>{descripcionProgramaCertificado}</strong> en el nivel <strong>{nivelCertificado}</strong>,
+                        con fecha de ingreso <strong>{fechaIngresoCertificado || 'Sin registro'}</strong> y fecha de egreso{' '}
+                        <strong>{fechaEgresoCertificado || 'Sin registro'}</strong>.
+                      </>
+                    )}
                   </p>
                   {promedio && (
                     <p className="text-center text-lg">
@@ -208,15 +226,25 @@ const CertificadoDigital = () => {
               ) : (
                 <>
                   <p className="text-lg font-semibold text-center my-6">
-                    <strong>CONSTAN</strong> que <strong>{alumno.nombreCompleto}</strong> se encuentra
-                    inscrito en el programa de formación <strong>{descripcionProgramaConstancia}</strong> en el nivel{' '}
-                    <strong>{nivelActual}</strong>, con fecha de ingreso{' '}
-                    <strong>{fechaIngresoActual || 'Sin registro'}</strong>.
+                    {esCursoActual ? (
+                      <>
+                        <strong>CONSTAN</strong> que <strong>{alumno.nombreCompleto}</strong> se encuentra
+                        inscrito en el <strong>{nivelActual}</strong>, con fecha de ingreso{' '}
+                        <strong>{fechaIngresoActual || 'Sin registro'}</strong>.
+                      </>
+                    ) : (
+                      <>
+                        <strong>CONSTAN</strong> que <strong>{alumno.nombreCompleto}</strong> se encuentra
+                        inscrito en el programa de formación <strong>{descripcionProgramaConstancia}</strong> en el nivel{' '}
+                        <strong>{nivelActual}</strong>, con fecha de ingreso{' '}
+                        <strong>{fechaIngresoActual || 'Sin registro'}</strong>.
+                      </>
+                    )}
                   </p>
                   <div className="bg-yellow/10 border-l-4 border-yellow p-4 my-6 rounded-r">
                     <p className="text-sm text-gray-700 leading-relaxed">
                       <strong className="font-semibold">Importante:</strong> La presente constancia únicamente hace constar
-                      la inscripción del alumno en el programa de formación. Este documento <strong>no constituye un certificado
+                      la inscripción del alumno en el {esCursoActual ? 'curso' : 'programa de formación'}. Este documento <strong>no constituye un certificado
                         ni un diploma</strong> que acredite la certificación Montessori. La certificación oficial se otorgará
                       únicamente una vez completados satisfactoriamente todos los requisitos académicos y prácticos del programa.
                     </p>
