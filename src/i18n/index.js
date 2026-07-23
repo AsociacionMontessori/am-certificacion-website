@@ -11,6 +11,7 @@ const NAMESPACES = [
   "faq",
   "contact",
   "publicaciones",
+  "programs",
   "roxana",
   "directorio",
   "ia",

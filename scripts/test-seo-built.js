@@ -11,6 +11,7 @@ const {
   localizePath,
   parsePath,
 } = require("../src/i18n/config")
+const { PROGRAM_LANDING_ROUTES } = require("../src/data/programLandingRoutes")
 
 const root = path.resolve(__dirname, "..")
 const publicDir = path.join(root, "public")
@@ -35,6 +36,7 @@ const approvedOriginalCanonicalPaths = [
   "/reembolsos/",
   "/roxana/",
   "/ia/",
+  ...PROGRAM_LANDING_ROUTES.map(route => `/diplomados/${route.slug}/`),
 ]
 const expectedCanonicalUrls = LANGUAGE_CODES.flatMap(language =>
   approvedOriginalCanonicalPaths.map(
@@ -74,13 +76,44 @@ const htmlPathFor = pathname =>
 const readHtml = pathname => {
   const htmlPath = htmlPathFor(pathname)
   assert(fs.existsSync(htmlPath), `Built HTML must exist for ${pathname}`)
-  return fs.readFileSync(htmlPath, "utf8")
+  const contents = fs.readFileSync(htmlPath)
+  assert(!contents.includes(0), `${pathname} must not contain NUL bytes`)
+  return contents.toString("utf8")
+}
+
+const builtFileForPathname = pathname => {
+  const clean = decodeURIComponent(pathname)
+  if (clean === "/") return path.join(publicDir, "index.html")
+  if (path.extname(clean)) return path.join(publicDir, clean.replace(/^\//, ""))
+  return htmlPathFor(clean)
+}
+
+const assertInternalLink = (href, sourceUrl) => {
+  if (!href || href.startsWith("#") || /^(mailto|tel):/i.test(href)) return
+  const target = new URL(href, sourceUrl)
+  if (target.origin !== origin) return
+  assert(
+    !legacyPattern.test(target.pathname),
+    `${sourceUrl} links to legacy ${target.pathname}`
+  )
+  const targetPath = path.resolve(builtFileForPathname(target.pathname))
+  assert(
+    targetPath.startsWith(`${path.resolve(publicDir)}${path.sep}`),
+    `${sourceUrl} has an escaping internal path ${target.pathname}`
+  )
+  assert(
+    fs.existsSync(targetPath),
+    `${sourceUrl} links to missing ${target.pathname}`
+  )
 }
 
 const uniqueAlternates = (links, label) => {
   const alternates = new Map()
   for (const link of links) {
-    assert(!alternates.has(link.language), `${label} duplicate hreflang ${link.language}`)
+    assert(
+      !alternates.has(link.language),
+      `${label} duplicate hreflang ${link.language}`
+    )
     alternates.set(link.language, link.url)
   }
   return alternates
@@ -92,9 +125,7 @@ async function main() {
     "utf8"
   )
   const sitemapIndex = await parseSitemapIndex(Readable.from([indexXml]))
-  assert.deepStrictEqual(sitemapIndex, [
-    { url: `${origin}/sitemap-0.xml` },
-  ])
+  assert.deepStrictEqual(sitemapIndex, [{ url: `${origin}/sitemap-0.xml` }])
 
   const sitemapXml = fs.readFileSync(
     path.join(publicDir, "sitemap-0.xml"),
@@ -104,7 +135,7 @@ async function main() {
   const urls = entries.map(entry => entry.url).sort()
   const urlSet = new Set(urls)
 
-  assert.strictEqual(urls.length, 27, "Expected 27 current canonical URLs")
+  assert.strictEqual(urls.length, 42, "Expected 42 canonical URLs")
   assert.strictEqual(urlSet.size, urls.length, "Sitemap URLs must be unique")
   assert.deepStrictEqual(
     [...urlSet].sort(),
@@ -120,12 +151,14 @@ async function main() {
       const pathname = new URL(url).pathname
       if (!prefix) {
         return !LANGUAGE_CODES.some(
-          code => LANGUAGES[code].prefix && pathname.startsWith(`${LANGUAGES[code].prefix}/`)
+          code =>
+            LANGUAGES[code].prefix &&
+            pathname.startsWith(`${LANGUAGES[code].prefix}/`)
         )
       }
       return pathname.startsWith(`${prefix}/`)
     }).length
-    assert.strictEqual(localizedCount, 9, `${language} sitemap count`)
+    assert.strictEqual(localizedCount, 14, `${language} sitemap count`)
   }
 
   for (const absoluteUrl of urls) {
@@ -134,10 +167,12 @@ async function main() {
     const html = readHtml(pathname)
     const $ = cheerio.load(html)
     const sitemapAlternates = uniqueAlternates(
-      (entries.find(entry => entry.url === absoluteUrl)?.links || []).map(link => ({
-        language: link.lang,
-        url: link.url,
-      })),
+      (entries.find(entry => entry.url === absoluteUrl)?.links || []).map(
+        link => ({
+          language: link.lang,
+          url: link.url,
+        })
+      ),
       `${absoluteUrl} sitemap`
     )
 
@@ -153,7 +188,9 @@ async function main() {
     assert(title, `${absoluteUrl} must expose a title`)
     assert(
       [...title].length <= 65,
-      `${absoluteUrl} title is too long (${[...title].length} characters): ${title}`
+      `${absoluteUrl} title is too long (${
+        [...title].length
+      } characters): ${title}`
     )
     assert(
       (title.match(/\bAMMAC\b/g) || []).length <= 1,
@@ -197,7 +234,10 @@ async function main() {
         expectedUrl,
         `${absoluteUrl} hreflang ${LANGUAGES[code].hreflang}`
       )
-      assert(urlSet.has(expectedUrl), `${expectedUrl} must be reciprocal in sitemap`)
+      assert(
+        urlSet.has(expectedUrl),
+        `${expectedUrl} must be reciprocal in sitemap`
+      )
       assert.strictEqual(
         sitemapAlternates.get(LANGUAGES[code].hreflang),
         expectedUrl,
@@ -219,17 +259,92 @@ async function main() {
       `${absoluteUrl} sitemap alternate count`
     )
 
-    const schemas = $("script[type='application/ld+json']").toArray()
-    assert(schemas.length > 0, `${absoluteUrl} must expose JSON-LD`)
-    for (const schema of schemas) {
-      const contents = String($(schema).html() || "").trim()
+    const schemaElements = $("script[type='application/ld+json']").toArray()
+    assert(schemaElements.length > 0, `${absoluteUrl} must expose JSON-LD`)
+    const schemas = []
+    for (const schemaElement of schemaElements) {
+      const contents = String($(schemaElement).html() || "").trim()
       assert(contents, `${absoluteUrl} JSON-LD must not be empty`)
       const parsed = JSON.parse(contents)
       assert(
         parsed && typeof parsed === "object",
         `${absoluteUrl} JSON-LD must be an object or array`
       )
+      schemas.push(...(Array.isArray(parsed) ? parsed : [parsed]))
     }
+
+    const schemaTypes = schemas.map(schema => schema["@type"])
+    assert(
+      schemaTypes.includes("EducationalOrganization"),
+      `${absoluteUrl} organization schema`
+    )
+    assert(schemaTypes.includes("WebSite"), `${absoluteUrl} website schema`)
+    assert(schemaTypes.includes("WebPage"), `${absoluteUrl} webpage schema`)
+    assert(schemas.some(schema => schema["@id"] === `${origin}/#organization`))
+    assert(schemas.some(schema => schema["@id"] === `${origin}/#website`))
+    assert(schemas.some(schema => schema["@id"] === `${absoluteUrl}#webpage`))
+    if (originalPath !== "/") {
+      assert(
+        schemaTypes.includes("BreadcrumbList"),
+        `${absoluteUrl} breadcrumb schema`
+      )
+    }
+
+    const programRoute = PROGRAM_LANDING_ROUTES.find(
+      route => originalPath === `/diplomados/${route.slug}/`
+    )
+    if (programRoute) {
+      const courses = schemas.filter(schema => schema["@type"] === "Course")
+      assert.strictEqual(
+        courses.length,
+        1,
+        `${absoluteUrl} Course schema count`
+      )
+      const course = courses[0]
+      assert.strictEqual(course["@id"], `${absoluteUrl}#course`)
+      assert.strictEqual(course.provider?.["@id"], `${origin}/#organization`)
+      assert.strictEqual(course.inLanguage, LANGUAGES[language].htmlLang)
+      for (const unsupported of [
+        "hasCourseInstance",
+        "offers",
+        "aggregateRating",
+        "review",
+      ]) {
+        assert.strictEqual(
+          course[unsupported],
+          undefined,
+          `${absoluteUrl} must omit ${unsupported}`
+        )
+      }
+
+      const breadcrumb = schemas.find(
+        schema => schema["@type"] === "BreadcrumbList"
+      )
+      const expectedSection = {
+        es: "Diplomados",
+        en: "Diploma courses",
+        "pt-br": "Cursos de formação",
+      }[language]
+      assert.strictEqual(
+        breadcrumb.itemListElement?.[1]?.name,
+        expectedSection,
+        `${absoluteUrl} localized breadcrumb section`
+      )
+    }
+
+    if (originalPath === "/publicaciones/") {
+      assert(schemaTypes.filter(type => type === "ItemList").length >= 2)
+      assert.strictEqual(schemaTypes.filter(type => type === "Book").length, 5)
+    }
+    if (originalPath === "/roxana/") {
+      assert(
+        schemas.some(schema => schema["@id"] === `${origin}/roxana/#person`)
+      )
+    }
+
+    $("a[href]").each((_, link) =>
+      assertInternalLink($(link).attr("href"), absoluteUrl)
+    )
   }
 
   for (const expectation of homeGuideIntent) {
@@ -257,7 +372,10 @@ async function main() {
   for (const originalPath of transactionalPaths) {
     for (const language of LANGUAGE_CODES) {
       const pathname = localizePath(language, originalPath)
-      assert(!urlSet.has(`${origin}${pathname}`), `${pathname} must stay out of sitemap`)
+      assert(
+        !urlSet.has(`${origin}${pathname}`),
+        `${pathname} must stay out of sitemap`
+      )
       const $ = cheerio.load(readHtml(pathname))
       assert.match(
         String($("meta[name='robots']").attr("content") || ""),
@@ -270,8 +388,15 @@ async function main() {
   for (const language of LANGUAGE_CODES) {
     const contactPath = localizePath(language, "/contact/")
     const html = readHtml(contactPath)
-    for (const forbidden of ["connect.facebook.net", "w.behold.so", "data-behold-id"]) {
-      assert(!html.includes(forbidden), `${contactPath} must not load ${forbidden}`)
+    for (const forbidden of [
+      "connect.facebook.net",
+      "w.behold.so",
+      "data-behold-id",
+    ]) {
+      assert(
+        !html.includes(forbidden),
+        `${contactPath} must not load ${forbidden}`
+      )
     }
   }
 
@@ -283,7 +408,7 @@ async function main() {
     )
   }
 
-  console.log("Built SEO contract ok: 27 canonical URLs, 9 per language")
+  console.log("Built SEO contract ok: 42 canonical URLs, 14 per language")
 }
 
 main().catch(error => {

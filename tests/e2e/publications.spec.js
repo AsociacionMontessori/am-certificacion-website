@@ -122,7 +122,33 @@ test("analytics tag waits for consent and preferences remain reversible", async 
   await expect(
     page.getByRole("dialog", { name: "Privacidad y analítica" })
   ).toBeVisible()
+  await expect(
+    page.getByRole("button", { name: "No aceptar" })
+  ).not.toBeFocused()
   expect(analyticsRequests).toHaveLength(0)
+
+  await page
+    .getByRole("button", { name: "Minimizar aviso de privacidad" })
+    .click()
+  await expect(
+    page.getByRole("dialog", { name: "Privacidad y analítica" })
+  ).toHaveCount(0)
+  await expect(
+    page.getByRole("button", { name: "Abrir preferencias de privacidad" })
+  ).toBeVisible()
+  await expect
+    .poll(() =>
+      page.evaluate(() => localStorage.getItem("ammac-analytics-consent-v1"))
+    )
+    .toBeNull()
+  expect(analyticsRequests).toHaveLength(0)
+
+  await page
+    .getByRole("button", { name: "Abrir preferencias de privacidad" })
+    .click()
+  await expect(
+    page.getByRole("dialog", { name: "Privacidad y analítica" })
+  ).toBeVisible()
   await page.getByRole("button", { name: "Aceptar analítica" }).click()
   await expect.poll(() => analyticsRequests.length).toBeGreaterThan(0)
 
@@ -134,4 +160,32 @@ test("analytics tag waits for consent and preferences remain reversible", async 
   await expect(
     page.getByRole("dialog", { name: "Privacidad y analítica" })
   ).toHaveCount(0)
+})
+
+test("unknown analytics consent auto-minimizes without recording a choice", async ({
+  page,
+}) => {
+  await page.clock.install()
+  await page.addInitScript(() =>
+    localStorage.removeItem("ammac-analytics-consent-v1")
+  )
+
+  await page.goto("/publicaciones/")
+  await expect(
+    page.getByRole("dialog", { name: "Privacidad y analítica" })
+  ).toBeVisible()
+
+  await page.clock.fastForward(12000)
+
+  await expect(
+    page.getByRole("dialog", { name: "Privacidad y analítica" })
+  ).toHaveCount(0)
+  await expect(
+    page.getByRole("button", { name: "Abrir preferencias de privacidad" })
+  ).toBeVisible()
+  await expect
+    .poll(() =>
+      page.evaluate(() => localStorage.getItem("ammac-analytics-consent-v1"))
+    )
+    .toBeNull()
 })

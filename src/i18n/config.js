@@ -6,6 +6,7 @@
  */
 
 const DEFAULT_LANGUAGE = "es"
+const { PROGRAM_LANDING_ROUTES } = require("../data/programLandingRoutes")
 
 // Idioma al que cae un navegador que no es es/en/pt (p. ej. fr, de):
 // inglés como lengua franca (decisión de Carlos, 2026-07-08).
@@ -68,6 +69,7 @@ const LOCALIZED_PATHS = [
   "/inscripcion/documentos/",
   "/inscripcion/pagar/",
   "/inscripcion/transferencia/",
+  ...PROGRAM_LANDING_ROUTES.map(route => `/diplomados/${route.slug}/`),
 ]
 
 // Claves de almacenamiento en el navegador
@@ -100,7 +102,11 @@ const splitPathSuffix = pathname => {
   const queryIndex = value.indexOf("?")
   const hashIndex = value.indexOf("#")
   const suffixIndex =
-    queryIndex === -1 ? hashIndex : hashIndex === -1 ? queryIndex : Math.min(queryIndex, hashIndex)
+    queryIndex === -1
+      ? hashIndex
+      : hashIndex === -1
+      ? queryIndex
+      : Math.min(queryIndex, hashIndex)
 
   if (suffixIndex === -1) {
     return { path: value, suffix: "" }
@@ -118,7 +124,8 @@ const localizePath = (language, originalPath) => {
   const normalized = normalizePath(path)
   const lang = LANGUAGES[language] || LANGUAGES[DEFAULT_LANGUAGE]
   if (!lang.prefix) return `${normalized}${suffix}`
-  const localized = normalized === "/" ? `${lang.prefix}/` : `${lang.prefix}${normalized}`
+  const localized =
+    normalized === "/" ? `${lang.prefix}/` : `${lang.prefix}${normalized}`
   return `${localized}${suffix}`
 }
 

@@ -33,6 +33,14 @@ Este archivo llms.txt es informativo, no es una señal de posicionamiento y las 
 - Aviso de privacidad: https://certificacionmontessori.com/privacy/
 - Índice público para IA: https://certificacionmontessori.com/ia/
 
+### Programas de formación
+
+- Guía Montessori en Nido y Comunidad Infantil: https://certificacionmontessori.com/diplomados/nido-comunidad-infantil/ — formación profesional en línea para acompañar los primeros ambientes Montessori.
+- Guía Montessori en Casa de Niños: https://certificacionmontessori.com/diplomados/casa-de-ninos/ — formación en línea sobre observación, ambiente preparado y materiales de Casa de Niños.
+- Guía Montessori en Taller I y II: https://certificacionmontessori.com/diplomados/taller-i-ii/ — formación profesional para acompañar el segundo plano de desarrollo y la exploración cultural.
+- Diplomado en Educación Cósmica: https://certificacionmontessori.com/diplomados/educacion-cosmica/ — recorrido en línea por la Educación Cósmica y las Grandes Lecciones Montessori.
+- Diplomado en Neuroeducación: https://certificacionmontessori.com/diplomados/neuroeducacion/ — formación breve sobre desarrollo, aprendizaje, emoción y movimiento.
+
 ## Recursos machine-readable
 
 - Sitemap: https://certificacionmontessori.com/sitemap-index.xml

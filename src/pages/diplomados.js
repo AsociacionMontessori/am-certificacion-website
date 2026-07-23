@@ -1,32 +1,33 @@
-import React, { useState, useEffect } from "react";
-import Nav from "../components/nav";
-import { StaticImage } from "gatsby-plugin-image";
-import Layout from "../components/layout";
-import CertificationPrice from "../components/certificationPrice";
-import ProfessorsSection from "../components/professorsSection";
-import MarcoPedagogico from "../components/marcoPedagogico";
-import Scholarship from "../components/scholarship";
-import Seo from "../components/seo";
-import { useTranslation, Trans } from "react-i18next";
-import { getT } from "../i18n";
-import { DIPLOMADOS_EN_LINEA, getNextItem } from "../data/diplomadosCalendario";
+import React, { useState, useEffect } from "react"
+import Nav from "../components/nav"
+import { StaticImage } from "gatsby-plugin-image"
+import Layout from "../components/layout"
+import CertificationPrice from "../components/certificationPrice"
+import ProfessorsSection from "../components/professorsSection"
+import ProgramDirectory from "../components/programs/ProgramDirectory"
+import MarcoPedagogico from "../components/marcoPedagogico"
+import Scholarship from "../components/scholarship"
+import Seo from "../components/seo"
+import { useTranslation, Trans } from "react-i18next"
+import { getT } from "../i18n"
+import { DIPLOMADOS_EN_LINEA, getNextItem } from "../data/diplomadosCalendario"
 
-const FORM_INSCRIPCION = "https://forms.gle/pQKbTjGKCMYtnjuY6";
+const FORM_INSCRIPCION = "https://forms.gle/pQKbTjGKCMYtnjuY6"
 
 export default function Landing() {
-  const { t } = useTranslation("diplomados");
-  const [proximoInicio, setProximoInicio] = useState(null);
+  const { t } = useTranslation("diplomados")
+  const [proximoInicio, setProximoInicio] = useState(null)
 
   useEffect(() => {
-    setProximoInicio(getNextItem(DIPLOMADOS_EN_LINEA));
-  }, []);
+    setProximoInicio(getNextItem(DIPLOMADOS_EN_LINEA))
+  }, [])
 
   const gradientTextStyle = {
-    backgroundImage: 'linear-gradient(to right, from-blue, via-blue, to-green)',
-    WebkitBackgroundClip: 'text', // para navegadores basados en WebKit
-    backgroundClip: 'text',
-    color: 'transparent',
-  };
+    backgroundImage: "linear-gradient(to right, from-blue, via-blue, to-green)",
+    WebkitBackgroundClip: "text", // para navegadores basados en WebKit
+    backgroundClip: "text",
+    color: "transparent",
+  }
 
   return (
     <>
@@ -37,12 +38,17 @@ export default function Landing() {
             <section id="home" className="relative flex pb-24 md:pb-32">
               {/* <div aria-hidden="true" className="absolute inset-0 z-[1] bg-gradient-to-b from-white/0 via-gray/20 to-gray"></div> */}
               {/* <img src={imagen} className="fixed inset-0 h-full w-full object-cover" alt="woman in dark" width="4160" height="6240" /> */}
-              <div className="fixed inset-0 w-full min-w-0 max-w-full h-full object-cover"
+              <div
+                className="fixed inset-0 w-full min-w-0 max-w-full h-full object-cover"
                 style={{
                   backgroundSize: "cover",
-                  backgroundImage: "url('/backgrounds/diplomados.webp')"
-                }}>
-                <span id="blackOverlay" className="w-full h-full absolute opacity-75 bg-black"></span>
+                  backgroundImage: "url('/backgrounds/diplomados.webp')",
+                }}
+              >
+                <span
+                  id="blackOverlay"
+                  className="w-full h-full absolute opacity-75 bg-black"
+                ></span>
               </div>
               <div className="container pt-20 relative mx-auto w-full max-w-full px-4">
                 <div className="flex flex-wrap min-w-0">
@@ -51,8 +57,17 @@ export default function Landing() {
                       <p className="text-sm sm:text-base uppercase tracking-widest text-green-300/90 mb-2">
                         {t("hero.kicker")}
                       </p>
-                      <h1 data-rellax-speed="-3" data-rellax-xs-speed="0" data-rellax-mobile-speed="0" className="rellax text-4xl sm:text-5xl font-bold text-white sm:text-7xl md:text-8xl xl:leading-tight font-semibold">
-                        <Trans i18nKey="hero.title" ns="diplomados" components={{ linea: <span className="block" /> }} />
+                      <h1
+                        data-rellax-speed="-3"
+                        data-rellax-xs-speed="0"
+                        data-rellax-mobile-speed="0"
+                        className="rellax text-4xl sm:text-5xl font-bold text-white sm:text-7xl md:text-8xl xl:leading-tight font-semibold"
+                      >
+                        <Trans
+                          i18nKey="hero.title"
+                          ns="diplomados"
+                          components={{ linea: <span className="block" /> }}
+                        />
                       </h1>
                       <p className="mt-6 sm:mt-10 text-md sm:text-lg md:text-xl text-gray-300 max-w-2xl">
                         {t("hero.p1")}
@@ -65,30 +80,70 @@ export default function Landing() {
                         className="inline-flex items-center gap-2 mt-6 sm:mt-8 px-6 py-3 rounded-full bg-white text-blue font-semibold hover:bg-green hover:text-white transition-all duration-300 shadow-lg"
                       >
                         {t("ctaProgramasPrecios")}
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" /></svg>
+                        <svg
+                          className="w-5 h-5"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M19 14l-7 7m0 0l-7-7m7 7V3"
+                          />
+                        </svg>
                       </a>
                       <div className="relative overflow-hidden lg:mt-16 lg:p-10 mt-6 p-2 sm:p-4 border border-white/60 bg-black/40 backdrop-blur-sm lg:border-white/80 lg:hover:border-green transition duration-300 ease-in-out rounded-3xl">
                         <div className="absolute bottom-0 right-0 lg:-top-[40vh] lg:-left-60 w-20 lg:w-1/2 lg:opacity-50 pointer-events-none">
-                          <StaticImage src="../images/elements/decor1.png" placeholder="none" alt={t("hero.decorAlt")} className="w-20 lg:w-full pointer-events-none select-none" />
+                          <StaticImage
+                            src="../images/elements/decor1.png"
+                            placeholder="none"
+                            alt={t("hero.decorAlt")}
+                            className="w-20 lg:w-full pointer-events-none select-none"
+                          />
                         </div>
                         <p className="text-xs sm:text-sm md:text-xl text-gray-200">
                           {t("hero.card.p1")}
                         </p>
                         <p className="text-xs sm:text-sm text-white/90 mt-3">
-                          <Trans i18nKey="hero.card.acceso" ns="diplomados" components={{ fuerte: <strong className="text-white" /> }} />
+                          <Trans
+                            i18nKey="hero.card.acceso"
+                            ns="diplomados"
+                            components={{
+                              fuerte: <strong className="text-white" />,
+                            }}
+                          />
                         </p>
                         <div className="flex flex-wrap justify-center gap-2 mt-4 text-xs text-white/80">
-                          {t("hero.card.badges", { returnObjects: true }).map((badge) => (
-                            <span key={badge} className="px-2 py-1 rounded bg-white/10">{badge}</span>
-                          ))}
+                          {t("hero.card.badges", { returnObjects: true }).map(
+                            badge => (
+                              <span
+                                key={badge}
+                                className="px-2 py-1 rounded bg-white/10"
+                              >
+                                {badge}
+                              </span>
+                            )
+                          )}
                         </div>
                         <div className="flex flex-col items-center justify-center gap-4 mt-5 px-2 w-full">
                           <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 w-full max-w-2xl mx-auto">
                             <div className="h-16 w-56 flex items-center justify-center flex-shrink-0">
-                              <StaticImage src="../images/elements/google2.png" placeholder="none" alt={t("hero.card.altClassroom")} className="h-full w-auto max-w-full object-contain object-center pointer-events-none select-none" />
+                              <StaticImage
+                                src="../images/elements/google2.png"
+                                placeholder="none"
+                                alt={t("hero.card.altClassroom")}
+                                className="h-full w-auto max-w-full object-contain object-center pointer-events-none select-none"
+                              />
                             </div>
                             <div className="h-20 w-64 flex items-center justify-center flex-shrink-0">
-                              <StaticImage src="../images/elements/google1.png" placeholder="none" alt={t("hero.card.altForEducation")} className="h-full w-auto max-w-full object-contain object-center pointer-events-none select-none" />
+                              <StaticImage
+                                src="../images/elements/google1.png"
+                                placeholder="none"
+                                alt={t("hero.card.altForEducation")}
+                                className="h-full w-auto max-w-full object-contain object-center pointer-events-none select-none"
+                              />
                             </div>
                           </div>
                           <div className="flex items-center justify-center gap-6 sm:gap-8">
@@ -140,9 +195,6 @@ export default function Landing() {
           <section className="relative bg-gradient-to-r from-blue via-purple to-green pb-20 -mt-24 z-20 overflow-hidden">
             <div className="container mx-auto w-full max-w-full px-4">
               <div className="flex flex-wrap items-center min-w-0">
-
-
-
                 {/* <div className="w-full md:w-5/12 px-4 mr-auto ml-auto">
                   <div className="text-gray-600 p-3 text-center inline-flex items-center justify-center w-16 h-16 mb-6 shadow-lg rounded-full bg-red">
                     <svg viewBox="0 0 24 24" id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg"><defs>
@@ -189,7 +241,9 @@ export default function Landing() {
                   </div>
                 </div> */}
                 <div className="w-full px-4 mr-auto ml-auto mt-32">
-                  <p className="text-green-300/90 text-sm uppercase tracking-wider mb-2">{t("contenido.kicker")}</p>
+                  <p className="text-green-300/90 text-sm uppercase tracking-wider mb-2">
+                    {t("contenido.kicker")}
+                  </p>
                   <h3 className="text-3xl sm:text-4xl lg:text-6xl mb-2 font-semibold leading-tight text-white">
                     {t("contenido.titulo")}
                   </h3>
@@ -200,13 +254,14 @@ export default function Landing() {
                     {t("contenido.badge")}
                   </div>
                 </div>
-
               </div>
               <div className="flex flex-wrap min-w-0 lg:pt-12 pt-6">
                 <div className="w-1/2 min-w-0 md:w-4/12 px-2">
                   <div className="relative flex flex-col min-w-0 break-words bg-white w-full mb-8 shadow-xl rounded-lg overflow-hidden">
                     <div className="hover:bg-red hover:bg-opacity-10 px-2 md:px-4 lg:px-6 py-5 flex-auto">
-                      <h6 className="text-sm md:text-xl font-semibold text-red">{t("contenido.materias.filosofia.nombre")}</h6>
+                      <h6 className="text-sm md:text-xl font-semibold text-red">
+                        {t("contenido.materias.filosofia.nombre")}
+                      </h6>
                       <p className="text-xs md:text-sm lg:text-base mt-2 mb-4 text-black">
                         {t("contenido.materias.filosofia.descripcion")}
                       </p>
@@ -216,7 +271,9 @@ export default function Landing() {
                 <div className="w-1/2 min-w-0 md:w-4/12 px-2 ">
                   <div className="relative flex flex-col min-w-0 break-words bg-white w-full mb-8 shadow-xl rounded-lg overflow-hidden">
                     <div className="hover:bg-blue hover:bg-opacity-10 px-2 md:px-4 lg:px-6 py-5 flex-auto">
-                      <h6 className="text-sm md:text-xl font-semibold text-blue">{t("contenido.materias.observacion.nombre")}</h6>
+                      <h6 className="text-sm md:text-xl font-semibold text-blue">
+                        {t("contenido.materias.observacion.nombre")}
+                      </h6>
                       <p className="text-xs md:text-sm lg:text-base mt-2 mb-4 text-black">
                         {t("contenido.materias.observacion.descripcion")}
                       </p>
@@ -226,7 +283,9 @@ export default function Landing() {
                 <div className="-mt-5 md:mt-0 w-1/2 min-w-0 md:w-4/12 px-2 ">
                   <div className="relative flex flex-col min-w-0 break-words bg-white w-full mb-8 shadow-xl rounded-lg overflow-hidden">
                     <div className="hover:bg-orange hover:bg-opacity-10 px-2 md:px-4 lg:px-6 py-5 flex-auto">
-                      <h6 className="text-sm md:text-xl font-semibold text-orange">{t("contenido.materias.neuroeducacion.nombre")}</h6>
+                      <h6 className="text-sm md:text-xl font-semibold text-orange">
+                        {t("contenido.materias.neuroeducacion.nombre")}
+                      </h6>
                       <p className="text-xs md:text-sm lg:text-base mt-2 mb-4 text-black">
                         {t("contenido.materias.neuroeducacion.descripcion")}
                       </p>
@@ -236,7 +295,9 @@ export default function Landing() {
                 <div className="w-1/2 min-w-0 md:w-4/12 px-2 ">
                   <div className="relative flex flex-col min-w-0 break-words bg-white w-full mb-8 shadow-xl rounded-lg overflow-hidden">
                     <div className="hover:bg-green hover:bg-opacity-10 px-2 md:px-4 lg:px-6 py-5 flex-auto">
-                      <h6 className="text-sm md:text-xl font-semibold text-green">{t("contenido.materias.psicologia.nombre")}</h6>
+                      <h6 className="text-sm md:text-xl font-semibold text-green">
+                        {t("contenido.materias.psicologia.nombre")}
+                      </h6>
                       <p className="text-xs md:text-sm lg:text-base mt-2 mb-4 text-black">
                         {t("contenido.materias.psicologia.descripcion")}
                       </p>
@@ -246,7 +307,9 @@ export default function Landing() {
                 <div className="-mt-10 md:mt-0 w-1/2 min-w-0 md:w-4/12 px-2 ">
                   <div className="relative flex flex-col min-w-0 break-words bg-white w-full mb-8 shadow-xl rounded-lg overflow-hidden">
                     <div className="hover:bg-red hover:bg-opacity-10 px-2 md:px-4 lg:px-6 py-5 flex-auto">
-                      <h6 className="text-sm md:text-xl font-semibold text-red">{t("contenido.materias.musicoterapia.nombre")}</h6>
+                      <h6 className="text-sm md:text-xl font-semibold text-red">
+                        {t("contenido.materias.musicoterapia.nombre")}
+                      </h6>
                       <p className="text-xs md:text-sm lg:text-base mt-2 mb-4 text-black">
                         {t("contenido.materias.musicoterapia.descripcion")}
                       </p>
@@ -256,7 +319,9 @@ export default function Landing() {
                 <div className="w-1/2 min-w-0 md:w-4/12 px-2 ">
                   <div className="relative flex flex-col min-w-0 break-words bg-white w-full mb-8 shadow-xl rounded-lg overflow-hidden">
                     <div className="hover:bg-blue hover:bg-opacity-10 px-2 md:px-4 lg:px-6 py-5 flex-auto">
-                      <h6 className="text-sm md:text-xl font-semibold text-blue">{t("contenido.materias.psicomotricidad.nombre")}</h6>
+                      <h6 className="text-sm md:text-xl font-semibold text-blue">
+                        {t("contenido.materias.psicomotricidad.nombre")}
+                      </h6>
                       <p className="text-xs md:text-sm lg:text-base mt-2 mb-4 text-black">
                         {t("contenido.materias.psicomotricidad.descripcion")}
                       </p>
@@ -266,7 +331,9 @@ export default function Landing() {
                 <div className="-mt-5 lg:mt-0 md:w-2/3 w-1/2 min-w-0 px-2 ">
                   <div className="relative flex flex-col min-w-0 break-words bg-white w-full mb-8 shadow-xl rounded-lg overflow-hidden">
                     <div className="hover:bg-orange hover:bg-opacity-10 px-2 md:px-4 lg:px-6 py-5 flex-auto">
-                      <h6 className="text-sm md:text-xl font-semibold text-orange">{t("contenido.materias.inclusiva.nombre")}</h6>
+                      <h6 className="text-sm md:text-xl font-semibold text-orange">
+                        {t("contenido.materias.inclusiva.nombre")}
+                      </h6>
                       <p className="text-xs md:text-sm lg:text-base mt-2 mb-4 text-black">
                         {t("contenido.materias.inclusiva.descripcion")}
                       </p>
@@ -276,7 +343,9 @@ export default function Landing() {
                 <div className="w-1/2 min-w-0 md:w-1/3 px-2 ">
                   <div className="relative flex flex-col min-w-0 break-words bg-white w-full mb-8 shadow-xl rounded-lg overflow-hidden">
                     <div className="hover:bg-green hover:bg-opacity-10 px-2 md:px-4 lg:px-6 py-5 flex-auto">
-                      <h6 className="text-sm md:text-xl font-semibold text-green">{t("contenido.materias.creativa.nombre")}</h6>
+                      <h6 className="text-sm md:text-xl font-semibold text-green">
+                        {t("contenido.materias.creativa.nombre")}
+                      </h6>
                       <p className="text-xs md:text-sm lg:text-base mt-2 mb-4 text-black">
                         {t("contenido.materias.creativa.descripcion")}
                       </p>
@@ -316,15 +385,29 @@ export default function Landing() {
                 y="0"
               >
                 <defs>
-                  <linearGradient id="myGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" className="text-blue" style={{ stopColor: "currentColor" }} />
-                    <stop offset="100%" className="text-green" style={{ stopColor: "currentColor" }} />
+                  <linearGradient
+                    id="myGradient"
+                    x1="0%"
+                    y1="0%"
+                    x2="100%"
+                    y2="0%"
+                  >
+                    <stop
+                      offset="0%"
+                      className="text-blue"
+                      style={{ stopColor: "currentColor" }}
+                    />
+                    <stop
+                      offset="100%"
+                      className="text-green"
+                      style={{ stopColor: "currentColor" }}
+                    />
                   </linearGradient>
                 </defs>
 
                 <polygon
                   style={{
-                    fill: 'url(#myGradient)', // Referencia al gradiente definido en <defs>
+                    fill: "url(#myGradient)", // Referencia al gradiente definido en <defs>
                   }}
                   points="2560 0 2560 100 0 100"
                 />
@@ -345,13 +428,23 @@ export default function Landing() {
                     <div className="hidden md:block text-red p-3 text-center inline-flex items-center justify-center w-16 h-16 mb-6 shadow-lg rounded-full bg-blue">
                       {/* svg of class online */}
 
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="white">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.697 50.697 0 0112 13.489a50.702 50.702 0 017.74-3.342M6.75 15a.75.75 0 100-1.5.75.75 0 000 1.5zm0 0v-3.675A55.378 55.378 0 0112 8.443m-7.007 11.55A5.981 5.981 0 006.75 15.75v-1.5" />
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth="1.5"
+                        stroke="white"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.697 50.697 0 0112 13.489a50.702 50.702 0 017.74-3.342M6.75 15a.75.75 0 100-1.5.75.75 0 000 1.5zm0 0v-3.675A55.378 55.378 0 0112 8.443m-7.007 11.55A5.981 5.981 0 006.75 15.75v-1.5"
+                        />
                       </svg>
-
-
                     </div>
-                    <p className="text-green-300/90 text-sm uppercase tracking-wider mb-2">{t("modalidad.kicker")}</p>
+                    <p className="text-green-300/90 text-sm uppercase tracking-wider mb-2">
+                      {t("modalidad.kicker")}
+                    </p>
                     <h3 className="pt-4 text-3xl font-semibold text-white">
                       {t("modalidad.titulo")}
                     </h3>
@@ -361,44 +454,123 @@ export default function Landing() {
                     <ul className="list-none mt-6 space-y-4 text-white">
                       <li className="flex items-start gap-3">
                         <span className="flex-shrink-0 w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                          <svg
+                            className="w-5 h-5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                            />
+                          </svg>
                         </span>
                         <div>
-                          <strong className="text-white block">{t("modalidad.items.publicacion.titulo")}</strong>
-                          <span className="text-white/90">{t("modalidad.items.publicacion.texto")}</span>
+                          <strong className="text-white block">
+                            {t("modalidad.items.publicacion.titulo")}
+                          </strong>
+                          <span className="text-white/90">
+                            {t("modalidad.items.publicacion.texto")}
+                          </span>
                         </div>
                       </li>
                       <li className="flex items-start gap-3">
                         <span className="flex-shrink-0 w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                          <svg
+                            className="w-5 h-5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                            />
+                          </svg>
                         </span>
                         <div>
-                          <strong className="text-white block">{t("modalidad.items.actividades.titulo")}</strong>
-                          <span className="text-white/90">{t("modalidad.items.actividades.texto")}</span>
+                          <strong className="text-white block">
+                            {t("modalidad.items.actividades.titulo")}
+                          </strong>
+                          <span className="text-white/90">
+                            {t("modalidad.items.actividades.texto")}
+                          </span>
                         </div>
                       </li>
                       <li className="flex items-start gap-3">
                         <span className="flex-shrink-0 w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" /></svg>
+                          <svg
+                            className="w-5 h-5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"
+                            />
+                          </svg>
                         </span>
                         <div>
-                          <strong className="text-white block">{t("modalidad.items.acceso.titulo")}</strong>
-                          <span className="text-white/90">{t("modalidad.items.acceso.texto")}</span>
+                          <strong className="text-white block">
+                            {t("modalidad.items.acceso.titulo")}
+                          </strong>
+                          <span className="text-white/90">
+                            {t("modalidad.items.acceso.texto")}
+                          </span>
                         </div>
                       </li>
                       <li className="flex items-start gap-3">
                         <span className="flex-shrink-0 w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+                          <svg
+                            className="w-5 h-5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
+                            />
+                          </svg>
                         </span>
                         <div>
-                          <strong className="text-white block">{t("modalidad.items.guia.titulo")}</strong>
-                          <span className="text-white/90">{t("modalidad.items.guia.texto")}</span>
+                          <strong className="text-white block">
+                            {t("modalidad.items.guia.titulo")}
+                          </strong>
+                          <span className="text-white/90">
+                            {t("modalidad.items.guia.texto")}
+                          </span>
                         </div>
                       </li>
                     </ul>
-                    <a href="#certificacion_internacional" className="inline-flex items-center gap-2 mt-8 px-5 py-2.5 rounded-full bg-white/20 text-white font-medium hover:bg-white hover:text-blue transition-all duration-300 text-sm">
+                    <a
+                      href="#certificacion_internacional"
+                      className="inline-flex items-center gap-2 mt-8 px-5 py-2.5 rounded-full bg-white/20 text-white font-medium hover:bg-white hover:text-blue transition-all duration-300 text-sm"
+                    >
                       {t("ctaProgramasPrecios")}
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" /></svg>
+                      <svg
+                        className="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M19 14l-7 7m0 0l-7-7m7 7V3"
+                        />
+                      </svg>
                     </a>
                   </div>
                 </div>
@@ -406,9 +578,16 @@ export default function Landing() {
             </div>
           </section>
 
-          <section id="" className="relative overflow-hidden bg-gradient-to-r from-blue to-green pb-20 pt-6">
+          <ProgramDirectory />
+
+          <section
+            id=""
+            className="relative overflow-hidden bg-gradient-to-r from-blue to-green pb-20 pt-6"
+          >
             <div className="container mx-auto w-full max-w-full px-4 text-center mb-8">
-              <p className="text-green-300/90 text-sm uppercase tracking-wider mb-2">{t("programasSeccion.kicker")}</p>
+              <p className="text-green-300/90 text-sm uppercase tracking-wider mb-2">
+                {t("programasSeccion.kicker")}
+              </p>
               <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-3">
                 {t("programasSeccion.titulo")}
               </h2>
@@ -447,7 +626,9 @@ export default function Landing() {
             <div className="container mx-auto w-full max-w-full px-4 lg:pt-24 lg:pb-32">
               <div className="flex flex-wrap min-w-0 text-center justify-center text-white">
                 <div className="w-full lg:w-6/12 px-4">
-                  <p className="text-green-300/90 text-sm uppercase tracking-wider mb-2">{t("inscripcionSeccion.kicker")}</p>
+                  <p className="text-green-300/90 text-sm uppercase tracking-wider mb-2">
+                    {t("inscripcionSeccion.kicker")}
+                  </p>
                   <h2 className="text-4xl font-semibold text-white">
                     {t("inscripcionSeccion.titulo")}
                   </h2>
@@ -457,9 +638,16 @@ export default function Landing() {
                         i18nKey="inscripcionSeccion.proximoInicio"
                         ns="diplomados"
                         values={{
-                          fecha: t(`calendario.fechas.${proximoInicio.date.toISOString().slice(0, 10)}`, { defaultValue: proximoInicio.label }),
+                          fecha: t(
+                            `calendario.fechas.${proximoInicio.date
+                              .toISOString()
+                              .slice(0, 10)}`,
+                            { defaultValue: proximoInicio.label }
+                          ),
                         }}
-                        components={{ verde: <span className="text-green-300" /> }}
+                        components={{
+                          verde: <span className="text-green-300" />,
+                        }}
                       />
                     </p>
                   )}
@@ -473,7 +661,19 @@ export default function Landing() {
                     className="inline-flex items-center gap-2 mt-4 px-6 py-3 rounded-full bg-white text-blue font-semibold hover:bg-green hover:text-white transition-all duration-300"
                   >
                     {t("inscripcionSeccion.ctaFormulario")}
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+                    <svg
+                      className="w-5 h-5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                      />
+                    </svg>
                   </a>
                 </div>
               </div>
@@ -487,7 +687,14 @@ export default function Landing() {
                   </h6>
                   <p className="mt-2 mb-4 text-white/90 text-sm">
                     {t("inscripcionSeccion.paso1.texto")}
-                    <a className="text-green-300 hover:underline block mt-1" href={FORM_INSCRIPCION} target="_blank" rel="noopener noreferrer">{t("inscripcionSeccion.paso1.linkTexto")}</a>
+                    <a
+                      className="text-green-300 hover:underline block mt-1"
+                      href={FORM_INSCRIPCION}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {t("inscripcionSeccion.paso1.linkTexto")}
+                    </a>
                   </p>
                 </div>
                 <div className="w-full lg:w-3/12 px-4 text-center">
@@ -499,10 +706,18 @@ export default function Landing() {
                   </h5>
                   <p className="mt-2 text-sm mb-4 text-white/90">
                     {t("inscripcionSeccion.paso2.intro")}
-                    <span className="pt-3 block text-white">{t("inscripcionSeccion.paso2.docs.domicilio")}</span>
-                    <span className="block text-white">{t("inscripcionSeccion.paso2.docs.identificacion")}</span>
-                    <span className="block text-white">{t("inscripcionSeccion.paso2.docs.acta")}</span>
-                    <span className="block text-white">{t("inscripcionSeccion.paso2.docs.certificado")}</span>
+                    <span className="pt-3 block text-white">
+                      {t("inscripcionSeccion.paso2.docs.domicilio")}
+                    </span>
+                    <span className="block text-white">
+                      {t("inscripcionSeccion.paso2.docs.identificacion")}
+                    </span>
+                    <span className="block text-white">
+                      {t("inscripcionSeccion.paso2.docs.acta")}
+                    </span>
+                    <span className="block text-white">
+                      {t("inscripcionSeccion.paso2.docs.certificado")}
+                    </span>
                     <span className="text-xs block mt-3 text-white/70">
                       {t("inscripcionSeccion.paso2.nota")}
                     </span>
@@ -516,7 +731,13 @@ export default function Landing() {
                     {t("inscripcionSeccion.paso3.titulo")}
                   </h5>
                   <p className="mt-2 mb-4 text-white/90 text-sm">
-                    <Trans i18nKey="inscripcionSeccion.paso3.texto" ns="diplomados" components={{ destacado: <span className="text-white font-medium" /> }} />
+                    <Trans
+                      i18nKey="inscripcionSeccion.paso3.texto"
+                      ns="diplomados"
+                      components={{
+                        destacado: <span className="text-white font-medium" />,
+                      }}
+                    />
                   </p>
                 </div>
               </div>
@@ -526,13 +747,12 @@ export default function Landing() {
             <Scholarship />
           </section>
         </main>
-
       </Layout>
     </>
-  );
+  )
 }
 
-const buildDiplomadosSchema = (t) => [
+const buildDiplomadosSchema = t => [
   {
     "@context": "https://schema.org",
     "@type": "EducationalOccupationalProgram",

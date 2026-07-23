@@ -92,14 +92,11 @@ const buildRoxanaSchema = t => [
     {
         "@context": "https://schema.org",
         "@type": "Person",
+        "@id": "https://certificacionmontessori.com/roxana/#person",
         name: t("schema.nombre"),
         jobTitle: t("schema.puesto"),
         description: t("schema.descripcion"),
-        worksFor: {
-            "@type": "EducationalOrganization",
-            name: t("schema.organizacion"),
-            url: "https://certificacionmontessori.com/",
-        },
+        worksFor: { "@id": "https://certificacionmontessori.com/#organization" },
         homeLocation: {
             "@type": "Place",
             name: t("schema.ubicacion"),

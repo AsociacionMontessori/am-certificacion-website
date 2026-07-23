@@ -13,15 +13,21 @@
     "ariaLabel": "Seleccionar idioma"
   },
   "breadcrumb": {
-    "inicio": "Inicio"
+    "inicio": "Inicio",
+    "paths": {
+      "diplomados": "Diplomados"
+    }
   },
   "analyticsConsent": {
     "title": "Privacidad y analítica",
-    "body": "Usamos Google Analytics solo si lo aceptas para entender qué contenido resulta útil. Tu decisión no limita el sitio.",
+    "body": "El sitio funciona con cookies necesarias. Google Analytics solo se activa si lo permites.",
     "privacy": "Aviso de privacidad",
     "reject": "No aceptar",
     "accept": "Aceptar analítica",
-    "settings": "Preferencias de privacidad"
+    "settings": "Preferencias de privacidad",
+    "close": "Minimizar aviso de privacidad",
+    "expand": "Abrir preferencias de privacidad",
+    "minimized": "Privacidad"
   },
   "schema": {
     "siteName": "Certificación Montessori",

@@ -31,6 +31,14 @@ Este arquivo llms.txt é informativo, não é um sinal de ranqueamento e as pág
 - Aviso de Privacidade: https://certificacionmontessori.com/pt-br/privacy/
 - Índice público para IA: https://certificacionmontessori.com/pt-br/ia/
 
+### Programas de formação
+
+- Guia Montessori de Nido e Comunidade Infantil: https://certificacionmontessori.com/pt-br/diplomados/nido-comunidad-infantil/ — formação profissional online para acompanhar os primeiros ambientes Montessori.
+- Guia Montessori de Casa das Crianças: https://certificacionmontessori.com/pt-br/diplomados/casa-de-ninos/ — formação online em observação, ambiente preparado e materiais de Casa das Crianças.
+- Guia Montessori de Fundamental I e II: https://certificacionmontessori.com/pt-br/diplomados/taller-i-ii/ — formação profissional para o segundo plano de desenvolvimento e a exploração cultural.
+- Curso de Formação em Educação Cósmica: https://certificacionmontessori.com/pt-br/diplomados/educacion-cosmica/ — percurso online pela Educação Cósmica e pelas Grandes Lições Montessori.
+- Curso de Formação em Neuroeducação: https://certificacionmontessori.com/pt-br/diplomados/neuroeducacion/ — formação breve sobre desenvolvimento, aprendizagem, emoção e movimento.
+
 ## Recursos legíveis por máquina
 
 - Sitemap (todos os idiomas, com alternativas hreflang): https://certificacionmontessori.com/sitemap-index.xml

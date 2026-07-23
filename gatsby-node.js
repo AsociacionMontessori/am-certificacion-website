@@ -1,3 +1,5 @@
+const fs = require("fs")
+const path = require("path")
 const {
   DEFAULT_LANGUAGE,
   LANGUAGE_CODES,
@@ -5,7 +7,23 @@ const {
   localizePath,
   normalizePath,
 } = require("./src/i18n/config")
+const { PROGRAM_LANDING_ROUTES } = require("./src/data/programLandingRoutes")
 const { loadWordPressPosts } = require("./src/services/wordpressNodeSource")
+
+exports.createPages = ({ actions }) => {
+  const component = path.resolve("./src/templates/programLandingPage.js")
+
+  PROGRAM_LANDING_ROUTES.forEach(route => {
+    const originalPath = `/diplomados/${route.slug}/`
+    LANGUAGE_CODES.forEach(language => {
+      actions.createPage({
+        path: localizePath(language, originalPath),
+        component,
+        context: { language, originalPath, programId: route.id },
+      })
+    })
+  })
+}
 
 exports.createSchemaCustomization = ({ actions }) => {
   actions.createTypes(`
@@ -79,4 +97,36 @@ exports.onCreatePage = ({ page, actions }) => {
       context: { ...page.context, language, originalPath },
     })
   })
+}
+
+exports.onPostBuild = ({ reporter }) => {
+  const publicDir = path.join(process.cwd(), "public")
+  let sanitizedFiles = 0
+
+  const sanitizeDirectory = directory => {
+    fs.readdirSync(directory, { withFileTypes: true }).forEach(entry => {
+      const entryPath = path.join(directory, entry.name)
+      if (entry.isDirectory()) {
+        sanitizeDirectory(entryPath)
+        return
+      }
+      if (!entry.isFile() || !entry.name.endsWith(".html")) return
+
+      const contents = fs.readFileSync(entryPath)
+      if (!contents.includes(0)) return
+
+      fs.writeFileSync(
+        entryPath,
+        contents.filter(byte => byte !== 0)
+      )
+      sanitizedFiles += 1
+    })
+  }
+
+  sanitizeDirectory(publicDir)
+  if (sanitizedFiles > 0) {
+    reporter.info(
+      `Removed NUL bytes from ${sanitizedFiles} generated HTML files`
+    )
+  }
 }
