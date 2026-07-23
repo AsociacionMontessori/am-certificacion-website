@@ -13,7 +13,7 @@ import '../styles/wordpress_publications.css'
 
 const iconsSize = "w-20 h-20"
 
-const contact = () => {
+const Contact = () => {
     const { t } = useTranslation("contact")
     return (
         <>
@@ -219,4 +219,4 @@ export const Head = ({ location }) => {
 }
 
 
-export default contact
+export default Contact

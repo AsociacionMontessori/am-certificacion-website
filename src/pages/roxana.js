@@ -10,7 +10,7 @@ import { StaticImage } from "gatsby-plugin-image"
 import { getT } from "../i18n"
 
 
-const roxana = () => {
+const Roxana = () => {
     const { t } = useTranslation("roxana")
 
     const introParagraphs = [
@@ -119,4 +119,4 @@ export const Head = ({ location }) => {
         />
     )
 }
-export default roxana
+export default Roxana
