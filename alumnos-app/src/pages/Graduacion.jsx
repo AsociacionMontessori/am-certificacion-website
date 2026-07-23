@@ -56,6 +56,7 @@ const Graduacion = () => {
     { nombre: 'Entrega de Album Montessori (proyecto final)', completado: infoGraduacion?.tesisCompletada || false },
     { nombre: 'Prácticas profesionales', completado: infoGraduacion?.practicasCompletadas || false },
     { nombre: 'Pago de derechos de certificado', completado: infoGraduacion?.pagoRealizado || false },
+    { nombre: 'No presentar adeudos en colegiaturas', completado: infoGraduacion?.sinAdeudos ?? Boolean(infoGraduacion?.progresoCompleto) },
   ];
 
   const completados = requisitos.filter(r => r.completado).length;

@@ -220,6 +220,7 @@
     "googleStrong": "Google:",
     "googleText": "creamos tu usuario <strong>@certificacionmontessori.com</strong>, te asignamos la unidad organizativa de tu programa y te inscribimos en tus clases de Classroom.",
     "fullName": "Nombre completo (nombre(s) y apellidos) *",
+    "fullNameHint": "⚠️ Escribe tu nombre y apellidos completos con cuidado: aparecerán en tu diploma exactamente como los escribas aquí (mayúsculas, acentos y orden incluidos).",
     "birthDate": "Fecha de nacimiento *",
     "nationality": "Nacionalidad *",
     "nationalityPlaceholder": "Ej. Mexicana",

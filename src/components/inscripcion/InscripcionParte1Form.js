@@ -169,6 +169,9 @@ const InscripcionParte1Form = ({
           className={inputClass}
           autoComplete="name"
         />
+        <p className="mt-1.5 text-xs text-amber-700">
+          {t("part1.fullNameHint")}
+        </p>
       </div>
 
       <div>

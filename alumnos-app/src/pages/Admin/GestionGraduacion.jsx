@@ -27,7 +27,8 @@ const GestionGraduacion = () => {
     promedioMinimo: false,
     tesisCompletada: false,
     practicasCompletadas: false,
-    pagoRealizado: false
+    pagoRealizado: false,
+    sinAdeudos: false
   });
 
   useEffect(() => {
@@ -56,7 +57,9 @@ const GestionGraduacion = () => {
             promedioMinimo: graduacionData.promedioMinimo || false,
             tesisCompletada: graduacionData.tesisCompletada || false,
             practicasCompletadas: graduacionData.practicasCompletadas || false,
-            pagoRealizado: graduacionData.pagoRealizado || false
+            pagoRealizado: graduacionData.pagoRealizado || false,
+            // Campo agregado después: los ya graduados lo tienen por cumplido
+            sinAdeudos: graduacionData.sinAdeudos ?? Boolean(graduacionData.progresoCompleto)
           });
         }
       } catch (error) {
@@ -107,7 +110,8 @@ const GestionGraduacion = () => {
         formData.promedioMinimo,
         formData.tesisCompletada,
         formData.practicasCompletadas,
-        formData.pagoRealizado
+        formData.pagoRealizado,
+        formData.sinAdeudos
       ].every(Boolean);
 
       const timestamp = serverTimestamp();
@@ -121,6 +125,7 @@ const GestionGraduacion = () => {
         tesisCompletada: formData.tesisCompletada,
         practicasCompletadas: formData.practicasCompletadas,
         pagoRealizado: formData.pagoRealizado,
+        sinAdeudos: formData.sinAdeudos,
         progresoCompleto: requisitosCompletos,
         fechaActualizacion: timestamp
       };
@@ -182,7 +187,8 @@ const GestionGraduacion = () => {
           promedioMinimo: graduacionActualizada.promedioMinimo || false,
           tesisCompletada: graduacionActualizada.tesisCompletada || false,
           practicasCompletadas: graduacionActualizada.practicasCompletadas || false,
-          pagoRealizado: graduacionActualizada.pagoRealizado || false
+          pagoRealizado: graduacionActualizada.pagoRealizado || false,
+          sinAdeudos: graduacionActualizada.sinAdeudos ?? Boolean(graduacionActualizada.progresoCompleto)
         });
       }
 
@@ -205,6 +211,7 @@ const GestionGraduacion = () => {
     { nombre: 'Entrega de Album Montessori (proyecto final)', completado: formData.tesisCompletada, key: 'tesisCompletada' },
     { nombre: 'Prácticas profesionales', completado: formData.practicasCompletadas, key: 'practicasCompletadas' },
     { nombre: 'Pago de derechos de certificado', completado: formData.pagoRealizado, key: 'pagoRealizado' },
+    { nombre: 'No presentar adeudos en colegiaturas', completado: formData.sinAdeudos, key: 'sinAdeudos' },
   ];
 
   const completados = requisitos.filter(r => r.completado).length;

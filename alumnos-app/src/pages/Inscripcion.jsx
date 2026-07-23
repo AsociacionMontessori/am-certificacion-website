@@ -84,7 +84,7 @@ const Inscripcion = () => {
             {/* Nombre Completo */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Nombre completo *
+                Nombre y apellidos completos *
               </label>
               <input
                 type="text"
@@ -95,6 +95,10 @@ const Inscripcion = () => {
                 placeholder="Ej: Juan Pérez García"
                 className="w-full px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue transition-all duration-200"
               />
+              <p className="mt-2 text-xs text-amber-700 dark:text-amber-400">
+                ⚠️ Escribe tu nombre y apellidos completos con cuidado: aparecerán en tu diploma
+                exactamente como los escribas aquí (mayúsculas, acentos y orden incluidos).
+              </p>
             </div>
 
             {/* Email */}
