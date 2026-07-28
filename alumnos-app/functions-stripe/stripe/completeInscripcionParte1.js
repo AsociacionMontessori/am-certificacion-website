@@ -31,6 +31,21 @@ function parseDateField(value) {
   return admin.firestore.Timestamp.fromDate(date);
 }
 
+/**
+ * Nombre comparable: sin acentos, sin dobles espacios y en minúsculas.
+ * Se usa para detectar que una misma persona se está registrando dos veces.
+ * @param {string} valor
+ * @return {string}
+ */
+function normalizarNombre(valor) {
+  return String(valor || "")
+      .normalize("NFD")
+      .replace(/[̀-ͯ]/g, "")
+      .toLowerCase()
+      .replace(/\s+/g, " ")
+      .trim();
+}
+
 async function getInscripcionByOrden(db, ordenId) {
   const snap = await db.collection("inscripciones").where("ordenId", "==", ordenId).limit(1).get();
   if (snap.empty) return {ref: null, data: null, id: null};
@@ -168,6 +183,44 @@ exports.completeInscripcionParte1Handler = onRequest(
             alumnoId: existing.data.alumnoId,
             emailInstitucional: existing.data.emailInstitucional,
             portalUrl: "https://alumnos.certificacionmontessori.com",
+          });
+          return;
+        }
+
+        // Una misma persona no debe terminar con dos cuentas institucionales.
+        // Las validaciones de arriba solo cubren "esta orden ya se usó" y
+        // "ese usuario institucional está tomado": alguien que canjea otro
+        // código y elige un usuario distinto las esquiva y se duplica a sí
+        // mismo (cuenta de Auth, buzón de Workspace y expediente aparte).
+        // Se corta aquí y se manda a administración, que puede cambiar o
+        // agregar el programa sobre la cuenta que ya existe.
+        //
+        // El correo de contacto NO basta como criterio: las escuelas inscriben
+        // a varias personas bajo el correo de su coordinación (hay casos de 13
+        // y 10 alumnas compartiéndolo). Se exige además que coincida el nombre.
+        const mismoContacto = await db.collection("alumnos")
+            .where("emailContacto", "==", emailContacto)
+            .limit(50)
+            .get();
+        const nombreNormalizado = normalizarNombre(nombre);
+        const previo = mismoContacto.docs.find((d) => {
+          const otro = d.data();
+          return otro.ordenId !== ordenId &&
+            normalizarNombre(otro.nombre) === nombreNormalizado;
+        });
+        if (previo) {
+          console.warn("completeInscripcionParte1:cuenta_duplicada_evitada", {
+            ordenId,
+            emailContacto,
+            alumnoExistente: previo.id,
+            ordenExistente: previo.data().ordenId || null,
+          });
+          res.status(409).json({
+            error: "Ya tienes una cuenta registrada con este correo. No creamos una " +
+              "segunda para que no se dividan tus documentos y tus materias. Escríbenos " +
+              "a admin@certificacionmontessori.com y agregamos o cambiamos el programa " +
+              "en tu cuenta actual.",
+            yaTieneCuenta: true,
           });
           return;
         }
