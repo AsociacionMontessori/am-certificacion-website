@@ -80,18 +80,35 @@ const TIPO_PROGRAMA_MAP = {
 const DOCUMENTOS_PARTE2_REQUERIDOS = new Set([
   "actaNacimiento",
   "comprobanteEstudios",
-  "cedulaFiscal",
   "identificacionOficial",
   "comprobanteDomicilio",
   "reglamentoFirmado",
 ]);
 
-const DOCUMENTOS_PARTE2_OPCIONALES = new Set(["comprobantePagoTransferencia"]);
+const DOCUMENTOS_PARTE2_OPCIONALES = new Set([
+  "comprobantePagoTransferencia",
+  "cedulaFiscal",
+]);
 
 const DOCUMENTOS_PARTE2 = new Set([
   ...DOCUMENTOS_PARTE2_REQUERIDOS,
   ...DOCUMENTOS_PARTE2_OPCIONALES,
 ]);
+
+/**
+ * La constancia de situación fiscal solo se exige a quien pidió factura en el
+ * checkout; el formulario público únicamente muestra ese campo cuando
+ * `requiereFacturaFiscal` viene en la orden.
+ */
+function getDocumentosParte2(requiereFacturaFiscal) {
+  const requeridos = new Set(DOCUMENTOS_PARTE2_REQUERIDOS);
+  const opcionales = new Set(DOCUMENTOS_PARTE2_OPCIONALES);
+  if (requiereFacturaFiscal) {
+    requeridos.add("cedulaFiscal");
+    opcionales.delete("cedulaFiscal");
+  }
+  return {requeridos, opcionales};
+}
 
 const MAX_FILE_BYTES = 10 * 1024 * 1024;
 const ALLOWED_MIME = /^image\/(jpeg|jpg|png|webp)|application\/pdf$/;
@@ -139,6 +156,7 @@ module.exports = {
   DOCUMENTOS_PARTE2,
   DOCUMENTOS_PARTE2_REQUERIDOS,
   DOCUMENTOS_PARTE2_OPCIONALES,
+  getDocumentosParte2,
   MAX_FILE_BYTES,
   ALLOWED_MIME,
   getReglamentoUrl,

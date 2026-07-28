@@ -113,9 +113,14 @@ export const DOCUMENTOS_PARTE2 = [
   },
   {
     id: "cedulaFiscal",
-    label: "Cédula de identificación fiscal",
+    label: "Constancia de situación fiscal del SAT (para tu factura)",
+    // Solo se muestra —y por tanto solo se exige— cuando la orden trae
+    // requiereFacturaFiscal. Ver InscripcionParte2Form.
     required: true,
-    hint: "PDF o imagen, máximo 10 MB",
+    hint:
+      "Es el documento que emite el SAT con tu RFC y domicilio fiscal. " +
+      "Solo se pide porque solicitaste factura. No es tu cédula profesional. " +
+      "PDF o imagen, máximo 10 MB.",
   },
   {
     id: "identificacionOficial",

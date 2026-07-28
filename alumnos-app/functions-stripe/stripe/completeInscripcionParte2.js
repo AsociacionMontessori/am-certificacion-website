@@ -2,7 +2,7 @@ const {onRequest} = require("firebase-functions/v2/https");
 const admin = require("firebase-admin");
 const {handleCors, rejectIfOriginNotAllowed} = require("./cors");
 const {enforceRateLimit} = require("./rateLimit");
-const {ESCOLARIDAD, DOCUMENTOS_PARTE2_REQUERIDOS, DOCUMENTOS_PARTE2_OPCIONALES} = require("./inscripcionCatalog");
+const {ESCOLARIDAD, getDocumentosParte2} = require("./inscripcionCatalog");
 const {requireAccessToken} = require("./accessToken");
 
 async function fileExists(bucket, path) {
@@ -112,7 +112,12 @@ exports.completeInscripcionParte2Handler = onRequest(
         const bucket = admin.storage().bucket();
         const documentosValidados = {};
 
-        for (const docId of DOCUMENTOS_PARTE2_REQUERIDOS) {
+        const {
+          requeridos: documentosRequeridos,
+          opcionales: documentosOpcionales,
+        } = getDocumentosParte2(Boolean(orden.requiereFacturaFiscal));
+
+        for (const docId of documentosRequeridos) {
           const meta = documentos[docId];
           const storagePath = meta?.storagePath ? String(meta.storagePath) : "";
           if (!storagePath || !storagePath.startsWith(`expediente/${alumnoId}/${docId}/`)) {
@@ -132,7 +137,7 @@ exports.completeInscripcionParte2Handler = onRequest(
           };
         }
 
-        for (const docId of DOCUMENTOS_PARTE2_OPCIONALES) {
+        for (const docId of documentosOpcionales) {
           const meta = documentos[docId];
           const storagePath = meta?.storagePath ? String(meta.storagePath) : "";
           if (!storagePath) continue;

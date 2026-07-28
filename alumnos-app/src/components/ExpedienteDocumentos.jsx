@@ -5,7 +5,7 @@ import { getExpedienteDocsUrls } from '../services/expedienteService';
 const LABELS = {
   actaNacimiento: 'Acta de nacimiento',
   comprobanteEstudios: 'Comprobante de estudios',
-  cedulaFiscal: 'Cédula de identificación fiscal',
+  cedulaFiscal: 'Constancia de situación fiscal (SAT)',
   identificacionOficial: 'Identificación oficial',
   comprobanteDomicilio: 'Comprobante de domicilio',
   reglamentoFirmado: 'Reglamento firmado',

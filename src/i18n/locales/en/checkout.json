@@ -277,7 +277,7 @@
     "documentLabels": {
       "actaNacimiento": "Birth certificate",
       "comprobanteEstudios": "Proof of latest completed studies",
-      "cedulaFiscal": "Fiscal identification certificate",
+      "cedulaFiscal": "Mexican tax status certificate, SAT (for your invoice)",
       "identificacionOficial": "Official ID",
       "comprobanteDomicilio": "Proof of address",
       "reglamentoFirmado": "Signed regulations (download, print, sign, and scan)",
@@ -286,6 +286,7 @@
     "documentHints": {
       "default": "PDF or image, maximum 10 MB",
       "reglamentoFirmado": "PDF, maximum 10 MB",
+      "cedulaFiscal": "The document issued by the Mexican tax authority (SAT) showing your RFC and tax address. We only ask for it because you requested an invoice. It is not your professional license. PDF or image, maximum 10 MB.",
       "comprobantePagoTransferencia": "PDF or image. Does not apply if you paid online."
     }
   },

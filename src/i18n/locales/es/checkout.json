@@ -277,7 +277,7 @@
     "documentLabels": {
       "actaNacimiento": "Acta de nacimiento",
       "comprobanteEstudios": "Comprobante de último certificado de estudios",
-      "cedulaFiscal": "Cédula de identificación fiscal",
+      "cedulaFiscal": "Constancia de situación fiscal del SAT (para tu factura)",
       "identificacionOficial": "Identificación oficial",
       "comprobanteDomicilio": "Comprobante de domicilio",
       "reglamentoFirmado": "Reglamento firmado (descarga, imprime, firma y escanea)",
@@ -286,6 +286,7 @@
     "documentHints": {
       "default": "PDF o imagen, máximo 10 MB",
       "reglamentoFirmado": "PDF, máximo 10 MB",
+      "cedulaFiscal": "Es el documento que emite el SAT con tu RFC y domicilio fiscal. Solo se pide porque solicitaste factura. No es tu cédula profesional. PDF o imagen, máximo 10 MB.",
       "comprobantePagoTransferencia": "PDF o imagen. No aplica si pagaste en línea."
     }
   },

@@ -277,7 +277,7 @@
     "documentLabels": {
       "actaNacimiento": "Certidão de nascimento",
       "comprobanteEstudios": "Comprovante do último certificado de estudos",
-      "cedulaFiscal": "Cédula de identificação fiscal",
+      "cedulaFiscal": "Comprovante de situação fiscal do SAT (para sua nota fiscal)",
       "identificacionOficial": "Identificação oficial",
       "comprobanteDomicilio": "Comprovante de endereço",
       "reglamentoFirmado": "Regulamento assinado (baixe, imprima, assine e escaneie)",
@@ -286,6 +286,7 @@
     "documentHints": {
       "default": "PDF ou imagem, máximo 10 MB",
       "reglamentoFirmado": "PDF, máximo 10 MB",
+      "cedulaFiscal": "É o documento emitido pelo SAT (autoridade fiscal mexicana) com seu RFC e endereço fiscal. Só é solicitado porque você pediu nota fiscal. Não é a sua cédula profissional. PDF ou imagem, máximo 10 MB.",
       "comprobantePagoTransferencia": "PDF ou imagem. Não se aplica se você pagou online."
     }
   },
