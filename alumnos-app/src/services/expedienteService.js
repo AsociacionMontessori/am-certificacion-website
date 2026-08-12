@@ -33,6 +33,9 @@ export const getExpedienteDocsUrls = async (alumnoId) => {
   }
   return {
     docs: data.docs || [],
+    datos: data.datos || {},
+    datosFaltantes: data.datosFaltantes || [],
+    documentosCompletos: Boolean(data.documentosCompletos),
     // Versiones reemplazadas. Solo llegan con lectura privilegiada
     // (administración o directivos); al alumno le llega vacío.
     historial: data.historial || [],
@@ -48,6 +51,34 @@ export const getExpedienteDocsUrls = async (alumnoId) => {
  * alumno; el alumno solo el suyo. Volver a subir el mismo tipo reemplaza el
  * archivo anterior en lugar de acumular copias.
  */
+export const ESCOLARIDAD_OPCIONES = [
+  'Secundaria',
+  'Preparatoria / Bachillerato',
+  'Licenciatura',
+  'Maestría',
+  'Doctorado',
+  'Otro',
+];
+
+/**
+ * Guarda los datos administrativos del expediente (los mismos que pedía la
+ * parte 2 del formulario de inscripción). El alumno guarda los suyos;
+ * administración puede guardarlos por cualquiera.
+ */
+export const guardarDatosExpediente = async (alumnoId, datos) => {
+  const headers = await getAuthHeaders();
+  const response = await fetch(`${BASE_URL}/guardarDatosExpediente`, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({ alumnoId, ...datos }),
+  });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(data.error || 'No se pudieron guardar los datos');
+  }
+  return data;
+};
+
 export const subirDocumentoExpediente = async (alumnoId, docType, file) => {
   if (!file) throw new Error('Selecciona un archivo');
   if (file.size > MAX_FILE_MB * 1024 * 1024) {

@@ -187,15 +187,34 @@ exports.getExpedienteDocsUrlsHandler = onRequest(
             String(b.reemplazadoEn || "").localeCompare(String(a.reemplazadoEn || "")));
         }
 
+        // Datos administrativos que exige el expediente. Se devuelven para que
+        // el portal precargue el formulario y sepa qué queda por capturar; el
+        // endpoint ya exige ser el propio alumno, administración o directivo.
+        const alumno = (await db.collection("alumnos").doc(alumnoId).get()).data() || {};
+        const datos = {
+          escolaridad: alumno.escolaridad || "",
+          domicilio: alumno.domicilio || "",
+          curpPasaporte: alumno.curpPasaporte || "",
+          ocupacion: alumno.ocupacion || "",
+          empresa: alumno.empresa || "",
+          telefonoEmpresa: alumno.telefonoEmpresa || "",
+        };
+        const datosFaltantes = ["escolaridad", "domicilio", "curpPasaporte", "ocupacion"]
+            .filter((campo) => !String(datos[campo] || "").trim());
+
         res.json({
           ok: true,
           alumnoId,
           docs,
           historial,
+          datos,
+          datosFaltantes,
           requeridos: [...requeridos],
           opcionales: [...opcionales],
           faltantes,
-          expedienteCompleto: faltantes.length === 0,
+          // El expediente está completo cuando no falta ni documento ni dato.
+          expedienteCompleto: faltantes.length === 0 && datosFaltantes.length === 0,
+          documentosCompletos: faltantes.length === 0,
         });
       } catch (err) {
         console.error("getExpedienteDocsUrls:", err);

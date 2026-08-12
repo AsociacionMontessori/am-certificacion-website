@@ -6,6 +6,7 @@ import { db } from '../config/firebase';
 import { DocumentTextIcon, UserIcon, AcademicCapIcon, LinkIcon, ShareIcon, EyeIcon } from '@heroicons/react/24/outline';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ExpedienteDocumentos from '../components/ExpedienteDocumentos';
+import ExpedienteDatos from '../components/ExpedienteDatos';
 import { formatearFechaLarga } from '../utils/formatearFecha';
 import { getEstadoBadgeClasses } from '../utils/estadoBadgeClasses';
 
@@ -171,6 +172,12 @@ const Expediente = () => {
           inscripción, así que quien lo dejaba a medias no tenía cómo volver. */}
       <div className="mt-6">
         <ExpedienteDocumentos alumnoId={alumnoId} titulo="Mis documentos" />
+      </div>
+
+      {/* Datos administrativos que pedía la parte 2 del formulario de
+          inscripción. Quien no lo terminó no tenía cómo aportarlos después. */}
+      <div className="mt-6">
+        <ExpedienteDatos alumnoId={alumnoId} />
       </div>
 
       {/* Enlaces Públicos - Ocultos si usuario inactivo */}
