@@ -89,6 +89,7 @@ const ExpedienteDocumentos = ({ alumnoId, soloLectura = false, titulo = 'Documen
   const requeridos = estado?.requeridos || [];
   const opcionales = estado?.opcionales || [];
   const faltantes = estado?.faltantes || [];
+  const historial = estado?.historial || [];
   const porTipo = new Map((estado?.docs || []).map((d) => [d.docType, d]));
 
   const tipos = ORDEN.filter((t) => requeridos.includes(t) || opcionales.includes(t));
@@ -211,8 +212,35 @@ const ExpedienteDocumentos = ({ alumnoId, soloLectura = false, titulo = 'Documen
         </ul>
       )}
 
+      {historial.length > 0 && (
+        <details className="mt-4 border-t border-gray-200 dark:border-gray-700 pt-3">
+          <summary className="text-sm font-medium text-gray-600 dark:text-gray-300 cursor-pointer">
+            Versiones anteriores ({historial.length})
+          </summary>
+          <ul className="mt-2 space-y-1">
+            {historial.map((h) => (
+              <li key={h.path} className="flex items-center justify-between gap-3 text-xs">
+                <span className="text-gray-500 dark:text-gray-400 truncate">
+                  {LABELS[h.docType] || h.docType}
+                  {h.reemplazadoEn ? ` · reemplazado el ${new Date(h.reemplazadoEn).toLocaleDateString('es-MX')}` : ''}
+                </span>
+                <a
+                  href={h.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 dark:text-blue-400 hover:underline shrink-0"
+                >
+                  Ver
+                </a>
+              </li>
+            ))}
+          </ul>
+        </details>
+      )}
+
       <p className="mt-3 text-xs text-gray-400">
-        PDF o imagen, máximo {MAX_FILE_MB} MB. Subir de nuevo un documento reemplaza el anterior.
+        PDF o imagen, máximo {MAX_FILE_MB} MB. Al reemplazar un documento, la versión anterior se
+        conserva en el historial.
         Los enlaces de descarga son temporales (≈15 min); usa «Actualizar» si expiran.
       </p>
     </div>

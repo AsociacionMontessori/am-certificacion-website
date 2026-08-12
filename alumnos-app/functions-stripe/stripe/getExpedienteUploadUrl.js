@@ -104,17 +104,36 @@ exports.getExpedienteUploadUrlHandler = onRequest(
         const storagePath = `expediente/${alumnoId}/${docType}/${docType}.${ext}`;
         const bucket = admin.storage().bucket();
 
-        // Si el mismo documento existía con otra extensión (p. ej. pasar de
-        // JPG a PDF), se borra la versión anterior: si no, el expediente
-        // mostraría dos archivos para un mismo requisito.
+        // Reemplazar NO destruye la versión anterior: se archiva en
+        // `historial/`. Son documentos legales —contratos firmados, actas— y
+        // conviene poder demostrar qué se tenía en cada momento.
+        //
+        // Se copia (no se mueve) antes de emitir la URL: si la subida falla a
+        // medias, el documento vigente sigue en su lugar. El nombre lleva la
+        // fecha de la versión archivada, así que reintentar copia encima de la
+        // misma entrada en lugar de acumular basura.
         const [previos] = await bucket.getFiles({
           prefix: `expediente/${alumnoId}/${docType}/`,
         });
-        await Promise.all(
-            previos
-                .filter((f) => f.name !== storagePath)
-                .map((f) => f.delete().catch(() => null)),
-        );
+        const vigentes = previos.filter((f) => !f.name.includes("/historial/"));
+        for (const anterior of vigentes) {
+          const meta = anterior.metadata || {};
+          const sello = String(meta.updated || meta.timeCreated || meta.generation || "previo")
+              .replace(/[:.]/g, "-");
+          const base = anterior.name.split("/").pop();
+          const destino = `expediente/${alumnoId}/${docType}/historial/${sello}-${base}`;
+          try {
+            await anterior.copy(bucket.file(destino));
+            // Si la versión nueva llega con otra extensión, el archivo vigente
+            // anterior debe retirarse o el requisito quedaría con dos vigentes.
+            if (anterior.name !== storagePath) await anterior.delete();
+          } catch (errArchivo) {
+            console.warn("getExpedienteUploadUrl:no_se_archivo", {
+              archivo: anterior.name,
+              error: errArchivo.message,
+            });
+          }
+        }
 
         const [uploadUrl] = await bucket.file(storagePath).getSignedUrl({
           version: "v4",

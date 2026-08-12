@@ -33,6 +33,9 @@ export const getExpedienteDocsUrls = async (alumnoId) => {
   }
   return {
     docs: data.docs || [],
+    // Versiones reemplazadas. Solo llegan con lectura privilegiada
+    // (administración o directivos); al alumno le llega vacío.
+    historial: data.historial || [],
     requeridos: data.requeridos || [],
     opcionales: data.opcionales || [],
     faltantes: data.faltantes || [],

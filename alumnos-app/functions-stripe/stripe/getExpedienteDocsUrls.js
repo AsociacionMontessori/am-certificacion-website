@@ -113,9 +113,13 @@ exports.getExpedienteDocsUrlsHandler = onRequest(
         const [files] = await bucket.getFiles({prefix: `expediente/${alumnoId}/`});
 
         const expiresAt = Date.now() + 15 * 60 * 1000;
+        // Las versiones reemplazadas viven en `{docType}/historial/`. No son
+        // el documento vigente, así que no cuentan para lo entregado ni
+        // aparecen en la lista principal.
+        const esHistorial = (f) => f.name.includes("/historial/");
         const docs = await Promise.all(
             files
-                .filter((f) => !f.name.endsWith("/"))
+                .filter((f) => !f.name.endsWith("/") && !esHistorial(f))
                 .map(async (file) => {
                   const {docType, fileName} = parsePath(file.name);
                   const [url] = await file.getSignedUrl({
@@ -154,10 +158,40 @@ exports.getExpedienteDocsUrlsHandler = onRequest(
         const entregados = new Set(docs.map((d) => d.docType).filter(Boolean));
         const faltantes = [...requeridos].filter((t) => !entregados.has(t));
 
+        // El historial es material de auditoría: solo administración y
+        // directivos. Al alumno le basta con su documento vigente.
+        let historial = [];
+        if (isPrivileged) {
+          historial = await Promise.all(
+              files
+                  .filter((f) => !f.name.endsWith("/") && esHistorial(f))
+                  .map(async (file) => {
+                    const [url] = await file.getSignedUrl({
+                      version: "v4",
+                      action: "read",
+                      expires: expiresAt,
+                    });
+                    const meta = file.metadata || {};
+                    const partes = file.name.split("/");
+                    return {
+                      docType: partes[2] || "",
+                      fileName: partes[partes.length - 1] || "",
+                      path: file.name,
+                      sizeBytes: meta.size ? Number(meta.size) : null,
+                      reemplazadoEn: meta.timeCreated || null,
+                      url,
+                    };
+                  }),
+          );
+          historial.sort((a, b) =>
+            String(b.reemplazadoEn || "").localeCompare(String(a.reemplazadoEn || "")));
+        }
+
         res.json({
           ok: true,
           alumnoId,
           docs,
+          historial,
           requeridos: [...requeridos],
           opcionales: [...opcionales],
           faltantes,
