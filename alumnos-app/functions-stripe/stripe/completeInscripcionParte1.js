@@ -216,11 +216,13 @@ exports.completeInscripcionParte1Handler = onRequest(
             ordenExistente: previo.data().ordenId || null,
           });
           res.status(409).json({
-            error: "Ya tienes una cuenta registrada con este correo. No creamos una " +
-              "segunda para que no se dividan tus documentos y tus materias. Escríbenos " +
-              "a admin@certificacionmontessori.com y agregamos o cambiamos el programa " +
-              "en tu cuenta actual.",
+            error: "Ya tienes una cuenta registrada con este correo, así que no creamos " +
+              "una segunda: tus documentos y tus materias quedarían divididas entre las " +
+              "dos. Si te faltaba entregar documentos, entra a tu portal de alumnos con " +
+              "tu correo institucional y súbelos desde «Mi expediente». Si quieres " +
+              "cambiar o agregar un programa, escríbenos a admin@certificacionmontessori.com.",
             yaTieneCuenta: true,
+            portalUrl: "https://alumnos.certificacionmontessori.com",
           });
           return;
         }

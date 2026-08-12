@@ -5,6 +5,7 @@ import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import { DocumentTextIcon, UserIcon, AcademicCapIcon, LinkIcon, ShareIcon, EyeIcon } from '@heroicons/react/24/outline';
 import LoadingSpinner from '../components/LoadingSpinner';
+import ExpedienteDocumentos from '../components/ExpedienteDocumentos';
 import { formatearFechaLarga } from '../utils/formatearFecha';
 import { getEstadoBadgeClasses } from '../utils/estadoBadgeClasses';
 
@@ -163,6 +164,13 @@ const Expediente = () => {
             )}
           </dl>
         </div>
+      </div>
+
+      {/* Documentos del expediente. El alumno ve qué entregó, qué le falta y
+          puede subirlo él mismo: antes solo existía durante el formulario de
+          inscripción, así que quien lo dejaba a medias no tenía cómo volver. */}
+      <div className="mt-6">
+        <ExpedienteDocumentos alumnoId={alumnoId} titulo="Mis documentos" />
       </div>
 
       {/* Enlaces Públicos - Ocultos si usuario inactivo */}

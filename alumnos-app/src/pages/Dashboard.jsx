@@ -21,6 +21,7 @@ import {
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
 import AlertasMateriasAtraso from '../components/AlertasMateriasAtraso';
+import AvisoDocumentosPendientes from '../components/AvisoDocumentosPendientes';
 
 const Dashboard = () => {
   const { userData } = useAuth();
@@ -156,6 +157,8 @@ const Dashboard = () => {
 
       {/* Alertas de Materias con Atraso - solo para alumnos, no para rol grupos */}
       {userData?.estado !== 'Inactivo' && userData?.rol !== 'grupos' && <AlertasMateriasAtraso />}
+
+      {userData?.estado !== 'Inactivo' && <AvisoDocumentosPendientes />}
 
       {/* Cards de navegación */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">

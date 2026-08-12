@@ -2,6 +2,7 @@ const {onRequest} = require("firebase-functions/v2/https");
 const admin = require("firebase-admin");
 const {handleCors, rejectIfOriginNotAllowed} = require("./cors");
 const {enforceRateLimit} = require("./rateLimit");
+const {getDocumentosParte2} = require("./inscripcionCatalog");
 
 /**
  * Lista los documentos del expediente de un alumno (Storage:
@@ -18,6 +19,34 @@ async function isCallerAdminOrDirectivo(db, uid) {
     db.collection("directivos").doc(uid).get(),
   ]);
   return adminSnap.exists || directivoSnap.exists;
+}
+
+/**
+ * Documentos que exige el expediente de un alumno. La constancia fiscal solo
+ * aplica a quien pidió factura, así que se consulta su orden.
+ * @param {FirebaseFirestore.Firestore} db
+ * @param {string} alumnoId
+ * @return {Promise<{requeridos: Set<string>, opcionales: Set<string>}>}
+ */
+async function documentosDelAlumno(db, alumnoId) {
+  let requiereFactura = false;
+  try {
+    const insc = await db.collection("inscripciones")
+        .where("alumnoId", "==", alumnoId)
+        .limit(1)
+        .get();
+    const ordenId = insc.empty ? null : insc.docs[0].data().ordenId;
+    if (ordenId) {
+      const orden = await db.collection("ordenes").doc(ordenId).get();
+      requiereFactura = Boolean(orden.exists && orden.data().requiereFacturaFiscal);
+    }
+  } catch (err) {
+    // Sin inscripción localizable se asume el expediente estándar: es mejor
+    // pedir de más y que administración lo dispense, que dar por completo un
+    // expediente al que le falta la constancia fiscal.
+    console.warn("getExpedienteDocsUrls:sin_orden", {alumnoId, error: err.message});
+  }
+  return getDocumentosParte2(requiereFactura);
 }
 
 /**
@@ -118,7 +147,22 @@ exports.getExpedienteDocsUrlsHandler = onRequest(
           count: docs.length,
         });
 
-        res.json({ok: true, alumnoId, docs});
+        // Qué exige el expediente de ESTE alumno y qué le falta todavía. Se
+        // calcula aquí para que el portal (alumno y administración) muestre lo
+        // mismo que valida el backend, sin duplicar la regla en el frontend.
+        const {requeridos, opcionales} = await documentosDelAlumno(db, alumnoId);
+        const entregados = new Set(docs.map((d) => d.docType).filter(Boolean));
+        const faltantes = [...requeridos].filter((t) => !entregados.has(t));
+
+        res.json({
+          ok: true,
+          alumnoId,
+          docs,
+          requeridos: [...requeridos],
+          opcionales: [...opcionales],
+          faltantes,
+          expedienteCompleto: faltantes.length === 0,
+        });
       } catch (err) {
         console.error("getExpedienteDocsUrls:", err);
         if (err.code === "auth/id-token-expired" || err.code === "auth/argument-error") {
