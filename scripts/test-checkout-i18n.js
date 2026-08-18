@@ -1,6 +1,11 @@
 const assert = require("assert")
 
 const { LOCALIZED_PATHS, localizePath } = require("../src/i18n/config")
+const checkoutTranslations = {
+  es: require("../src/i18n/locales/es/checkout.json"),
+  en: require("../src/i18n/locales/en/checkout.json"),
+  "pt-br": require("../src/i18n/locales/pt-br/checkout.json"),
+}
 const {
   buildLocalizedCheckoutUrl,
   getStripeCheckoutLocale,
@@ -21,6 +26,32 @@ requiredTransactionalPaths.forEach((path) => {
   assert(
       LOCALIZED_PATHS.includes(path),
       `Expected ${path} to be listed as a localized transactional path`,
+  )
+})
+
+const requiredPaymentReferenceKeys = [
+  "referenceHelpButton",
+  "referenceHelpButtonLabel",
+  "referenceHelpTitle",
+  "referenceHelpImageAlt",
+  "referenceHelpWarning",
+  "referenceHelpClose",
+]
+
+Object.entries(checkoutTranslations).forEach(([locale, translations]) => {
+  requiredPaymentReferenceKeys.forEach((key) => {
+    assert(
+        translations.completePage[key],
+        `Expected checkout.completePage.${key} in ${locale}`,
+    )
+  })
+  assert(
+      translations.success.paymentReferenceTitle,
+      `Expected checkout.success.paymentReferenceTitle in ${locale}`,
+  )
+  assert(
+      translations.success.paymentReferenceHint,
+      `Expected checkout.success.paymentReferenceHint in ${locale}`,
   )
 })
 

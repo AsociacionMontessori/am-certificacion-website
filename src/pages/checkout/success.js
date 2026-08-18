@@ -129,9 +129,27 @@ const CheckoutSuccessPage = () => {
                 : t("success.defaultMessage")}
           </p>
           {ordenId && (
-            <p className="text-sm text-gray mb-6">
-              {t("common.reference")}: <span className="font-mono text-blue">{ordenId}</span>
-            </p>
+            <section
+              data-testid="payment-reference-card"
+              className="mb-6 rounded-2xl border-2 border-blue/30 bg-blue/5 px-5 py-4 text-left shadow-sm"
+              aria-labelledby="payment-reference-title"
+            >
+              <p
+                id="payment-reference-title"
+                className="text-xs font-bold uppercase tracking-wide text-blue"
+              >
+                {t("success.paymentReferenceTitle")}
+              </p>
+              <p
+                data-testid="payment-reference-value"
+                className="mt-2 break-all font-mono text-lg font-bold tracking-wide text-blue"
+              >
+                {ordenId}
+              </p>
+              <p className="mt-2 text-xs leading-relaxed text-gray">
+                {t("success.paymentReferenceHint")}
+              </p>
+            </section>
           )}
 
           {esEbook && (

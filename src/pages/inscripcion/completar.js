@@ -6,6 +6,7 @@ import { getT, useLocalization } from "../../i18n"
 import CheckoutPageShell from "../../components/checkout/CheckoutPageShell"
 import Seo from "../../components/seo"
 import InscripcionParte1Form from "../../components/inscripcion/InscripcionParte1Form"
+import PaymentReferenceHelp from "../../components/inscripcion/PaymentReferenceHelp"
 import { fetchInscripcionOrden, canjearCodigoDirecto } from "../../utils/inscripcionApi"
 import { mapProgramaCheckoutANivel, PORTAL_ALUMNOS_URL } from "../../data/inscripcionForm"
 
@@ -126,9 +127,12 @@ const InscripcionCompletarPage = () => {
     >
       {!ordenFromUrl && !context && (
         <div className="mb-6 space-y-3">
-          <label className="block text-sm font-medium text-black" htmlFor="orden-ref">
-            {t("completePage.paymentReference")}
-          </label>
+          <div className="flex flex-wrap items-center justify-between gap-x-3">
+            <label className="block text-sm font-medium text-black" htmlFor="orden-ref">
+              {t("completePage.paymentReference")}
+            </label>
+            <PaymentReferenceHelp />
+          </div>
           <input
             id="orden-ref"
             type="text"
