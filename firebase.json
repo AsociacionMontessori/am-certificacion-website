@@ -24,6 +24,16 @@
         "type": 301
       },
       {
+        "source": "/contacto",
+        "destination": "/contact/",
+        "type": 301
+      },
+      {
+        "source": "/contacto/**",
+        "destination": "/contact/",
+        "type": 301
+      },
+      {
         "source": "/certificate",
         "destination": "/diplomados/#certificacion_internacional",
         "type": 301

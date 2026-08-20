@@ -24,6 +24,8 @@ async function main() {
   )
 
   const redirects = new Map([
+    ["/contacto", "/contact/"],
+    ["/contacto/", "/contact/"],
     ["/certificate/", "/diplomados/#certificacion_internacional"],
     ["/en/certificate/", "/en/diplomados/#certificacion_internacional"],
     ["/pt-br/certificate/", "/pt-br/diplomados/#certificacion_internacional"],
