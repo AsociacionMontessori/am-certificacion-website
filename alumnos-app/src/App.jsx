@@ -32,6 +32,7 @@ const GeneradorQR = lazy(() => import('./pages/Admin/GeneradorQR'));
 const DiagnosticoCodigos = lazy(() => import('./pages/Admin/DiagnosticoCodigos'));
 const GestionGrupos = lazy(() => import('./pages/Admin/GestionGrupos'));
 const GestionNiveles = lazy(() => import('./pages/Admin/GestionNiveles'));
+const Mensajes = lazy(() => import('./pages/Admin/Mensajes'));
 // TEMPORAL: Sección de Pagos oculta mientras no está lista
 // const GestionPagos = lazy(() => import('./pages/Admin/GestionPagos'));
 const OrdenesPublicas = lazy(() => import('./pages/Admin/OrdenesPublicas'));
@@ -303,6 +304,18 @@ function App() {
             }
           />
           */}
+          <Route
+            path="/admin/mensajes"
+            element={
+              <AdminRoute allowedRoles={['admin', 'directivo']}>
+                <AdminLayout>
+                  <Suspense fallback={<LoadingSpinner fullScreen size="xl" variant="montessori" message="Cargando..." />}>
+                    <Mensajes />
+                  </Suspense>
+                </AdminLayout>
+              </AdminRoute>
+            }
+          />
           <Route
             path="/admin/ordenes"
             element={

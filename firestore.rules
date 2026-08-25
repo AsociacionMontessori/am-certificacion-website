@@ -252,6 +252,27 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
     
+    // Colección: mensajes
+    // Avisos que administración publica para el tablero del alumno.
+    // El alumno solo puede leer los que están activos y le corresponden;
+    // escribir el mensaje es exclusivo de admin. Que lo haya cerrado se
+    // guarda en la subcolección `lecturas`, un documento por alumno, para
+    // que nadie pueda alterar lo que ven los demás.
+    match /mensajes/{mensajeId} {
+      allow read: if canReadAdmin()
+                   || (request.auth != null
+                       && resource.data.activo == true
+                       && (resource.data.destino == 'todos'
+                           || resource.data.alumnoId == request.auth.uid));
+      allow write: if isAdmin();
+
+      match /lecturas/{alumnoId} {
+        allow read: if canReadAdmin() || isOwnAlumno(alumnoId);
+        allow create, update: if isOwnAlumno(alumnoId);
+        allow delete: if isAdmin();
+      }
+    }
+    
     // Denegar acceso a todo lo demás por defecto
     match /{document=**} {
       allow read, write: if false;

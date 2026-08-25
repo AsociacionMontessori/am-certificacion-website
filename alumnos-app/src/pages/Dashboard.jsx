@@ -22,6 +22,7 @@ import { Link } from 'react-router-dom';
 import { useState } from 'react';
 import AlertasMateriasAtraso from '../components/AlertasMateriasAtraso';
 import AvisoDocumentosPendientes from '../components/AvisoDocumentosPendientes';
+import AvisosDelAdmin from '../components/AvisosDelAdmin';
 
 const Dashboard = () => {
   const { userData } = useAuth();
@@ -154,6 +155,9 @@ const Dashboard = () => {
           </div>
         </div>
       )} */}
+
+      {/* Mensajes que administración publicó para el alumno */}
+      {userData?.estado !== 'Inactivo' && <AvisosDelAdmin />}
 
       {/* Alertas de Materias con Atraso - solo para alumnos, no para rol grupos */}
       {userData?.estado !== 'Inactivo' && userData?.rol !== 'grupos' && <AlertasMateriasAtraso />}

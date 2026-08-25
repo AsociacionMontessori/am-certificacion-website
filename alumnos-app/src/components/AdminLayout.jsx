@@ -14,7 +14,8 @@ import {
   ArrowRightOnRectangleIcon,
   SunIcon,
   MoonIcon,
-  IdentificationIcon
+  IdentificationIcon,
+  MegaphoneIcon
 } from '@heroicons/react/24/outline';
 
 const AdminLayout = ({ children }) => {
@@ -35,6 +36,7 @@ const AdminLayout = ({ children }) => {
         [{ name: 'Órdenes web', href: '/admin/ordenes', icon: CurrencyDollarIcon }] :
         []),
     ] : []),
+    ...(canEdit ? [{ name: 'Mensajes', href: '/admin/mensajes', icon: MegaphoneIcon }] : []),
     ...(canEdit ? [{ name: 'Gestión Grupos', href: '/admin/gestion-grupos', icon: UserGroupIcon }] : []),
     // Generador QR solo para admin y directivo, no para grupos
     ...(userData?.rol !== 'grupos' && userData?.rol !== 'catedratico' ? [{ name: 'Generador QR', href: '/admin/generador-qr', icon: QrCodeIcon }] : []),
