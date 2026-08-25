@@ -1,6 +1,5 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { collection, getDocs, orderBy, query } from 'firebase/firestore';
 import {
   ArrowLeftIcon,
   MegaphoneIcon,
@@ -10,7 +9,6 @@ import {
   UserGroupIcon,
   UserIcon
 } from '@heroicons/react/24/outline';
-import { db } from '../../config/firebase';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNotifications } from '../../contexts/NotificationContext';
@@ -30,8 +28,6 @@ import {
 } from '../../services/mensajesService';
 
 const FORM_INICIAL = {
-  destino: DESTINO_TODOS,
-  alumnoId: '',
   titulo: '',
   cuerpo: '',
   tipo: 'info',
@@ -39,9 +35,11 @@ const FORM_INICIAL = {
 };
 
 /**
- * Publicación de mensajes de administración hacia el tablero de los alumnos.
- * Vive en su propia página en vez de dentro de AlumnoDetail, que ya es un
- * archivo muy grande, y así se atienden igual los avisos generales.
+ * Avisos de administración para todos los alumnos.
+ *
+ * Aquí solo se publica el aviso general: el mensaje a una sola persona se
+ * escribe desde la ficha del alumno, que es donde surge la necesidad. La lista
+ * de abajo sí muestra ambos, para tener a la vista todo lo publicado.
  */
 const Mensajes = () => {
   const canEdit = useCanEdit();
@@ -50,8 +48,6 @@ const Mensajes = () => {
 
   const [loading, setLoading] = useState(true);
   const [mensajes, setMensajes] = useState([]);
-  const [alumnos, setAlumnos] = useState([]);
-  const [busquedaAlumno, setBusquedaAlumno] = useState('');
   const [formData, setFormData] = useState(FORM_INICIAL);
   const [guardando, setGuardando] = useState(false);
   const [procesando, setProcesando] = useState(null);
@@ -68,36 +64,11 @@ const Mensajes = () => {
   useEffect(() => {
     const cargarTodo = async () => {
       setLoading(true);
-      try {
-        const alumnosSnapshot = await getDocs(
-          query(collection(db, 'alumnos'), orderBy('nombre', 'asc'))
-        );
-        setAlumnos(
-          alumnosSnapshot.docs.map((alumnoDoc) => ({
-            id: alumnoDoc.id,
-            nombre: alumnoDoc.data().nombre || '(sin nombre)',
-            matricula: alumnoDoc.data().matricula || ''
-          }))
-        );
-      } catch (error) {
-        console.error('Error al cargar los alumnos:', error);
-        showError('No se pudo cargar la lista de alumnos');
-      }
       await cargarMensajes();
       setLoading(false);
     };
     cargarTodo();
-  }, [cargarMensajes, showError]);
-
-  const alumnosFiltrados = useMemo(() => {
-    const termino = busquedaAlumno.trim().toLowerCase();
-    if (!termino) return alumnos;
-    return alumnos.filter(
-      (alumno) =>
-        alumno.nombre.toLowerCase().includes(termino) ||
-        alumno.matricula.toString().toLowerCase().includes(termino)
-    );
-  }, [alumnos, busquedaAlumno]);
+  }, [cargarMensajes]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -110,20 +81,18 @@ const Mensajes = () => {
 
     setGuardando(true);
     try {
-      const alumno = alumnos.find((a) => a.id === formData.alumnoId);
       const resultado = await crearMensaje(
         {
           ...formData,
-          alumnoNombre: alumno?.nombre || '',
+          destino: DESTINO_TODOS,
           fechaFin: fechaFinDesdeInput(formData.fechaFin)
         },
         currentUser?.uid || null
       );
 
       if (resultado.success) {
-        success('Mensaje publicado');
+        success('Mensaje publicado para todos los alumnos');
         setFormData(FORM_INICIAL);
-        setBusquedaAlumno('');
         await cargarMensajes();
       } else {
         showError(resultado.error || 'No se pudo publicar el mensaje');
@@ -194,7 +163,8 @@ const Mensajes = () => {
             Mensajes a alumnos
           </h1>
           <p className="text-sm text-gray-600 dark:text-gray-400">
-            Lo que publiques aquí lo verá el alumno en su tablero al iniciar sesión.
+            Lo que publiques aquí lo verán todos los alumnos en su tablero al iniciar sesión.
+            Para escribirle a uno solo, entra a su ficha.
           </p>
         </div>
       </div>
@@ -206,62 +176,8 @@ const Mensajes = () => {
         >
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
             <MegaphoneIcon className="w-5 h-5 text-blue" />
-            Nuevo mensaje
+            Nuevo aviso para todos los alumnos
           </h2>
-
-          <div>
-            <span className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Destinatario
-            </span>
-            <div className="flex flex-col sm:flex-row gap-3">
-              <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
-                <input
-                  type="radio"
-                  name="destino"
-                  value={DESTINO_TODOS}
-                  checked={formData.destino === DESTINO_TODOS}
-                  onChange={handleChange}
-                />
-                Todos los alumnos
-              </label>
-              <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
-                <input
-                  type="radio"
-                  name="destino"
-                  value={DESTINO_ALUMNO}
-                  checked={formData.destino === DESTINO_ALUMNO}
-                  onChange={handleChange}
-                />
-                Un alumno en particular
-              </label>
-            </div>
-          </div>
-
-          {formData.destino === DESTINO_ALUMNO && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <input
-                type="text"
-                value={busquedaAlumno}
-                onChange={(e) => setBusquedaAlumno(e.target.value)}
-                placeholder="Buscar por nombre o matrícula"
-                className="w-full px-3 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-              />
-              <select
-                name="alumnoId"
-                value={formData.alumnoId}
-                onChange={handleChange}
-                className="w-full px-3 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-              >
-                <option value="">Selecciona un alumno</option>
-                {alumnosFiltrados.map((alumno) => (
-                  <option key={alumno.id} value={alumno.id}>
-                    {alumno.nombre}
-                    {alumno.matricula ? ` — ${alumno.matricula}` : ''}
-                  </option>
-                ))}
-              </select>
-            </div>
-          )}
 
           <div>
             <label htmlFor="titulo" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">

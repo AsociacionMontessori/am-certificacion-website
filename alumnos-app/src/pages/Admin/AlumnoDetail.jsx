@@ -12,6 +12,7 @@ import { obtenerNiveles } from '../../services/nivelesService';
 import { getEstadoBadgeClasses } from '../../utils/estadoBadgeClasses';
 import ExpedienteDocumentos from '../../components/ExpedienteDocumentos';
 import ExpedienteDatos from '../../components/ExpedienteDatos';
+import MensajesDelAlumno from '../../components/MensajesDelAlumno';
 
 const AlumnoDetail = () => {
   const { id } = useParams();
@@ -1089,6 +1090,8 @@ const AlumnoDetail = () => {
             </Link>
           </div>
         </div>
+
+        <MensajesDelAlumno alumnoId={alumno.id} alumnoNombre={alumno.nombre} />
 
         {/* Vista Pública y Certificado */}
         <div className="lg:col-span-2 bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">

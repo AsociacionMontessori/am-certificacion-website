@@ -133,6 +133,45 @@ export const obtenerMensajes = async () => {
   }
 };
 
+/**
+ * Los mensajes dirigidos a un alumno, para la tarjeta de su ficha. Incluye si
+ * ya cerró cada uno, que es lo único que administración necesita saber de la
+ * lectura cuando el mensaje va a una sola persona.
+ */
+export const obtenerMensajesDeAlumno = async (alumnoId) => {
+  if (!alumnoId) return { success: true, mensajes: [] };
+
+  try {
+    const snapshot = await getDocs(
+      query(collection(db, MENSAJES), where('alumnoId', '==', alumnoId))
+    );
+
+    const mensajes = await Promise.all(
+      snapshot.docs.map(async (mensajeDoc) => {
+        let cerrado = false;
+        try {
+          const acuse = await getDoc(doc(db, MENSAJES, mensajeDoc.id, LECTURAS, alumnoId));
+          cerrado = acuse.exists();
+        } catch {
+          // El acuse es informativo: si no se puede leer, se asume sin cerrar.
+        }
+        return { id: mensajeDoc.id, ...mensajeDoc.data(), cerrado };
+      })
+    );
+
+    mensajes.sort((a, b) => {
+      const fechaA = aFecha(a.creadoEn)?.getTime() || 0;
+      const fechaB = aFecha(b.creadoEn)?.getTime() || 0;
+      return fechaB - fechaA;
+    });
+
+    return { success: true, mensajes };
+  } catch (error) {
+    console.error('Error al obtener los mensajes del alumno:', error);
+    return { success: false, error: error.message, mensajes: [] };
+  }
+};
+
 /** Activa o desactiva un mensaje sin borrarlo. */
 export const cambiarEstadoMensaje = async (mensajeId, activo) => {
   try {
