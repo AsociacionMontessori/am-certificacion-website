@@ -1,4 +1,10 @@
 /**
+ * Cómo se lee una materia a la que todavía no se le asigna fecha. Se muestra
+ * igual en el portal del alumno y en la gestión de administración.
+ */
+export const ETIQUETA_SIN_FECHA = 'Sin fecha próxima';
+
+/**
  * Verifica si una fecha es una fecha "por defecto" o "sin fecha" (1900-01-01)
  * @param {Date} fechaObj - Objeto Date a verificar
  * @returns {boolean} true si es fecha por defecto

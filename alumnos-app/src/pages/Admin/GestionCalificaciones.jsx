@@ -9,6 +9,11 @@ import LoadingSpinner from '../../components/LoadingSpinner';
 import LoadingButton from '../../components/LoadingButton';
 import { useNotifications } from '../../contexts/NotificationContext';
 import useCanEdit from '../../hooks/useCanEdit';
+import {
+  normalizarTexto,
+  formatearValorCalificacion,
+  obtenerColorCalificacion
+} from '../../utils/calificaciones';
 
 const GestionCalificaciones = () => {
   const { id } = useParams();
@@ -131,33 +136,6 @@ const GestionCalificaciones = () => {
       null
     );
   }, [bulkNivelId, nivelesOpciones, nivelesHistorial, nivelActivo]);
-
-  const normalizarTexto = (valor) => (valor || '').toString().trim().toLowerCase();
-
-  const formatearValorCalificacion = (valor) => {
-    const numero = Number(valor);
-    if (Number.isNaN(numero)) {
-      return 'N/A';
-    }
-    if (numero === 0) {
-      return 'Por cursar';
-    }
-    if (numero === 1) {
-      return 'Cursando';
-    }
-    return numero;
-  };
-
-  const obtenerColorCalificacion = (calificacion) => {
-    const numero = Number(calificacion);
-    if (Number.isNaN(numero)) return 'text-gray-500';
-    if (numero === 0) return 'text-gray-500';
-    if (numero === 1) return 'text-blue';
-    if (numero >= 9) return 'text-green';
-    if (numero >= 8) return 'text-blue';
-    if (numero >= 7) return 'text-yellow';
-    return 'text-red';
-  };
 
   const obtenerFechaFinMateria = (materia) => {
     if (!materia?.fechaFin) {

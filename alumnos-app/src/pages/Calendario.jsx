@@ -3,7 +3,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import { CalendarIcon, ClockIcon, MapPinIcon, UserIcon } from '@heroicons/react/24/outline';
-import { formatearFechaLarga } from '../utils/formatearFecha';
+import { formatearFechaLarga, ETIQUETA_SIN_FECHA } from '../utils/formatearFecha';
 
 const Calendario = () => {
   const { currentUser } = useAuth();
@@ -47,7 +47,7 @@ const Calendario = () => {
   const materiasPorFecha = materias.reduce((acc, materia) => {
     const fechaInicio = materia.fechaInicio 
       ? formatearFechaLarga(materia.fechaInicio)
-      : 'Sin fecha';
+      : ETIQUETA_SIN_FECHA;
     
     if (!acc[fechaInicio]) {
       acc[fechaInicio] = [];
@@ -57,8 +57,8 @@ const Calendario = () => {
   }, {});
 
   const fechasOrdenadas = Object.keys(materiasPorFecha).sort((a, b) => {
-    if (a === 'Sin fecha') return 1;
-    if (b === 'Sin fecha') return -1;
+    if (a === ETIQUETA_SIN_FECHA) return 1;
+    if (b === ETIQUETA_SIN_FECHA) return -1;
     return new Date(a) - new Date(b);
   });
 
@@ -88,7 +88,7 @@ const Calendario = () => {
               <div className="bg-blue/10 dark:bg-blue/20 px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 dark:border-gray-700">
                 <h2 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white flex items-center">
                   <CalendarIcon className="w-5 h-5 sm:w-6 sm:h-6 text-blue mr-2" />
-                  {fecha === 'Sin fecha' ? 'Materias sin fecha asignada' : `Inicio: ${fecha}`}
+                  {fecha === ETIQUETA_SIN_FECHA ? `Materias ${ETIQUETA_SIN_FECHA.toLowerCase()}` : `Inicio: ${fecha}`}
                 </h2>
               </div>
               <div className="p-4 sm:p-6">

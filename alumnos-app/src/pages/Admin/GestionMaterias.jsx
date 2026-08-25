@@ -7,7 +7,13 @@ import { getHistorialNiveles, getNivelActivo } from '../../utils/alumnos';
 import { ArrowLeftIcon, PlusIcon, PencilIcon, TrashIcon, CalendarIcon, DocumentDuplicateIcon, XMarkIcon, ExclamationTriangleIcon, CheckCircleIcon, ClockIcon } from '@heroicons/react/24/outline';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import LoadingButton from '../../components/LoadingButton';
-import { formatearFechaLarga, formatearFechaInput } from '../../utils/formatearFecha';
+import { formatearFechaLarga, formatearFechaInput, ETIQUETA_SIN_FECHA } from '../../utils/formatearFecha';
+import {
+  formatearValorCalificacion,
+  obtenerColorCalificacion,
+  buscarCalificacionDeMateria,
+  coincideConMateria
+} from '../../utils/calificaciones';
 import { useNotifications } from '../../contexts/NotificationContext';
 import useCanEdit from '../../hooks/useCanEdit';
 
@@ -19,6 +25,10 @@ const GestionMaterias = () => {
   const { success, error: showError, confirm } = useNotifications();
   const [alumno, setAlumno] = useState(null);
   const [materias, setMaterias] = useState([]);
+  const [calificaciones, setCalificaciones] = useState([]);
+  const [calificacionEnEdicion, setCalificacionEnEdicion] = useState(null);
+  const [calificacionBorrador, setCalificacionBorrador] = useState('');
+  const [guardandoCalificacion, setGuardandoCalificacion] = useState(false);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [showBulkModal, setShowBulkModal] = useState(false);
@@ -35,6 +45,7 @@ const GestionMaterias = () => {
     fechaFin: '',
     aula: '',
     estado: 'Pendiente',
+    calificacion: '',
     nivelId: '',
     nivelNombre: ''
   });
@@ -57,6 +68,41 @@ const GestionMaterias = () => {
         nivelNombre: nombreFinal
       };
     });
+  };
+
+  const ordenarPorFecha = (lista) => {
+    lista.sort((a, b) => {
+      const fechaA = a.fechaInicio?.toDate ? a.fechaInicio.toDate() : null;
+      const fechaB = b.fechaInicio?.toDate ? b.fechaInicio.toDate() : null;
+      if (!fechaA && !fechaB) return 0;
+      if (!fechaA) return 1;
+      if (!fechaB) return -1;
+      return fechaA - fechaB;
+    });
+    return lista;
+  };
+
+  /**
+   * Trae materias y calificaciones juntas: desde esta pantalla se capturan de
+   * una sola vez, aunque sigan viviendo en colecciones separadas porque de ahí
+   * comen el portal del alumno y el perfil público.
+   */
+  const cargarMateriasYCalificaciones = async (historialLista, nivelActivoRef, alumnoRef) => {
+    const [materiasSnapshot, calificacionesSnapshot] = await Promise.all([
+      getDocs(query(collection(db, 'materias'), where('alumnoId', '==', id))),
+      getDocs(query(collection(db, 'calificaciones'), where('alumnoId', '==', id)))
+    ]);
+
+    const materiasData = ordenarPorFecha(
+      materiasSnapshot.docs.map((materiaDoc) => ({ id: materiaDoc.id, ...materiaDoc.data() }))
+    );
+    setMaterias(normalizarMaterias(materiasData, historialLista, nivelActivoRef, alumnoRef));
+    setCalificaciones(
+      calificacionesSnapshot.docs.map((calificacionDoc) => ({
+        id: calificacionDoc.id,
+        ...calificacionDoc.data()
+      }))
+    );
   };
 
   const nivelesOpciones = useMemo(() => {
@@ -151,27 +197,7 @@ const GestionMaterias = () => {
           setNivelFiltro(nivelInicial);
           setBulkNivelId(nivelActivoActual?.id || null);
 
-          // Cargar materias del alumno
-          const materiasQuery = query(
-            collection(db, 'materias'),
-            where('alumnoId', '==', id)
-          );
-          const materiasSnapshot = await getDocs(materiasQuery);
-          const materiasData = materiasSnapshot.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data()
-          }));
-          // Ordenar manualmente: primero las que tienen fecha, luego las que no
-          materiasData.sort((a, b) => {
-            const fechaA = a.fechaInicio?.toDate ? a.fechaInicio.toDate() : null;
-            const fechaB = b.fechaInicio?.toDate ? b.fechaInicio.toDate() : null;
-            if (!fechaA && !fechaB) return 0;
-            if (!fechaA) return 1;
-            if (!fechaB) return -1;
-            return fechaA - fechaB;
-          });
-          const materiasNormalizadas = normalizarMaterias(materiasData, historial, nivelActivoActual, alumnoData);
-          setMaterias(materiasNormalizadas);
+          await cargarMateriasYCalificaciones(historial, nivelActivoActual, alumnoData);
         }
       } catch (error) {
         console.error('Error al cargar datos:', error);
@@ -182,7 +208,82 @@ const GestionMaterias = () => {
     if (id) {
       loadData();
     }
+    // La carga solo debe repetirse al cambiar de alumno o de nivel en la URL.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, nivelDesdeUrl]);
+
+  /**
+   * Guarda la calificación de una materia en su propia colección. Vacío borra
+   * la que hubiera: así el admin puede corregir una nota puesta por error.
+   * Al renombrar una materia se busca por el nombre anterior para no dejar la
+   * calificación huérfana, ya que ambas colecciones se unen por nombre.
+   */
+  const guardarCalificacionDeMateria = async ({ nombre, nombreAnterior, nivelId, nivelNombre, valor }) => {
+    const referencia = {
+      nombre: nombreAnterior || nombre,
+      nivelId: nivelId || null,
+      nivelNombre: nivelNombre || ''
+    };
+    const existente = calificaciones.find((calificacion) => coincideConMateria(calificacion, referencia));
+    const texto = (valor ?? '').toString().trim();
+
+    if (texto === '') {
+      if (existente) {
+        await deleteDoc(doc(db, 'calificaciones', existente.id));
+      }
+      return;
+    }
+
+    const numero = Number(texto);
+    if (Number.isNaN(numero)) {
+      return;
+    }
+
+    if (existente) {
+      await updateDoc(doc(db, 'calificaciones', existente.id), {
+        materia: nombre,
+        calificacion: numero,
+        nivel: nivelNombre || '',
+        nivelId: nivelId || null,
+        nivelNombre: nivelNombre || '',
+        fechaActualizacion: serverTimestamp()
+      });
+      return;
+    }
+
+    await addDoc(collection(db, 'calificaciones'), {
+      alumnoId: id,
+      materia: nombre,
+      calificacion: numero,
+      nivel: nivelNombre || '',
+      nivelId: nivelId || null,
+      nivelNombre: nivelNombre || '',
+      fechaCreacion: serverTimestamp(),
+      fechaActualizacion: serverTimestamp()
+    });
+  };
+
+  /** Edición rápida de la nota desde la tarjeta de la materia. */
+  const handleGuardarCalificacionInline = async (materia) => {
+    setGuardandoCalificacion(true);
+    try {
+      await guardarCalificacionDeMateria({
+        nombre: materia.nombre,
+        nivelId: materia.nivelId || materia.nivelActualId || null,
+        nivelNombre: materia.nivelNombre || materia.nivel || '',
+        valor: calificacionBorrador
+      });
+      await cargarMateriasYCalificaciones(nivelesHistorial, nivelActivo, alumno);
+      setCalificacionEnEdicion(null);
+      setCalificacionBorrador('');
+      success('Calificación actualizada');
+    } catch (error) {
+      console.error('Error al guardar la calificación:', error);
+      showError('Error al guardar la calificación');
+    } finally {
+      setGuardandoCalificacion(false);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -193,24 +294,10 @@ const GestionMaterias = () => {
       const nivelNombreFinal = nivelSeleccionado?.nombre || formData.nivelNombre || nivelActivo?.nombre || alumno?.nivel || '';
       const nivelIdFinal = nivelSeleccionado?.id || formData.nivelId || nivelActivo?.id || null;
 
-      // Para "Diplomado en Neuroeducación", las fechas son opcionales
-      const esDiplomadoNeuroeducacion = nivelNombreFinal === 'Diplomado en Neuroeducación';
-      let fechaInicioFinal = null;
-      let fechaFinFinal = null;
-
-      if (esDiplomadoNeuroeducacion) {
-        // Si es Diplomado en Neuroeducación y no hay fecha, usar null (no requerido)
-        fechaInicioFinal = formData.fechaInicio ? new Date(formData.fechaInicio) : null;
-        fechaFinFinal = formData.fechaFin ? new Date(formData.fechaFin) : null;
-      } else {
-        // Para otros niveles, validar que haya fecha de inicio
-        if (!formData.fechaInicio) {
-          showError('La fecha de inicio es requerida para este nivel');
-          return;
-        }
-        fechaInicioFinal = new Date(formData.fechaInicio);
-        fechaFinFinal = formData.fechaFin ? new Date(formData.fechaFin) : null;
-      }
+      // Las fechas son opcionales: una materia puede quedar sin fecha próxima
+      // hasta que se programe.
+      const fechaInicioFinal = formData.fechaInicio ? new Date(formData.fechaInicio) : null;
+      const fechaFinFinal = formData.fechaFin ? new Date(formData.fechaFin) : null;
 
       const materiaData = {
         alumnoId: id,
@@ -234,27 +321,15 @@ const GestionMaterias = () => {
         });
       }
 
-      // Recargar materias
-      const materiasQuery = query(
-        collection(db, 'materias'),
-        where('alumnoId', '==', id)
-      );
-      const materiasSnapshot = await getDocs(materiasQuery);
-      const materiasData = materiasSnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
-      // Ordenar manualmente: primero las que tienen fecha, luego las que no
-      materiasData.sort((a, b) => {
-        const fechaA = a.fechaInicio?.toDate ? a.fechaInicio.toDate() : null;
-        const fechaB = b.fechaInicio?.toDate ? b.fechaInicio.toDate() : null;
-        if (!fechaA && !fechaB) return 0;
-        if (!fechaA) return 1;
-        if (!fechaB) return -1;
-        return fechaA - fechaB;
+      await guardarCalificacionDeMateria({
+        nombre: formData.nombre,
+        nombreAnterior: materiaEditando?.nombre,
+        nivelId: nivelIdFinal,
+        nivelNombre: nivelNombreFinal,
+        valor: formData.calificacion
       });
-      const materiasNormalizadas = normalizarMaterias(materiasData, nivelesHistorial, nivelActivo, alumno);
-      setMaterias(materiasNormalizadas);
+
+      await cargarMateriasYCalificaciones(nivelesHistorial, nivelActivo, alumno);
 
       setShowModal(false);
       setMateriaEditando(null);
@@ -264,6 +339,7 @@ const GestionMaterias = () => {
         fechaFin: '',
         aula: '',
         estado: 'Pendiente',
+        calificacion: '',
         nivelId: nivelActivo?.id || '',
         nivelNombre: nivelActivo?.nombre || ''
       });
@@ -275,12 +351,14 @@ const GestionMaterias = () => {
 
   const handleEdit = (materia) => {
     setMateriaEditando(materia);
+    const calificacionActual = buscarCalificacionDeMateria(calificaciones, materia);
     setFormData({
       nombre: materia.nombre,
       fechaInicio: formatearFechaInput(materia.fechaInicio),
       fechaFin: formatearFechaInput(materia.fechaFin),
       aula: materia.aula || '',
       estado: materia.estado || 'Pendiente',
+      calificacion: calificacionActual ? String(calificacionActual.calificacion) : '',
       nivelId: materia.nivelId || materia.nivelActualId || '',
       nivelNombre: materia.nivelNombre || materia.nivel || ''
     });
@@ -401,54 +479,77 @@ const GestionMaterias = () => {
     return null;
   };
 
+  const ESTADOS_VALIDOS = ['Pendiente', 'En curso', 'Con atraso', 'Completada'];
+
+  const esEncabezado = (columnas) => {
+    const primeras = columnas.slice(0, 2).map((col) => (col || '').toLowerCase());
+    return primeras.some((col) =>
+      col.includes('calific') ||
+      col.includes('nota') ||
+      col.includes('materia') ||
+      col.includes('nombre') ||
+      col.includes('asignatura')
+    );
+  };
+
+  /**
+   * Lee lo pegado desde Excel. El formato es
+   * Calificación | Materia | Inicio | Fin | Aula | Estado, pero se sigue
+   * aceptando el anterior (sin calificación) para no romper listas viejas:
+   * si la primera columna no es un número, se asume que es el nombre.
+   */
   const parsearBulkData = (texto) => {
     setBulkError('');
-    const lineas = texto.split('\n').filter(linea => linea.trim() !== '');
+    const lineas = texto.split('\n').filter((linea) => linea.trim() !== '');
     const materiasParseadas = [];
-
-    // Verificar si el nivel seleccionado es "Diplomado en Neuroeducación"
-    const esDiplomadoNeuroeducacion = nivelBulkSeleccionado?.nombre === 'Diplomado en Neuroeducación';
+    const nivelIdObjetivo = nivelBulkSeleccionado?.id || null;
+    const nivelNombreObjetivo = nivelBulkSeleccionado?.nombre || alumno?.nivel || '';
 
     lineas.forEach((linea, index) => {
-      const columnas = linea.split('\t').map(col => col.trim());
+      const columnas = linea.split('\t').map((col) => col.trim());
 
-      // Detectar si es encabezado (primera línea)
-      if (index === 0 && (
-        columnas[0]?.toLowerCase().includes('materia') ||
-        columnas[0]?.toLowerCase().includes('nombre') ||
-        columnas[0]?.toLowerCase().includes('asignatura')
-      )) {
-        return; // Saltar encabezado
+      if (index === 0 && esEncabezado(columnas)) {
+        return;
       }
 
-      // Esperamos: Materia | Fecha Inicio (opcional) | Fecha Fin (opcional) | Aula (opcional) | Estado
-      const materia = {
-        nombre: columnas[0] || '',
-        fechaInicio: parsearFecha(columnas[1]),
-        fechaFin: parsearFecha(columnas[2]),
-        aula: columnas[3] || '',
-        estado: columnas[4] || 'Pendiente'
-      };
+      const traeCalificacion = columnas[0] === '' || !Number.isNaN(Number(columnas[0]));
+      const [calificacionTexto, nombre, inicioTexto, finTexto, aula, estadoTexto] = traeCalificacion
+        ? columnas
+        : ['', ...columnas];
 
-      // Validar
-      if (!materia.nombre) {
+      if (!nombre) {
         setBulkError(`Error en línea ${index + 1}: Falta el nombre de la materia`);
         return;
       }
 
-      // Solo validar fecha de inicio si NO es Diplomado en Neuroeducación
-      if (!esDiplomadoNeuroeducacion && !materia.fechaInicio) {
-        setBulkError(`Error en línea ${index + 1}: Fecha de inicio inválida: "${columnas[1] || 'vacía'}". Deje en blanco para Diplomado en Neuroeducación.`);
-        return;
+      let calificacion = null;
+      if (calificacionTexto !== '' && calificacionTexto !== undefined) {
+        const numero = Number(calificacionTexto);
+        if (Number.isNaN(numero) || numero < 0 || numero > 10) {
+          setBulkError(`Error en línea ${index + 1}: Calificación inválida: "${calificacionTexto}" (debe ser un número entre 0 y 10)`);
+          return;
+        }
+        calificacion = numero;
       }
 
-      // Validar estado
-      const estadosValidos = ['Pendiente', 'En curso', 'Con atraso', 'Completada'];
-      if (materia.estado && !estadosValidos.includes(materia.estado)) {
-        materia.estado = 'Pendiente';
-      }
+      const estado = ESTADOS_VALIDOS.includes(estadoTexto) ? estadoTexto : 'Pendiente';
+      const existente = materias.find((materia) =>
+        coincideConMateria(materia, {
+          nombre,
+          nivelId: nivelIdObjetivo,
+          nivelNombre: nivelNombreObjetivo
+        })
+      );
 
-      materiasParseadas.push(materia);
+      materiasParseadas.push({
+        calificacion,
+        nombre,
+        fechaInicio: parsearFecha(inicioTexto),
+        fechaFin: parsearFecha(finTexto),
+        aula: aula || '',
+        estado,
+        materiaExistenteId: existente?.id || null
+      });
     });
 
     setBulkPreview(materiasParseadas);
@@ -496,12 +597,12 @@ const GestionMaterias = () => {
     try {
       const batch = writeBatch(db);
       const materiasRef = collection(db, 'materias');
+      const calificacionesRef = collection(db, 'calificaciones');
       const nivelBulkNombre = nivelBulkSeleccionado?.nombre || alumno?.nivel || '';
       const nivelBulkId = nivelBulkSeleccionado?.id || null;
 
       bulkPreview.forEach((materia) => {
-        const nuevaMateriaRef = doc(materiasRef);
-        batch.set(nuevaMateriaRef, {
+        const datosMateria = {
           alumnoId: id,
           nombre: materia.nombre,
           nivel: nivelBulkNombre,
@@ -511,39 +612,59 @@ const GestionMaterias = () => {
           fechaFin: materia.fechaFin ? new Date(materia.fechaFin) : null,
           aula: materia.aula || null,
           estado: materia.estado,
-          fechaCreacion: serverTimestamp(),
           fechaActualizacion: serverTimestamp()
-        });
+        };
+
+        // Repegar la misma lista actualiza la materia en lugar de duplicarla.
+        if (materia.materiaExistenteId) {
+          batch.update(doc(materiasRef, materia.materiaExistenteId), datosMateria);
+        } else {
+          batch.set(doc(materiasRef), { ...datosMateria, fechaCreacion: serverTimestamp() });
+        }
+
+        // Una columna de calificación vacía no borra la nota que ya existía.
+        if (materia.calificacion === null) {
+          return;
+        }
+
+        const calificacionExistente = calificaciones.find((calificacion) =>
+          coincideConMateria(calificacion, {
+            nombre: materia.nombre,
+            nivelId: nivelBulkId,
+            nivelNombre: nivelBulkNombre
+          })
+        );
+        const datosCalificacion = {
+          alumnoId: id,
+          materia: materia.nombre,
+          calificacion: materia.calificacion,
+          nivel: nivelBulkNombre,
+          nivelId: nivelBulkId,
+          nivelNombre: nivelBulkNombre,
+          fechaActualizacion: serverTimestamp()
+        };
+
+        if (calificacionExistente) {
+          batch.update(doc(calificacionesRef, calificacionExistente.id), datosCalificacion);
+        } else {
+          batch.set(doc(calificacionesRef), { ...datosCalificacion, fechaCreacion: serverTimestamp() });
+        }
       });
 
       await batch.commit();
 
-      // Recargar materias
-      const materiasQuery = query(
-        collection(db, 'materias'),
-        where('alumnoId', '==', id)
-      );
-      const materiasSnapshot = await getDocs(materiasQuery);
-      const materiasData = materiasSnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
+      await cargarMateriasYCalificaciones(nivelesHistorial, nivelActivo, alumno);
 
-      materiasData.sort((a, b) => {
-        const fechaA = a.fechaInicio?.toDate ? a.fechaInicio.toDate() : null;
-        const fechaB = b.fechaInicio?.toDate ? b.fechaInicio.toDate() : null;
-        if (!fechaA && !fechaB) return 0;
-        if (!fechaA) return 1;
-        if (!fechaB) return -1;
-        return fechaA - fechaB;
-      });
-
-      const materiasNormalizadas = normalizarMaterias(materiasData, nivelesHistorial, nivelActivo, alumno);
-      setMaterias(materiasNormalizadas);
+      const actualizadas = bulkPreview.filter((materia) => materia.materiaExistenteId).length;
+      const nuevas = bulkPreview.length - actualizadas;
       setShowBulkModal(false);
       setBulkData('');
       setBulkPreview([]);
-      success(`${bulkPreview.length} materias agregadas exitosamente`);
+      success(
+        actualizadas > 0
+          ? `${nuevas} materia(s) agregada(s) y ${actualizadas} actualizada(s)`
+          : `${nuevas} materias agregadas exitosamente`
+      );
     } catch (error) {
       console.error('Error al agregar materias por lotes:', error);
       setBulkError('Error al guardar las materias: ' + error.message);
@@ -617,6 +738,7 @@ const GestionMaterias = () => {
                   fechaFin: '',
                   aula: '',
                   estado: 'Pendiente',
+                  calificacion: '',
                   nivelId: nivelDefault.id || '',
                   nivelNombre: nivelDefault.nombre || ''
                 });
@@ -744,6 +866,7 @@ const GestionMaterias = () => {
 
             const renderTarjetaMateria = (materia) => {
               const estado = (materia.estado || 'Pendiente').toString().trim();
+              const calificacionMateria = buscarCalificacionDeMateria(calificaciones, materia);
               let estadoClass = 'bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-white';
               let borderColor = 'border-gray-200 dark:border-gray-600';
               let bgColor = 'bg-gray-50 dark:bg-gray-700/50';
@@ -792,17 +915,81 @@ const GestionMaterias = () => {
                           {materia.nivelNombre || 'Sin nivel asignado'}
                         </p>
                       </div>
+                      <div>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">Calificación</p>
+                        {calificacionEnEdicion === materia.id ? (
+                          <div className="flex flex-wrap items-center gap-2 mt-1">
+                            <input
+                              type="number"
+                              step="0.1"
+                              min="0"
+                              max="10"
+                              autoFocus
+                              value={calificacionBorrador}
+                              onChange={(e) => setCalificacionBorrador(e.target.value)}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                  e.preventDefault();
+                                  handleGuardarCalificacionInline(materia);
+                                }
+                              }}
+                              placeholder="0 a 10"
+                              className="w-24 px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => handleGuardarCalificacionInline(materia)}
+                              disabled={guardandoCalificacion}
+                              className="px-2 py-1 text-xs font-semibold text-white bg-blue rounded-lg hover:bg-blue/90 disabled:opacity-60"
+                            >
+                              Guardar
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setCalificacionEnEdicion(null);
+                                setCalificacionBorrador('');
+                              }}
+                              className="px-2 py-1 text-xs text-gray-600 dark:text-gray-300 hover:underline"
+                            >
+                              Cancelar
+                            </button>
+                          </div>
+                        ) : (
+                          <div className="flex items-center gap-2">
+                            <p className={`font-semibold ${calificacionMateria ? obtenerColorCalificacion(calificacionMateria.calificacion) : 'text-gray-500'}`}>
+                              {calificacionMateria
+                                ? formatearValorCalificacion(calificacionMateria.calificacion)
+                                : 'Sin calificación'}
+                            </p>
+                            {canEdit && (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setCalificacionEnEdicion(materia.id);
+                                  setCalificacionBorrador(
+                                    calificacionMateria ? String(calificacionMateria.calificacion) : ''
+                                  );
+                                }}
+                                className="text-xs font-medium text-blue hover:underline"
+                              >
+                                {calificacionMateria ? 'Cambiar' : 'Poner'}
+                              </button>
+                            )}
+                          </div>
+                        )}
+                      </div>
                       <div className="grid grid-cols-1 gap-2">
                         <div>
                           <p className="text-xs text-gray-500 dark:text-gray-400">Fecha de inicio</p>
                           <p className="text-gray-700 dark:text-gray-300 font-medium">
-                            {materia.fechaInicio ? formatearFechaLarga(materia.fechaInicio) : 'Sin fecha'}
+                            {materia.fechaInicio ? formatearFechaLarga(materia.fechaInicio) : ETIQUETA_SIN_FECHA}
                           </p>
                         </div>
                         <div>
                           <p className="text-xs text-gray-500 dark:text-gray-400">Fecha de fin</p>
                           <p className="text-gray-700 dark:text-gray-300 font-medium">
-                            {materia.fechaFin ? formatearFechaLarga(materia.fechaFin) : 'Sin fecha'}
+                            {materia.fechaFin ? formatearFechaLarga(materia.fechaFin) : ETIQUETA_SIN_FECHA}
                           </p>
                         </div>
                         {materia.aula && (
@@ -1028,24 +1215,21 @@ const GestionMaterias = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Fecha de inicio {nivelNombreActual !== 'Diplomado en Neuroeducación' ? '*' : '(opcional)'}
+                      Fecha de inicio (opcional)
                     </label>
                     <input
                       type="date"
-                      required={nivelNombreActual !== 'Diplomado en Neuroeducación'}
                       value={formData.fechaInicio}
                       onChange={(e) => setFormData({ ...formData, fechaInicio: e.target.value })}
                       className="w-full px-4 py-2.5 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue"
                     />
-                    {nivelNombreActual === 'Diplomado en Neuroeducación' && (
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                        Las materias de este diplomado no requieren fechas específicas
-                      </p>
-                    )}
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                      Sin fecha, la materia se muestra como &laquo;{ETIQUETA_SIN_FECHA}&raquo;
+                    </p>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Fecha de fin {nivelNombreActual === 'Diplomado en Neuroeducación' ? '(opcional)' : ''}
+                      Fecha de fin (opcional)
                     </label>
                     <input
                       type="date"
@@ -1086,6 +1270,25 @@ const GestionMaterias = () => {
                   </div>
                 </div>
 
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Calificación (opcional)
+                  </label>
+                  <input
+                    type="number"
+                    step="0.1"
+                    min="0"
+                    max="10"
+                    value={formData.calificacion}
+                    onChange={(e) => setFormData({ ...formData, calificacion: e.target.value })}
+                    placeholder="0 a 10"
+                    className="w-full px-4 py-2.5 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue"
+                  />
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    0 es &laquo;Por cursar&raquo; y 1 es &laquo;Cursando&raquo;. Déjalo vacío para quitar la calificación.
+                  </p>
+                </div>
+
                 <div className="flex justify-end gap-3 pt-4">
                   <button
                     type="button"
@@ -1124,22 +1327,22 @@ const GestionMaterias = () => {
                   <strong>Instrucciones:</strong>
                 </p>
                 <ol className="text-sm text-gray-600 dark:text-gray-400 list-decimal list-inside space-y-1">
-                  <li>En Excel, selecciona las columnas: <strong>Materia | Fecha Inicio {nivelBulkSeleccionado?.nombre === 'Diplomado en Neuroeducación' ? '(opcional)' : ''} | Fecha Fin {nivelBulkSeleccionado?.nombre === 'Diplomado en Neuroeducación' ? '(opcional)' : ''} | Aula | Estado</strong></li>
+                  <li>En Excel, selecciona las columnas: <strong>Calificación | Materia | Fecha Inicio | Fecha Fin | Aula | Estado</strong></li>
                   <li>Copia las celdas (Ctrl+C o Cmd+C)</li>
                   <li>Pega aquí abajo (Ctrl+V o Cmd+V)</li>
                   <li>Revisa la vista previa y guarda</li>
                 </ol>
-                {nivelBulkSeleccionado?.nombre === 'Diplomado en Neuroeducación' ? (
-                  <div className="mt-2 p-2 bg-green/10 dark:bg-green/20 rounded border border-green/20">
-                    <p className="text-xs font-medium text-green-700 dark:text-green-300">
-                      💡 <strong>Diplomado en Neuroeducación:</strong> Las fechas son opcionales. Puedes dejar las columnas de fechas vacías o con guiones (-) para materias sin fechas específicas (ritmo del estudiante).
-                    </p>
-                  </div>
-                ) : (
-                  <p className="text-xs text-gray-500 dark:text-gray-500 mt-2">
-                    Formatos de fecha aceptados: DD/MM/YYYY, MM/DD/YYYY, YYYY-MM-DD
+                <div className="mt-2 p-2 bg-green/10 dark:bg-green/20 rounded border border-green/20 space-y-1">
+                  <p className="text-xs font-medium text-green-700 dark:text-green-300">
+                    💡 La calificación <strong>0</strong> es «Por cursar» y <strong>1</strong> es «Cursando». Cada renglón guarda la materia y su calificación de una sola vez.
                   </p>
-                )}
+                  <p className="text-xs font-medium text-green-700 dark:text-green-300">
+                    Las fechas pueden ir vacías: la materia queda como «{ETIQUETA_SIN_FECHA}». Si una materia ya existe en este nivel, se actualiza en lugar de duplicarse.
+                  </p>
+                </div>
+                <p className="text-xs text-gray-500 dark:text-gray-500 mt-2">
+                  Formatos de fecha aceptados: DD/MM/YYYY, MM/DD/YYYY, YYYY-MM-DD. También se acepta la lista anterior, sin la columna de calificación.
+                </p>
               </div>
 
               <div className="mb-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -1180,9 +1383,7 @@ const GestionMaterias = () => {
                   value={bulkData}
                   onChange={handleBulkChange}
                   onPaste={handleBulkPaste}
-                  placeholder={nivelBulkSeleccionado?.nombre === 'Diplomado en Neuroeducación'
-                    ? "Materia\t-\t-\tAula 1\tEn curso\nO simplemente: Materia\t\t\t\tEn curso"
-                    : "Materia	01/01/2024	30/06/2024	Aula 1	En curso"}
+                  placeholder={"10\tFilosofía Montessori\t25/01/2023\t12/04/2023\tG219\tCompletada\n1\tNeuroeducación\t13/06/2026\t29/08/2026\tN17\tEn curso\n0\tDidáctica\t\t\t\tPendiente"}
                   rows={8}
                   className="w-full px-4 py-2.5 text-sm font-mono border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue"
                 />
@@ -1203,21 +1404,29 @@ const GestionMaterias = () => {
                     <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700 text-sm">
                       <thead className="bg-gray-50 dark:bg-gray-700 sticky top-0">
                         <tr>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Calificación</th>
                           <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Materia</th>
                           <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Inicio</th>
                           <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Fin</th>
                           <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Aula</th>
                           <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Estado</th>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Acción</th>
                         </tr>
                       </thead>
                       <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                         {bulkPreview.map((materia, index) => (
                           <tr key={index}>
+                            <td className={`px-3 py-2 font-medium ${materia.calificacion === null ? 'text-gray-400' : obtenerColorCalificacion(materia.calificacion)}`}>
+                              {materia.calificacion === null ? '-' : formatearValorCalificacion(materia.calificacion)}
+                            </td>
                             <td className="px-3 py-2 text-gray-900 dark:text-white">{materia.nombre}</td>
-                            <td className="px-3 py-2 text-gray-600 dark:text-gray-400">{materia.fechaInicio || (nivelBulkSeleccionado?.nombre === 'Diplomado en Neuroeducación' ? 'Sin fecha' : '-')}</td>
-                            <td className="px-3 py-2 text-gray-600 dark:text-gray-400">{materia.fechaFin || (nivelBulkSeleccionado?.nombre === 'Diplomado en Neuroeducación' ? 'Sin fecha' : '-')}</td>
+                            <td className="px-3 py-2 text-gray-600 dark:text-gray-400">{materia.fechaInicio || ETIQUETA_SIN_FECHA}</td>
+                            <td className="px-3 py-2 text-gray-600 dark:text-gray-400">{materia.fechaFin || ETIQUETA_SIN_FECHA}</td>
                             <td className="px-3 py-2 text-gray-600 dark:text-gray-400">{materia.aula || '-'}</td>
                             <td className="px-3 py-2 text-gray-600 dark:text-gray-400">{materia.estado}</td>
+                            <td className="px-3 py-2 text-gray-600 dark:text-gray-400">
+                              {materia.materiaExistenteId ? 'Actualiza' : 'Nueva'}
+                            </td>
                           </tr>
                         ))}
                       </tbody>
