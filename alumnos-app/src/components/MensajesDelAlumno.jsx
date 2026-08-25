@@ -3,6 +3,7 @@ import { ChatBubbleLeftRightIcon, TrashIcon, EyeIcon, EyeSlashIcon } from '@hero
 import { useAuth } from '../contexts/AuthContext';
 import { useNotifications } from '../contexts/NotificationContext';
 import useCanEdit from '../hooks/useCanEdit';
+import MensajesPlantillas from './MensajesPlantillas';
 import { formatearFechaLarga } from '../utils/formatearFecha';
 import {
   DESTINO_ALUMNO,
@@ -134,6 +135,10 @@ const MensajesDelAlumno = ({ alumnoId, alumnoNombre }) => {
 
       {canEdit && (
         <form onSubmit={handleSubmit} className="space-y-3 mb-6">
+          <MensajesPlantillas
+            valores={{ titulo: formData.titulo, cuerpo: formData.cuerpo, tipo: formData.tipo }}
+            onUsar={(plantilla) => setFormData((previo) => ({ ...previo, ...plantilla }))}
+          />
           <div>
             <label htmlFor="mensaje-titulo" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Título

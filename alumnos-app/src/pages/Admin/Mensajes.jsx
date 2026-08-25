@@ -13,6 +13,7 @@ import LoadingSpinner from '../../components/LoadingSpinner';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNotifications } from '../../contexts/NotificationContext';
 import useCanEdit from '../../hooks/useCanEdit';
+import MensajesPlantillas from '../../components/MensajesPlantillas';
 import { formatearFechaLarga } from '../../utils/formatearFecha';
 import {
   DESTINO_TODOS,
@@ -178,6 +179,11 @@ const Mensajes = () => {
             <MegaphoneIcon className="w-5 h-5 text-blue" />
             Nuevo aviso para todos los alumnos
           </h2>
+
+          <MensajesPlantillas
+            valores={{ titulo: formData.titulo, cuerpo: formData.cuerpo, tipo: formData.tipo }}
+            onUsar={(plantilla) => setFormData((previo) => ({ ...previo, ...plantilla }))}
+          />
 
           <div>
             <label htmlFor="titulo" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">

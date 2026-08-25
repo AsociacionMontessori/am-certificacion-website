@@ -34,6 +34,7 @@ export const TIPOS_MENSAJE = [
 
 const MENSAJES = 'mensajes';
 const LECTURAS = 'lecturas';
+const PLANTILLAS = 'mensajesPlantillas';
 
 /** Convierte a Date lo que Firestore puede devolver como fecha. */
 export const aFecha = (valor) => {
@@ -235,6 +236,81 @@ export const obtenerMensajesParaAlumno = async (alumnoId) => {
       const fechaB = aFecha(b.creadoEn)?.getTime() || 0;
       return fechaB - fechaA;
     });
+};
+
+/**
+ * Mensajes reutilizables.
+ *
+ * Existen porque el mismo aviso se le manda a varios alumnos por separado
+ * —un pago pendiente, un documento faltante— y volver a escribirlo cada vez
+ * era trabajo repetido. Guardan solo el texto: la fecha de fin depende de
+ * cuándo se manda, no de la plantilla.
+ */
+export const obtenerPlantillas = async () => {
+  try {
+    const snapshot = await getDocs(collection(db, PLANTILLAS));
+    const plantillas = snapshot.docs.map((plantillaDoc) => ({
+      id: plantillaDoc.id,
+      ...plantillaDoc.data()
+    }));
+    plantillas.sort((a, b) => (a.titulo || '').localeCompare(b.titulo || ''));
+    return { success: true, plantillas };
+  } catch (error) {
+    console.error('Error al obtener los mensajes guardados:', error);
+    return { success: false, error: error.message, plantillas: [] };
+  }
+};
+
+/**
+ * Guarda el texto para volver a usarlo. Si ya hay uno con el mismo título lo
+ * actualiza, para que la lista no se llene de copias casi iguales.
+ */
+export const guardarPlantilla = async (datos, creadoPor = null) => {
+  try {
+    const titulo = (datos?.titulo || '').trim();
+    const cuerpo = (datos?.cuerpo || '').trim();
+    if (!titulo) return { success: false, error: 'Escribe el título antes de guardarlo' };
+    if (!cuerpo) return { success: false, error: 'Escribe el mensaje antes de guardarlo' };
+
+    const tipo = datos?.tipo === 'importante' ? 'importante' : 'info';
+    const { plantillas } = await obtenerPlantillas();
+    const existente = plantillas.find(
+      (plantilla) => (plantilla.titulo || '').trim().toLowerCase() === titulo.toLowerCase()
+    );
+
+    if (existente) {
+      await updateDoc(doc(db, PLANTILLAS, existente.id), {
+        titulo,
+        cuerpo,
+        tipo,
+        actualizadoEn: serverTimestamp()
+      });
+      return { success: true, id: existente.id, actualizada: true };
+    }
+
+    const docRef = await addDoc(collection(db, PLANTILLAS), {
+      titulo,
+      cuerpo,
+      tipo,
+      creadoPor,
+      creadoEn: serverTimestamp(),
+      actualizadoEn: serverTimestamp()
+    });
+    return { success: true, id: docRef.id, actualizada: false };
+  } catch (error) {
+    console.error('Error al guardar el mensaje reutilizable:', error);
+    return { success: false, error: error.message };
+  }
+};
+
+export const eliminarPlantilla = async (plantillaId) => {
+  try {
+    await deleteDoc(doc(db, PLANTILLAS, plantillaId));
+    return { success: true };
+  } catch (error) {
+    console.error('Error al eliminar el mensaje guardado:', error);
+    return { success: false, error: error.message };
+  }
 };
 
 /** Acusa que el alumno cerró el mensaje: ya no vuelve a aparecerle. */

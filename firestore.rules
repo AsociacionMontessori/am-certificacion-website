@@ -273,6 +273,14 @@ service cloud.firestore {
       }
     }
     
+    // Colección: mensajesPlantillas
+    // Textos que administración guarda para reutilizar al escribirle a varios
+    // alumnos. Nunca los ve un alumno: no son mensajes, son borradores.
+    match /mensajesPlantillas/{plantillaId} {
+      allow read: if canReadAdmin();
+      allow write: if isAdmin();
+    }
+    
     // Denegar acceso a todo lo demás por defecto
     match /{document=**} {
       allow read, write: if false;
