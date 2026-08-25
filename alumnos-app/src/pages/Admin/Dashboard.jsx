@@ -30,8 +30,10 @@ const AdminDashboard = () => {
   const [filtroEstado, setFiltroEstado] = useState('');
   const [filtroFechaInicio, setFiltroFechaInicio] = useState('');
   const [filtroFechaFin, setFiltroFechaFin] = useState('');
-  const [ordenPor, setOrdenPor] = useState('nombre'); // 'nombre', 'fechaIngreso', 'nivel'
-  const [ordenDireccion, setOrdenDireccion] = useState('asc'); // 'asc', 'desc'
+  // Arranca por fecha de ingreso, de lo más reciente a lo más viejo: al entrar
+  // al panel interesa quién llegó al último, no el orden alfabético.
+  const [ordenPor, setOrdenPor] = useState('fechaIngreso'); // 'nombre', 'fechaIngreso', 'fechaCreacion', 'nivel'
+  const [ordenDireccion, setOrdenDireccion] = useState('desc'); // 'asc', 'desc'
   const [nivelesDisponibles, setNivelesDisponibles] = useState([]);
   const [showFilters, setShowFilters] = useState(false);
   const [viewMode, setViewMode] = useState(() => {
@@ -182,6 +184,16 @@ const AdminDashboard = () => {
         case 'fechaIngreso': {
           const fechaA = getDate(a.fechaIngreso);
           const fechaB = getDate(b.fechaIngreso);
+          if (!fechaA && !fechaB) comparison = 0;
+          else if (!fechaA) comparison = 1;
+          else if (!fechaB) comparison = -1;
+          else comparison = fechaA.getTime() - fechaB.getTime();
+          break;
+        }
+        case 'fechaCreacion': {
+          // Cuándo se creó la cuenta en el portal, no cuándo entró al programa.
+          const fechaA = getDate(a.fechaCreacion);
+          const fechaB = getDate(b.fechaCreacion);
           if (!fechaA && !fechaB) comparison = 0;
           else if (!fechaA) comparison = 1;
           else if (!fechaB) comparison = -1;
@@ -419,6 +431,7 @@ const AdminDashboard = () => {
                   >
                     <option value="nombre">Nombre</option>
                     <option value="fechaIngreso">Fecha Ingreso</option>
+                    <option value="fechaCreacion">Fecha de alta</option>
                     <option value="nivel">Nivel</option>
                   </select>
                   <button

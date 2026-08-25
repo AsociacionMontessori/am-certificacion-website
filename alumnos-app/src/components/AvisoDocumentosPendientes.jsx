@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 import { useAuth } from '../contexts/AuthContext';
 import { getExpedienteDocsUrls } from '../services/expedienteService';
+import { debePedirseExpediente } from '../utils/expediente';
 
 const LABELS = {
   actaNacimiento: 'acta de nacimiento',
@@ -21,6 +22,9 @@ const LABELS = {
  * enterara: si el formulario de inscripción se abandonaba a media captura, los
  * documentos faltantes no se le reclamaban por ningún lado. Se mantiene
  * silencioso ante errores — es un recordatorio, no debe romper el tablero.
+ *
+ * Solo aplica a los alumnos dados de alta desde que el portal captura el
+ * expediente; ver [[debePedirseExpediente]] en utils/expediente.
  */
 const CAMPOS = {
   escolaridad: 'escolaridad',
@@ -38,6 +42,9 @@ const AvisoDocumentosPendientes = () => {
     let cancelado = false;
     const revisar = async () => {
       if (!currentUser?.uid || userData?.rol !== 'alumno') return;
+      // A los alumnos anteriores al portal no se les reclama el expediente:
+      // ya lo entregaron en el sistema anterior.
+      if (!debePedirseExpediente(userData)) return;
       try {
         const estado = await getExpedienteDocsUrls(currentUser.uid);
         if (cancelado) return;
@@ -51,7 +58,7 @@ const AvisoDocumentosPendientes = () => {
     return () => {
       cancelado = true;
     };
-  }, [currentUser?.uid, userData?.rol]);
+  }, [currentUser?.uid, userData]);
 
   const pendientes = faltantes.length + datosFaltantes.length;
   if (pendientes === 0) return null;
