@@ -39,6 +39,7 @@ const OrdenesPublicas = lazy(() => import('./pages/Admin/OrdenesPublicas'));
 // TEMPORAL: Sección de Pagos oculta mientras no está lista
 // const Pagos = lazy(() => import('./pages/Pagos'));
 const UsuariosAdministrativos = lazy(() => import('./pages/Admin/UsuariosAdministrativos'));
+const DesignPreview = import.meta.env.DEV ? lazy(() => import('./pages/DesignPreview')) : null;
 
 // Componente para redirigir según el rol
 const DashboardRedirect = () => {
@@ -100,6 +101,16 @@ function App() {
               </Suspense>
             } 
           />
+          {DesignPreview && (
+            <Route
+              path="/design-preview"
+              element={
+                <Suspense fallback={<LoadingSpinner fullScreen size="xl" variant="montessori" message="Cargando vista de diseño..." />}>
+                  <DesignPreview />
+                </Suspense>
+              }
+            />
+          )}
           <Route 
             path="/inscripcion" 
             element={

@@ -1,216 +1,187 @@
 import { Link, useLocation } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
-import { useTheme } from '../contexts/ThemeContext';
-import { useIsIOS } from '../hooks/useIsIOS';
-import WhatsAppButton from './WhatsAppButton';
-import { 
-  HomeIcon, 
-  AcademicCapIcon, 
+import {
+  AcademicCapIcon,
+  ArrowRightOnRectangleIcon,
   CalendarIcon,
   ChartBarIcon,
   DocumentTextIcon,
-  ArrowRightOnRectangleIcon,
+  HomeIcon,
+  MoonIcon,
   SunIcon,
-  MoonIcon
 } from '@heroicons/react/24/outline';
+import { useAuth } from '../contexts/AuthContext';
+import { useTheme } from '../contexts/ThemeContext';
+import WhatsAppButton from './WhatsAppButton';
 
-const Layout = ({ children }) => {
-  const { userData, logout } = useAuth();
+const NAVIGATION = [
+  { name: 'Inicio', mobileName: 'Inicio', href: '/', icon: HomeIcon },
+  { name: 'Mi Expediente', mobileName: 'Expediente', href: '/expediente', icon: DocumentTextIcon },
+  { name: 'Calendario', mobileName: 'Calendario', href: '/calendario', icon: CalendarIcon },
+  { name: 'Calificaciones', mobileName: 'Calificaciones', href: '/calificaciones', icon: ChartBarIcon },
+  { name: 'Graduación', mobileName: 'Graduación', href: '/graduacion', icon: AcademicCapIcon },
+];
+
+const getInitials = (name = '') => {
+  const initials = name
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((part) => part[0])
+    .join('')
+    .toUpperCase();
+
+  return initials || 'AM';
+};
+
+const ThemeButton = ({ compact = false }) => {
   const { theme, toggleTheme } = useTheme();
+  const Icon = theme === 'dark' ? SunIcon : MoonIcon;
+  const label = theme === 'dark' ? 'Usar tema claro' : 'Usar tema oscuro';
+
+  return (
+    <button
+      type="button"
+      onClick={toggleTheme}
+      className={`apple-press inline-flex min-h-11 items-center justify-center rounded-2xl border border-slate-200/80 bg-white/80 text-slate-700 shadow-sm backdrop-blur-xl hover:bg-white dark:border-white/10 dark:bg-slate-800/80 dark:text-slate-100 dark:hover:bg-slate-800 ${
+        compact ? 'h-11 w-11' : 'gap-2 px-4 text-sm font-semibold'
+      }`}
+      aria-label={label}
+      title={label}
+    >
+      <Icon className="h-5 w-5" aria-hidden="true" />
+      {!compact && <span>Cambiar tema</span>}
+    </button>
+  );
+};
+
+const Layout = ({ children, previewUserData = null }) => {
+  const { userData, logout } = useAuth();
   const location = useLocation();
-  const isIOS = useIsIOS();
-
-  const navigation = [
-    { name: 'Inicio', href: '/', icon: HomeIcon },
-    { name: 'Mi Expediente', href: '/expediente', icon: DocumentTextIcon },
-    { name: 'Calendario', href: '/calendario', icon: CalendarIcon },
-    { name: 'Calificaciones', href: '/calificaciones', icon: ChartBarIcon },
-    // TEMPORAL: Sección de Pagos oculta mientras no está lista
-    // { name: 'Pagos', href: '/pagos', icon: CurrencyDollarIcon },
-    { name: 'Graduación', href: '/graduacion', icon: AcademicCapIcon },
-  ];
-
-  const filteredNavigation = userData?.estado === 'Inactivo'
-    ? navigation.filter((n) => n.name !== 'Graduación')
-    : navigation;
+  const resolvedUserData = previewUserData || userData;
+  const isPreview = Boolean(previewUserData);
+  const initials = getInitials(resolvedUserData?.nombre || resolvedUserData?.email);
+  const navigation = resolvedUserData?.estado === 'Inactivo'
+    ? NAVIGATION.filter((item) => item.href !== '/graduacion')
+    : NAVIGATION;
 
   const handleLogout = async () => {
-    await logout();
+    if (!isPreview) await logout();
   };
 
   return (
-    <div className={`min-h-screen bg-gray-50 dark:bg-gray-900 ${isIOS ? 'pt-20 md:pt-0' : 'pb-16 md:pb-0'}`}>
-      {/* Navbar Superior - Desktop */}
-      <nav className="hidden md:block shadow-sm border-b border-gray-100 dark:border-gray-700 sticky top-0 z-50 backdrop-blur-sm bg-white/95 dark:bg-gray-800/95">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16 sm:h-20">
-            <div className="flex items-center flex-1">
-              <div className="flex-shrink-0 flex items-center space-x-2 sm:space-x-3">
-                <img 
-                  src="/images/lasc.png" 
-                  alt="Logo" 
-                  className="h-8 w-8 sm:h-10 sm:w-10 object-contain"
-                />
-                <div className="hidden xs:block">
-                  <h1 className="text-base sm:text-lg font-bold text-blue leading-tight">Portal Alumnos</h1>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 leading-tight">Certificación Montessori</p>
-                </div>
-              </div>
-              <div className="hidden md:ml-8 md:flex md:space-x-1">
-                {filteredNavigation.map((item) => {
-                  const isActive = location.pathname === item.href;
-                  return (
-                    <Link
-                      key={item.name}
-                      to={item.href}
-                      className={`${
-                        isActive
-                          ? 'border-blue text-blue bg-blue/5'
-                          : 'border-transparent text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white'
-                      } inline-flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200`}
-                    >
-                      <item.icon className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-                      <span className="hidden lg:inline">{item.name}</span>
-                    </Link>
-                  );
-                })}
-              </div>
-            </div>
-            <div className="flex items-center space-x-2 sm:space-x-3">
-              {userData && (
-                <div className="hidden sm:block text-right">
-                  <p className="text-sm font-medium text-gray-900 dark:text-white truncate max-w-[150px]">
-                    {userData.nombre || userData.email}
-                  </p>
-                  {userData.matricula && (
-                    <p className="text-xs text-gray-500 dark:text-gray-400">Matrícula: {userData.matricula}</p>
-                  )}
-                </div>
+    <div className="student-shell min-h-screen bg-white text-slate-900 dark:bg-slate-950 dark:text-white">
+      <aside className="student-sidebar glass-material hidden lg:flex" aria-label="Navegación del alumno">
+        <div className="flex items-center gap-3 px-2">
+          <img
+            src="/images/lasc.png"
+            alt="Asociación Montessori de México"
+            className="h-14 w-14 shrink-0 object-contain"
+          />
+          <div className="min-w-0">
+            <p className="text-lg font-bold leading-tight tracking-[-0.02em] text-blue">Portal Alumnos</p>
+            <p className="mt-0.5 text-xs font-medium leading-tight text-slate-500 dark:text-slate-400">
+              Certificación Montessori
+            </p>
+          </div>
+        </div>
+
+        <nav className="mt-12 space-y-2">
+          {navigation.map((item) => {
+            const isActive = location.pathname === item.href;
+            return (
+              <Link
+                key={item.name}
+                to={item.href}
+                className={`student-nav-item apple-press ${isActive ? 'student-nav-item-active' : ''}`}
+                aria-current={isActive ? 'page' : undefined}
+              >
+                <item.icon className="h-5 w-5" aria-hidden="true" />
+                <span>{item.name}</span>
+              </Link>
+            );
+          })}
+        </nav>
+
+        <div className="mt-auto rounded-3xl border border-slate-200/80 bg-white/75 p-4 shadow-sm dark:border-white/10 dark:bg-slate-900/70">
+          <div className="flex items-center gap-3 border-b border-slate-200/80 pb-4 dark:border-white/10">
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-blue/10 text-sm font-bold text-blue">
+              {initials}
+            </span>
+            <div className="min-w-0">
+              <p className="truncate text-sm font-semibold text-slate-900 dark:text-white">
+                {resolvedUserData?.nombre || resolvedUserData?.email || 'Alumno'}
+              </p>
+              {resolvedUserData?.matricula && (
+                <p className="mt-0.5 truncate text-xs text-slate-500 dark:text-slate-400">
+                  Matrícula {resolvedUserData.matricula}
+                </p>
               )}
-              <button
-                onClick={toggleTheme}
-                className="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
-                aria-label="Cambiar tema"
-              >
-                {theme === 'dark' ? (
-                  <SunIcon className="w-5 h-5 text-yellow" />
-                ) : (
-                  <MoonIcon className="w-5 h-5 text-gray-700 dark:text-gray-300" />
-                )}
-              </button>
-              <button
-                onClick={handleLogout}
-                className="inline-flex items-center px-3 sm:px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-red hover:bg-red-light focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red transition-all duration-200 shadow-sm hover:shadow"
-              >
-                <ArrowRightOnRectangleIcon className="w-4 h-4 sm:w-5 sm:h-5 sm:mr-2" />
-                <span className="hidden sm:inline">Salir</span>
-              </button>
             </div>
           </div>
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="apple-press mt-3 flex min-h-11 w-full items-center gap-3 rounded-2xl px-3 text-sm font-semibold text-slate-600 hover:bg-slate-100 hover:text-red dark:text-slate-300 dark:hover:bg-white/5 dark:hover:text-red-light"
+          >
+            <ArrowRightOnRectangleIcon className="h-5 w-5" aria-hidden="true" />
+            <span>Salir</span>
+          </button>
         </div>
-      </nav>
+      </aside>
 
-      {/* Navbar Superior - Mobile (solo logo y acciones) */}
-      <nav className="md:hidden sticky top-0 z-50 backdrop-blur-lg bg-blue/60 dark:bg-blue/40 border-b border-blue/30 shadow-lg shadow-[0_4px_32px_rgba(0,151,178,0.3)] dark:shadow-[0_4px_32px_rgba(0,151,178,0.2)]" style={{ backgroundColor: 'rgba(0, 151, 178, 0.6)' }}>
-        {/* Efecto de brillo sutil en el borde inferior */}
-        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/50 to-transparent"></div>
-        <div className="px-4">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-3">
-              <img 
-                src="/images/lasc.png" 
-                alt="Logo" 
-                className="h-8 w-8 object-contain"
-              />
-              <div>
-                <h1 className="text-sm font-bold text-white leading-tight">Portal Alumnos</h1>
-                <p className="text-xs text-white/80 leading-tight">Certificación Montessori</p>
-              </div>
-            </div>
-            <div className="flex items-center space-x-2">
-              <button
-                onClick={toggleTheme}
-                className="p-2 rounded-lg bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white transition-all duration-300 hover:scale-110 active:scale-90"
-                aria-label="Cambiar tema"
-              >
-                {theme === 'dark' ? (
-                  <SunIcon className="w-5 h-5 text-yellow" />
-                ) : (
-                  <MoonIcon className="w-5 h-5 text-white" />
-                )}
-              </button>
-              <button
-                onClick={handleLogout}
-                className="p-2 rounded-lg bg-white/20 backdrop-blur-sm hover:bg-red/30 text-white transition-all duration-300 hover:scale-110 active:scale-90"
-                aria-label="Salir"
-              >
-                <ArrowRightOnRectangleIcon className="w-5 h-5" />
-              </button>
-            </div>
-          </div>
+      <header className="glass-material fixed inset-x-0 top-0 z-50 flex h-16 items-center justify-between border-b border-slate-200/70 px-4 lg:hidden dark:border-white/10">
+        <Link to="/" className="apple-press flex min-h-11 items-center gap-2.5 rounded-2xl pr-2">
+          <img src="/images/lasc.png" alt="" className="h-10 w-10 object-contain" />
+          <span className="text-base font-bold tracking-[-0.02em] text-slate-900 dark:text-white">Portal Alumnos</span>
+        </Link>
+        <div className="flex items-center gap-2">
+          <ThemeButton compact />
+          <span className="flex h-11 w-11 items-center justify-center rounded-full border border-blue/10 bg-blue/10 text-sm font-bold text-slate-700 dark:border-blue/20 dark:text-slate-100">
+            {initials}
+          </span>
         </div>
-      </nav>
+      </header>
 
-      {/* Main content */}
-      <main className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 ${isIOS ? 'md:pb-8' : 'pb-16 md:pb-8'} animate-fade-in`}>
-        {userData?.estado === 'Inactivo' && (
-          <div className="mb-4 sm:mb-6 bg-red/10 dark:bg-red/20 border border-red/30 rounded-xl p-4 sm:p-5">
-            <h2 className="text-base sm:text-lg font-semibold text-red mb-1">Usuario inactivo</h2>
-            <p className="text-sm text-gray-700 dark:text-gray-200 mb-2">
+      <div className="student-desktop-tools hidden lg:flex">
+        <ThemeButton />
+        <span
+          className="flex h-11 w-11 items-center justify-center rounded-full border border-blue/10 bg-blue/10 text-sm font-bold text-slate-700 dark:border-blue/20 dark:text-slate-100"
+          aria-label={`Perfil de ${resolvedUserData?.nombre || 'alumno'}`}
+        >
+          {initials}
+        </span>
+      </div>
+
+      <main className="student-main pb-[calc(7.25rem+env(safe-area-inset-bottom))] pt-24 lg:pb-16 lg:pt-12">
+        {resolvedUserData?.estado === 'Inactivo' && (
+          <section className="mb-6 rounded-3xl border border-red/20 bg-red/5 p-5" role="alert">
+            <h2 className="text-lg font-bold text-red">Usuario inactivo</h2>
+            <p className="mt-1 text-sm text-slate-700 dark:text-slate-200">
               Tu cuenta está inactiva. Contacta con administración para reactivarla.
             </p>
-            <a
-              href={`https://api.whatsapp.com/send?phone=5215548885013&text=${encodeURIComponent(`Hola, soy ${userData?.nombre || 'Alumno'} del nivel ${userData?.nivel || ''} mi cuenta está inactiva, necesito ayuda`)}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center px-3 py-2 bg-green text-gray-900 dark:text-gray-900 rounded-lg text-sm hover:bg-green/90 transition-colors"
-            >
-              Contactar por WhatsApp
-            </a>
-          </div>
+          </section>
         )}
         {children}
       </main>
 
-      {/* WhatsApp Button */}
-      <WhatsAppButton />
+      {!isPreview && <WhatsAppButton />}
 
-      {/* Bottom Navigation - Mobile (Glassmorphism Style) */}
-      {/* En iOS se posiciona en la parte superior para evitar conflicto con la barra de Safari */}
-      <nav className={`md:hidden ${isIOS ? 'sticky top-16 z-40' : 'fixed bottom-0 left-0 right-0 z-50'}`}>
-        <div className={`backdrop-blur-lg bg-blue/60 dark:bg-blue/40 shadow-lg ${
-          isIOS 
-            ? 'border-b border-blue/30 shadow-[0_8px_32px_rgba(0,151,178,0.3)] dark:shadow-[0_8px_32px_rgba(0,151,178,0.2)]' 
-            : 'border-t border-blue/30 shadow-[0_-8px_32px_rgba(0,151,178,0.3)] dark:shadow-[0_-8px_32px_rgba(0,151,178,0.2)]'
-        }`} style={{ backgroundColor: theme === 'dark' ? 'rgba(0, 151, 178, 0.4)' : 'rgba(0, 151, 178, 0.6)' }}>
-          {/* Efecto de brillo sutil en el borde */}
-          <div className={`absolute ${isIOS ? 'bottom-0' : 'top-0'} left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/50 to-transparent`}></div>
-          <div className="px-2 py-1.5">
-            <div className="flex justify-around items-center">
-              {filteredNavigation.map((item) => {
-                const isActive = location.pathname === item.href;
-                return (
-                  <Link
-                    key={item.name}
-                    to={item.href}
-                    className={`relative flex flex-col items-center justify-center w-14 h-14 rounded-2xl transition-all duration-300 active:scale-90 ${
-                      isActive
-                        ? 'bg-white/20 backdrop-blur-sm text-white scale-110 shadow-lg shadow-white/20'
-                        : 'text-white/80 hover:text-yellow hover:scale-[1.2] hover:bg-white/10'
-                    }`}
-                  >
-                    {isActive && (
-                      <div className="absolute -top-1 left-1/2 transform -translate-x-1/2 w-1.5 h-1.5 bg-yellow rounded-full shadow-lg shadow-yellow/50"></div>
-                    )}
-                    <item.icon className={`w-5 h-5 transition-transform duration-300 ${isActive ? 'scale-110' : ''}`} />
-                    <span className="text-[9px] font-medium mt-0.5 leading-tight text-center px-0.5">
-                      {item.name}
-                    </span>
-                  </Link>
-                );
-              })}
-            </div>
-          </div>
+      <nav className="student-bottom-nav glass-material lg:hidden" aria-label="Navegación principal">
+        <div className="mx-auto grid max-w-lg grid-cols-5 gap-1 px-2 pb-[max(0.45rem,env(safe-area-inset-bottom))] pt-2">
+          {navigation.map((item) => {
+            const isActive = location.pathname === item.href;
+            return (
+              <Link
+                key={item.name}
+                to={item.href}
+                className={`student-bottom-item apple-press ${isActive ? 'student-bottom-item-active' : ''}`}
+                aria-current={isActive ? 'page' : undefined}
+              >
+                <item.icon className="h-5 w-5" aria-hidden="true" />
+                <span>{item.mobileName}</span>
+              </Link>
+            );
+          })}
         </div>
       </nav>
     </div>

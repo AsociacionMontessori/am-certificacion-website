@@ -302,16 +302,11 @@ html.dark .bg-gray-200:not([class*="dark:bg-"]) {
 
 /* WhatsApp Button Animations */
 .whatsapp-button {
-  animation: whatsappFloat 3s ease-in-out infinite;
+  animation: none;
 }
 
 .whatsapp-button::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  background: rgba(37, 211, 102, 0.4);
-  animation: whatsappPulse 2s ease-out infinite;
+  content: none;
 }
 
 @keyframes whatsappFloat {
@@ -331,5 +326,465 @@ html.dark .bg-gray-200:not([class*="dark:bg-"]) {
   100% {
     transform: scale(1.5);
     opacity: 0;
+  }
+}
+
+/* Portal de alumnos — sistema visual Apple-inspired */
+@layer components {
+  .apple-press {
+    touch-action: manipulation;
+    transition:
+      transform 120ms ease-out,
+      background-color 180ms ease-out,
+      border-color 180ms ease-out,
+      color 180ms ease-out,
+      box-shadow 220ms ease-out,
+      opacity 180ms ease-out;
+  }
+
+  .apple-press:active {
+    transform: scale(0.97);
+    transition-duration: 80ms;
+  }
+
+  .glass-material {
+    background: rgba(255, 255, 255, 0.78);
+    -webkit-backdrop-filter: blur(24px) saturate(160%);
+    backdrop-filter: blur(24px) saturate(160%);
+  }
+
+  .dark .glass-material {
+    background: rgba(15, 23, 42, 0.82);
+  }
+
+  .sheet-material {
+    background: rgba(255, 255, 255, 0.96);
+    -webkit-backdrop-filter: blur(28px) saturate(170%);
+    backdrop-filter: blur(28px) saturate(170%);
+  }
+
+  .dark .sheet-material {
+    background: rgba(15, 23, 42, 0.97);
+  }
+
+  .student-sidebar {
+    position: fixed;
+    inset: 0 auto 0 0;
+    z-index: 45;
+    width: 17.5rem;
+    flex-direction: column;
+    border-right: 1px solid rgba(226, 232, 240, 0.82);
+    padding: 2rem 1.25rem 1.5rem;
+  }
+
+  .dark .student-sidebar {
+    border-right-color: rgba(255, 255, 255, 0.1);
+  }
+
+  .student-main {
+    min-height: 100vh;
+    width: 100%;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .student-desktop-tools {
+    position: fixed;
+    right: clamp(2rem, 4vw, 4.5rem);
+    top: 2.5rem;
+    z-index: 40;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .student-nav-item {
+    position: relative;
+    display: flex;
+    min-height: 3.25rem;
+    align-items: center;
+    gap: 0.8rem;
+    border-radius: 1rem;
+    padding: 0.75rem 1rem;
+    color: rgb(71 85 105);
+    font-size: 0.9rem;
+    font-weight: 650;
+  }
+
+  .dark .student-nav-item {
+    color: rgb(203 213 225);
+  }
+
+  .student-nav-item:hover {
+    background: rgba(241, 245, 249, 0.86);
+    color: rgb(15 23 42);
+  }
+
+  .dark .student-nav-item:hover {
+    background: rgba(255, 255, 255, 0.06);
+    color: white;
+  }
+
+  .student-nav-item-active {
+    background: rgba(0, 151, 178, 0.08);
+    color: #0097b2;
+  }
+
+  .student-nav-item-active::before {
+    position: absolute;
+    bottom: 0.75rem;
+    left: -1.25rem;
+    top: 0.75rem;
+    width: 0.2rem;
+    border-radius: 999px;
+    background: #0097b2;
+    content: '';
+  }
+
+  .student-bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 60;
+    border-top: 1px solid rgba(226, 232, 240, 0.78);
+    box-shadow: 0 -12px 36px rgba(15, 23, 42, 0.07);
+  }
+
+  .dark .student-bottom-nav {
+    border-top-color: rgba(255, 255, 255, 0.1);
+  }
+
+  .student-bottom-item {
+    position: relative;
+    display: flex;
+    min-width: 0;
+    min-height: 3.55rem;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.2rem;
+    border-radius: 0.9rem;
+    color: rgb(100 116 139);
+    font-size: clamp(0.56rem, 2.2vw, 0.7rem);
+    font-weight: 600;
+    line-height: 1;
+  }
+
+  .dark .student-bottom-item {
+    color: rgb(148 163 184);
+  }
+
+  .student-bottom-item-active {
+    color: #0097b2;
+  }
+
+  .student-bottom-item-active::before {
+    position: absolute;
+    top: 0;
+    width: 2.75rem;
+    height: 0.16rem;
+    border-radius: 999px;
+    background: #0097b2;
+    content: '';
+  }
+
+  .dashboard-columns {
+    display: grid;
+    min-width: 0;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2rem;
+  }
+
+  .dashboard-columns > * {
+    min-width: 0;
+  }
+
+  .section-title {
+    font-size: clamp(1.35rem, 2.2vw, 1.65rem);
+    font-weight: 750;
+    line-height: 1.15;
+    letter-spacing: -0.028em;
+    color: rgb(15 23 42);
+  }
+
+  .dark .section-title {
+    color: white;
+  }
+
+  .dashboard-panel,
+  .open-list,
+  .attention-surface {
+    border: 1px solid rgba(226, 232, 240, 0.88);
+    background: white;
+    box-shadow: 0 10px 32px rgba(15, 23, 42, 0.055), 0 1px 2px rgba(15, 23, 42, 0.04);
+  }
+
+  .dashboard-panel,
+  .attention-surface {
+    border-radius: 1.5rem;
+  }
+
+  .open-list {
+    margin-top: 1rem;
+    overflow: hidden;
+    border-radius: 1.5rem;
+  }
+
+  .dark .dashboard-panel,
+  .dark .open-list,
+  .dark .attention-surface {
+    border-color: rgba(255, 255, 255, 0.1);
+    background: rgb(15 23 42);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.22);
+  }
+
+  .open-list-row {
+    display: flex;
+    min-height: 4.5rem;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.9rem 1.25rem;
+  }
+
+  .open-list-row:hover {
+    background: rgb(248 250 252);
+  }
+
+  .dark .open-list-row:hover {
+    background: rgba(255, 255, 255, 0.045);
+  }
+
+  .attention-icon-yellow {
+    background: rgba(251, 209, 22, 0.16);
+    color: #b88200;
+  }
+
+  .attention-icon-orange {
+    background: rgba(236, 106, 61, 0.12);
+    color: #d94d1e;
+  }
+
+  .attention-icon-blue {
+    background: rgba(0, 151, 178, 0.1);
+    color: #0097b2;
+  }
+
+  .secure-field {
+    display: flex;
+    min-height: 3.25rem;
+    align-items: center;
+    gap: 0.35rem;
+    border: 1px solid rgb(226 232 240);
+    border-radius: 1rem;
+    background: rgb(248 250 252);
+    padding: 0.25rem 0.3rem 0.25rem 0.9rem;
+  }
+
+  .dark .secure-field {
+    border-color: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.04);
+  }
+
+  .secure-field-button {
+    display: inline-flex;
+    height: 2.75rem;
+    width: 2.75rem;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.8rem;
+    color: rgb(100 116 139);
+  }
+
+  .secure-field-button:hover {
+    background: white;
+    color: #0097b2;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
+  }
+
+  .dark .secure-field-button:hover {
+    background: rgba(255, 255, 255, 0.08);
+  }
+
+  .login-screen {
+    display: grid;
+  }
+
+  .login-brand-panel,
+  .login-form-panel {
+    position: relative;
+    min-width: 0;
+  }
+
+  .login-brand-panel {
+    display: flex;
+    min-height: 22rem;
+    align-items: flex-start;
+    justify-content: center;
+    overflow: hidden;
+    padding: 3rem 1.5rem 1.5rem;
+  }
+
+  .login-brand-copy {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    max-width: 34rem;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    text-align: center;
+  }
+
+  .login-classroom-image {
+    display: none;
+  }
+
+  .login-form-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem 3rem;
+  }
+
+  .login-form-surface {
+    width: 100%;
+    max-width: 32rem;
+    border: 1px solid rgba(226, 232, 240, 0.9);
+    border-radius: 1.75rem;
+    background: rgba(255, 255, 255, 0.96);
+    padding: clamp(1.5rem, 5vw, 3.5rem);
+    box-shadow: 0 24px 70px rgba(15, 23, 42, 0.08), 0 1px 2px rgba(15, 23, 42, 0.04);
+  }
+
+  .dark .login-form-surface {
+    border-color: rgba(255, 255, 255, 0.1);
+    background: rgb(15 23 42);
+    box-shadow: 0 24px 70px rgba(0, 0, 0, 0.3);
+  }
+
+  .apple-input {
+    min-height: 3.25rem;
+    width: 100%;
+    appearance: none;
+    border: 1px solid rgb(203 213 225);
+    border-radius: 1rem;
+    background: white;
+    padding: 0.75rem 1rem;
+    color: rgb(15 23 42);
+    font-size: 1rem;
+    font-weight: 500;
+    line-height: 1.5;
+    transition: border-color 160ms ease-out, box-shadow 160ms ease-out, background-color 160ms ease-out;
+  }
+
+  .apple-input::placeholder {
+    color: rgb(148 163 184);
+  }
+
+  .apple-input:focus {
+    border-color: #0097b2;
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(0, 151, 178, 0.12);
+  }
+
+  .dark .apple-input {
+    border-color: rgba(255, 255, 255, 0.13);
+    background: rgba(255, 255, 255, 0.045);
+    color: white;
+  }
+}
+
+@media (min-width: 1024px) {
+  .student-main {
+    margin-left: 17.5rem;
+    width: calc(100% - 17.5rem);
+    padding-left: clamp(2rem, 4vw, 4.5rem);
+    padding-right: clamp(2rem, 4vw, 4.5rem);
+  }
+}
+
+@media (min-width: 1200px) {
+  .dashboard-columns {
+    grid-template-columns: minmax(0, 1.45fr) minmax(19rem, 0.72fr);
+    align-items: start;
+    gap: clamp(1.5rem, 3vw, 2.5rem);
+  }
+}
+
+@media (min-width: 900px) {
+  .login-screen {
+    grid-template-columns: minmax(0, 1fr) minmax(31rem, 1.1fr);
+  }
+
+  .login-brand-panel {
+    min-height: 100vh;
+    align-items: flex-start;
+    padding: clamp(3rem, 8vh, 6rem) 2rem 2rem;
+  }
+
+  .login-brand-copy {
+    gap: 1.35rem;
+  }
+
+  .login-classroom-image {
+    position: absolute;
+    inset: 30% 0 0;
+    display: block;
+    height: 70%;
+    width: 100%;
+    object-fit: cover;
+    object-position: 45% center;
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 24%, black 100%);
+    mask-image: linear-gradient(to bottom, transparent 0%, black 24%, black 100%);
+  }
+
+  .login-form-panel {
+    min-height: 100vh;
+    padding: 3rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .apple-press:active {
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .glass-material,
+  .sheet-material {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    background: white;
+  }
+
+  .dark .glass-material,
+  .dark .sheet-material {
+    background: rgb(15 23 42);
+  }
+}
+
+@media (prefers-contrast: more) {
+  .dashboard-panel,
+  .open-list,
+  .attention-surface,
+  .login-form-surface,
+  .student-sidebar,
+  .student-bottom-nav {
+    border-color: currentColor;
   }
 }

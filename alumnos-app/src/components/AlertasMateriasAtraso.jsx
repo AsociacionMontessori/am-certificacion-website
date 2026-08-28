@@ -9,7 +9,7 @@ import { db } from '../config/firebase';
 import { useAuth } from '../contexts/AuthContext';
 import LoadingSpinner from './LoadingSpinner';
 
-const AlertasMateriasAtraso = () => {
+const AlertasMateriasAtraso = ({ compact = false, onVisibilityChange }) => {
   const { currentUser } = useAuth();
   const [materiasAtraso, setMateriasAtraso] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -51,7 +51,12 @@ const AlertasMateriasAtraso = () => {
     return () => clearInterval(interval);
   }, [currentUser]);
 
+  useEffect(() => {
+    if (!loading) onVisibilityChange?.(materiasAtraso.length > 0);
+  }, [loading, materiasAtraso.length, onVisibilityChange]);
+
   if (loading) {
+    if (compact) return null;
     return (
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-4">
         <LoadingSpinner size="sm" variant="montessori" />
@@ -68,6 +73,30 @@ const AlertasMateriasAtraso = () => {
     `Hola, tengo ${materiasAtraso.length} materia(s) con atraso y necesito ayuda para regularizar mis clases.`
   );
   const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${whatsappMessage}`;
+
+  if (compact) {
+    return (
+      <div className="attention-surface flex items-start gap-3 px-4 py-4 sm:px-5">
+        <span className="attention-icon-orange flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl">
+          <ExclamationTriangleIcon className="h-6 w-6" aria-hidden="true" />
+        </span>
+        <div className="min-w-0 flex-1">
+          <h3 className="text-sm font-bold text-slate-900 dark:text-white sm:text-base">Materias con atraso</h3>
+          <p className="mt-1 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+            {materiasAtraso.length === 1
+              ? `${materiasAtraso[0].nombre} requiere tu atención.`
+              : `${materiasAtraso.length} materias requieren tu atención.`}
+          </p>
+        </div>
+        <Link
+          to="/calendario"
+          className="apple-press inline-flex min-h-11 shrink-0 items-center rounded-2xl px-3 text-sm font-bold text-blue hover:bg-blue/5"
+        >
+          Revisar
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-red/10 dark:bg-red/20 rounded-xl shadow-md border border-red/30 p-4 sm:p-6 mb-6 animate-slide-up">

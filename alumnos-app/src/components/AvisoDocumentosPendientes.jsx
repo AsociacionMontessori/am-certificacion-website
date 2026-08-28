@@ -33,7 +33,7 @@ const CAMPOS = {
   ocupacion: 'ocupación',
 };
 
-const AvisoDocumentosPendientes = () => {
+const AvisoDocumentosPendientes = ({ compact = false, onVisibilityChange }) => {
   const { currentUser, userData } = useAuth();
   const [faltantes, setFaltantes] = useState([]);
   const [datosFaltantes, setDatosFaltantes] = useState([]);
@@ -61,7 +61,48 @@ const AvisoDocumentosPendientes = () => {
   }, [currentUser?.uid, userData]);
 
   const pendientes = faltantes.length + datosFaltantes.length;
+
+  useEffect(() => {
+    onVisibilityChange?.(pendientes > 0);
+  }, [onVisibilityChange, pendientes]);
+
   if (pendientes === 0) return null;
+
+  const detail = (
+    <>
+      {faltantes.length > 0 && (
+        <>
+          Nos {faltantes.length === 1 ? 'falta tu' : 'faltan tus'}{' '}
+          {faltantes.map((type) => LABELS[type] || type).join(', ')}.{' '}
+        </>
+      )}
+      {datosFaltantes.length > 0 && (
+        <>
+          Falta capturar {datosFaltantes.map((field) => CAMPOS[field] || field).join(', ')}.{' '}
+        </>
+      )}
+    </>
+  );
+
+  if (compact) {
+    return (
+      <div className="attention-surface flex items-start gap-3 px-4 py-4 sm:px-5">
+        <span className="attention-icon-yellow flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl">
+          <ExclamationTriangleIcon className="h-6 w-6" aria-hidden="true" />
+        </span>
+        <div className="min-w-0 flex-1">
+          <h3 className="text-sm font-bold text-slate-900 dark:text-white sm:text-base">Tu expediente está incompleto</h3>
+          <p className="mt-1 text-sm leading-relaxed text-slate-600 dark:text-slate-300">{detail}</p>
+        </div>
+        <Link
+          to="/expediente"
+          className="apple-press inline-flex min-h-11 shrink-0 items-center rounded-2xl px-3 text-sm font-bold text-blue hover:bg-blue/5"
+        >
+          Revisar
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-300 dark:border-amber-700 rounded-xl p-5 sm:p-6">
@@ -72,17 +113,7 @@ const AvisoDocumentosPendientes = () => {
             Tu expediente está incompleto
           </h2>
           <p className="text-sm text-amber-900/90 dark:text-amber-200/90 mb-3">
-            {faltantes.length > 0 && (
-              <>
-                Nos {faltantes.length === 1 ? 'falta tu' : 'faltan tus'}{' '}
-                {faltantes.map((t) => LABELS[t] || t).join(', ')}.{' '}
-              </>
-            )}
-            {datosFaltantes.length > 0 && (
-              <>
-                Falta capturar {datosFaltantes.map((c) => CAMPOS[c] || c).join(', ')}.{' '}
-              </>
-            )}
+            {detail}
             Puedes completarlo tú desde tu expediente, sin trámites ni correos.
           </p>
           <Link
