@@ -74,7 +74,7 @@ const Calificaciones = () => {
   const periodos = [...new Set(calificaciones.map(c => c.periodo))].sort().reverse();
 
   return (
-    <div className="px-4 py-6 sm:px-0">
+    <div className="student-page space-y-7 animate-fade-in">
       <div className="mb-6">
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
           Calificaciones
@@ -85,13 +85,15 @@ const Calificaciones = () => {
       </div>
 
       {/* Promedio General */}
-      <div className="mb-6 bg-gradient-to-r from-blue to-green rounded-lg shadow-md p-6 text-white">
+      <div className="dashboard-panel mb-6 p-6">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-lg font-medium mb-2">Promedio General</h2>
-            <p className="text-3xl font-bold">{calcularPromedio()}</p>
+            <h2 className="mb-2 text-lg font-semibold text-slate-800 dark:text-slate-100">Promedio General</h2>
+            <p className="text-4xl font-bold tracking-[-0.04em] text-blue">{calcularPromedio()}</p>
           </div>
-          <TrophyIcon className="w-16 h-16 opacity-50" />
+          <span className="flex h-16 w-16 items-center justify-center rounded-3xl bg-blue/10 text-blue">
+            <TrophyIcon className="h-8 w-8" />
+          </span>
         </div>
       </div>
 
@@ -150,4 +152,3 @@ const Calificaciones = () => {
 };
 
 export default Calificaciones;
-

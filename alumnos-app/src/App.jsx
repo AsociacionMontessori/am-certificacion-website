@@ -40,6 +40,8 @@ const OrdenesPublicas = lazy(() => import('./pages/Admin/OrdenesPublicas'));
 // const Pagos = lazy(() => import('./pages/Pagos'));
 const UsuariosAdministrativos = lazy(() => import('./pages/Admin/UsuariosAdministrativos'));
 const DesignPreview = import.meta.env.DEV ? lazy(() => import('./pages/DesignPreview')) : null;
+const AdminDesignPreview = import.meta.env.DEV ? lazy(() => import('./pages/AdminDesignPreview')) : null;
+const AdminFormPreview = import.meta.env.DEV ? lazy(() => import('./pages/AdminFormPreview')) : null;
 
 // Componente para redirigir según el rol
 const DashboardRedirect = () => {
@@ -107,6 +109,26 @@ function App() {
               element={
                 <Suspense fallback={<LoadingSpinner fullScreen size="xl" variant="montessori" message="Cargando vista de diseño..." />}>
                   <DesignPreview />
+                </Suspense>
+              }
+            />
+          )}
+          {AdminDesignPreview && (
+            <Route
+              path="/admin-design-preview"
+              element={
+                <Suspense fallback={<LoadingSpinner fullScreen size="xl" variant="montessori" message="Cargando vista administrativa..." />}>
+                  <AdminDesignPreview />
+                </Suspense>
+              }
+            />
+          )}
+          {AdminFormPreview && (
+            <Route
+              path="/admin-form-preview"
+              element={
+                <Suspense fallback={<LoadingSpinner fullScreen size="xl" variant="montessori" message="Cargando formulario administrativo..." />}>
+                  <AdminFormPreview />
                 </Suspense>
               }
             />

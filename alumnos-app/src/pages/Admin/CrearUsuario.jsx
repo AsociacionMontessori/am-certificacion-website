@@ -6,17 +6,17 @@ import { UserPlusIcon, ArrowLeftIcon, Cog6ToothIcon } from '@heroicons/react/24/
 import useCanEdit from '../../hooks/useCanEdit';
 import { obtenerNiveles } from '../../services/nivelesService';
 
-const CrearUsuario = () => {
+const CrearUsuario = ({ previewMode = false }) => {
   const navigate = useNavigate();
   const { currentUser } = useAuth();
   const canEdit = useCanEdit();
   const [loading, setLoading] = useState(false);
   
   useEffect(() => {
-    if (!canEdit) {
+    if (!previewMode && !canEdit) {
       navigate('/admin');
     }
-  }, [canEdit, navigate]);
+  }, [canEdit, navigate, previewMode]);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const [niveles, setNiveles] = useState([]);
@@ -40,6 +40,12 @@ const CrearUsuario = () => {
 
   // Cargar niveles desde Firestore
   useEffect(() => {
+    if (previewMode) {
+      setNiveles(['Propedéutico', 'Nido & Comunidad infantil', 'Casa de Niños', 'Taller', 'Neuroeducación']);
+      setLoadingNiveles(false);
+      return undefined;
+    }
+
     const loadNiveles = async () => {
       setLoadingNiveles(true);
       try {
@@ -76,7 +82,7 @@ const CrearUsuario = () => {
     };
 
     loadNiveles();
-  }, []);
+  }, [previewMode]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -105,6 +111,12 @@ const CrearUsuario = () => {
     setError('');
     setSuccess(false);
     setLoading(true);
+
+    if (previewMode) {
+      setSuccess(true);
+      setLoading(false);
+      return;
+    }
 
     // Validaciones
     if (formData.password !== formData.confirmPassword) {
@@ -184,8 +196,8 @@ const CrearUsuario = () => {
 
   if (success) {
     return (
-      <div className="px-4 py-6 sm:px-0">
-        <div className="bg-green text-gray-900 dark:text-gray-900 rounded-lg p-8 text-center">
+      <div className="admin-page">
+        <div className="admin-form-surface border-green/30 bg-green/5 p-8 text-center">
           <UserPlusIcon className="w-16 h-16 mx-auto mb-4" />
           <h2 className="text-2xl font-bold mb-2">¡Usuario creado exitosamente!</h2>
           <p className="mb-4">El alumno ha sido registrado correctamente.</p>
@@ -219,10 +231,10 @@ const CrearUsuario = () => {
   }
 
   return (
-    <div className="px-4 py-6 sm:px-0">
+    <div className="admin-page space-y-6">
       <Link
         to="/admin"
-        className="inline-flex items-center text-blue hover:text-blue/80 mb-6"
+        className="apple-press -ml-3 mb-6 inline-flex min-h-11 items-center rounded-xl px-3 text-blue hover:text-blue/80"
       >
         <ArrowLeftIcon className="w-5 h-5 mr-2" />
         Volver al panel
@@ -230,14 +242,15 @@ const CrearUsuario = () => {
 
       <div className="mb-6">
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
-          Crear Nuevo Usuario
+          Crear usuario
         </h1>
         <p className="mt-2 text-gray-600 dark:text-gray-400">
-          Registra un nuevo usuario en el sistema
+          Registra un nuevo usuario y sus accesos
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 sm:p-8 space-y-6">
+      <div className="admin-form-grid">
+      <form onSubmit={handleSubmit} className="admin-form-surface space-y-0" noValidate={false}>
         {error && (
           <div className="bg-red-light border border-red rounded-md p-3 text-red text-sm">
             {error}
@@ -329,10 +342,10 @@ const CrearUsuario = () => {
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                       Nivel *
                     </label>
-                    {canEdit && (
+                    {(canEdit || previewMode) && (
                       <Link
                         to="/admin/gestion-niveles"
-                        className="inline-flex items-center text-xs text-blue hover:text-blue/80 transition-colors"
+                        className="apple-press -my-2 inline-flex min-h-11 items-center rounded-xl px-2 text-xs text-blue transition-colors hover:text-blue/80"
                       >
                         <Cog6ToothIcon className="w-4 h-4 mr-1" />
                         Gestionar niveles
@@ -425,17 +438,20 @@ const CrearUsuario = () => {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Contraseña *
+              <div className="mb-2 flex items-center justify-between gap-2">
+                <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Contraseña *
+                </label>
                 <button
                   type="button"
                   onClick={generarPassword}
-                  className="ml-2 text-xs text-blue hover:underline"
+                  className="apple-press -my-2 inline-flex min-h-11 items-center rounded-xl px-2 text-xs text-blue hover:underline"
                 >
                   Generar automática
                 </button>
-              </label>
+              </div>
               <input
+                id="password"
                 type="password"
                 name="password"
                 required
@@ -527,6 +543,23 @@ const CrearUsuario = () => {
           </button>
         </div>
       </form>
+      <aside className="admin-summary-rail hidden xl:block" aria-label="Resumen del usuario">
+        <h2 className="text-lg font-bold text-slate-900 dark:text-white">Resumen</h2>
+        <dl className="mt-6 space-y-6">
+          {[
+            ['Nombre', formData.nombreCompleto],
+            ['Matrícula', formData.matricula],
+            ['Nivel', formData.nivel],
+            ['Estado', formData.estado],
+          ].map(([label, value]) => (
+            <div key={label}>
+              <dt className="text-xs font-semibold text-slate-500 dark:text-slate-400">{label}</dt>
+              <dd className="mt-1 break-words text-sm font-semibold text-slate-800 dark:text-slate-100">{value || '—'}</dd>
+            </div>
+          ))}
+        </dl>
+      </aside>
+      </div>
     </div>
   );
 };

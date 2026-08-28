@@ -67,7 +67,7 @@ const Graduacion = () => {
 
   if (userData?.estado === 'Inactivo') {
     return (
-      <div className="px-4 py-6 sm:px-0">
+      <div className="student-page space-y-7 animate-fade-in">
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Información de Graduación</h1>
           <p className="mt-2 text-gray-600 dark:text-gray-400">Progreso y requisitos para tu graduación</p>
@@ -83,7 +83,7 @@ const Graduacion = () => {
   }
 
   return (
-    <div className="px-4 py-6 sm:px-0">
+    <div className="student-page space-y-7 animate-fade-in">
       <div className="mb-6">
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
           Información de Graduación
@@ -262,15 +262,17 @@ const Graduacion = () => {
 
       {/* Certificado Digital - Link general */}
       {currentUser && (
-        <div className="mb-6 bg-gradient-to-r from-green to-green/90 rounded-lg shadow-md p-6">
+        <div className="dashboard-panel mb-6 border-green/20 bg-green/5 p-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center">
-              <DocumentTextIcon className="w-8 h-8 text-white mr-4" />
+              <span className="mr-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-green/15 text-[#4ca72e]">
+                <DocumentTextIcon className="h-6 w-6" />
+              </span>
               <div>
-                <h2 className="text-xl font-semibold text-white mb-1">
+                <h2 className="mb-1 text-xl font-semibold text-slate-900 dark:text-white">
                   Certificado Digital
                 </h2>
-                <p className="text-white/90 text-sm">
+                <p className="text-sm text-slate-600 dark:text-slate-300">
                   Accede a tu certificado digital verificable
                 </p>
               </div>
@@ -278,7 +280,7 @@ const Graduacion = () => {
             <Link
               to={`/certificado/${currentUser.uid}`}
               target="_blank"
-              className="inline-flex items-center px-6 py-3 bg-white text-green rounded-lg hover:bg-white/90 font-semibold transition-all duration-200 shadow-lg hover:shadow-xl"
+              className="apple-press inline-flex min-h-11 items-center rounded-2xl bg-green px-5 py-3 font-bold text-slate-900 shadow-sm hover:bg-green/90"
             >
               Ver Certificado
               <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -302,4 +304,3 @@ const Graduacion = () => {
 };
 
 export default Graduacion;
-

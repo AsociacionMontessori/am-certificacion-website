@@ -38,7 +38,7 @@ const AdminDashboard = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [viewMode, setViewMode] = useState(() => {
     const saved = localStorage.getItem('adminViewMode');
-    return saved || 'cards'; // 'cards' por defecto, luego 'table' o 'auto'
+    return saved || 'table'; // tabla por defecto; tarjetas siguen disponibles como preferencia
   });
 
   useEffect(() => {
@@ -236,9 +236,9 @@ const AdminDashboard = () => {
   }
 
   return (
-    <div className="space-y-6 sm:space-y-8 animate-fade-in">
+    <div className="admin-page space-y-7 animate-fade-in">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="admin-page-header flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white">
             Panel de Administración
@@ -259,7 +259,7 @@ const AdminDashboard = () => {
       </div>
 
       {/* Estadísticas */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+      <div className="admin-metrics-rail grid grid-cols-2 lg:grid-cols-4">
         {[
           { label: 'Total Alumnos', value: stats.total, icon: UserGroupIcon, iconBg: 'bg-blue/10 dark:bg-blue/20', iconColor: 'text-blue', valueColor: 'text-blue' },
           { label: 'Activos', value: stats.activos, icon: AcademicCapIcon, iconBg: 'bg-green/10 dark:bg-green/20', iconColor: 'text-green', valueColor: 'text-green' },
@@ -268,7 +268,7 @@ const AdminDashboard = () => {
         ].map((stat, index) => (
           <div
             key={stat.label}
-            className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 transition-all duration-300 hover:shadow-md hover:border-gray-200 dark:hover:border-gray-600 p-5 sm:p-6 hover:scale-[1.02] animate-slide-up"
+            className="admin-metric animate-slide-up"
             style={{ animationDelay: `${index * 50}ms` }}
           >
             <div className="flex items-center justify-between">
@@ -287,7 +287,7 @@ const AdminDashboard = () => {
       </div>
 
       {/* Búsqueda, Filtros y Vista */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 transition-all duration-300 hover:shadow-md hover:border-gray-200 dark:hover:border-gray-600 p-4 sm:p-5 space-y-4">
+      <div className="admin-toolbar space-y-4">
         {/* Primera fila: Búsqueda y controles */}
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="relative flex-1">
@@ -461,9 +461,9 @@ const AdminDashboard = () => {
       </div>
 
       {/* Lista de Alumnos */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
+      <div className="admin-table-surface overflow-hidden">
         {/* Vista de Tabla */}
-        <div className={`overflow-x-auto ${viewMode === 'cards' ? 'hidden' : viewMode === 'auto' ? 'hidden lg:block' : 'block'}`}>
+        <div className={`overflow-x-auto ${viewMode === 'cards' ? 'hidden' : 'hidden md:block'}`}>
           <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
             <thead className="bg-gray-50 dark:bg-gray-700">
               <tr>
@@ -500,7 +500,7 @@ const AdminDashboard = () => {
                       {alumno.nombre || 'N/A'}
                       {esReciente && (
                         <SparklesIcon 
-                          className="w-5 h-5 text-yellow animate-pulse" 
+                          className="w-5 h-5 text-yellow"
                           title="Último alumno agregado"
                         />
                       )}
@@ -546,7 +546,7 @@ const AdminDashboard = () => {
         </div>
 
         {/* Vista de Tarjetas */}
-        <div className={`${viewMode === 'table' ? 'hidden' : viewMode === 'auto' ? 'block lg:hidden' : 'block'} ${
+        <div className={`${viewMode === 'table' || viewMode === 'auto' ? 'block md:hidden' : 'block'} ${
           viewMode === 'cards' ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 p-4 sm:p-6' : 'divide-y divide-gray-200 dark:divide-gray-700'
         }`}>
           {filteredAlumnos.map((alumno) => {
@@ -566,7 +566,7 @@ const AdminDashboard = () => {
                     {alumno.nombre || 'N/A'}
                     {esReciente && (
                       <SparklesIcon 
-                        className="w-5 h-5 text-yellow animate-pulse flex-shrink-0" 
+                        className="w-5 h-5 text-yellow flex-shrink-0"
                         title="Último alumno agregado"
                       />
                     )}

@@ -1,310 +1,284 @@
+import { useMemo, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { Dialog, DialogBackdrop, DialogPanel, DialogTitle } from '@headlessui/react';
+import {
+  ArrowPathIcon,
+  ArrowRightOnRectangleIcon,
+  BuildingLibraryIcon,
+  CurrencyDollarIcon,
+  DocumentTextIcon,
+  EllipsisHorizontalIcon,
+  HomeIcon,
+  IdentificationIcon,
+  MegaphoneIcon,
+  MoonIcon,
+  QrCodeIcon,
+  SunIcon,
+  UserGroupIcon,
+  UserPlusIcon,
+  WrenchScrewdriverIcon,
+  XMarkIcon,
+} from '@heroicons/react/24/outline';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
-import { useIsIOS } from '../hooks/useIsIOS';
 import useCanEdit from '../hooks/useCanEdit';
-import { 
-  HomeIcon, 
-  UserGroupIcon,
-  DocumentTextIcon,
-  CurrencyDollarIcon,
-  ArrowPathIcon,
-  QrCodeIcon,
-  WrenchScrewdriverIcon,
-  ArrowRightOnRectangleIcon,
-  SunIcon,
-  MoonIcon,
-  IdentificationIcon,
-  MegaphoneIcon
-} from '@heroicons/react/24/outline';
 
-const AdminLayout = ({ children }) => {
-  const { userData, logout } = useAuth();
+const getInitials = (name = '') => {
+  const initials = name
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((part) => part[0])
+    .join('')
+    .toUpperCase();
+
+  return initials || 'AM';
+};
+
+const getRoleLabel = (role) => {
+  const labels = {
+    admin: 'Administración',
+    directivo: 'Directivo',
+    catedratico: 'Catedrático',
+    grupos: 'Grupos',
+  };
+  return labels[role] || 'Usuario administrativo';
+};
+
+const ThemeButton = ({ compact = false }) => {
   const { theme, toggleTheme } = useTheme();
+  const Icon = theme === 'dark' ? SunIcon : MoonIcon;
+  const label = theme === 'dark' ? 'Usar tema claro' : 'Usar tema oscuro';
+
+  return (
+    <button
+      type="button"
+      onClick={toggleTheme}
+      className={`apple-press inline-flex min-h-11 items-center justify-center rounded-2xl border border-slate-200/80 bg-white/80 text-slate-700 shadow-sm backdrop-blur-xl hover:bg-white dark:border-white/10 dark:bg-slate-800/80 dark:text-slate-100 dark:hover:bg-slate-800 ${
+        compact ? 'h-11 w-11' : 'gap-2 px-4 text-sm font-semibold'
+      }`}
+      aria-label={label}
+      title={label}
+    >
+      <Icon className="h-5 w-5" aria-hidden="true" />
+      {!compact && <span>Cambiar tema</span>}
+    </button>
+  );
+};
+
+const NavigationLink = ({ item, active, onNavigate }) => (
+  <Link
+    to={item.href}
+    onClick={onNavigate}
+    className={`admin-nav-item apple-press ${active ? 'admin-nav-item-active' : ''}`}
+    aria-current={active ? 'page' : undefined}
+  >
+    <item.icon className="h-5 w-5" aria-hidden="true" />
+    <span>{item.name}</span>
+  </Link>
+);
+
+const AdminLayout = ({ children, previewUserData = null, previewCanEdit = null }) => {
+  const { userData, logout } = useAuth();
+  const { theme } = useTheme();
   const location = useLocation();
-  const canEdit = useCanEdit();
-  const isIOS = useIsIOS();
+  const authCanEdit = useCanEdit();
+  const [moreOpen, setMoreOpen] = useState(false);
+  const resolvedUser = previewUserData || userData;
+  const canEdit = previewCanEdit ?? authCanEdit;
+  const isPreview = Boolean(previewUserData);
+  const initials = getInitials(resolvedUser?.nombre || resolvedUser?.email);
 
-  const navigation = [
-    { name: 'Dashboard', href: '/admin', icon: HomeIcon },
-    ...(canEdit ? [{ name: 'Crear Usuario', href: '/admin/crear-usuario', icon: UserGroupIcon }] : []),
-    { name: 'Inscripciones', href: '/admin/inscripciones', icon: DocumentTextIcon },
-    ...(userData?.rol !== 'catedratico' ? [
-      // TEMPORAL: Sección de Pagos oculta mientras no está lista
-      // { name: 'Pagos', href: '/admin/pagos', icon: CurrencyDollarIcon },
-      ...(userData?.rol === 'admin' || userData?.rol === 'directivo' ?
-        [{ name: 'Órdenes web', href: '/admin/ordenes', icon: CurrencyDollarIcon }] :
-        []),
-    ] : []),
-    ...(canEdit ? [{ name: 'Mensajes', href: '/admin/mensajes', icon: MegaphoneIcon }] : []),
-    ...(canEdit ? [{ name: 'Gestión Grupos', href: '/admin/gestion-grupos', icon: UserGroupIcon }] : []),
-    // Generador QR solo para admin y directivo, no para grupos
-    ...(userData?.rol !== 'grupos' && userData?.rol !== 'catedratico' ? [{ name: 'Generador QR', href: '/admin/generador-qr', icon: QrCodeIcon }] : []),
-  ];
+  const navigation = useMemo(() => {
+    const role = resolvedUser?.rol;
+    const main = [
+      { name: 'Panel', href: '/admin', icon: HomeIcon },
+      ...(canEdit ? [{ name: 'Crear usuario', href: '/admin/crear-usuario', icon: UserPlusIcon }] : []),
+      { name: 'Inscripciones', href: '/admin/inscripciones', icon: DocumentTextIcon },
+      ...(role === 'admin' || role === 'directivo'
+        ? [{ name: 'Órdenes web', href: '/admin/ordenes', icon: CurrencyDollarIcon }]
+        : []),
+      ...(canEdit ? [{ name: 'Mensajes', href: '/admin/mensajes', icon: MegaphoneIcon }] : []),
+      ...(canEdit ? [{ name: 'Grupos', href: '/admin/gestion-grupos', icon: UserGroupIcon }] : []),
+      ...(role !== 'grupos' && role !== 'catedratico'
+        ? [{ name: 'Generador QR', href: '/admin/generador-qr', icon: QrCodeIcon }]
+        : []),
+    ];
 
-  const herramientasAvanzadas = canEdit ? [
-    { name: 'Usuarios Administrativos', href: '/admin/usuarios-administrativos', icon: IdentificationIcon },
-    { name: 'Regenerar Códigos', href: '/admin/regenerar-codigos', icon: ArrowPathIcon },
-    { name: 'Diagnóstico', href: '/admin/diagnostico-codigos', icon: DocumentTextIcon },
-  ] : [];
+    const tools = canEdit
+      ? [
+          { name: 'Niveles', href: '/admin/gestion-niveles', icon: BuildingLibraryIcon },
+          { name: 'Usuarios administrativos', href: '/admin/usuarios-administrativos', icon: IdentificationIcon },
+          { name: 'Regenerar códigos', href: '/admin/regenerar-codigos', icon: ArrowPathIcon },
+          { name: 'Diagnóstico', href: '/admin/diagnostico-codigos', icon: WrenchScrewdriverIcon },
+        ]
+      : [];
+
+    return { main, tools };
+  }, [canEdit, resolvedUser?.rol]);
+
+  const primaryMobile = useMemo(() => {
+    const preferredHrefs = ['/admin', '/admin/crear-usuario', '/admin/inscripciones', '/admin/mensajes'];
+    return preferredHrefs
+      .map((href) => navigation.main.find((item) => item.href === href))
+      .filter(Boolean);
+  }, [navigation.main]);
+
+  const moreItems = useMemo(() => {
+    const primaryHrefs = new Set(primaryMobile.map((item) => item.href));
+    return [...navigation.main, ...navigation.tools].filter((item) => !primaryHrefs.has(item.href) && item.href !== '/admin');
+  }, [navigation, primaryMobile]);
+
+  const isActive = (href) => {
+    if (href === '/admin') {
+      return location.pathname === '/admin' || location.pathname.startsWith('/admin/alumno/');
+    }
+    return location.pathname === href || location.pathname.startsWith(`${href}/`);
+  };
 
   const handleLogout = async () => {
-    await logout();
+    if (!isPreview) await logout();
   };
 
   return (
-    <div className={`min-h-screen bg-gray-50 dark:bg-gray-900 ${isIOS ? 'pt-20 md:pt-0' : 'pb-16 md:pb-0'}`}>
-      {/* Navbar Superior - Desktop */}
-      <nav className="hidden md:block shadow-sm border-b border-gray-100 dark:border-gray-700 sticky top-0 z-50 backdrop-blur-sm bg-white/95 dark:bg-gray-800/95">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16 sm:h-20">
-            <div className="flex items-center flex-1">
-              <div className="flex-shrink-0 flex items-center space-x-2 sm:space-x-3">
-                <img 
-                  src="/images/lasc.png" 
-                  alt="Logo" 
-                  className="h-8 w-8 sm:h-10 sm:w-10 object-contain"
-                />
-                <div className="hidden xs:block">
-                  <h1 className="text-base sm:text-lg font-bold text-blue leading-tight">Admin - Portal Alumnos</h1>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 leading-tight">Certificación Montessori</p>
-                </div>
-              </div>
-              <div className="hidden md:ml-8 md:flex md:space-x-1 md:items-center">
-                {navigation.map((item) => {
-                  const isActive = location.pathname === item.href;
-                  return (
-                    <Link
-                      key={item.name}
-                      to={item.href}
-                      className={`${
-                        isActive
-                          ? 'border-blue text-blue dark:text-blue-300 bg-blue/5 dark:bg-blue/20'
-                          : 'border-transparent text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white'
-                      } inline-flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200`}
-                    >
-                      <item.icon className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-                      <span className="hidden lg:inline">{item.name}</span>
-                    </Link>
-                  );
-                })}
-                
-                {/* Separador visual */}
-                <div className="hidden lg:block h-6 w-px bg-gray-300 dark:bg-gray-600 mx-2"></div>
-                
-                {/* Herramientas Avanzadas - Dropdown */}
-                <div className="hidden lg:block relative group">
-                  <button className="inline-flex items-center px-3 py-2 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white transition-all duration-200">
-                    <WrenchScrewdriverIcon className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-                    <span className="hidden lg:inline">Herramientas Avanzadas</span>
-                    <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </button>
-                  
-                  {/* Dropdown Menu */}
-                  <div className="absolute left-0 mt-2 w-56 rounded-lg shadow-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-                    <div className="py-2">
-                      <div className="px-4 py-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-700">
-                        Mantenimiento
-                      </div>
-                      {herramientasAvanzadas.map((item) => {
-                        const isActive = location.pathname === item.href;
-                        return (
-                          <Link
-                            key={item.name}
-                            to={item.href}
-                            className={`${
-                              isActive
-                                ? 'bg-blue/5 dark:bg-blue/20 text-blue dark:text-blue-300'
-                                : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
-                            } block px-4 py-2 text-sm transition-colors duration-150`}
-                          >
-                            <div className="flex items-center">
-                              <item.icon className="w-4 h-4 mr-2" />
-                              <span>{item.name}</span>
-                            </div>
-                          </Link>
-                        );
-                      })}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="flex items-center space-x-2 sm:space-x-3">
-              {userData && (
-                <div className="hidden sm:block text-right">
-                  <p className="text-sm font-medium text-gray-900 dark:text-white truncate max-w-[150px]">
-                    {userData.nombre || userData.email}
-                  </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
-                    {userData.rol === 'admin'
-                      ? 'Administrador'
-                      : userData.rol === 'directivo'
-                        ? 'Directivo'
-                        : userData.rol === 'catedratico'
-                          ? 'Catedrático'
-                          : userData.rol === 'grupos'
-                            ? 'Grupos'
-                            : 'Usuario'}
-                  </p>
-                </div>
-              )}
-              <button
-                onClick={toggleTheme}
-                className="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
-                aria-label="Cambiar tema"
-              >
-                {theme === 'dark' ? (
-                  <SunIcon className="w-5 h-5 text-yellow" />
-                ) : (
-                  <MoonIcon className="w-5 h-5 text-gray-700 dark:text-gray-300" />
-                )}
-              </button>
-              <button
-                onClick={handleLogout}
-                className="inline-flex items-center px-3 sm:px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-red hover:bg-red-light focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red transition-all duration-200 shadow-sm hover:shadow"
-              >
-                <ArrowRightOnRectangleIcon className="w-4 h-4 sm:w-5 sm:h-5 sm:mr-2" />
-                <span className="hidden sm:inline">Salir</span>
-              </button>
+    <div className="admin-shell min-h-screen bg-white text-slate-900 dark:bg-slate-950 dark:text-white">
+      <aside className="admin-sidebar glass-material hidden lg:flex" aria-label="Navegación administrativa">
+        <Link to="/admin" className="apple-press flex items-center gap-3 rounded-2xl px-2">
+          <img src="/images/lasc.png" alt="Asociación Montessori de México" className="h-14 w-14 shrink-0 object-contain" />
+          <div className="min-w-0">
+            <p className="text-lg font-bold leading-tight tracking-[-0.02em] text-blue">Portal Administrativo</p>
+            <p className="mt-0.5 text-xs font-medium leading-tight text-slate-500 dark:text-slate-400">Certificación Montessori</p>
+          </div>
+        </Link>
+
+        <nav className="mt-10 space-y-1" aria-label="Operación">
+          {navigation.main.map((item) => (
+            <NavigationLink key={item.href} item={item} active={isActive(item.href)} />
+          ))}
+        </nav>
+
+        {navigation.tools.length > 0 && (
+          <div className="mt-7">
+            <p className="px-4 text-[0.68rem] font-bold uppercase tracking-[0.12em] text-slate-400 dark:text-slate-500">Herramientas</p>
+            <nav className="mt-2 space-y-1" aria-label="Herramientas administrativas">
+              {navigation.tools.map((item) => (
+                <NavigationLink key={item.href} item={item} active={isActive(item.href)} />
+              ))}
+            </nav>
+          </div>
+        )}
+
+        <div className="mt-auto rounded-3xl border border-slate-200/80 bg-white/75 p-4 shadow-sm dark:border-white/10 dark:bg-slate-900/70">
+          <div className="flex items-center gap-3 border-b border-slate-200/80 pb-4 dark:border-white/10">
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-blue/10 text-sm font-bold text-blue">{initials}</span>
+            <div className="min-w-0">
+              <p className="truncate text-sm font-semibold text-slate-900 dark:text-white">{resolvedUser?.nombre || resolvedUser?.email || 'Administración'}</p>
+              <p className="mt-0.5 truncate text-xs text-slate-500 dark:text-slate-400">{getRoleLabel(resolvedUser?.rol)}</p>
             </div>
           </div>
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="apple-press mt-3 flex min-h-11 w-full items-center gap-3 rounded-2xl px-3 text-sm font-semibold text-slate-600 hover:bg-slate-100 hover:text-red dark:text-slate-300 dark:hover:bg-white/5 dark:hover:text-red-light"
+          >
+            <ArrowRightOnRectangleIcon className="h-5 w-5" aria-hidden="true" />
+            <span>Cerrar sesión</span>
+          </button>
         </div>
-      </nav>
+      </aside>
 
-      {/* Navbar Superior - Mobile (solo logo y acciones) */}
-      <nav className="md:hidden sticky top-0 z-50 backdrop-blur-lg bg-blue/60 dark:bg-blue/40 border-b border-blue/30 shadow-lg shadow-[0_4px_32px_rgba(0,151,178,0.3)] dark:shadow-[0_4px_32px_rgba(0,151,178,0.2)]" style={{ backgroundColor: 'rgba(0, 151, 178, 0.6)' }}>
-        {/* Efecto de brillo sutil en el borde inferior */}
-        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/50 to-transparent"></div>
-        <div className="px-4">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-3">
-              <img 
-                src="/images/lasc.png" 
-                alt="Logo" 
-                className="h-8 w-8 object-contain"
-              />
-              <div>
-                <h1 className="text-sm font-bold text-white leading-tight">Admin Portal</h1>
-                <p className="text-xs text-white/80 leading-tight">Certificación Montessori</p>
-              </div>
-            </div>
-            <div className="flex items-center space-x-2">
-              <button
-                onClick={toggleTheme}
-                className="p-2 rounded-lg bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white transition-all duration-300 hover:scale-110 active:scale-90"
-                aria-label="Cambiar tema"
-              >
-                {theme === 'dark' ? (
-                  <SunIcon className="w-5 h-5 text-yellow" />
-                ) : (
-                  <MoonIcon className="w-5 h-5 text-white" />
-                )}
-              </button>
-              <button
-                onClick={handleLogout}
-                className="p-2 rounded-lg bg-white/20 backdrop-blur-sm hover:bg-red/30 text-white transition-all duration-300 hover:scale-110 active:scale-90"
-                aria-label="Salir"
-              >
-                <ArrowRightOnRectangleIcon className="w-5 h-5" />
-              </button>
-            </div>
+      <header className="glass-material fixed inset-x-0 top-0 z-50 flex h-16 items-center justify-between border-b border-slate-200/70 px-4 lg:hidden dark:border-white/10">
+        <Link to="/admin" className="apple-press flex min-h-11 items-center gap-2.5 rounded-2xl pr-2">
+          <img src="/images/lasc.png" alt="" className="h-10 w-10 object-contain" />
+          <span className="text-base font-bold tracking-[-0.02em] text-slate-900 dark:text-white">Portal Administrativo</span>
+        </Link>
+        <div className="flex items-center gap-2">
+          <ThemeButton compact />
+          <span className="flex h-11 w-11 items-center justify-center rounded-full border border-blue/10 bg-blue/10 text-sm font-bold text-slate-700 dark:border-blue/20 dark:text-slate-100">{initials}</span>
+        </div>
+      </header>
+
+      <div className="admin-desktop-tools hidden lg:flex">
+        <ThemeButton />
+        <div className="flex min-h-11 items-center gap-2 rounded-2xl border border-slate-200/80 bg-white/80 px-2 pr-4 shadow-sm backdrop-blur-xl dark:border-white/10 dark:bg-slate-800/80">
+          <span className="flex h-9 w-9 items-center justify-center rounded-full bg-blue/10 text-xs font-bold text-blue">{initials}</span>
+          <div className="min-w-0">
+            <p className="max-w-36 truncate text-xs font-bold text-slate-800 dark:text-white">{resolvedUser?.nombre || 'Administración'}</p>
+            <p className="text-[0.68rem] text-slate-500 dark:text-slate-400">{getRoleLabel(resolvedUser?.rol)}</p>
           </div>
         </div>
-      </nav>
+      </div>
 
-      {/* Main content */}
-      <main className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 ${isIOS ? 'md:pb-8' : 'pb-16 md:pb-8'} animate-fade-in`}>
-        {children}
+      <main className="admin-main pb-[calc(7rem+env(safe-area-inset-bottom))] pt-24 lg:pb-16 lg:pt-12">
+        <div className="admin-content animate-fade-in">{children}</div>
       </main>
 
-      {/* Bottom Navigation - Mobile (Glassmorphism Style) */}
-      {/* En iOS se posiciona en la parte superior para evitar conflicto con la barra de Safari */}
-      <nav className={`md:hidden ${isIOS ? 'sticky top-16 z-40' : 'fixed bottom-0 left-0 right-0 z-50'}`}>
-        <div className={`backdrop-blur-lg bg-blue/60 dark:bg-blue/40 shadow-lg ${
-          isIOS 
-            ? 'border-b border-blue/30 shadow-[0_8px_32px_rgba(0,151,178,0.3)] dark:shadow-[0_8px_32px_rgba(0,151,178,0.2)]' 
-            : 'border-t border-blue/30 shadow-[0_-8px_32px_rgba(0,151,178,0.3)] dark:shadow-[0_-8px_32px_rgba(0,151,178,0.2)]'
-        }`} style={{ backgroundColor: theme === 'dark' ? 'rgba(0, 151, 178, 0.4)' : 'rgba(0, 151, 178, 0.6)' }}>
-          {/* Efecto de brillo sutil en el borde */}
-          <div className={`absolute ${isIOS ? 'bottom-0' : 'top-0'} left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/50 to-transparent`}></div>
-          <div className="px-2 py-1.5">
-            <div className="flex justify-around items-center">
-              {navigation.map((item) => {
-                const isActive = location.pathname === item.href;
-                return (
-                  <Link
-                    key={item.name}
-                    to={item.href}
-                    className={`relative flex flex-col items-center justify-center w-14 h-14 rounded-2xl transition-all duration-300 active:scale-90 ${
-                      isActive
-                        ? 'bg-white/20 backdrop-blur-sm text-white scale-110 shadow-lg shadow-white/20'
-                        : 'text-white/80 hover:text-yellow hover:scale-[1.2] hover:bg-white/10'
-                    }`}
-                  >
-                    {isActive && (
-                      <div className="absolute -top-1 left-1/2 transform -translate-x-1/2 w-1.5 h-1.5 bg-yellow rounded-full shadow-lg shadow-yellow/50"></div>
-                    )}
-                    <item.icon className={`w-5 h-5 transition-transform duration-300 ${isActive ? 'scale-110' : ''}`} />
-                    <span className="text-[9px] font-medium mt-0.5 leading-tight text-center px-0.5">
-                      {item.name}
-                    </span>
-                  </Link>
-                );
-              })}
-              
-              {/* Herramientas Avanzadas - Mobile (solo icono) */}
-              <div className="relative group">
-                <button
-                  className={`relative flex flex-col items-center justify-center w-14 h-14 rounded-2xl transition-all duration-300 active:scale-90 ${
-                    herramientasAvanzadas.some(item => location.pathname === item.href)
-                      ? 'bg-white/20 backdrop-blur-sm text-white scale-110 shadow-lg shadow-white/20'
-                      : 'text-white/80 hover:text-yellow hover:scale-[1.2] hover:bg-white/10'
-                  }`}
-                >
-                  {herramientasAvanzadas.some(item => location.pathname === item.href) && (
-                    <div className="absolute -top-1 left-1/2 transform -translate-x-1/2 w-1.5 h-1.5 bg-yellow rounded-full shadow-lg shadow-yellow/50"></div>
-                  )}
-                  <WrenchScrewdriverIcon className="w-5 h-5 transition-transform duration-300" />
-                  <span className="text-[9px] font-medium mt-0.5 leading-tight text-center px-0.5">
-                    Más
-                  </span>
-                </button>
-                
-                {/* Dropdown Menu Mobile */}
-                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-48 rounded-lg shadow-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-                  <div className="py-2">
-                    <div className="px-4 py-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-700">
-                      Avanzadas
-                    </div>
-                    {herramientasAvanzadas.map((item) => {
-                      const isActive = location.pathname === item.href;
-                      return (
-                        <Link
-                          key={item.name}
-                          to={item.href}
-                          className={`${
-                            isActive
-                              ? 'bg-blue/5 dark:bg-blue/20 text-blue dark:text-blue-300'
-                              : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
-                          } block px-4 py-2 text-sm transition-colors duration-150`}
-                        >
-                          <div className="flex items-center">
-                            <item.icon className="w-4 h-4 mr-2" />
-                            <span>{item.name}</span>
-                          </div>
-                        </Link>
-                      );
-                    })}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+      <nav className="admin-bottom-nav glass-material lg:hidden" aria-label="Navegación administrativa principal">
+        <div
+          className="mx-auto grid max-w-lg gap-1 px-2 pb-[max(0.45rem,env(safe-area-inset-bottom))] pt-2"
+          style={{ gridTemplateColumns: `repeat(${primaryMobile.length + 1}, minmax(0, 1fr))` }}
+        >
+          {primaryMobile.map((item) => (
+            <Link
+              key={item.href}
+              to={item.href}
+              className={`admin-bottom-item apple-press ${isActive(item.href) ? 'admin-bottom-item-active' : ''}`}
+              aria-current={isActive(item.href) ? 'page' : undefined}
+            >
+              <item.icon className="h-5 w-5" aria-hidden="true" />
+              <span>{item.name === 'Crear usuario' ? 'Usuarios' : item.name}</span>
+            </Link>
+          ))}
+          <button
+            type="button"
+            onClick={() => setMoreOpen(true)}
+            className={`admin-bottom-item apple-press ${moreItems.some((item) => isActive(item.href)) ? 'admin-bottom-item-active' : ''}`}
+            aria-label="Abrir más opciones administrativas"
+          >
+            <EllipsisHorizontalIcon className="h-5 w-5" aria-hidden="true" />
+            <span>Más</span>
+          </button>
         </div>
       </nav>
+
+      <Dialog open={moreOpen} onClose={setMoreOpen} className="relative z-[90] lg:hidden" transition>
+        <DialogBackdrop className="fixed inset-x-0 top-0 bottom-[calc(4.55rem+env(safe-area-inset-bottom))] bg-slate-950/30 backdrop-blur-[2px] transition duration-300 ease-out data-closed:opacity-0 motion-reduce:duration-150" />
+        <div className="fixed inset-x-0 top-0 bottom-[calc(4.55rem+env(safe-area-inset-bottom))] flex items-end justify-center">
+          <DialogPanel className="sheet-material w-full max-w-xl rounded-t-[2rem] px-4 pb-4 pt-3 shadow-[0_-20px_70px_rgba(15,23,42,0.18)] transition duration-300 ease-out data-closed:translate-y-full motion-reduce:transform-none motion-reduce:data-closed:opacity-0">
+            <div className="mx-auto h-1.5 w-12 rounded-full bg-slate-300 dark:bg-slate-600" aria-hidden="true" />
+            <div className="mt-4 flex items-center justify-between gap-3">
+              <DialogTitle className="text-xl font-bold tracking-[-0.025em] text-slate-900 dark:text-white">Más opciones</DialogTitle>
+              <button
+                type="button"
+                onClick={() => setMoreOpen(false)}
+                className="apple-press flex h-11 w-11 items-center justify-center rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-white/10 dark:text-slate-200 dark:hover:bg-white/15"
+                aria-label="Cerrar más opciones"
+              >
+                <XMarkIcon className="h-5 w-5" />
+              </button>
+            </div>
+            <div className="admin-more-grid mt-4 overflow-hidden rounded-3xl border border-slate-200/80 dark:border-white/10">
+              {moreItems.map((item) => (
+                <Link
+                  key={item.href}
+                  to={item.href}
+                  onClick={() => setMoreOpen(false)}
+                  className={`apple-press flex min-h-16 items-center gap-3 px-4 py-3 text-sm font-semibold ${
+                    isActive(item.href)
+                      ? 'bg-blue/10 text-blue'
+                      : 'bg-white text-slate-700 hover:bg-slate-50 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-white/5'
+                  }`}
+                >
+                  <item.icon className="h-6 w-6 shrink-0" aria-hidden="true" />
+                  <span>{item.name}</span>
+                </Link>
+              ))}
+            </div>
+          </DialogPanel>
+        </div>
+      </Dialog>
+
+      <span className="sr-only" aria-live="polite">Tema {theme === 'dark' ? 'oscuro' : 'claro'} activo</span>
     </div>
   );
 };

@@ -71,7 +71,7 @@ const Calendario = () => {
   }
 
   return (
-    <div className="space-y-6 sm:space-y-8 animate-fade-in">
+    <div className="student-page space-y-7 animate-fade-in">
       <div className="mb-6">
         <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white">
           Calendario de Materias

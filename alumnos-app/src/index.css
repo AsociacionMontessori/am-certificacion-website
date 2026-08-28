@@ -788,3 +788,454 @@ html.dark .bg-gray-200:not([class*="dark:bg-"]) {
     border-color: currentColor;
   }
 }
+
+/* Portal administrativo — el mismo sistema, con densidad de herramienta */
+.admin-sidebar {
+  position: fixed;
+  inset: 0 auto 0 0;
+  z-index: 45;
+  width: 17.5rem;
+  flex-direction: column;
+  overflow-y: auto;
+  border-right: 1px solid rgba(226, 232, 240, 0.82);
+  padding: 2rem 1.25rem 1.5rem;
+}
+
+.dark .admin-sidebar {
+  border-right-color: rgba(255, 255, 255, 0.1);
+}
+
+.admin-main {
+  min-height: 100vh;
+  width: 100%;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.admin-content {
+  width: 100%;
+  max-width: 86rem;
+  margin: 0 auto;
+}
+
+.admin-desktop-tools {
+  position: fixed;
+  right: clamp(2rem, 4vw, 4.5rem);
+  top: 1.5rem;
+  z-index: 40;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.admin-nav-item {
+  position: relative;
+  display: flex;
+  min-height: 2.85rem;
+  align-items: center;
+  gap: 0.75rem;
+  border-radius: 0.9rem;
+  padding: 0.65rem 1rem;
+  color: rgb(71 85 105);
+  font-size: 0.84rem;
+  font-weight: 650;
+}
+
+.dark .admin-nav-item {
+  color: rgb(203 213 225);
+}
+
+.admin-nav-item:hover {
+  background: rgba(241, 245, 249, 0.86);
+  color: rgb(15 23 42);
+}
+
+.dark .admin-nav-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: white;
+}
+
+.admin-nav-item-active {
+  background: rgba(0, 151, 178, 0.08);
+  color: #0097b2;
+}
+
+.admin-nav-item-active::before {
+  position: absolute;
+  bottom: 0.65rem;
+  left: -1.25rem;
+  top: 0.65rem;
+  width: 0.2rem;
+  border-radius: 999px;
+  background: #0097b2;
+  content: '';
+}
+
+.admin-bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 60;
+  border-top: 1px solid rgba(226, 232, 240, 0.78);
+  box-shadow: 0 -12px 36px rgba(15, 23, 42, 0.07);
+}
+
+.dark .admin-bottom-nav {
+  border-top-color: rgba(255, 255, 255, 0.1);
+}
+
+.admin-bottom-item {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  min-height: 3.55rem;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.2rem;
+  border-radius: 0.9rem;
+  color: rgb(100 116 139);
+  font-size: clamp(0.56rem, 2.2vw, 0.7rem);
+  font-weight: 600;
+  line-height: 1;
+}
+
+.dark .admin-bottom-item {
+  color: rgb(148 163 184);
+}
+
+.admin-bottom-item-active {
+  color: #0097b2;
+}
+
+.admin-bottom-item-active::before {
+  position: absolute;
+  top: 0;
+  width: 2.75rem;
+  height: 0.16rem;
+  border-radius: 999px;
+  background: #0097b2;
+  content: '';
+}
+
+.admin-more-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  background: rgb(226 232 240);
+  gap: 1px;
+}
+
+.dark .admin-more-grid {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.admin-page-header {
+  padding-right: 0;
+}
+
+.admin-content h1,
+.student-page h1 {
+  font-size: clamp(2.1rem, 4.3vw, 3.3rem) !important;
+  font-weight: 750 !important;
+  line-height: 1.04 !important;
+  letter-spacing: -0.042em !important;
+  color: rgb(15 23 42);
+}
+
+.dark .admin-content h1,
+.dark .student-page h1 {
+  color: white;
+}
+
+.admin-content h2,
+.student-page h2 {
+  letter-spacing: -0.025em;
+}
+
+.admin-page-header > div > p,
+.student-page > div:first-child > p {
+  color: rgb(100 116 139) !important;
+  font-size: 1rem !important;
+  font-weight: 500;
+}
+
+.dark .admin-page-header > div > p,
+.dark .student-page > div:first-child > p {
+  color: rgb(148 163 184) !important;
+}
+
+.admin-metrics-rail {
+  overflow: hidden;
+  border: 1px solid rgba(226, 232, 240, 0.88);
+  border-radius: 1.5rem;
+  background: white;
+  box-shadow: 0 10px 32px rgba(15, 23, 42, 0.05);
+}
+
+.dark .admin-metrics-rail {
+  border-color: rgba(255, 255, 255, 0.1);
+  background: rgb(15 23 42);
+}
+
+.admin-metric {
+  min-width: 0;
+  padding: 1.15rem;
+  border-right: 1px solid rgb(226 232 240);
+  border-bottom: 1px solid rgb(226 232 240);
+  background: transparent;
+}
+
+.dark .admin-metric {
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.admin-metric:nth-child(2n) {
+  border-right: 0;
+}
+
+.admin-metric:nth-last-child(-n + 2) {
+  border-bottom: 0;
+}
+
+.admin-toolbar,
+.admin-table-surface,
+.admin-form-surface {
+  border: 1px solid rgba(226, 232, 240, 0.88);
+  border-radius: 1.5rem;
+  background: white;
+  box-shadow: 0 10px 32px rgba(15, 23, 42, 0.05), 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+.admin-toolbar {
+  padding: 1rem;
+}
+
+.admin-form-surface {
+  padding: clamp(1.25rem, 3vw, 2rem);
+}
+
+.admin-form-grid {
+  display: grid;
+  min-width: 0;
+  gap: 1.5rem;
+}
+
+.admin-summary-rail {
+  position: sticky;
+  top: 6rem;
+  align-self: start;
+  min-height: 22rem;
+  border: 1px solid rgba(226, 232, 240, 0.88);
+  border-radius: 1.5rem;
+  background: white;
+  padding: 1.5rem;
+  box-shadow: 0 10px 32px rgba(15, 23, 42, 0.05);
+}
+
+.dark .admin-summary-rail {
+  border-color: rgba(255, 255, 255, 0.1);
+  background: rgb(15 23 42);
+}
+
+.admin-form-surface > section {
+  padding: 1.6rem 0;
+  border-top: 1px solid rgb(226 232 240);
+}
+
+.admin-form-surface > section:first-of-type {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.admin-form-surface > section > h2 {
+  padding-bottom: 0.7rem;
+  border-bottom: 1px solid rgb(226 232 240);
+}
+
+.dark .admin-toolbar,
+.dark .admin-table-surface,
+.dark .admin-form-surface {
+  border-color: rgba(255, 255, 255, 0.1);
+  background: rgb(15 23 42);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.22);
+}
+
+.dark .admin-form-surface > section,
+.dark .admin-form-surface > section > h2 {
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.admin-content :where(input:not([type='checkbox']):not([type='radio']), select, textarea),
+.student-page :where(input:not([type='checkbox']):not([type='radio']), select, textarea) {
+  min-height: 2.75rem;
+  border-color: rgb(203 213 225) !important;
+  border-radius: 0.9rem !important;
+  background: white !important;
+  color: rgb(15 23 42) !important;
+  font: inherit;
+  font-size: 0.9rem;
+  transition: border-color 160ms ease-out, box-shadow 160ms ease-out, background-color 160ms ease-out;
+}
+
+.admin-content :where(input:not([type='checkbox']):not([type='radio']), select, textarea):focus,
+.student-page :where(input:not([type='checkbox']):not([type='radio']), select, textarea):focus {
+  border-color: #0097b2 !important;
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(0, 151, 178, 0.12) !important;
+}
+
+.dark .admin-content :where(input:not([type='checkbox']):not([type='radio']), select, textarea),
+.dark .student-page :where(input:not([type='checkbox']):not([type='radio']), select, textarea) {
+  border-color: rgba(255, 255, 255, 0.13) !important;
+  background: rgba(255, 255, 255, 0.045) !important;
+  color: white !important;
+}
+
+.admin-content :where(button, a),
+.student-page :where(button, a) {
+  font-family: inherit;
+}
+
+.admin-content :where(button[class*='bg-blue'], a[class*='bg-blue'], button[class*='bg-green'], a[class*='bg-green']),
+.student-page :where(button[class*='bg-blue'], a[class*='bg-blue'], button[class*='bg-green'], a[class*='bg-green']) {
+  min-height: 2.75rem;
+  border-radius: 0.9rem !important;
+  font-weight: 700;
+}
+
+.admin-content :where(.rounded-lg, .rounded-xl),
+.student-page :where(.rounded-lg, .rounded-xl) {
+  border-radius: 1.15rem;
+}
+
+.admin-content :where(.shadow-sm, .shadow-md, .shadow-xl),
+.student-page :where(.shadow-md, .shadow-xl) {
+  border-color: rgba(226, 232, 240, 0.88) !important;
+  box-shadow: 0 14px 38px rgba(15, 23, 42, 0.08), 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+.admin-content table {
+  border-collapse: separate;
+  border-spacing: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.admin-content thead {
+  background: rgb(248 250 252) !important;
+}
+
+.dark .admin-content thead {
+  background: rgba(255, 255, 255, 0.045) !important;
+}
+
+.admin-content th {
+  color: rgb(71 85 105) !important;
+  font-size: 0.72rem !important;
+  font-weight: 750 !important;
+  letter-spacing: 0.045em !important;
+}
+
+.admin-content td {
+  border-color: rgb(226 232 240) !important;
+  color: rgb(71 85 105);
+}
+
+.dark .admin-content td {
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.admin-content tbody tr {
+  transition: background-color 160ms ease-out;
+}
+
+.admin-content tbody tr:hover {
+  background: rgb(248 250 252) !important;
+}
+
+.dark .admin-content tbody tr:hover {
+  background: rgba(255, 255, 255, 0.045) !important;
+}
+
+.admin-content label,
+.student-page label {
+  font-weight: 650 !important;
+  color: rgb(51 65 85) !important;
+}
+
+.dark .admin-content label,
+.dark .student-page label {
+  color: rgb(226 232 240) !important;
+}
+
+.student-page {
+  width: 100%;
+  max-width: 72rem;
+  margin: 0 auto;
+}
+
+.student-page :where(.bg-white) {
+  border: 1px solid rgba(226, 232, 240, 0.88);
+  box-shadow: 0 10px 32px rgba(15, 23, 42, 0.055), 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+.dark .student-page :where(.dark\:bg-gray-800) {
+  border-color: rgba(255, 255, 255, 0.1);
+  background: rgb(15 23 42) !important;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.22);
+}
+
+@media (min-width: 640px) {
+  .admin-metric {
+    padding: 1.4rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .admin-main {
+    margin-left: 17.5rem;
+    width: calc(100% - 17.5rem);
+    padding-left: clamp(2rem, 3.4vw, 4rem);
+    padding-right: clamp(2rem, 3.4vw, 4rem);
+  }
+
+  .admin-page-header {
+    padding-right: 18rem;
+  }
+
+  .admin-content h1 {
+    max-width: calc(100% - 18rem);
+  }
+
+  .admin-metric {
+    border-bottom: 0;
+  }
+
+  .admin-metric:nth-child(2n) {
+    border-right: 1px solid rgb(226 232 240);
+  }
+
+  .dark .admin-metric:nth-child(2n) {
+    border-right-color: rgba(255, 255, 255, 0.1);
+  }
+
+  .admin-metric:last-child {
+    border-right: 0;
+  }
+}
+
+@media (min-width: 1280px) {
+  .admin-form-grid {
+    grid-template-columns: minmax(0, 1fr) 16rem;
+  }
+}
+
+@media (max-width: 639px) {
+  .admin-content h1,
+  .student-page h1 {
+    font-size: 2.25rem !important;
+  }
+
+  .admin-content table {
+    font-size: 0.78rem;
+  }
+}

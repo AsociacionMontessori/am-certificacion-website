@@ -51,7 +51,7 @@ const Expediente = () => {
   const tieneCertificado = Boolean(expediente?.fechaGraduacion);
 
   return (
-    <div className="px-4 py-6 sm:px-0">
+    <div className="student-page space-y-8 animate-fade-in">
       <div className="mb-6">
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
           Mi Expediente
