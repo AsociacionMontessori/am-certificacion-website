@@ -1,3 +1,4 @@
+import InstallApp from '../components/InstallApp';
 import { useState } from 'react';
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
 import { useNavigate } from 'react-router-dom';
@@ -123,6 +124,8 @@ const Login = () => {
             {loading ? 'Iniciando sesión…' : 'Iniciar sesión'}
           </button>
         </form>
+
+        <div className="mt-6 text-center"><InstallApp /></div>
 
         <p className="mt-10 text-center text-xs font-medium text-slate-500 dark:text-slate-400">
           © {new Date().getFullYear()} Asociación Montessori de México

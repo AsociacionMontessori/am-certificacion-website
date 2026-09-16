@@ -1,3 +1,4 @@
+import InstallApp from './InstallApp';
 import { Link, useLocation } from 'react-router-dom';
 import {
   AcademicCapIcon,
@@ -153,6 +154,7 @@ const Layout = ({ children, previewUserData = null }) => {
       </div>
 
       <main className="student-main pb-[calc(7.25rem+env(safe-area-inset-bottom))] pt-24 lg:pb-16 lg:pt-12">
+        <div className="mb-4 flex justify-end"><InstallApp /></div>
         {resolvedUserData?.estado === 'Inactivo' && (
           <section className="mb-6 rounded-3xl border border-red/20 bg-red/5 p-5" role="alert">
             <h2 className="text-lg font-bold text-red">Usuario inactivo</h2>

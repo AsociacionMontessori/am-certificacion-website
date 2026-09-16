@@ -1,3 +1,4 @@
+import InstallApp from './InstallApp';
 import { useMemo, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Dialog, DialogBackdrop, DialogPanel, DialogTitle } from '@headlessui/react';
@@ -210,6 +211,7 @@ const AdminLayout = ({ children, previewUserData = null, previewCanEdit = null }
       </div>
 
       <main className="admin-main pb-[calc(7rem+env(safe-area-inset-bottom))] pt-24 lg:pb-16 lg:pt-12">
+        <div className="mb-4 flex justify-end"><InstallApp /></div>
         <div className="admin-content animate-fade-in">{children}</div>
       </main>
 
