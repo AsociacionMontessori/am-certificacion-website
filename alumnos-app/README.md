@@ -116,6 +116,33 @@ Los alumnos deben tener una cuenta creada en Firebase Authentication con:
 - Email y contraseña
 - El UID debe coincidir con el documento en la colección `alumnos`
 
+## 📊 Sincronización con BD-Diplomado
+
+El codebase `functions-stripe` mantiene las altas nuevas en la hoja operativa:
+
+- `alumnos/{alumnoId}` creado → pestaña `👤Alumnos`.
+- `inscripciones/{inscripcionId}` con `parte1Completa` → pestaña
+  `🏫Inscripciones`.
+- Las operaciones son idempotentes y conservan fórmulas, validaciones y el
+  rango de las tablas nativas.
+- La columna `🏫Inscripciones!G:G` (contraseña) no se lee ni se escribe; las
+  altas automáticas la dejan vacía.
+
+Configuración del codebase:
+
+```env
+GOOGLE_SHEETS_SYNC_ENABLED=true
+GOOGLE_SHEETS_DIPLOMADO_ID=<spreadsheet-id>
+```
+
+La cuenta de servicio se obtiene del secret existente
+`GOOGLE_SERVICE_ACCOUNT_JSON`. Pruebas locales:
+
+```bash
+cd functions-stripe
+npm test
+```
+
 ## 📱 Páginas
 
 - `/login` - Página de inicio de sesión

@@ -21,6 +21,10 @@ const {guardarDatosExpedienteHandler} = require("./stripe/guardarDatosExpediente
 const {getDigitalBookDownloadUrlHandler} = require("./stripe/getDigitalBookDownloadUrl");
 const {getCredencialesAlumnoHandler} = require("./stripe/getCredencialesAlumno");
 const {verificarCertificadoPublicoHandler} = require("./stripe/verificarCertificadoPublico");
+const {
+  syncAlumnoToSheetsTrigger,
+  syncInscripcionToSheetsTrigger,
+} = require("./stripe/googleSheetsTriggers");
 
 exports.createPublicCheckout = createPublicCheckoutHandler;
 exports.createAlumnoCheckout = createAlumnoCheckoutHandler;
@@ -39,3 +43,5 @@ exports.guardarDatosExpediente = guardarDatosExpedienteHandler;
 exports.getDigitalBookDownloadUrl = getDigitalBookDownloadUrlHandler;
 exports.getCredencialesAlumno = getCredencialesAlumnoHandler;
 exports.verificarCertificadoPublico = verificarCertificadoPublicoHandler;
+exports.syncAlumnoToSheets = syncAlumnoToSheetsTrigger;
+exports.syncInscripcionToSheets = syncInscripcionToSheetsTrigger;
