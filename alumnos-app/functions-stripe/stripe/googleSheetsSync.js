@@ -128,10 +128,32 @@ function buildAlumnoRow(data) {
   ).trim().toLowerCase();
   const telefono = String(data.telefono || data.telefonoMovil || "").trim();
   const nivel = String(data.nivel || data.nivelEspecializacion || "").trim();
+  const documentos = data.documentos || {};
+  const alumnoId = String(data.alumnoId || "").trim();
+  const adminUrl = alumnoId ?
+    `https://alumnos.certificacionmontessori.com/admin/alumno/` +
+      encodeURIComponent(alumnoId) :
+    "";
+  const cedulaFiscal = documentos.cedulaFiscal ?
+    "✓" :
+    data.requiereFacturaFiscal === false ? "No requiere" : "";
 
   // La contraseña no se sincroniza. La columna correspondiente sólo existe
   // en Inscripciones y se conserva vacía para las altas automáticas.
-  return [nombre, "", email, telefono, nivel, "", "", "", "", "", "", "✓"];
+  return [
+    nombre,
+    "",
+    email,
+    telefono,
+    nivel,
+    adminUrl,
+    cedulaFiscal,
+    documentos.identificacionOficial ? "✓" : "",
+    documentos.actaNacimiento ? "✓" : "",
+    documentos.comprobanteDomicilio ? "✓" : "",
+    documentos.comprobanteEstudios ? "✓" : "",
+    "✓",
+  ];
 }
 
 /**
@@ -637,8 +659,20 @@ async function updateCells(sheets, spreadsheetId, data) {
  * @return {Promise<object>}
  */
 async function upsertAlumnoWithClient(sheets, spreadsheetId, alumnoId, data) {
-  const row = buildAlumnoRow(data);
-  const [nombre, , email, telefono, nivel] = row;
+  const row = buildAlumnoRow({...data, alumnoId});
+  const [
+    nombre,
+    ,
+    email,
+    telefono,
+    nivel,
+    adminUrl,
+    cedulaFiscal,
+    identificacionOficial,
+    actaNacimiento,
+    comprobanteDomicilio,
+    comprobanteEstudios,
+  ] = row;
   if (!nombre || !email) {
     return {status: "skipped", reason: "Faltan nombre o correo", alumnoId};
   }
@@ -667,6 +701,24 @@ async function upsertAlumnoWithClient(sheets, spreadsheetId, alumnoId, data) {
     addUpdate(updates, `'${ALUMNOS_SHEET}'!C${rowNumber}`, email);
     addUpdate(updates, `'${ALUMNOS_SHEET}'!D${rowNumber}`, telefono);
     addUpdate(updates, `'${ALUMNOS_SHEET}'!E${rowNumber}`, nivel);
+    addUpdate(updates, `'${ALUMNOS_SHEET}'!F${rowNumber}`, adminUrl);
+    addUpdate(updates, `'${ALUMNOS_SHEET}'!G${rowNumber}`, cedulaFiscal);
+    addUpdate(
+        updates,
+        `'${ALUMNOS_SHEET}'!H${rowNumber}`,
+        identificacionOficial,
+    );
+    addUpdate(updates, `'${ALUMNOS_SHEET}'!I${rowNumber}`, actaNacimiento);
+    addUpdate(
+        updates,
+        `'${ALUMNOS_SHEET}'!J${rowNumber}`,
+        comprobanteDomicilio,
+    );
+    addUpdate(
+        updates,
+        `'${ALUMNOS_SHEET}'!K${rowNumber}`,
+        comprobanteEstudios,
+    );
     addUpdate(updates, `'${ALUMNOS_SHEET}'!L${rowNumber}`, "✓");
     await updateCells(sheets, spreadsheetId, updates);
     return {status: "updated", rowNumber, alumnoId};
@@ -690,6 +742,51 @@ async function upsertAlumnoWithClient(sheets, spreadsheetId, alumnoId, data) {
     ],
   });
   return {status: "appended", rowNumber, alumnoId};
+}
+
+/** Actualiza URL administrativa y estado documental de un alumno existente. */
+async function updateAlumnoDocumentsWithClient(
+    sheets,
+    spreadsheetId,
+    alumnoId,
+    data,
+) {
+  const row = buildAlumnoRow({...data, alumnoId});
+  const [nombre, , , , , adminUrl, ...documentStatus] = row;
+  if (!nombre || !alumnoId) {
+    return {status: "skipped", reason: "Faltan nombre o alumnoId"};
+  }
+  const context = await getTableContext(
+      sheets,
+      spreadsheetId,
+      ALUMNOS_SHEET,
+      ALUMNOS_TABLE,
+  );
+  const lastRow = Math.max(context.table.range.endRowIndex || 1, 1);
+  const response = await sheets.spreadsheets.values.get({
+    spreadsheetId,
+    range: `'${ALUMNOS_SHEET}'!A2:F${lastRow}`,
+    valueRenderOption: "UNFORMATTED_VALUE",
+  });
+  const rows = response.data.values || [];
+  const targetIndex = rows.findIndex((candidate) =>
+    normalizeText(candidate[5]) === normalizeText(adminUrl) ||
+    normalizeText(candidate[0]) === normalizeText(nombre));
+  if (targetIndex < 0) {
+    return {status: "skipped", reason: "Alumno no encontrado en Sheets"};
+  }
+  const rowNumber = targetIndex + 2;
+  const updates = [];
+  addUpdate(updates, `'${ALUMNOS_SHEET}'!F${rowNumber}`, adminUrl);
+  documentStatus.slice(0, 5).forEach((value, index) => {
+    addUpdate(
+        updates,
+        `'${ALUMNOS_SHEET}'!${String.fromCharCode(71 + index)}${rowNumber}`,
+        value,
+    );
+  });
+  await updateCells(sheets, spreadsheetId, updates);
+  return {status: updates.length ? "updated" : "unchanged", rowNumber};
 }
 
 /**
@@ -870,6 +967,12 @@ async function syncInscripcionToSheets(inscripcionId, data) {
       inscripcionId,
       data,
   );
+  const alumnoResult = await updateAlumnoDocumentsWithClient(
+      sheets,
+      spreadsheetId,
+      data.alumnoId,
+      data,
+  );
   const calificacionesResult = await upsertCalificacionesWithClient(
       sheets,
       spreadsheetId,
@@ -880,6 +983,7 @@ async function syncInscripcionToSheets(inscripcionId, data) {
     status: "completed",
     nivel: nivelResult,
     inscripcion: inscripcionResult,
+    alumno: alumnoResult,
     calificaciones: calificacionesResult,
   };
 }
@@ -898,4 +1002,5 @@ module.exports = {
   upsertAlumnoWithClient,
   upsertCalificacionesWithClient,
   upsertInscripcionWithClient,
+  updateAlumnoDocumentsWithClient,
 };

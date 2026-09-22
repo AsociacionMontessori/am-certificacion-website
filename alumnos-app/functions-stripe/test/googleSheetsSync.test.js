@@ -8,6 +8,7 @@ const {
   toSheetsDateSerial,
   upsertCalificacionesWithClient,
   upsertInscripcionWithClient,
+  updateAlumnoDocumentsWithClient,
 } = require("../stripe/googleSheetsSync");
 
 test("normaliza nombres para detectar filas existentes", () => {
@@ -47,6 +48,91 @@ test("mapea un alumno sin copiar contraseñas ni datos documentales", () => {
   ]);
   assert.equal(row.includes("no-debe-salir"), false);
   assert.equal(row.includes("tampoco-debe-salir"), false);
+});
+
+test("mapea URL administrativa y estados documentales comprobados", () => {
+  const row = buildAlumnoRow({
+    alumnoId: "uid-alumno-123",
+    nombre: "Alumno con expediente",
+    emailContacto: "familia@example.com",
+    telefono: "5555555555",
+    nivel: "Propedéutico",
+    requiereFacturaFiscal: false,
+    documentos: {
+      identificacionOficial: {storagePath: "expediente/identificacion.pdf"},
+      actaNacimiento: {storagePath: "expediente/acta.pdf"},
+      comprobanteDomicilio: {storagePath: "expediente/domicilio.pdf"},
+      comprobanteEstudios: {storagePath: "expediente/estudios.pdf"},
+    },
+  });
+
+  assert.deepEqual(row.slice(5, 11), [
+    "https://alumnos.certificacionmontessori.com/admin/alumno/uid-alumno-123",
+    "No requiere",
+    "✓",
+    "✓",
+    "✓",
+    "✓",
+  ]);
+});
+
+test("actualiza sólo URL y estados documentales del alumno existente", async () => {
+  const calls = [];
+  const sheets = {
+    spreadsheets: {
+      get: async () => ({data: {sheets: [{
+        properties: {sheetId: 382680933, title: "👤Alumnos"},
+        tables: [{
+          tableId: "1433080935",
+          name: "Alumnos",
+          range: {sheetId: 382680933, startRowIndex: 0, endRowIndex: 174},
+        }],
+      }]}}),
+      values: {
+        get: async () => ({data: {values: [
+          ["Eric Sarquis Castellanos", "A174", "mail", "tel", "nivel", ""],
+        ]}}),
+        batchUpdate: async ({requestBody}) => {
+          calls.push(...requestBody.data);
+          return {data: {}};
+        },
+      },
+    },
+  };
+
+  const result = await updateAlumnoDocumentsWithClient(
+      sheets,
+      "spreadsheet-id",
+      "uid-eric",
+      {
+        nombre: "Eric Sarquis Castellanos",
+        requiereFacturaFiscal: false,
+        documentos: {
+          identificacionOficial: {},
+          actaNacimiento: {},
+          comprobanteDomicilio: {},
+          comprobanteEstudios: {},
+        },
+      },
+  );
+
+  assert.equal(result.status, "updated");
+  assert.deepEqual(calls.map((entry) => entry.range), [
+    "'👤Alumnos'!F2",
+    "'👤Alumnos'!G2",
+    "'👤Alumnos'!H2",
+    "'👤Alumnos'!I2",
+    "'👤Alumnos'!J2",
+    "'👤Alumnos'!K2",
+  ]);
+  assert.deepEqual(calls.map((entry) => entry.values[0][0]), [
+    "https://alumnos.certificacionmontessori.com/admin/alumno/uid-eric",
+    "No requiere",
+    "✓",
+    "✓",
+    "✓",
+    "✓",
+  ]);
 });
 
 test("mapea la inscripción y mantiene vacía la columna Contraseña", () => {

@@ -50,14 +50,35 @@ const syncInscripcionToSheetsTrigger = onDocumentWritten(
       const parte1Completa = snapshot.get("parte1Completa");
       if (!alumnoId || !parte1Completa) return;
 
+      let requiereFacturaFiscal = null;
+      const ordenId = snapshot.get("ordenId");
+      if (ordenId) {
+        const orden = await snapshot.ref.firestore
+            .collection("ordenes")
+            .doc(ordenId)
+            .get();
+        if (orden.exists) {
+          requiereFacturaFiscal = Boolean(
+              orden.get("requiereFacturaFiscal"),
+          );
+        }
+      }
+
       const result = await syncInscripcionToSheets(event.params.inscripcionId, {
+        alumnoId,
         nombre: snapshot.get("nombre"),
+        email: snapshot.get("email"),
+        emailContacto: snapshot.get("emailContacto"),
+        telefono: snapshot.get("telefono"),
+        telefonoMovil: snapshot.get("telefonoMovil"),
         nivel: snapshot.get("nivel"),
         nivelEspecializacion: snapshot.get("nivelEspecializacion"),
         modalidad: snapshot.get("modalidad"),
         fechaInscripcion: snapshot.get("fechaInscripcion"),
         parte1CompletadaAt: snapshot.get("parte1CompletadaAt"),
         emailInstitucional: snapshot.get("emailInstitucional"),
+        documentos: snapshot.get("documentos") || {},
+        requiereFacturaFiscal,
       });
       console.info("syncInscripcionToSheets", {
         inscripcionId: event.params.inscripcionId,
