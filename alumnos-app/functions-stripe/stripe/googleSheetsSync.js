@@ -3,6 +3,7 @@ const {defineString} = require("firebase-functions/params");
 const {
   parseServiceAccountJson,
 } = require("./googleWorkspaceClient");
+const {getDuracionMeses} = require("./inscripcionCatalog");
 
 const GOOGLE_SHEETS_SYNC_ENABLED = defineString(
     "GOOGLE_SHEETS_SYNC_ENABLED",
@@ -17,11 +18,22 @@ const GOOGLE_SHEETS_DIPLOMADO_ID = defineString(
 const SHEETS_SCOPE = "https://www.googleapis.com/auth/spreadsheets";
 const ALUMNOS_SHEET = "👤Alumnos";
 const INSCRIPCIONES_SHEET = "🏫Inscripciones";
+const CALIFICACIONES_SHEET = "✔️Calificaciones";
+const VALIDACION_SHEET = "🚫Validación de Datos";
 const ALUMNOS_TABLE = "Alumnos";
 const INSCRIPCIONES_TABLE = "Inscripciones";
+const CALIFICACIONES_TABLE = "Tabla12";
+const NIVELES_TABLE = "Tabla6";
 const SHEET_TIME_ZONE = "America/Mexico_City";
 const MILLIS_PER_DAY = 24 * 60 * 60 * 1000;
 const SHEETS_EPOCH_UTC = Date.UTC(1899, 11, 30);
+
+const MATERIAS_POR_PROGRAMA = {
+  "Curso de Filosofía Montessori y Psicología Educativa (3 meses)": [
+    "Filosofía Montessori",
+    "Psicologia Educativa",
+  ],
+};
 
 /**
  * Devuelve si la sincronización está habilitada para este proyecto.
@@ -233,6 +245,34 @@ function formulaRequest(sheetId, rowNumber, columnIndex, formulaValue) {
   };
 }
 
+/** Construye una validación de lista basada en un rango de otra pestaña. */
+function rangeValidationRequest(
+    sheetId,
+    rowNumber,
+    columnIndex,
+    sourceRange,
+) {
+  return {
+    setDataValidation: {
+      range: {
+        sheetId,
+        startRowIndex: rowNumber - 1,
+        endRowIndex: rowNumber,
+        startColumnIndex: columnIndex,
+        endColumnIndex: columnIndex + 1,
+      },
+      rule: {
+        condition: {
+          type: "ONE_OF_RANGE",
+          values: [{userEnteredValue: sourceRange}],
+        },
+        strict: true,
+        showCustomUi: true,
+      },
+    },
+  };
+}
+
 /** Copia formato/validación, restaura fórmulas y amplía la tabla. */
 async function styleAndExtendTable({
   sheets,
@@ -241,6 +281,7 @@ async function styleAndExtendTable({
   tableName,
   rowNumber,
   columnCount,
+  startColumnIndex = 0,
   formulaRequests,
 }) {
   const current = await getTableContext(
@@ -256,15 +297,15 @@ async function styleAndExtendTable({
       sheetId: current.sheetId,
       startRowIndex: rowNumber - 2,
       endRowIndex: rowNumber - 1,
-      startColumnIndex: 0,
-      endColumnIndex: columnCount,
+      startColumnIndex,
+      endColumnIndex: startColumnIndex + columnCount,
     };
     const destination = {
       sheetId: current.sheetId,
       startRowIndex: rowNumber - 1,
       endRowIndex: rowNumber,
-      startColumnIndex: 0,
-      endColumnIndex: columnCount,
+      startColumnIndex,
+      endColumnIndex: startColumnIndex + columnCount,
     };
     requests.push(
         {copyPaste: {source, destination, pasteType: "PASTE_FORMAT"}},
@@ -306,6 +347,7 @@ async function appendRow({
   tableName,
   columnRange,
   columnCount,
+  startColumnIndex = 0,
   row,
   formulaRequests,
 }) {
@@ -324,9 +366,238 @@ async function appendRow({
     tableName,
     rowNumber,
     columnCount,
+    startColumnIndex,
     formulaRequests,
   });
   return rowNumber;
+}
+
+/**
+ * Añade varias filas y copia formato/validación desde filas equivalentes.
+ * @return {Promise<{startRow: number, endRow: number}>}
+ */
+async function appendRows({
+  sheets,
+  spreadsheetId,
+  sheetTitle,
+  tableName,
+  columnRange,
+  columnCount,
+  rows,
+  sourceRows,
+  rowRequests,
+}) {
+  const response = await sheets.spreadsheets.values.append({
+    spreadsheetId,
+    range: `'${sheetTitle}'!${columnRange}`,
+    valueInputOption: "RAW",
+    insertDataOption: "INSERT_ROWS",
+    requestBody: {majorDimension: "ROWS", values: rows},
+  });
+  const updatedRange = String(response.data.updates?.updatedRange || "");
+  const match = updatedRange.match(/![A-Z]+(\d+):[A-Z]+(\d+)$/i);
+  if (!match) throw new Error("Google Sheets no devolvió las filas actualizadas");
+  const startRow = Number(match[1]);
+  const endRow = Number(match[2]);
+  const current = await getTableContext(
+      sheets,
+      spreadsheetId,
+      sheetTitle,
+      tableName,
+  );
+  const requests = [];
+
+  rows.forEach((unused, index) => {
+    const targetRow = startRow + index;
+    const sourceRow = sourceRows[index] || startRow - 1;
+    if (sourceRow > 1) {
+      const source = {
+        sheetId: current.sheetId,
+        startRowIndex: sourceRow - 1,
+        endRowIndex: sourceRow,
+        startColumnIndex: 0,
+        endColumnIndex: columnCount,
+      };
+      const destination = {
+        sheetId: current.sheetId,
+        startRowIndex: targetRow - 1,
+        endRowIndex: targetRow,
+        startColumnIndex: 0,
+        endColumnIndex: columnCount,
+      };
+      requests.push(
+          {copyPaste: {source, destination, pasteType: "PASTE_FORMAT"}},
+          {copyPaste: {
+            source,
+            destination,
+            pasteType: "PASTE_DATA_VALIDATION",
+          }},
+      );
+    }
+    requests.push(...rowRequests(current.sheetId, targetRow, index));
+  });
+
+  if ((current.table.range.endRowIndex || 0) < endRow) {
+    requests.push({
+      updateTable: {
+        table: {
+          tableId: current.table.tableId,
+          range: {...current.table.range, endRowIndex: endRow},
+        },
+        fields: "range",
+      },
+    });
+  }
+  await sheets.spreadsheets.batchUpdate({
+    spreadsheetId,
+    requestBody: {requests},
+  });
+  return {startRow, endRow};
+}
+
+/** Asegura que el programa y su duración existan en Validación de Datos. */
+async function ensureNivelWithClient(sheets, spreadsheetId, nivel) {
+  const nombre = String(nivel || "").trim();
+  const duracionMeses = getDuracionMeses(nombre);
+  if (!nombre || !duracionMeses) {
+    return {status: "skipped", reason: "Nivel o duración no catalogados"};
+  }
+  const context = await getTableContext(
+      sheets,
+      spreadsheetId,
+      VALIDACION_SHEET,
+      NIVELES_TABLE,
+  );
+  const lastRow = Math.max(context.table.range.endRowIndex || 2, 2);
+  const response = await sheets.spreadsheets.values.get({
+    spreadsheetId,
+    range: `'${VALIDACION_SHEET}'!I3:J${lastRow}`,
+    valueRenderOption: "UNFORMATTED_VALUE",
+  });
+  const rows = response.data.values || [];
+  const targetIndex = rows.findIndex((row) =>
+    normalizeText(row[0]) === normalizeText(nombre));
+  if (targetIndex >= 0) {
+    const rowNumber = targetIndex + 3;
+    await updateCells(sheets, spreadsheetId, [{
+      range: `'${VALIDACION_SHEET}'!J${rowNumber}`,
+      majorDimension: "ROWS",
+      values: [[duracionMeses]],
+    }]);
+    return {status: "updated", rowNumber, duracionMeses};
+  }
+
+  const rowNumber = await appendRow({
+    sheets,
+    spreadsheetId,
+    sheetTitle: VALIDACION_SHEET,
+    tableName: NIVELES_TABLE,
+    columnRange: "I:K",
+    columnCount: 3,
+    startColumnIndex: 8,
+    row: [nombre, duracionMeses, ""],
+    formulaRequests: (sheetId, targetRow) => [
+      formulaRequest(sheetId, targetRow, 10, '="NV"&TEXT(ROW()*1;"0")'),
+    ],
+  });
+  return {status: "appended", rowNumber, duracionMeses};
+}
+
+/** Inserta las materias del programa en Calificaciones sin duplicarlas. */
+async function upsertCalificacionesWithClient(
+    sheets,
+    spreadsheetId,
+    inscripcionId,
+    data,
+) {
+  const nombre = String(data.nombre || "").trim();
+  const nivel = String(data.nivelEspecializacion || "").trim();
+  const materias = MATERIAS_POR_PROGRAMA[nivel] || [];
+  if (!nombre || materias.length === 0) {
+    return {status: "skipped", reason: "Programa sin materias catalogadas"};
+  }
+  const context = await getTableContext(
+      sheets,
+      spreadsheetId,
+      CALIFICACIONES_SHEET,
+      CALIFICACIONES_TABLE,
+  );
+  const lastRow = Math.max(context.table.range.endRowIndex || 1, 1);
+  const response = await sheets.spreadsheets.values.get({
+    spreadsheetId,
+    range: `'${CALIFICACIONES_SHEET}'!A2:C${lastRow}`,
+    valueRenderOption: "UNFORMATTED_VALUE",
+  });
+  const existingRows = response.data.values || [];
+  const pending = materias.filter((materia) => !existingRows.some((row) =>
+    normalizeText(row[0]) === normalizeText(nombre) &&
+    normalizeText(row[2]) === normalizeText(materia)));
+  if (pending.length === 0) {
+    return {status: "unchanged", count: 0, inscripcionId};
+  }
+  const sourceRows = pending.map((materia) => {
+    for (let index = existingRows.length - 1; index >= 0; index -= 1) {
+      if (normalizeText(existingRows[index][2]) === normalizeText(materia)) {
+        return index + 2;
+      }
+    }
+    return lastRow;
+  });
+  const rows = pending.map((materia) => [
+    nombre,
+    0,
+    materia,
+    "",
+    "",
+    "00",
+    "Pendiente",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+  ]);
+  const appended = await appendRows({
+    sheets,
+    spreadsheetId,
+    sheetTitle: CALIFICACIONES_SHEET,
+    tableName: CALIFICACIONES_TABLE,
+    columnRange: "A:M",
+    columnCount: 13,
+    rows,
+    sourceRows,
+    rowRequests: (sheetId, targetRow) => [
+      formulaRequest(
+          sheetId,
+          targetRow,
+          7,
+          `=INDEX('${INSCRIPCIONES_SHEET}'!B:B; ` +
+            `MATCH('${CALIFICACIONES_SHEET}'!$A${targetRow}; ` +
+            `'${INSCRIPCIONES_SHEET}'!A:A;0))`,
+      ),
+      formulaRequest(
+          sheetId,
+          targetRow,
+          8,
+          `=INDEX('${ALUMNOS_SHEET}'!B:B; ` +
+            `MATCH('${CALIFICACIONES_SHEET}'!$A${targetRow}; ` +
+            `'${ALUMNOS_SHEET}'!A:A; 0))`,
+      ),
+      formulaRequest(
+          sheetId,
+          targetRow,
+          9,
+          '="CL"&TEXT(ROW()-1;"0")',
+      ),
+    ],
+  });
+  return {
+    status: "appended",
+    count: pending.length,
+    ...appended,
+    inscripcionId,
+  };
 }
 
 /**
@@ -474,6 +745,28 @@ async function upsertInscripcionWithClient(
         emailInstitucional,
     );
     await updateCells(sheets, spreadsheetId, updates);
+    await sheets.spreadsheets.batchUpdate({
+      spreadsheetId,
+      requestBody: {
+        requests: [
+          formulaRequest(
+              context.sheetId,
+              rowNumber,
+              4,
+              `=EDATE('${INSCRIPCIONES_SHEET}'!$D${rowNumber}; ` +
+                `INDEX('${VALIDACION_SHEET}'!J:J; ` +
+                `MATCH('${INSCRIPCIONES_SHEET}'!$B${rowNumber}; ` +
+                `'${VALIDACION_SHEET}'!I:I; 0)))`,
+          ),
+          rangeValidationRequest(
+              context.sheetId,
+              rowNumber,
+              1,
+              `='${VALIDACION_SHEET}'!$I$3:$I$1000`,
+          ),
+        ],
+      },
+    });
     return {status: "updated", rowNumber, inscripcionId};
   }
 
@@ -491,9 +784,15 @@ async function upsertInscripcionWithClient(
           targetRow,
           4,
           `=EDATE('${INSCRIPCIONES_SHEET}'!$D${targetRow}; ` +
-            `INDEX('🚫Validación de Datos'!$J$3:$J$8; ` +
+            `INDEX('${VALIDACION_SHEET}'!J:J; ` +
             `MATCH('${INSCRIPCIONES_SHEET}'!$B${targetRow}; ` +
-            `'🚫Validación de Datos'!$I$3:$I$8; 0)))`,
+            `'${VALIDACION_SHEET}'!I:I; 0)))`,
+      ),
+      rangeValidationRequest(
+          sheetId,
+          targetRow,
+          1,
+          `='${VALIDACION_SHEET}'!$I$3:$I$1000`,
       ),
       formulaRequest(
           sheetId,
@@ -558,12 +857,31 @@ async function syncInscripcionToSheets(inscripcionId, data) {
   if (!spreadsheetId) {
     throw new Error("Falta GOOGLE_SHEETS_DIPLOMADO_ID");
   }
-  return upsertInscripcionWithClient(
-      buildSheetsClient(),
+  const sheets = buildSheetsClient();
+  const nivel = String(data.nivelEspecializacion || data.nivel || "").trim();
+  const nivelResult = await ensureNivelWithClient(
+      sheets,
+      spreadsheetId,
+      nivel,
+  );
+  const inscripcionResult = await upsertInscripcionWithClient(
+      sheets,
       spreadsheetId,
       inscripcionId,
       data,
   );
+  const calificacionesResult = await upsertCalificacionesWithClient(
+      sheets,
+      spreadsheetId,
+      inscripcionId,
+      data,
+  );
+  return {
+    status: "completed",
+    nivel: nivelResult,
+    inscripcion: inscripcionResult,
+    calificaciones: calificacionesResult,
+  };
 }
 
 module.exports = {
@@ -573,9 +891,11 @@ module.exports = {
   buildInscripcionRow,
   isSheetsSyncEnabled,
   normalizeText,
+  ensureNivelWithClient,
   syncAlumnoToSheets,
   syncInscripcionToSheets,
   toSheetsDateSerial,
   upsertAlumnoWithClient,
+  upsertCalificacionesWithClient,
   upsertInscripcionWithClient,
 };

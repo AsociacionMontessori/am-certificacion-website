@@ -3,8 +3,10 @@ const assert = require("node:assert/strict");
 const {
   buildAlumnoRow,
   buildInscripcionRow,
+  ensureNivelWithClient,
   normalizeText,
   toSheetsDateSerial,
+  upsertCalificacionesWithClient,
   upsertInscripcionWithClient,
 } = require("../stripe/googleSheetsSync");
 
@@ -89,6 +91,10 @@ test("actualiza una inscripción existente sin leer ni escribir la columna G", a
           }],
         },
       }),
+      batchUpdate: async ({requestBody}) => {
+        calls.push({kind: "sheetBatchUpdate", requests: requestBody.requests});
+        return {data: {}};
+      },
       values: {
         get: async ({range}) => {
           calls.push({kind: "get", range});
@@ -131,6 +137,16 @@ test("actualiza una inscripción existente sin leer ni escribir la columna G", a
   ]);
   assert.equal(writtenRanges.some((range) => range.includes("!G")), false);
   assert.equal(JSON.stringify(calls).includes("no-se-copia"), false);
+  const sheetRequests = calls[2].requests;
+  assert.match(
+      sheetRequests[0].updateCells.rows[0].values[0]
+          .userEnteredValue.formulaValue,
+      /Validación de Datos.*I:I/,
+  );
+  assert.equal(
+      sheetRequests[1].setDataValidation.range.startColumnIndex,
+      1,
+  );
 });
 
 test("añade una inscripción, restaura fórmulas y amplía la tabla", async () => {
@@ -198,4 +214,125 @@ test("añade una inscripción, restaura fórmulas y amplía la tabla", async () 
     request.updateCells?.range?.startColumnIndex === 6), false);
   const updateTable = requests.find((request) => request.updateTable);
   assert.equal(updateTable.updateTable.table.range.endRowIndex, 173);
+});
+
+test("agrega un nivel catalogado con sus meses y amplía la tabla", async () => {
+  const calls = [];
+  const table = {
+    tableId: "2001282845",
+    name: "Tabla6",
+    range: {
+      sheetId: 837831300,
+      startRowIndex: 1,
+      endRowIndex: 8,
+      startColumnIndex: 8,
+      endColumnIndex: 11,
+    },
+  };
+  const sheets = {
+    spreadsheets: {
+      get: async () => ({data: {sheets: [{
+        properties: {sheetId: 837831300, title: "🚫Validación de Datos"},
+        tables: [table],
+      }]}}),
+      batchUpdate: async ({requestBody}) => {
+        calls.push({kind: "sheetBatchUpdate", requests: requestBody.requests});
+        return {data: {}};
+      },
+      values: {
+        get: async () => ({data: {values: [
+          ["Propedéutico", 8],
+          ["Neuroeducación", 3],
+        ]}}),
+        append: async ({requestBody}) => {
+          calls.push({kind: "append", values: requestBody.values});
+          return {data: {updates: {
+            updatedRange: "'🚫Validación de Datos'!I9:K9",
+          }}};
+        },
+      },
+    },
+  };
+
+  const result = await ensureNivelWithClient(
+      sheets,
+      "spreadsheet-id",
+      "Curso de Filosofía Montessori y Psicología Educativa (3 meses)",
+  );
+
+  assert.equal(result.status, "appended");
+  assert.deepEqual(calls[0].values[0].slice(0, 2), [
+    "Curso de Filosofía Montessori y Psicología Educativa (3 meses)",
+    3,
+  ]);
+  const requests = calls[1].requests;
+  assert.equal(requests[0].copyPaste.source.startColumnIndex, 8);
+  assert.equal(requests[2].updateCells.range.startColumnIndex, 10);
+  assert.equal(
+      requests.at(-1).updateTable.table.range.endRowIndex,
+      9,
+  );
+});
+
+test("agrega sólo las dos materias del curso y evita duplicados", async () => {
+  const calls = [];
+  const table = {
+    tableId: "249395811",
+    name: "Tabla12",
+    range: {
+      sheetId: 54491731,
+      startRowIndex: 0,
+      endRowIndex: 1287,
+      startColumnIndex: 0,
+      endColumnIndex: 13,
+    },
+  };
+  const sheets = {
+    spreadsheets: {
+      get: async () => ({data: {sheets: [{
+        properties: {sheetId: 54491731, title: "✔️Calificaciones"},
+        tables: [table],
+      }]}}),
+      batchUpdate: async ({requestBody}) => {
+        calls.push({kind: "sheetBatchUpdate", requests: requestBody.requests});
+        return {data: {}};
+      },
+      values: {
+        get: async () => ({data: {values: [
+          ["Otra persona", 0, "Filosofía Montessori"],
+          ["Otra persona", 0, "Psicologia Educativa"],
+        ]}}),
+        append: async ({requestBody}) => {
+          calls.push({kind: "append", values: requestBody.values});
+          return {data: {updates: {
+            updatedRange: "'✔️Calificaciones'!A1288:M1289",
+          }}};
+        },
+      },
+    },
+  };
+  const data = {
+    nombre: "Eric Sarquis Castellanos",
+    nivelEspecializacion:
+      "Curso de Filosofía Montessori y Psicología Educativa (3 meses)",
+  };
+
+  const result = await upsertCalificacionesWithClient(
+      sheets,
+      "spreadsheet-id",
+      "inscripcion-id",
+      data,
+  );
+
+  assert.equal(result.status, "appended");
+  assert.equal(result.count, 2);
+  assert.deepEqual(calls[0].values.map((row) => row[2]), [
+    "Filosofía Montessori",
+    "Psicologia Educativa",
+  ]);
+  assert.equal(calls[0].values.every((row) => row[6] === "Pendiente"), true);
+  const formulaColumns = calls[1].requests
+      .filter((request) => request.updateCells)
+      .map((request) => request.updateCells.range.startColumnIndex);
+  assert.deepEqual(formulaColumns, [7, 8, 9, 7, 8, 9]);
 });
