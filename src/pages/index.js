@@ -1,3 +1,4 @@
+import BuenFinOffers from "../components/promotions/BuenFinOffers"
 import * as React from 'react';
 import { useEffect } from 'react';
 import { useTranslation, Trans } from 'react-i18next';
@@ -50,6 +51,7 @@ const IndexPage = ({ location }) => {
       <Nav textColor="text-white" />
       <main>
         <HomeMarketingHero />
+        <BuenFinOffers />
         <section id="work" className="relative py-5 z-10 bg-white dark:bg-gray lg:pt-0">
           <div className="mx-auto max-w-7xl px-6 lg:px-12 xl:px-6 2xl:px-0 pt-10">
             <div data-rellax-speed="-3" data-rellax-xs-speed="0" data-rellax-mobile-speed="0" className="rellax flex flex-wrap items-center gap-6 selection:text-white selection:bg-red selection:bg-opacity-20">

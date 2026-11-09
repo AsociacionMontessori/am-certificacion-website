@@ -1,3 +1,4 @@
+import BuenFinOffers from "../components/promotions/BuenFinOffers"
 import * as React from "react"
 import { Link } from "gatsby"
 import { CheckIcon, ChatBubbleLeftRightIcon } from "@heroicons/react/24/outline"
@@ -88,6 +89,8 @@ const ProgramLandingPage = ({ pageContext }) => {
             <ProgramOfferPanel program={program} programId={programId} />
           </div>
         </header>
+
+        <BuenFinOffers programId={programId} />
 
         <section className="bg-white py-12 sm:py-16">
           <div className="mx-auto grid max-w-6xl gap-10 px-5 sm:px-6 lg:grid-cols-2 lg:gap-x-16">

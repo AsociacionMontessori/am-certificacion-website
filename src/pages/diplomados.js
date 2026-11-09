@@ -1,3 +1,4 @@
+import BuenFinOffers from "../components/promotions/BuenFinOffers"
 import React, { useState, useEffect } from "react"
 import Nav from "../components/nav"
 import { StaticImage } from "gatsby-plugin-image"
@@ -578,6 +579,7 @@ export default function Landing() {
             </div>
           </section>
 
+          <BuenFinOffers />
           <ProgramDirectory />
 
           <section
