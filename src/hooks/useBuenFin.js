@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { BUEN_FIN, isBuenFinActive, getServerTime } from '../data/buenFin2026'
+import { isBuenFinActive, getNextBuenFinBoundary, getServerTime } from '../data/buenFin2026'
 
 // Fail closed until the hosting server supplies a date. No dependence on the
 // visitor's wall clock, build date, local cron, or an always-on workstation.
@@ -23,8 +23,8 @@ export default function useBuenFin() {
         if (disposed || signal.aborted) return
         clearTimeout(boundaryTimer)
         setActive(isBuenFinActive(now))
-        const next = now < BUEN_FIN.start ? BUEN_FIN.start : BUEN_FIN.end
-        if (now < next) {
+        const next = getNextBuenFinBoundary(now)
+        if (next !== null) {
           boundaryTimer = setTimeout(() => {
             // Close immediately at expiry, even when the next fetch fails.
             setActive(false)

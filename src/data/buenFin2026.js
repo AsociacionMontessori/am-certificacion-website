@@ -5,7 +5,17 @@ const BUEN_FIN = Object.freeze({
   timeZone: 'America/Mexico_City',
 })
 
-const isBuenFinActive = now => Number.isFinite(now) && now >= BUEN_FIN.start && now < BUEN_FIN.end
+// One-off viewing window requested by Carlos; automatically expires on server time.
+// This does not change the official campaign dates or payment eligibility.
+const BUEN_FIN_PREVIEW = Object.freeze({
+  start: Date.parse('2026-11-09T16:40:00-06:00'),
+  end: Date.parse('2026-11-09T17:10:00-06:00'),
+})
+const windows = [BUEN_FIN_PREVIEW, BUEN_FIN]
+const isBuenFinActive = now => Number.isFinite(now) && windows.some(({ start, end }) => now >= start && now < end)
+const getNextBuenFinBoundary = now => Number.isFinite(now)
+  ? windows.flatMap(({ start, end }) => [start, end]).filter(time => time > now).sort((a, b) => a - b)[0] ?? null
+  : null
 const getServerTime = (date, age = '0') => {
   const parsed = Date.parse(date)
   const seconds = Number(age || 0)
@@ -47,4 +57,4 @@ const BUEN_FIN_OFFERS = Object.freeze([
   },
 ])
 
-module.exports = { BUEN_FIN, BUEN_FIN_OFFERS, isBuenFinActive, getServerTime }
+module.exports = { BUEN_FIN, BUEN_FIN_PREVIEW, BUEN_FIN_OFFERS, isBuenFinActive, getNextBuenFinBoundary, getServerTime }

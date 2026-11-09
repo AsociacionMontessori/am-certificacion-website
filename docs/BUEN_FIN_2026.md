@@ -68,3 +68,23 @@ reportó un 429 durante QA, sin afectar la promoción en MXN.
 Cambios propios respaldados en `release/buen-fin-2026` e integrados en main
 local. No se publican los commits antiguos pendientes del portal de alumnos ni
 se alteran los archivos de trabajo previos. Solo se desplegó el sitio público.
+
+## Vista temporal autorizada — 9 de noviembre de 2026
+
+A petición de Carlos, se añadió una ventana de visualización de una sola vez:
+9/nov 16:40–17:10, hora de Ciudad de México (fin exclusivo, 23:10 UTC).
+No cambia la vigencia comercial ni las condiciones publicadas del 13 al 17.
+El hook contempla ambos intervalos y programa el siguiente límite; a las 17:10
+oculta el bloque incluso si falla la siguiente consulta. La apertura oficial
+sigue siendo el 13/nov a las 00:00. No requiere cron ni un segundo despliegue.
+
+Respaldo inmediatamente previo: canal `before-preview-20261109`.
+Rollback, si se desea quitar esta vista antes del cierre automático:
+
+```sh
+firebase hosting:clone certificacionmontessori:before-preview-20261109 certificacionmontessori:live --project certificacionmontessori
+```
+
+Verificados límites de ambos intervalos, build, contrato de 42 URLs y navegador
+con móvil/escritorio y cierre de vista en pestaña abierta. Cambios acotados a
+los datos de vigencia, hook, prueba de fechas y esta documentación.
