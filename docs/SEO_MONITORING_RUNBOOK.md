@@ -15,6 +15,17 @@ puede registrar un estado externo cuando una comprobacion autorizada, incluida
 una consulta autenticada, deja evidencia fechada y verificable. No registre
 claves, contrasenas de aplicacion, tokens ni otros secretos.
 
+### Acceso operativo a buscadores
+
+| Servicio | Cuenta operativa verificada | Alcance |
+| --- | --- | --- |
+| Google Search Console | `itinnitus@gmail.com` | Propiedad de `certificacionmontessori.com`. |
+| Bing Webmaster Tools | `itinnitus@gmail.com` | Propiedad importada de Google Search Console para `certificacionmontessori.com`. |
+
+Este registro identifica solamente la cuenta. Las contrasenas, codigos de
+recuperacion, cookies de sesion, claves API y tokens no se almacenan en el
+repositorio.
+
 | Estado permitido | Significado |
 | --- | --- |
 | `PENDIENTE_CONTROLADO` | No se ha realizado o no se ha registrado evidencia. |
@@ -134,6 +145,40 @@ filtros, exportacion o captura y responsable. Separe observacion de acciones:
 un estado en procesamiento se vuelve `EN_PROCESAMIENTO` y no se intenta
 acelerarlo con reenvios reiterados.
 
+## Control de 28 dias: 2026-08-20
+
+### Google Search Console
+
+| Control | Evidencia autenticada | Decision |
+| --- | --- | --- |
+| Sitemap | `sitemap-index.xml` en estado `Correcto`, ultima lectura `2026-08-10`, `42` paginas descubiertas y `0` videos. El contrato publico vuelve a validar `42` canonicas, `14` por idioma. | No volver a presentarlo. |
+| Cobertura | Informe actualizado `2026-08-16`: `28` indexadas y `32` no indexadas. Los motivos son `9` redirecciones, `4` alternativas con canonical, `1` URL `404`, `14` descubiertas sin indexar y `4` rastreadas sin indexar. Hay `8/15` paginas de programa indexadas: ES `3/5`, EN `4/5` y PT-BR `1/5`. | Mantener el procesamiento. El alias intuitivo `/contacto/` se corrigio con un `301` a `/contact/` el `2026-08-20`; no reactivar validaciones ni solicitar indexacion masiva. |
+| Rendimiento | Busqueda Web, `2026-07-22` a `2026-08-18`: `231` clics, `4,388` impresiones, CTR `5.3 %`, posicion media `11.3` y `274` consultas. La linea base previa fue `288`, `5,417`, `5.32 %` y `7.39`. | La caida agregada no coincide con una regresion tecnica: el CTR permanece estable y aumento el inventario internacional de menor posicion. Priorizar autoridad, contenido y conversion. |
+| Idiomas | EN paso de `3` clics/`56` impresiones en la linea base a `22`/`917`; PT-BR paso de `0`/`7` a `0`/`53`. Las paginas individuales de programa suman `2` clics y `71` impresiones. | Consolidar EN y acelerar descubrimiento PT-BR con enlaces internos y autoridad, sin crear duplicados de intencion. |
+| Paises | Mexico `177/2,647`; Estados Unidos `10/480`; Canada `2/37`; Brasil `0/53`; Portugal `1/6`. | Mantener foco comercial principal en espanol, con expansion EN ya demostrada y PT-BR aun temprana. |
+| Visibilidad generativa | El informe de aparicion en busquedas generativas registra `931` impresiones. Portada `607`, directorio `86`, diplomados ES `83`, portada EN `61` y diplomados EN `54`. | GEO ya genera exposicion medible. Mejorar fuentes citables y autoridad antes de aumentar volumen de contenido. |
+| Experimento `guia montessori` | Consulta que contiene el termino: `8` clics, `217` impresiones, CTR `3.7 %` y posicion `6.6`, frente a `6`, `200`, `3 %` y `6.3` de linea base. La portada concentra `215` impresiones y no aparece canibalizacion material. | Conservar la pagina y el copy actuales. |
+
+### Bing, Copilot e IndexNow
+
+| Control | Evidencia autenticada | Decision |
+| --- | --- | --- |
+| Rendimiento Web y Chat | Ventana `30 D`: `16` clics, `154` impresiones, CTR `10.39 %` y posicion media `4.3`. Bing ya muestra portada, diplomados, directorio y paginas EN/PT-BR. | La muestra crece con buena posicion; no ajustar copy por volumen todavia pequeno. |
+| Rendimiento de IA | Ventana `30 D`: `42` citas. Portada `16`, diplomados ES `11`, autora `4`, diplomados PT-BR `3`, portada PT-BR `3` y diplomados EN `2`. | Confirmada presencia en Microsoft Copilots and Partners; reforzar contenido verificable y enlaces editoriales. |
+| Site Explorer | `61` URLs indexadas, `0` con error, `20` con advertencia y `5` excluidas. | El informe agregado ya esta poblado; no existe bloqueo general de indexacion. |
+| IndexNow | `26` URLs enviadas historicamente; Insights atribuye `5` indexadas y `5` rastreadas mediante IndexNow. No hubo nuevas canonicas modificadas desde el ultimo lote. | No repetir lotes sin cambios publicos reales. |
+| Site Scan | `Auditoria SEO multilingue - 2026-08-20`, alcance por sitemap: `42` paginas, `0` errores y `42` advertencias, todas por `alt`. El DOM y el contrato confirman que son imagenes decorativas con `alt=""`, `role="presentation"` o ancestro `aria-hidden`. | Conservar el `alt` vacio correcto; no introducir texto alternativo artificial. |
+| Recomendaciones | Una recomendacion moderada por falta de enlaces entrantes de alta calidad y cuatro paginas con el mismo detector de `alt`. | La autoridad externa es el unico hallazgo real. No comprar enlaces. |
+| Sitemap hijo | La interfaz conservaba `27` URLs y ultima lectura `2026-07-11`, aunque produccion contiene `42`. Se realizo una unica re-presentacion de `sitemap-0.xml` el `2026-08-20`; quedo en `Processing`. | Esperar procesamiento y no reenviar de nuevo. |
+
+### GA4 y conversion
+
+| Control | Evidencia autenticada | Decision |
+| --- | --- | --- |
+| Actividad consentida | `2026-07-23` a `2026-08-19`: `716` eventos y `94` usuarios. `view_program` registra `19` eventos/`8` usuarios; `click_program_cta`, `4`/`1`; `generate_lead`, `3`/`2`; `click_amazon`, `4`/`1`; `click_whatsapp`, `4`/`4`. | El embudo ya registra interes y leads sin depender de cookies publicitarias. |
+| Programas | `view_program`: Neuroeducacion `8`, Taller `5`, Nido `4`, Casa `1` y Cosmica `1`. Dos de los tres `generate_lead` observados siguieron la ruta EN. | Priorizar EN en contenido y conversion; la muestra aun no permite redistribuir oferta. |
+| Compra | `begin_checkout` permanece en `0` pese a existir clics de CTA y leads. | Auditar el evento antes de usar pago o abandono como KPI y antes de invertir en publicidad. |
+
 ## Google Search Console: checklist de terminacion controlada
 
 La release historica del `2026-07-13` contenia **27 URLs canonicas**, nueve por
@@ -147,6 +192,7 @@ su estado cuando la propiedad muestre evidencia fechada.
 | Sitemaps | `COMPLETADO_CON_EVIDENCIA` | `2026-07-13` | `AMMAC / Codex` | Captura de la propiedad correcta: `/sitemap-index.xml`, tipo `Indice de sitemaps`, enviado `2026-07-09`, ultima lectura `2026-07-11`, estado `Correcto`, `27` paginas descubiertas y `0` videos. No se reenvio el sitemap. |
 | Contrato de sitemap actual | `COMPLETADO_CON_EVIDENCIA` | `2026-07-29` | `AMMAC / Codex` | Consulta autenticada de control: `sitemap-index.xml` conserva estado `Correcto`, ultima lectura `2026-07-22`, `42` paginas descubiertas y `0` videos. Coincide con las `42` canonicas (`14` por idioma) verificadas de nuevo por `npm run test:deployed-hosting -- https://certificacionmontessori.com` y `npm run test:seo-production`. No se volvio a presentar el sitemap. |
 | Contrato de produccion | `COMPLETADO_CON_EVIDENCIA` | `2026-07-13` | `AMMAC / Codex` | El contrato HTTP posterior al despliegue valido las `27` URLs canonicas, nueve por idioma: respuestas publicas correctas, canonicales, indexabilidad y `hreflang` reciproco. Este control tecnico no afirma que Google ya las haya indexado. |
+| Alias de contacto | `COMPLETADO_CON_EVIDENCIA` | `2026-08-20` | `AMMAC / Codex` | El commit `291c06a` se desplego exclusivamente a Firebase Hosting. `/contacto` y `/contacto/` responden `301` hacia `/contact/`, cuyo destino responde `200`. El contrato publico paso con `42` URLs canonicas, `14` por idioma. No se envio el alias a IndexNow ni se solicito indexacion porque no es una URL canonica. |
 | Muestra manual de programas | `COMPLETADO_CON_EVIDENCIA` | `2026-07-29` | `AMMAC / Codex` | Inspeccion autenticada de Casa de Ninos en los tres idiomas: `/diplomados/casa-de-ninos/`, `/en/diplomados/casa-de-ninos/` y `/pt-br/diplomados/casa-de-ninos/` estan en Google. Los ultimos rastreos fueron `2026-07-26`, `2026-07-23` y `2026-07-24`, respectivamente; Googlebot smartphone obtuvo cada pagina correctamente, permitio rastreo e indexacion y eligio como canonical la URL localizada inspeccionada. Las tres pertenecen al sitemap y exponen un breadcrumb valido. No se repitieron solicitudes de indexacion. |
 | Page indexing | `EN_PROCESAMIENTO` | `2026-07-29` | `AMMAC / Codex` | El informe agregado, actualizado `2026-07-23`, muestra `26` URLs indexadas y `34` sin indexar entre `60` URLs conocidas. Los motivos son `9` paginas con redireccion, `4` alternativas con canonical adecuada, `1` no encontrada (`404`), `16` descubiertas actualmente sin indexar y `4` rastreadas actualmente sin indexar. El total incluye redirecciones, alternativas y otras variantes; no se compara directamente con las `42` canonicas del sitemap. La muestra manual posterior confirma el avance de las tres versiones Casa. |
 | Validacion existente | `EN_PROCESAMIENTO` | `2026-07-23` | `AMMAC / Codex` | La pantalla actual marca `No iniciada` en los cuatro motivos; la validacion historica iniciada el `2026-07-11` ya no aparece activa en este informe reclasificado. No se inicia otra validacion ni se solicitan indexaciones repetidas mientras el informe conserve fecha anterior al release. |
@@ -189,7 +235,7 @@ estados distintos.
 | Línea base de Google | `COMPLETADO_CON_EVIDENCIA` | `2026-07-14` | Search Console, búsqueda Web, últimos 28 días y consulta que contiene `guia montessori`: `200` impresiones, `6` clics, CTR `3 %` y posición media `6,3`. La portada reúne `189` impresiones y los `6` clics; `/diplomados/` reúne `21` impresiones y `0` clics. La consulta exacta `guia montessori` aporta `153` impresiones y `2` clics. Las filas pueden solaparse por la agregación de Search Console. |
 | Decisión de intención | `COMPLETADO_CON_EVIDENCIA` | `2026-07-14` | La portada conserva la intención `Guía Montessori`; no se crea `/guia-montessori/`. `/diplomados/` conserva su intención específica. Se sustituyó la franja genérica por una respuesta localizada sobre el rol de la Guía y el título español pasó a `Certificación de Guía Montessori Online | AMMAC`. |
 | Producción e IndexNow | `COMPLETADO_CON_EVIDENCIA` | `2026-07-14` | Los contratos local y público validaron las tres portadas, un solo H1, H2 localizado, canonicales, `hreflang`, robots y JSON-LD. IndexNow aceptó una sola vez exactamente `/`, `/en/` y `/pt-br/`. No se reenvió el sitemap ni se repitieron solicitudes manuales en Google. |
-| Seguimiento | `EN_PROCESAMIENTO` | `2026-07-23`, `2026-08-11`, `2026-10-12` | Control de 7 dias completado en Search Console comparando los ultimos 7 dias con los 7 anteriores para consultas que contienen `guia montessori`: clics `0` frente a `2`, impresiones `41` frente a `58`, CTR `0 %` frente a `3,4 %` y posicion media `6,5` frente a `6,8`. La portada concentro `39` impresiones y `/diplomados/` `4`; no aparecio una tercera URL ni evidencia de canibalizacion. La posicion se mantuvo y la muestra es demasiado pequena para atribuir la caida de clics al cambio. Se conserva el contenido actual y siguen programados los controles de 28 y 90 dias. |
+| Seguimiento | `EN_PROCESAMIENTO` | `2026-07-23`, `2026-08-20`, `2026-10-12` | El control de 7 dias registro `0` clics, `41` impresiones, CTR `0 %` y posicion `6.5`, frente a `2`, `58`, `3.4 %` y `6.8` del periodo anterior. El control de 28 dias registra `8` clics, `217` impresiones, CTR `3.7 %` y posicion `6.6`, frente a la linea base de `6`, `200`, `3 %` y `6.3`. La portada concentra `215` impresiones y no aparece canibalizacion material. Se conserva el contenido actual y queda pendiente solo el control de 90 dias. |
 
 ## Acceso de crawlers e IA
 

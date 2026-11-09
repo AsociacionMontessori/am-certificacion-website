@@ -1,0 +1,1 @@
+AMMAC public promotion clock. Use HTTP Date and Age headers.
