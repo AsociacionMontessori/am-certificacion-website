@@ -38,15 +38,29 @@ const DiplomadoCountdown = ({ variant = "dark" }) => {
     return () => clearInterval(id)
   }, [])
 
+  const enrollmentCalendar = (
+      <details className={`text-sm ${textMain}`}>
+        <summary className="cursor-pointer font-semibold underline underline-offset-4">{t("countdown.calendario2027")}</summary>
+        <p className={`mt-3 ${textMuted}`}>{t("countdown.calendarioNota")}</p>
+        <ul className="mt-2 grid gap-1 sm:grid-cols-2" data-testid="enrollment-calendar-2027">
+          {DIPLOMADOS_EN_LINEA.filter(item => item.kind === "enrollment").map(item => {
+            const key = item.date.toISOString().slice(0, 10)
+            return <li key={key}>{t(`countdown.fechas.${key}`, { defaultValue: item.label })}</li>
+          })}
+        </ul>
+      </details>
+  )
+
   if (state.status === "loading") {
     return <p className={`text-sm ${textMuted}`}>{t("countdown.calculando")}</p>
   }
 
   if (state.status === "noMore") {
     return (
-      <p className={`text-sm ${textMain}`}>
-        {t("countdown.sinFechas")}
-      </p>
+      <div className="space-y-3">
+        <p className={`text-sm ${textMain}`}>{t("countdown.sinFechas")}</p>
+        {enrollmentCalendar}
+      </div>
     )
   }
 
@@ -67,7 +81,7 @@ const DiplomadoCountdown = ({ variant = "dark" }) => {
   }
 
   const { days, hours } = getTimeParts(state.diff)
-  const isUrgent = days <= 7
+  const isUrgent = state.next.kind !== "enrollment" && days <= 7
   // Clave por fecha (YYYY-MM-DD) para poder localizar la etiqueta visible.
   const fechaKey = state.next?.date
     ? state.next.date.toISOString().slice(0, 10)
@@ -81,7 +95,7 @@ const DiplomadoCountdown = ({ variant = "dark" }) => {
         </span>
       )}
       <p className={`text-sm ${textMain}`}>
-        <span className="font-semibold">{t("countdown.proximoInicio")}</span>
+        <span className="font-semibold">{t(state.next.kind === "enrollment" ? "countdown.proximaInscripcion" : "countdown.proximoInicio")}</span>
         <span className="inline-block rounded-lg bg-gradient-to-r from-blue to-green px-3 py-1 text-sm font-bold text-white">
           {t(`countdown.fechas.${fechaKey}`, { defaultValue: state.next?.label })}
         </span>
@@ -101,6 +115,7 @@ const DiplomadoCountdown = ({ variant = "dark" }) => {
           </div>
         )}
       </div>
+      {enrollmentCalendar}
     </div>
   )
 }

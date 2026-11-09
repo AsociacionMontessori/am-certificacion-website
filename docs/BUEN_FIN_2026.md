@@ -1,3 +1,56 @@
+# Programación vigente desde el 9 de noviembre de 2026
+
+Esta sección sustituye las ventanas de lanzamiento/vista temporal descritas en
+el historial inferior. Autorización: Carlos, 9/nov/2026.
+
+- Campaña actual activa sin interrupción desde 9/nov 16:40 CDMX hasta el final
+  del 17/nov (18/nov 00:00 exclusivo). La vista temporal ya no caduca a las 17:10.
+- Misma oferta cada tres meses desde febrero de 2027: **9–15 de febrero,
+  mayo, agosto y noviembre**, siete días completos, hora CDMX; se repite cada
+  año hasta cambiar esta programación. Apertura 00:00 del 9, cierre exclusivo
+  00:00 del 16. Anclaje trimestral al día 9 de la campaña actual.
+- Campañas futuras se llaman **Promoción trimestral**, incluso en noviembre;
+  no se atribuyen fechas oficiales de Buen Fin a años futuros. Encabezados,
+  condiciones y mensajes WhatsApp se calculan para la campaña activa.
+- Precios, libros y programas elegibles conservados; no se altera Stripe.
+- Paleta tomada de tailwind.config.js: turquesa #0097B2, verde #7ED957,
+  naranja #EC6A3D, texto #40424B y botones/precios #00758A (contraste sobre blanco).
+- Se reutiliza el hook con reloj del servidor: sin nueva dependencia, cron ni
+  estación de trabajo encendida. Calendario trimestral calculado para año actual
+  y siguiente, por lo que cruza diciembre sin nuevo despliegue.
+
+## Calendario de inscripciones 2027
+
+Carlos corrigió expresamente el 27/enero al **sábado 30/enero**: último sábado
+cada mes, enero a noviembre, sin omitir marzo ni julio. Fuente única:
+`src/data/diplomadosCalendario.js`. Fechas históricas de 2026 conservadas.
+Las nuevas fechas son apertura de inscripción a las 00:00 CDMX, no horario de
+clase. En portada aparece el calendario desplegable completo; el contador y el
+catálogo avanzan automáticamente y cambian la etiqueta a apertura de inscripción
+para las fechas 2027. Traducciones en español, inglés y portugués.
+
+| Mes 2027 | Sábado |
+|---|---|
+| Enero | 30 |
+| Febrero | 27 |
+| Marzo | 27 |
+| Abril | 24 |
+| Mayo | 29 |
+| Junio | 26 |
+| Julio | 31 |
+| Agosto | 28 |
+| Septiembre | 25 |
+| Octubre | 30 |
+| Noviembre | 27 |
+
+Pruebas: `node scripts/test-buen-fin.js` y
+`node scripts/test-diplomados-calendario.js`, además de build/SEO/programas y
+QA navegador con reloj interceptado (solo en pruebas). El PDF se guarda en
+`output/pdf/Calendario_Inscripciones_AMMAC_2027.pdf` y se entrega a Carlos.
+
+---
+# Historial anterior (vigencias sustituidas por la sección superior)
+
 # Buen Fin 2026 — campaña web AMMAC
 
 ## Alcance autorizado
@@ -88,3 +141,29 @@ firebase hosting:clone certificacionmontessori:before-preview-20261109 certifica
 Verificados límites de ambos intervalos, build, contrato de 42 URLs y navegador
 con móvil/escritorio y cierre de vista en pestaña abierta. Cambios acotados a
 los datos de vigencia, hook, prueba de fechas y esta documentación.
+
+## Respaldo previo al calendario y recurrencia
+
+Canal Firebase creado 9/nov/2026: `before-calendar-20261109`.
+Rollback de esta entrega mientras el canal exista:
+
+```sh
+firebase hosting:clone certificacionmontessori:before-calendar-20261109 certificacionmontessori:live --project certificacionmontessori
+```
+
+## Verificación de esta entrega — 9/nov/2026
+
+- Firebase confirmó publicación solo de Hosting. Contrato de 42 URLs canónicas
+  aprobado en el dominio real.
+- QA local y público: siete rutas, cantidades correctas de ofertas, teléfono
+  institucional, móvil sin desbordamiento, apertura/cierre en pestaña abierta,
+  corte del 17/nov, promoción de febrero y fallo cerrado de reloj. Sin errores
+  JavaScript. Relojes simulados únicamente en navegador QA.
+- Calendario: 11 fechas, cambio noviembre 2026→enero 2027→febrero, calendario
+  aún visible después de la última apertura y sin badge de escasez antes de
+  abrir inscripciones. Unit tests adicionales cubren 2028 y 2030.
+- Codex implementó y verificó; otro agente Codex hizo revisión independiente.
+  Claude ACP no pudo revisar por requerir autenticación; no se cambiaron credenciales.
+- PDF revisado visualmente, archivado también en `docs/` y enviado a WhatsApp
+  personal de Carlos junto con las fechas en texto, ambos envíos confirmados.
+  Generador reproducible: `scripts/create-inscripciones-calendar.py` (ReportLab).

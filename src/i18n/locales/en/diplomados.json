@@ -130,7 +130,8 @@
     "paso3": {
       "titulo": "📜 Signed regulations",
       "texto": "We are committed to <destacado>quality</destacado> education in an environment of <destacado>respect</destacado>. Review and sign our program regulations to begin your diploma course."
-    }
+    },
+    "proximaInscripcion": "Enrollment opens: <verde>{{fecha}}</verde>"
   },
   "calendario": {
     "fechas": {
@@ -143,7 +144,18 @@
       "2026-08-29": "August 29, 2026",
       "2026-09-26": "September 26, 2026",
       "2026-10-24": "October 24, 2026",
-      "2026-11-28": "November 28, 2026"
+      "2026-11-28": "November 28, 2026",
+      "2027-01-30": "January 30, 2027",
+      "2027-02-27": "February 27, 2027",
+      "2027-03-27": "March 27, 2027",
+      "2027-04-24": "April 24, 2027",
+      "2027-05-29": "May 29, 2027",
+      "2027-06-26": "June 26, 2027",
+      "2027-07-31": "July 31, 2027",
+      "2027-08-28": "August 28, 2027",
+      "2027-09-25": "September 25, 2027",
+      "2027-10-30": "October 30, 2027",
+      "2027-11-27": "November 27, 2027"
     }
   },
   "precios": {

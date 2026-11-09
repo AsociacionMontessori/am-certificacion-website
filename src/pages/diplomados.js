@@ -20,7 +20,10 @@ export default function Landing() {
   const [proximoInicio, setProximoInicio] = useState(null)
 
   useEffect(() => {
-    setProximoInicio(getNextItem(DIPLOMADOS_EN_LINEA))
+    const update = () => setProximoInicio(getNextItem(DIPLOMADOS_EN_LINEA))
+    update()
+    const timer = setInterval(update, 60000)
+    return () => clearInterval(timer)
   }, [])
 
   const gradientTextStyle = {
@@ -637,7 +640,7 @@ export default function Landing() {
                   {proximoInicio && (
                     <p className="text-lg font-medium text-white mt-4">
                       <Trans
-                        i18nKey="inscripcionSeccion.proximoInicio"
+                        i18nKey={proximoInicio.kind === "enrollment" ? "inscripcionSeccion.proximaInscripcion" : "inscripcionSeccion.proximoInicio"}
                         ns="diplomados"
                         values={{
                           fecha: t(

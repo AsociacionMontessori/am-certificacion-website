@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react'
-import { isBuenFinActive, getNextBuenFinBoundary, getServerTime } from '../data/buenFin2026'
+import { getActiveCampaign, getNextBuenFinBoundary, getServerTime } from '../data/buenFin2026'
 
 // Fail closed until the hosting server supplies a date. No dependence on the
 // visitor's wall clock, build date, local cron, or an always-on workstation.
 export default function useBuenFin() {
-  const [active, setActive] = useState(false)
+  const [active, setActive] = useState(null)
   useEffect(() => {
     let disposed = false
     let boundaryTimer
@@ -22,17 +22,17 @@ export default function useBuenFin() {
         if (now === null) throw new Error('Invalid server date')
         if (disposed || signal.aborted) return
         clearTimeout(boundaryTimer)
-        setActive(isBuenFinActive(now))
+        setActive(getActiveCampaign(now))
         const next = getNextBuenFinBoundary(now)
         if (next !== null) {
           boundaryTimer = setTimeout(() => {
             // Close immediately at expiry, even when the next fetch fails.
-            setActive(false)
+            setActive(null)
             sync()
           }, Math.min(next - now, 2147483647))
         }
       } catch (error) {
-        if (!disposed && !signal.aborted) setActive(false)
+        if (!disposed && !signal.aborted) setActive(null)
       }
     }
     const onVisible = () => { if (document.visibilityState === 'visible') sync() }
