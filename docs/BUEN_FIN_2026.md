@@ -54,3 +54,17 @@ firebase hosting:clone certificacionmontessori:before-buen-fin-20261109 certific
 Después de caducar ese canal, se puede revertir el commit de esta campaña,
 reconstruir y desplegar **solo Hosting certificacionmontessori**. Conservar el
 redirect `/contacto` de la rama SEO, ya publicado antes de esta campaña.
+
+## Publicación verificada — 9 de noviembre de 2026
+
+Firebase confirmó release de Hosting a las 22:24 UTC. El dominio público pasó
+el contrato de 42 URLs canónicas (14 por idioma) y HEAD del reloj devolvió 200,
+Date actual y contenido esperado. Playwright contra el dominio público confirmó
+las siete rutas, tarjetas 3/3/2/2/2/1/0 respectivamente, enlaces institucionales,
+comportamiento antes/durante/después de vigencia y fallo cerrado. Cero errores
+JavaScript de página. El servicio preexistente de geolocalización `ipapi.co`
+reportó un 429 durante QA, sin afectar la promoción en MXN.
+
+Cambios propios respaldados en `release/buen-fin-2026` e integrados en main
+local. No se publican los commits antiguos pendientes del portal de alumnos ni
+se alteran los archivos de trabajo previos. Solo se desplegó el sitio público.
