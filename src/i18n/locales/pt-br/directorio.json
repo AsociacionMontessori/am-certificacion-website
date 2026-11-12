@@ -12,7 +12,13 @@
     "buscarPlaceholder": "Buscar por nome, cidade ou estado…",
     "buscarAriaLabel": "Buscar escola Montessori",
     "todos": "🌎 Todos",
-    "soloAmmac": "Apenas certificadas AMMAC"
+    "soloAmmac": "Apenas certificadas AMMAC",
+    "alcance": "Mostrar países",
+    "porIdioma": "Países de língua portuguesa",
+    "descripcionIdioma": "Mostrando países de língua portuguesa conforme o idioma da página.",
+    "descripcionTodos": "Mostrando países de todos os idiomas.",
+    "pais": "Filtrar por país",
+    "todosPaises": "Todos os países desta seleção"
   },
   "resultados": {
     "cargando": "Carregando escolas…",

@@ -12,7 +12,13 @@
     "buscarPlaceholder": "Search by name, city, or state…",
     "buscarAriaLabel": "Search for a Montessori school",
     "todos": "🌎 All",
-    "soloAmmac": "AMMAC-certified only"
+    "soloAmmac": "AMMAC-certified only",
+    "alcance": "Country scope",
+    "porIdioma": "English-speaking countries",
+    "descripcionIdioma": "Showing English-speaking countries based on the page language.",
+    "descripcionTodos": "Showing countries in all languages.",
+    "pais": "Filter by country",
+    "todosPaises": "All countries in this view"
   },
   "resultados": {
     "cargando": "Loading schools…",

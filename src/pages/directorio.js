@@ -4,7 +4,8 @@ import Seo from "../components/seo"
 import Nav from "../components/nav"
 import React, { useEffect, useMemo, useState } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
-import { getT } from '../i18n'
+import { getT, useLocalization } from '../i18n'
+import { countryMatchesLanguage } from '../data/directoryLanguages'
 
 const TODOS = 'Todos'
 
@@ -19,12 +20,14 @@ const FLAGS = {
   'Reino Unido': '🇬🇧', 'Irlanda': '🇮🇪', 'Francia': '🇫🇷', 'Alemania': '🇩🇪',
   'Países Bajos': '🇳🇱', 'Portugal': '🇵🇹', 'Bélgica': '🇧🇪', 'Austria': '🇦🇹',
   'Suiza': '🇨🇭', 'Israel': '🇮🇱', 'India': '🇮🇳', 'Australia': '🇦🇺',
-  'Nueva Zelanda': '🇳🇿', 'Filipinas': '🇵🇭',
+  'Nueva Zelanda': '🇳🇿', 'Filipinas': '🇵🇭', 'Brasil': '🇧🇷',
 }
 const flagOf = (country) => FLAGS[country] || ''
 
 const Directorio = () => {
   const { t } = useTranslation('directorio')
+  const { language } = useLocalization()
+  const [showAllCountries, setShowAllCountries] = useState(false)
   const [schools, setSchools] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
@@ -40,21 +43,30 @@ const Directorio = () => {
       .finally(() => setLoading(false))
   }, [])
 
+  useEffect(() => {
+    setShowAllCountries(false)
+    setCountry(TODOS)
+  }, [language])
+
+  const scopedSchools = useMemo(() => schools.filter(s =>
+    showAllCountries || countryMatchesLanguage(s.country, language)
+  ), [schools, showAllCountries, language])
+
   const countries = useMemo(() => {
-    const set = new Set(schools.map(s => s.country).filter(Boolean))
+    const set = new Set(scopedSchools.map(s => s.country).filter(Boolean))
     return [TODOS, ...[...set].sort((a, b) => a.localeCompare(b))]
-  }, [schools])
+  }, [scopedSchools])
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()
-    return schools.filter(s => {
+    return scopedSchools.filter(s => {
       if (country !== TODOS && s.country !== country) return false
       if (soloAmmac && !s.ammacCertified) return false
       if (!q) return true
       return [s.name, s.address, s.city, s.state, s.country]
         .filter(Boolean).join(' ').toLowerCase().includes(q)
     })
-  }, [schools, query, country, soloAmmac])
+  }, [scopedSchools, query, country, soloAmmac])
 
   const LIMIT = 120
   const visibles = filtered.slice(0, LIMIT)
@@ -86,16 +98,37 @@ const Directorio = () => {
               className="w-full md:w-2/3 rounded-full px-6 py-3 text-black placeholder-black/50 shadow-lg focus:outline-none focus:ring-2 focus:ring-green-300"
               aria-label={t('filtros.buscarAriaLabel')}
             />
-            <div className="flex flex-wrap items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2" role="group" aria-label={t('filtros.alcance')}>
+              <button
+                type="button"
+                aria-pressed={!showAllCountries}
+                onClick={() => { setShowAllCountries(false); setCountry(TODOS) }}
+                className={`rounded-full px-5 py-2 text-sm font-medium transition ${!showAllCountries ? 'bg-white text-blue shadow' : 'bg-white/15 text-white hover:bg-white/25'}`}
+              >
+                {t('filtros.porIdioma')}
+              </button>
+              <button
+                type="button"
+                aria-pressed={showAllCountries}
+                onClick={() => { setShowAllCountries(true); setCountry(TODOS) }}
+                className={`rounded-full px-5 py-2 text-sm font-medium transition ${showAllCountries ? 'bg-white text-blue shadow' : 'bg-white/15 text-white hover:bg-white/25'}`}
+              >
+                {t('filtros.todos')}
+              </button>
+            </div>
+            <p className="text-sm text-white/80">{t(showAllCountries ? 'filtros.descripcionTodos' : 'filtros.descripcionIdioma')}</p>
+            <div className="flex flex-wrap items-center gap-2" role="group" aria-label={t('filtros.pais')}>
               {countries.map(c => (
                 <button
                   key={c}
+                  type="button"
+                  aria-pressed={country === c}
                   onClick={() => setCountry(c)}
                   className={`rounded-full px-5 py-1.5 text-sm font-medium transition ${
                     country === c ? 'bg-white text-blue shadow' : 'bg-white/15 text-white hover:bg-white/25'
                   }`}
                 >
-                  {c === TODOS ? t('filtros.todos') : `${flagOf(c)} ${c}`}
+                  {c === TODOS ? t('filtros.todosPaises') : `${flagOf(c)} ${c}`}
                 </button>
               ))}
               <label className="ml-2 flex items-center gap-2 text-sm text-white/90 cursor-pointer select-none">
