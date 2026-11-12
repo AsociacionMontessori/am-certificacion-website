@@ -149,7 +149,7 @@ export const DOCUMENTOS_PARTE2 = [
 ]
 
 export const PORTAL_ALUMNOS_URL =
-  process.env.GATSBY_PORTAL_ALUMNOS_URL || "https://alumnos.certificacionmontessori.com"
+  (typeof process !== "undefined" && process.env.GATSBY_PORTAL_ALUMNOS_URL) || "https://alumnos.certificacionmontessori.com"
 
 /** Mapeo programa de pago en línea → nivel sugerido */
 export const mapProgramaCheckoutANivel = (programa) => {

@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { getNivelByLabel, getReglamentoUrl } from '../../../src/data/inscripcionForm';
 import {
   DocumentTextIcon,
   ArrowDownTrayIcon,
@@ -42,7 +43,12 @@ const formatSize = (bytes) => {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 };
 
-const ExpedienteDocumentos = ({ alumnoId, soloLectura = false, titulo = 'Documentos del expediente' }) => {
+const ExpedienteDocumentos = ({ alumnoId, nivelEspecializacion, vistaAdministracion = false, soloLectura = false, titulo = 'Documentos del expediente' }) => {
+  // Usar el mismo catálogo que la inscripción, sin asignar el contrato
+  // genérico a un alumno cuyo programa no se pudo identificar.
+  const reglamentoUrl = getNivelByLabel(nivelEspecializacion)
+    ? getReglamentoUrl(nivelEspecializacion)
+    : null;
   const [estado, setEstado] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -117,6 +123,42 @@ const ExpedienteDocumentos = ({ alumnoId, soloLectura = false, titulo = 'Documen
       )}
 
       {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
+
+      {!soloLectura && (
+        <section aria-label="Descarga del contrato para firmar" className="mb-4 rounded-lg border border-blue/30 bg-blue/5 p-4 dark:border-blue/50 dark:bg-blue/10">
+          <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Contrato / reglamento para firmar</h3>
+          {reglamentoUrl ? (
+            <>
+              <p className="mt-1 text-sm text-gray-700 dark:text-gray-300">
+                {vistaAdministracion
+                  ? 'Descarga el formato correspondiente al programa de inscripción del alumno. Una vez firmado, puedes subir el PDF o una foto legible en «Contrato / reglamento firmado» de la lista de abajo.'
+                  : 'Descarga el formato de tu programa, imprímelo y fírmalo. Después sube el PDF o una foto legible en «Contrato / reglamento firmado» de la lista de abajo.'}
+              </p>
+              {vistaAdministracion && (
+                <p className="mt-2 text-sm font-medium text-gray-700 dark:text-gray-300">Programa: {nivelEspecializacion}</p>
+              )}
+              <a href={reglamentoUrl} target="_blank" rel="noopener noreferrer"
+                className="mt-3 inline-flex min-h-[44px] items-center gap-2 rounded-lg bg-blue px-4 py-2 text-sm font-semibold text-white hover:bg-blue/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue">
+                <ArrowDownTrayIcon className="h-5 w-5 shrink-0" />
+                Descargar contrato / reglamento
+              </a>
+              <p className="mt-2 text-xs text-gray-600 dark:text-gray-400">
+                Se abre en Google Drive; usa su opción Descargar. {vistaAdministracion
+                  ? 'Este es el formato original, no la copia firmada del alumno.'
+                  : 'Este es el formato original, no tu copia firmada.'}
+              </p>
+            </>
+          ) : (
+            <p className="mt-1 text-sm text-gray-700 dark:text-gray-300">
+              {vistaAdministracion ? (
+                'No se pudo identificar el programa de inscripción. Verifica el expediente antes de proporcionar un contrato; no se asigna un formato genérico automáticamente.'
+              ) : (
+                <>Solicita a <a href="mailto:admin@certificacionmontessori.com" className="underline break-all">admin@certificacionmontessori.com</a> el contrato correspondiente a tu programa para firmarlo y subirlo aquí.</>
+              )}
+            </p>
+          )}
+        </section>
+      )}
 
       {!error && cargadoUnaVez && estado && (
         <div

@@ -1,3 +1,4 @@
+import EnlacesDocumentosPorNivel from '../components/EnlacesDocumentosPorNivel';
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNotifications } from '../contexts/NotificationContext';
@@ -46,9 +47,7 @@ const Expediente = () => {
   }
 
   const alumnoId = currentUser?.uid;
-  const baseCertUrl = alumnoId ? `${window.location.origin}/certificado/${alumnoId}` : '';
-  const constanciaUrl = alumnoId ? `${baseCertUrl}?tipo=constancia` : '';
-  const tieneCertificado = Boolean(expediente?.fechaGraduacion);
+
 
   return (
     <div className="student-page space-y-8 animate-fade-in">
@@ -171,7 +170,7 @@ const Expediente = () => {
           puede subirlo él mismo: antes solo existía durante el formulario de
           inscripción, así que quien lo dejaba a medias no tenía cómo volver. */}
       <div className="mt-6">
-        <ExpedienteDocumentos alumnoId={alumnoId} titulo="Mis documentos" />
+        <ExpedienteDocumentos alumnoId={alumnoId} nivelEspecializacion={expediente?.nivelEspecializacion} titulo="Mis documentos" />
       </div>
 
       {/* Datos administrativos que pedía la parte 2 del formulario de
@@ -231,156 +230,7 @@ const Expediente = () => {
               </div>
             </div>
 
-            {/* Enlaces por nivel */}
-            {expediente?.niveles?.length > 0 && (
-              <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-                  Certificados y constancias por nivel
-                </label>
-                <div className="space-y-3">
-                  {expediente.niveles.map((nivel) => {
-                    // Graduado: sin inscripción vigente, su documento es el certificado
-                    const esCompletado = nivel.estado !== 'activo' || expediente?.estado === 'Graduado';
-                    const nivelUrl = esCompletado
-                      ? `${baseCertUrl}?nivel=${nivel.id}`
-                      : `${baseCertUrl}?nivel=${nivel.id}&tipo=constancia`;
-                    const tipoDoc = esCompletado ? 'Certificado' : 'Constancia';
-
-                    return (
-                      <div key={nivel.id} className="flex flex-col sm:flex-row sm:items-center gap-2 bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3">
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2">
-                            <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${esCompletado
-                                ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300'
-                                : 'bg-blue/10 text-blue'
-                              }`}>
-                              {esCompletado ? 'Completado' : 'Activo'}
-                            </span>
-                            <span className="text-sm font-medium text-gray-900 dark:text-white truncate">
-                              {nivel.nombre}
-                            </span>
-                          </div>
-                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 truncate">
-                            {tipoDoc}: {nivelUrl}
-                          </p>
-                        </div>
-                        <div className="flex gap-2 sm:flex-shrink-0">
-                          <a
-                            href={nivelUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className={`inline-flex items-center justify-center px-3 py-1.5 rounded-lg transition-colors text-xs whitespace-nowrap ${esCompletado
-                                ? 'bg-emerald-600 text-white hover:bg-emerald-700'
-                                : 'bg-blue text-white hover:bg-blue/90'
-                              }`}
-                          >
-                            <EyeIcon className="w-3.5 h-3.5 mr-1" />
-                            Ver {tipoDoc.toLowerCase()}
-                          </a>
-                          <button
-                            onClick={async () => {
-                              try {
-                                await navigator.clipboard.writeText(nivelUrl);
-                                success('URL copiada al portapapeles');
-                              } catch (error) {
-                                console.error('Error al copiar:', error);
-                              }
-                            }}
-                            className="inline-flex items-center justify-center px-3 py-1.5 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors text-xs whitespace-nowrap"
-                          >
-                            <ShareIcon className="w-3.5 h-3.5 mr-1" />
-                            Copiar
-                          </button>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-
-            {/* Constancia general (o certificado si ya está graduado) */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                {expediente?.estado === 'Graduado'
-                  ? 'Certificado digital'
-                  : `Constancia de estudios ${expediente?.niveles?.length > 1 ? '(general)' : '(nivel actual)'}`}
-              </label>
-              <div className="flex flex-col sm:flex-row gap-2">
-                <input
-                  type="text"
-                  readOnly
-                  value={expediente?.estado === 'Graduado' ? baseCertUrl : constanciaUrl}
-                  className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm min-w-0"
-                />
-                <div className="flex gap-2 sm:flex-shrink-0">
-                  <a
-                    href={expediente?.estado === 'Graduado' ? baseCertUrl : constanciaUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center px-3 sm:px-4 py-2 bg-green text-gray-900 dark:bg-green/80 dark:text-gray-900 rounded-lg hover:bg-green/90 dark:hover:bg-green/70 transition-colors text-sm whitespace-nowrap"
-                  >
-                    <EyeIcon className="w-4 h-4 mr-1" />
-                    {expediente?.estado === 'Graduado' ? 'Ver certificado' : 'Ver constancia'}
-                  </a>
-                  <button
-                    onClick={async () => {
-                      try {
-                        await navigator.clipboard.writeText(expediente?.estado === 'Graduado' ? baseCertUrl : constanciaUrl);
-                        success('URL copiada al portapapeles');
-                      } catch (error) {
-                        console.error('Error al copiar:', error);
-                      }
-                    }}
-                    className="inline-flex items-center justify-center px-3 sm:px-4 py-2 bg-green text-gray-900 dark:bg-green/80 dark:text-gray-900 rounded-lg hover:bg-green/90 dark:hover:bg-green/70 transition-colors text-sm whitespace-nowrap"
-                  >
-                    <ShareIcon className="w-4 h-4 mr-1" />
-                    Compartir
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {tieneCertificado && (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Certificado digital de graduación
-                </label>
-                <div className="flex flex-col sm:flex-row gap-2">
-                  <input
-                    type="text"
-                    readOnly
-                    value={baseCertUrl}
-                    className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm min-w-0"
-                  />
-                  <div className="flex gap-2 sm:flex-shrink-0">
-                    <a
-                      href={baseCertUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center justify-center px-3 sm:px-4 py-2 bg-green text-gray-900 dark:bg-green/80 dark:text-gray-900 rounded-lg hover:bg-green/90 dark:hover:bg-green/70 transition-colors text-sm whitespace-nowrap"
-                    >
-                      <EyeIcon className="w-4 h-4 mr-1" />
-                      Ver certificado
-                    </a>
-                    <button
-                      onClick={async () => {
-                        try {
-                          await navigator.clipboard.writeText(baseCertUrl);
-                          success('URL copiada al portapapeles');
-                        } catch (error) {
-                          console.error('Error al copiar:', error);
-                        }
-                      }}
-                      className="inline-flex items-center justify-center px-3 sm:px-4 py-2 bg-green text-gray-900 dark:bg-green/80 dark:text-gray-900 rounded-lg hover:bg-green/90 dark:hover:bg-green/70 transition-colors text-sm whitespace-nowrap"
-                    >
-                      <ShareIcon className="w-4 h-4 mr-1" />
-                      Compartir
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
+            <EnlacesDocumentosPorNivel alumno={expediente} />
           </div>
         </div>
       )}

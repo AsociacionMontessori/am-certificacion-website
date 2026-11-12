@@ -6,6 +6,7 @@ import { QRCodeSVG } from 'qrcode.react';
 import { ArrowLeftIcon, ArrowDownTrayIcon, PrinterIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 import { useNotifications } from '../../contexts/NotificationContext';
 import { useAuth } from '../../contexts/AuthContext';
+import { obtenerOpcionesCertificado } from '../../utils/opcionesCertificado';
 
 const GeneradorQR = () => {
   const { error: showError } = useNotifications();
@@ -56,16 +57,16 @@ const GeneradorQR = () => {
     return nombre.includes(busquedaLower) || email.includes(busquedaLower);
   });
 
-  const urlCertificado = alumnoSeleccionado 
-    ? `${window.location.origin}/certificado/${alumnoSeleccionado.id}`
-    : '';
+  const certificados = alumnoSeleccionado
+    ? obtenerOpcionesCertificado(alumnoSeleccionado, window.location.origin)
+    : [];
 
   // Método para descargar el QR como PNG
-  const handleDescargarQR = async () => {
+  const handleDescargarQR = async (certificado, indice) => {
     if (!alumnoSeleccionado) return;
     
     // Buscar el elemento SVG del QR
-    const qrElement = document.querySelector('#qr-permanente svg');
+    const qrElement = document.querySelector(`#qr-permanente-${indice} svg`);
     if (!qrElement) {
       showError('No se pudo encontrar el código QR. Por favor, intenta de nuevo.');
       return;
@@ -106,7 +107,7 @@ const GeneradorQR = () => {
           const url = URL.createObjectURL(blob);
           const link = document.createElement('a');
           link.href = url;
-          const nombreArchivo = `QR-Certificado-${alumnoSeleccionado.nombre?.replace(/[^a-z0-9]/gi, '-').toLowerCase() || 'alumno'}.png`;
+          const nombreArchivo = `QR-Certificado-${alumnoSeleccionado.nombre?.replace(/[^a-z0-9]/gi, '-').toLowerCase() || 'alumno'}-${certificado.nombre.replace(/[^a-z0-9]/gi, '-').toLowerCase()}-${indice + 1}.png`;
           link.download = nombreArchivo;
           document.body.appendChild(link);
           link.click();
@@ -128,8 +129,11 @@ const GeneradorQR = () => {
     }
   };
 
-  const handleImprimirQR = () => {
+  const handleImprimirQR = (indice) => {
+    const elemento = document.getElementById(`qr-permanente-${indice}`);
+    elemento?.setAttribute('data-print-qr', 'true');
     window.print();
+    elemento?.removeAttribute('data-print-qr');
   };
 
   if (loading) {
@@ -202,7 +206,7 @@ const GeneradorQR = () => {
                   </p>
                   {alumno.nivel && (
                     <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
-                      {alumno.nivel}
+                      {obtenerOpcionesCertificado(alumno, window.location.origin).map(n => n.nombre).join(' · ')}
                     </p>
                   )}
                 </button>
@@ -214,7 +218,7 @@ const GeneradorQR = () => {
         {/* Panel de QR */}
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-            Código QR Permanente
+            Certificados y códigos QR por nivel
           </h2>
           
           {alumnoSeleccionado ? (
@@ -228,49 +232,57 @@ const GeneradorQR = () => {
                 </p>
                 {alumnoSeleccionado.nivel && (
                   <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                    Nivel: {alumnoSeleccionado.nivel}
+                    Niveles: {certificados.map(n => n.nombre).join(' · ')}
                   </p>
                 )}
               </div>
 
-              {/* QR Code */}
-              <div id="qr-permanente" className="flex justify-center bg-white p-6 rounded-lg border-2 border-gray-200 dark:border-gray-600 print:border-0 print:bg-white">
-                <div className="print:bg-white">
-                  <QRCodeSVG
-                    value={urlCertificado}
-                    size={300}
-                    level="H"
-                    includeMargin={true}
-                  />
-                </div>
-              </div>
+              {certificados.map((certificado, indice) => (
+                <section key={certificado.url} className="space-y-4 border-t border-gray-200 pt-4">
+                  <h3 className="font-semibold text-gray-900 dark:text-white">{certificado.nombre}</h3>
+                  {/* QR Code */}
+                  <div id={`qr-permanente-${indice}`} className="flex justify-center bg-white p-6 rounded-lg border-2 border-gray-200 dark:border-gray-600 print:border-0 print:bg-white">
+                    <div className="print:bg-white">
+                      <p className="text-sm text-center text-gray-900 mb-3">{alumnoSeleccionado.nombre} — {certificado.nombre}</p>
+                      <QRCodeSVG
+                        value={certificado.url}
+                        size={256}
+                        style={{ maxWidth: '100%', height: 'auto' }}
+                        level="H"
+                        includeMargin={true}
+                      />
+                    </div>
+                  </div>
 
-              <div className="bg-blue/10 dark:bg-blue/20 rounded-lg p-4">
-                <p className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  URL del certificado:
-                </p>
-                <p className="text-xs font-mono text-gray-600 dark:text-gray-400 break-all">
-                  {urlCertificado}
-                </p>
-              </div>
+                  <div className="bg-blue/10 dark:bg-blue/20 rounded-lg p-4">
+                    <p className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      URL del certificado:
+                    </p>
+                    <a href={certificado.url} target="_blank" rel="noopener noreferrer" className="text-xs font-mono text-blue underline break-all">
+                      {certificado.url}
+                    </a>
+                  </div>
 
-              {/* Botones de acción */}
-              <div className="flex flex-col sm:flex-row gap-3">
-                <button
-                  onClick={handleDescargarQR}
-                  className="flex-1 inline-flex items-center justify-center px-4 py-2 bg-green text-gray-900 dark:text-gray-900 rounded-lg hover:bg-green/90 transition-colors"
-                >
-                  <ArrowDownTrayIcon className="w-5 h-5 mr-2" />
-                  Descargar QR
-                </button>
-                <button
-                  onClick={handleImprimirQR}
-                  className="flex-1 inline-flex items-center justify-center px-4 py-2 bg-blue text-white rounded-lg hover:bg-blue/90 transition-colors"
-                >
-                  <PrinterIcon className="w-5 h-5 mr-2" />
-                  Imprimir QR
-                </button>
-              </div>
+                  {/* Botones de acción */}
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <button
+                      onClick={() => handleDescargarQR(certificado, indice)}
+                      className="flex-1 inline-flex items-center justify-center px-4 py-2 bg-green text-gray-900 dark:text-gray-900 rounded-lg hover:bg-green/90 transition-colors"
+                    >
+                      <ArrowDownTrayIcon className="w-5 h-5 mr-2" />
+                      Descargar QR
+                    </button>
+                    <button
+                      onClick={() => handleImprimirQR(indice)}
+                      className="flex-1 inline-flex items-center justify-center px-4 py-2 bg-blue text-white rounded-lg hover:bg-blue/90 transition-colors"
+                    >
+                      <PrinterIcon className="w-5 h-5 mr-2" />
+                      Imprimir QR
+                    </button>
+                  </div>
+
+                </section>
+              ))}
 
               <div className="bg-yellow/10 dark:bg-yellow/20 border border-yellow/30 rounded-lg p-3">
                 <p className="text-xs text-gray-700 dark:text-gray-300">
@@ -300,10 +312,10 @@ const GeneradorQR = () => {
             border: none !important;
             box-shadow: none !important;
           }
-          #qr-permanente, #qr-permanente * {
+          [data-print-qr], [data-print-qr] * {
             visibility: visible;
           }
-          #qr-permanente {
+          [data-print-qr] {
             position: absolute;
             left: 50%;
             top: 50%;

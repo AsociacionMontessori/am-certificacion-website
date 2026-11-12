@@ -1,4 +1,5 @@
-import { useCallback, useMemo, useState } from 'react';
+import { obtenerDocumentosPorNivel } from '../utils/opcionesCertificado';
+import { useCallback, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   AcademicCapIcon,
@@ -149,22 +150,17 @@ const CredentialsPanel = ({ userData, showPassword, onTogglePassword, onCopy }) 
 const CertificatesPanel = ({ userData, onCopy }) => {
   const origin = typeof window === 'undefined' ? '' : window.location.origin;
   const publicProfileUrl = `${origin}/public/alumno/${userData?.id || ''}`;
-  const certificateUrl = `${origin}/certificado/${userData?.id || ''}`;
   const verificationUrl = userData?.folioCertificado && userData?.codigoVerificacion
     ? `${origin}/verificar/${userData.folioCertificado}/${userData.codigoVerificacion}`
     : '';
 
-  const links = useMemo(() => {
-    const available = [
-      { label: 'Vista pública del perfil', value: publicProfileUrl },
-      ...(userData?.estado !== 'Graduado'
-        ? [{ label: 'Constancia del nivel actual', value: `${certificateUrl}?tipo=constancia` }]
-        : []),
-      ...(userData?.fechaGraduacion ? [{ label: 'Certificado de graduación', value: certificateUrl }] : []),
-      ...(verificationUrl ? [{ label: 'Enlace de verificación', value: verificationUrl }] : []),
-    ];
-    return available;
-  }, [certificateUrl, publicProfileUrl, userData?.estado, userData?.fechaGraduacion, verificationUrl]);
+  const links = [
+    { label: 'Vista pública del perfil', value: publicProfileUrl },
+    ...obtenerDocumentosPorNivel(userData, origin).map(documento => ({
+      label: documento.label, value: documento.url,
+    })),
+    ...(verificationUrl ? [{ label: 'Enlace de verificación', value: verificationUrl }] : []),
+  ];
 
   return (
     <details className="dashboard-panel group overflow-hidden" open={false}>
@@ -175,7 +171,7 @@ const CertificatesPanel = ({ userData, onCopy }) => {
       </summary>
       <div className="divide-y divide-slate-200/80 border-t border-slate-200/80 px-5 dark:divide-white/10 dark:border-white/10 sm:px-6">
         {links.map((link) => (
-          <div key={link.label} className="flex items-center gap-3 py-4">
+          <div key={link.value} className="flex items-center gap-3 py-4">
             <div className="min-w-0 flex-1">
               <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">{link.label}</p>
               <p className="mt-1 truncate font-mono text-xs text-slate-700 dark:text-slate-200">{link.value}</p>
