@@ -1,4 +1,8 @@
 const { test, expect } = require('@playwright/test')
+
+test.beforeEach(async ({ page }) => {
+  await page.route('https://get.geojs.io/v1/ip/country.json', route => route.abort())
+})
 const data = require('../../static/schools.json')
 
 const cases = [
@@ -11,6 +15,7 @@ for (const entry of cases) {
   test(`language scope, all countries, search and return: ${entry.path}`, async ({ page }) => {
     const errors = []
     page.on('pageerror', error => errors.push(error.message))
+    await page.route('https://ipapi.co/json/', route => route.abort())
     await page.goto(entry.path)
     const countries = page.getByRole('group', { name: entry.group })
     const scope = page.getByRole('button', { name: entry.scope, exact: true })
@@ -39,6 +44,7 @@ test('browser language automatically selects the corresponding directory', async
   for (const locale of ['es-MX', 'en-US', 'pt-BR']) {
     const context = await browser.newContext({ locale, storageState: { cookies: [], origins: [] } })
     const page = await context.newPage()
+    await page.route('https://ipapi.co/json/', route => route.abort())
     await page.goto('http://127.0.0.1:9000/directorio/')
     const entry = cases[locale.startsWith('es') ? 0 : locale.startsWith('en') ? 1 : 2]
     await expect(page).toHaveURL(new RegExp(`${entry.path}$`))

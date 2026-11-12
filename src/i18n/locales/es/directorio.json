@@ -18,14 +18,19 @@
     "descripcionIdioma": "Mostrando países de habla hispana según el idioma de la página.",
     "descripcionTodos": "Mostrando países de todos los idiomas.",
     "pais": "Filtrar por país",
-    "todosPaises": "Todos los países de esta vista"
+    "todosPaises": "Todos los países de esta vista",
+    "miPais": "Mi país: {{pais}}",
+    "otrosPaises": "Otros países",
+    "descripcionPais": "Mostrando escuelas de {{pais}}. País aproximado por IP, sin GPS; puedes cambiarlo con los filtros.",
+    "descripcionOtros": "Mostrando otros países del directorio. Elige un país o usa Todos."
   },
   "resultados": {
     "cargando": "Cargando escuelas…",
-    "muchas": "{{total}} escuelas encontradas — mostrando las primeras {{limite}}. Afina con el buscador o el filtro de país.",
+    "muchas": "{{total}} escuelas encontradas — mostrando {{limite}}.",
     "contador": "{{total}} escuela(s) encontradas",
     "error": "No se pudo cargar el directorio. Intenta de nuevo más tarde.",
-    "vacio": "No tenemos escuelas registradas para esa búsqueda."
+    "vacio": "No tenemos escuelas registradas para esa búsqueda.",
+    "cargarMas": "Cargar más"
   },
   "tarjeta": {
     "certificacion": "★ Certificación AMMAC",

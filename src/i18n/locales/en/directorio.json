@@ -18,14 +18,19 @@
     "descripcionIdioma": "Showing English-speaking countries based on the page language.",
     "descripcionTodos": "Showing countries in all languages.",
     "pais": "Filter by country",
-    "todosPaises": "All countries in this view"
+    "todosPaises": "All countries in this view",
+    "miPais": "My country: {{pais}}",
+    "otrosPaises": "Other countries",
+    "descripcionPais": "Showing schools in {{pais}}. Approximate country by IP, without GPS; you can change it using the filters.",
+    "descripcionOtros": "Showing other countries in the directory. Choose a country or select All."
   },
   "resultados": {
     "cargando": "Loading schools…",
-    "muchas": "{{total}} schools found — showing the first {{limite}}. Narrow your results with the search box or the country filter.",
+    "muchas": "{{total}} schools found — showing {{limite}}.",
     "contador": "{{total}} school(s) found",
     "error": "We couldn't load the directory. Please try again later.",
-    "vacio": "We have no schools on record for that search."
+    "vacio": "We have no schools on record for that search.",
+    "cargarMas": "Load more"
   },
   "tarjeta": {
     "certificacion": "★ AMMAC Certified",

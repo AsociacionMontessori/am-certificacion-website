@@ -5,9 +5,11 @@ import Nav from "../components/nav"
 import React, { useEffect, useMemo, useState } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { getT, useLocalization } from '../i18n'
+import { useVisitorGeo } from '../hooks/useVisitorGeo'
 import { countryMatchesLanguage } from '../data/directoryLanguages'
 
 const TODOS = 'Todos'
+const PAGE_SIZE = 120
 
 // País (en español, como lo devuelve Places) -> emoji de bandera.
 const FLAGS = {
@@ -27,7 +29,9 @@ const flagOf = (country) => FLAGS[country] || ''
 const Directorio = () => {
   const { t } = useTranslation('directorio')
   const { language } = useLocalization()
-  const [showAllCountries, setShowAllCountries] = useState(false)
+  const { detectedCountryCode } = useVisitorGeo({ fallbackCountryLookup: true })
+  const [scope, setScope] = useState('auto')
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
   const [schools, setSchools] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
@@ -44,13 +48,30 @@ const Directorio = () => {
   }, [])
 
   useEffect(() => {
-    setShowAllCountries(false)
+    setScope('auto')
     setCountry(TODOS)
   }, [language])
 
-  const scopedSchools = useMemo(() => schools.filter(s =>
-    showAllCountries || countryMatchesLanguage(s.country, language)
-  ), [schools, showAllCountries, language])
+  const detectedCountry = useMemo(() => {
+    if (!detectedCountryCode || typeof Intl.DisplayNames !== 'function') return null
+    try {
+      const name = new Intl.DisplayNames(['es'], { type: 'region' }).of(detectedCountryCode)
+      return schools.some(s => s.country === name) ? name : null
+    } catch {
+      return null
+    }
+  }, [schools, detectedCountryCode])
+
+  const activeScope = scope === 'auto' ? (detectedCountry ? 'local' : 'language') : scope
+  const changeScope = next => { setScope(next); setCountry(TODOS) }
+  // Freeze a manual choice so a late IP response never overrides it.
+  const keepManualScope = () => setScope(activeScope)
+
+  const scopedSchools = useMemo(() => schools.filter(s => {
+    if (activeScope === 'local') return s.country === detectedCountry
+    if (activeScope === 'others') return s.country !== detectedCountry
+    return activeScope === 'all' || countryMatchesLanguage(s.country, language)
+  }), [schools, activeScope, detectedCountry, language])
 
   const countries = useMemo(() => {
     const set = new Set(scopedSchools.map(s => s.country).filter(Boolean))
@@ -68,8 +89,11 @@ const Directorio = () => {
     })
   }, [scopedSchools, query, country, soloAmmac])
 
-  const LIMIT = 120
-  const visibles = filtered.slice(0, LIMIT)
+  useEffect(() => {
+    setVisibleCount(PAGE_SIZE)
+  }, [query, country, soloAmmac, activeScope, detectedCountry, language])
+
+  const visibles = filtered.slice(0, visibleCount)
 
   return (
     <Layout>
@@ -93,37 +117,55 @@ const Directorio = () => {
             <input
               type="search"
               value={query}
-              onChange={e => setQuery(e.target.value)}
+              onChange={e => { keepManualScope(); setQuery(e.target.value) }}
               placeholder={t('filtros.buscarPlaceholder')}
               className="w-full md:w-2/3 rounded-full px-6 py-3 text-black placeholder-black/50 shadow-lg focus:outline-none focus:ring-2 focus:ring-green-300"
               aria-label={t('filtros.buscarAriaLabel')}
             />
             <div className="flex flex-wrap items-center gap-2" role="group" aria-label={t('filtros.alcance')}>
+              {detectedCountry && (
+                <button
+                  type="button"
+                  aria-pressed={activeScope === 'local'}
+                  onClick={() => changeScope('local')}
+                  className={`rounded-full px-5 py-2 text-sm font-medium transition ${activeScope === 'local' ? 'bg-white text-blue shadow' : 'bg-white/15 text-white hover:bg-white/25'}`}
+                >
+                  {flagOf(detectedCountry)} {t('filtros.miPais', { pais: detectedCountry })}
+                </button>
+              )}
               <button
                 type="button"
-                aria-pressed={!showAllCountries}
-                onClick={() => { setShowAllCountries(false); setCountry(TODOS) }}
-                className={`rounded-full px-5 py-2 text-sm font-medium transition ${!showAllCountries ? 'bg-white text-blue shadow' : 'bg-white/15 text-white hover:bg-white/25'}`}
+                aria-pressed={activeScope === 'others'}
+                onClick={() => changeScope('others')}
+                className={`rounded-full px-5 py-2 text-sm font-medium transition ${activeScope === 'others' ? 'bg-white text-blue shadow' : 'bg-white/15 text-white hover:bg-white/25'}`}
+              >
+                {t('filtros.otrosPaises')}
+              </button>
+              <button
+                type="button"
+                aria-pressed={activeScope === 'language'}
+                onClick={() => changeScope('language')}
+                className={`rounded-full px-5 py-2 text-sm font-medium transition ${activeScope === 'language' ? 'bg-white text-blue shadow' : 'bg-white/15 text-white hover:bg-white/25'}`}
               >
                 {t('filtros.porIdioma')}
               </button>
               <button
                 type="button"
-                aria-pressed={showAllCountries}
-                onClick={() => { setShowAllCountries(true); setCountry(TODOS) }}
-                className={`rounded-full px-5 py-2 text-sm font-medium transition ${showAllCountries ? 'bg-white text-blue shadow' : 'bg-white/15 text-white hover:bg-white/25'}`}
+                aria-pressed={activeScope === 'all'}
+                onClick={() => changeScope('all')}
+                className={`rounded-full px-5 py-2 text-sm font-medium transition ${activeScope === 'all' ? 'bg-white text-blue shadow' : 'bg-white/15 text-white hover:bg-white/25'}`}
               >
                 {t('filtros.todos')}
               </button>
             </div>
-            <p className="text-sm text-white/80">{t(showAllCountries ? 'filtros.descripcionTodos' : 'filtros.descripcionIdioma')}</p>
+            <p className="text-sm text-white/80">{t(activeScope === 'local' ? 'filtros.descripcionPais' : activeScope === 'others' ? 'filtros.descripcionOtros' : activeScope === 'all' ? 'filtros.descripcionTodos' : 'filtros.descripcionIdioma', { pais: detectedCountry })}</p>
             <div className="flex flex-wrap items-center gap-2" role="group" aria-label={t('filtros.pais')}>
               {countries.map(c => (
                 <button
                   key={c}
                   type="button"
                   aria-pressed={country === c}
-                  onClick={() => setCountry(c)}
+                  onClick={() => { keepManualScope(); setCountry(c) }}
                   className={`rounded-full px-5 py-1.5 text-sm font-medium transition ${
                     country === c ? 'bg-white text-blue shadow' : 'bg-white/15 text-white hover:bg-white/25'
                   }`}
@@ -132,18 +174,18 @@ const Directorio = () => {
                 </button>
               ))}
               <label className="ml-2 flex items-center gap-2 text-sm text-white/90 cursor-pointer select-none">
-                <input type="checkbox" checked={soloAmmac} onChange={e => setSoloAmmac(e.target.checked)} className="accent-green-400" />
+                <input type="checkbox" checked={soloAmmac} onChange={e => { keepManualScope(); setSoloAmmac(e.target.checked) }} className="accent-green-400" />
                 {t('filtros.soloAmmac')}
               </label>
             </div>
           </div>
 
           {/* Resultados */}
-          <div className="mt-6 text-white/80 text-sm">
+          <div className="mt-6 text-white/80 text-sm" role="status" aria-live="polite">
             {loading
               ? t('resultados.cargando')
-              : filtered.length > LIMIT
-                ? t('resultados.muchas', { total: filtered.length, limite: LIMIT })
+              : filtered.length > visibles.length
+                ? t('resultados.muchas', { total: filtered.length, limite: visibles.length })
                 : t('resultados.contador', { total: filtered.length })}
           </div>
 
@@ -181,6 +223,16 @@ const Directorio = () => {
               )
             })}
           </div>
+
+          {!loading && !error && visibles.length < filtered.length && (
+            <button
+              type="button"
+              onClick={() => setVisibleCount(count => count + PAGE_SIZE)}
+              className="block mx-auto mt-8 rounded-full bg-white text-blue font-semibold px-6 py-3 shadow hover:bg-green-100 transition"
+            >
+              {t('resultados.cargarMas')}
+            </button>
+          )}
 
           {!loading && !error && filtered.length === 0 && (
             <div className="mt-10 text-white/90">

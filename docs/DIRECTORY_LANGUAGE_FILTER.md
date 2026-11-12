@@ -1,32 +1,45 @@
 # Directory country scope
 
-The directory uses `useLocalization()` (the active page language), not IP
-geolocation. The existing first-visit browser-language redirect and explicit
-language selector remain responsible for choosing the page language.
+The page language still follows the existing browser-language redirect / explicit
+language selector. Country detection never changes that language.
 
-- Default: countries in the page language group.
-- “Todos” / “All”: all countries in the existing catalog; resets the country chip.
-- The language-group button restores the scoped view and resets the country chip.
-- Search and AMMAC certification remain independent, combined filters.
-- Changing page language restores its default language scope.
-- The existing 120-card rendering limit remains unchanged; the counter reports
-  all matches and search/country filters narrow the list.
+## Initial country and manual controls (2026-11-12)
 
-Country names in `src/data/directoryLanguages.js` match the Spanish values in
-`static/schools.json`. Multilingual countries may belong to several groups.
-This groups countries, not the teaching language of individual schools. New
-countries must be classified there. Brazil is included in the Portuguese group,
-although the current catalog contains Portugal but no Brazilian records.
+- Default: show schools in the visitor's IP country when it exists in the catalog,
+  independently of page language (for example Argentina on the English page).
+- Reuse `useVisitorGeo`: ipapi.co, 5-second timeout. Only the directory opts into
+  a free GeoJS country lookup as fallback (3 seconds) if the primary is invalid,
+  unavailable or rate-limited. No GPS, API keys or paid fallback.
+- `detectedCountryCode` is null until a real, valid response. The existing Mexican
+  pricing default is NOT evidence of visitor location. Pricing consumers keep
+  their existing default and do not opt into the fallback.
+- Only the country code is used; no IP, city or coordinates are persisted by the
+  new directory functionality. Providers necessarily receive the connection IP.
+- Map ISO code to the catalog's Spanish names using native `Intl.DisplayNames`;
+  unsupported browsers, missing countries and failed detection use language scope.
+- “Mi país” returns to the detected country. “Otros países” opens the rest of the
+  catalog; “Todos” includes every country. The language-group button is retained.
+- Manual scope, country, search and certification choices are never overwritten
+  by a late lookup. Page-language navigation restores the automatic scope.
+- Search and AMMAC certification combine with the selected scope/country.
+- “Cargar más” adds 120 cards per click until ALL matching schools are visible.
+  Counters report the current visible count; filter changes reset the page size.
 
-## Verification and deployment (2026-11-12)
+Country groups in `src/data/directoryLanguages.js` classify countries, not school
+teaching languages. New countries should be classified there. Brazil belongs to
+the Portuguese group but currently has no catalog entries (so detection falls
+back to the language scope rather than showing an empty Brazilian directory).
 
-- `npm run test:foundation`, `npm run build`, `npm run test:seo-built` passed.
-- `npx playwright test tests/e2e/directory-language.spec.js`: 8 passed (desktop
-  Chrome and Pixel 7 emulation). Includes browser-language redirects, country
-  selection, global scope, search and return to language scope.
-- Playwright fallback: Browser plugin/skill not available in this session.
-- Deploy only the public site: `npx firebase deploy --only hosting --project
-  certificacionmontessori`; never deploy the independent alumnos-app as part
-  of this change.
-- Firebase Hosting retains the preceding release: use the Hosting release
-  history to roll back if needed. The pre-change source commit is `051cc32`.
+## Verification and release
+
+- Foundation contracts, Gatsby production build and built SEO checks.
+- `npx playwright test tests/e2e/directory-language.spec.js tests/e2e/directory-country.spec.js --workers=2`
+  covers country overrides, all three page languages, browser-language redirects,
+  primary-provider failure/timeout/rate-limits, fallback lookup, late-response
+  manual override protection, search, certification and pagination through the
+  entire 2,577-school catalog. Runs desktop Chrome and Pixel 7 emulation.
+- Browser plugin/skill unavailable; use the repository's Playwright workflow.
+- Deploy only public hosting: `npx firebase deploy --only hosting --project
+  certificacionmontessori`. Do not deploy alumnos-app, functions or rules.
+- Previous source commit: `93150a2`. Firebase Hosting release history retains the
+  previous deployment for rollback.
