@@ -34,7 +34,7 @@ export default function Nav({ textColor }) {
     <Disclosure as="nav" className="bg-white-400 mb-10 relative z-20">
       {({ open }) => (
         <>
-          <div className="mx-auto max-w-7x1 px-3 sm:px-4 lg:px-6 min-w-fit dark:text-white pt-5">
+          <div className="mx-auto max-w-7x1 px-3 sm:px-4 lg:px-6 min-w-0 dark:text-white pt-5">
             <div className="relative flex h-16 items-center justify-between sm:justify-center">
               <div className="absolute inset-y-0 left-0 flex items-center lg:hidden">
                 <Disclosure.Button className="bg-white text-gray inline-flex items-center justify-center rounded-md p-2 hover:bg-gray hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
