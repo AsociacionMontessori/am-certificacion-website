@@ -78,3 +78,23 @@ back to the language scope rather than showing an empty Brazilian directory).
   validation uses the existing Playwright project workflow.
 - Carlos explicitly authorized commit/push of all pending project changes globally
   on 2026-11-12, superseding the earlier no-push interpretation above.
+
+### City release evidence
+
+- 2026-11-12: **40/40** directory regression tests passed in desktop Chrome and
+  Pixel 7 emulation; production build, foundation and built SEO passed.
+- Firebase confirmed public Hosting release complete, source `71a9538`.
+- Production desktop/mobile browser checks: title/content present, HTTP 200,
+  detected Guadalajara/Jalisco restored with “Mi ciudad”, manual Tijuana selection
+  returned 38 matching cards, no runtime exceptions or horizontal overflow.
+  Location response was mocked to make this city-flow check reproducible; real
+  IP city accuracy depends on the provider and was not independently established.
+- A pre-existing 2px desktop navbar overflow found by QA was fixed by removing
+  its minimum fit-content width (`src/components/nav.js`).
+- Production SEO/Hosting contract passed for all 42 canonical URLs.
+- All pending alumnos-app source changes backed up separately (`b520786`);
+  seven document-link unit tests and its Vite build passed. No alumnos-app,
+  Functions or rules deployment was performed in this task.
+- `main` pushed to the existing GitHub repository, retaining its public visibility.
+  GitHub reported existing Dependabot alerts (161 total, 18 critical); remediation
+  is outside this directory change.
