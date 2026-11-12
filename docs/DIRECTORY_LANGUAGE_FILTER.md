@@ -43,3 +43,18 @@ back to the language scope rather than showing an empty Brazilian directory).
   certificacionmontessori`. Do not deploy alumnos-app, functions or rules.
 - Previous source commit: `93150a2`. Firebase Hosting release history retains the
   previous deployment for rollback.
+
+### Confirmed release evidence
+
+- 2026-11-12: foundation contracts, production build and built SEO checks passed.
+- **30/30 Playwright tests passed**, desktop Chrome and Pixel 7 emulation.
+- Real GeoJS fallback worked in desktop and mobile browsers. Screenshots showed
+  no horizontal overflow; both had no page runtime errors.
+- Firebase confirmed public Hosting release complete (implementation `45583a8`).
+- Production browser checks: HTTP 200 in ES/EN/PT-BR, country selection independent
+  of language and loading from 120 to 240 cards, with no page runtime errors.
+- Real, unmocked production IP detection passed.
+- `npm run test:deployed-hosting -- https://certificacionmontessori.com` passed:
+  42 canonical URLs, 14 per language.
+- No Git push: the task authorized implementation/public-site release, not a push;
+  local history includes earlier unpublished commits that are outside this diff.
