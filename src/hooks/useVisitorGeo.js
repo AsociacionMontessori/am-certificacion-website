@@ -10,6 +10,8 @@ const DEFAULT_GEO = { countryCode: "MX", countryName: "Mexico" }
 export function useVisitorGeo({ fallbackCountryLookup = false } = {}) {
   const [geo, setGeo] = useState(DEFAULT_GEO)
   const [detectedCountryCode, setDetectedCountryCode] = useState(null)
+  const [detectedCity, setDetectedCity] = useState(null)
+  const [detectedRegion, setDetectedRegion] = useState(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -22,6 +24,8 @@ export function useVisitorGeo({ fallbackCountryLookup = false } = {}) {
         }
         if (!data.error && /^[A-Z]{2}$/i.test(data.country_code || "")) {
           setDetectedCountryCode(data.country_code.toUpperCase())
+          if (typeof data.region === "string") setDetectedRegion(data.region.trim())
+          if (typeof data.city === "string" && data.city.trim()) setDetectedCity(data.city.trim())
         }
         setGeo({
           countryCode: (data.country_code || "MX").toUpperCase(),
@@ -49,6 +53,8 @@ export function useVisitorGeo({ fallbackCountryLookup = false } = {}) {
   return {
     geo,
     detectedCountryCode,
+    detectedCity,
+    detectedRegion,
     loading,
     esMexico: isMexico(geo),
   }

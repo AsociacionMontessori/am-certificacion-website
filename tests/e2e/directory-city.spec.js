@@ -1,0 +1,70 @@
+const { test, expect } = require('@playwright/test')
+const { schools } = require('../../static/schools.json')
+const cards = page => page.locator('main .grid > a, main .grid > div')
+const key = s => JSON.stringify([s.country, s.state || '', (s.city || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim().toLowerCase()])
+test.beforeEach(async ({ page }) => {
+  await page.route('https://get.geojs.io/v1/ip/country.json', r => r.abort())
+})
+for (const [path, label, myCity] of [
+  ['/directorio/', 'Filtrar por ciudad', 'Mi ciudad: Guadalajara'],
+  ['/en/directorio/', 'Filter by city', 'My city: Guadalajara'],
+  ['/pt-br/directorio/', 'Filtrar por cidade', 'Minha cidade: Guadalajara'],
+]) {
+  test(`city detection and manual selection ${path}`, async ({ page }) => {
+    const errors = []
+    page.on('pageerror', e => errors.push(e.message))
+    await page.route('https://ipapi.co/json/', r => r.fulfill({ json: { country_code: 'MX', city: 'Guadalajara', region: 'Jalisco' } }))
+    await page.goto(path)
+    const detected = page.getByRole('button', { name: myCity, exact: true })
+    await expect(detected).toHaveAttribute('aria-pressed', 'true')
+    const sample = schools.find(s => s.city === 'Guadalajara' && s.state === 'Jalisco' && s.country === 'México')
+    const total = schools.filter(s => key(s) === key(sample)).length
+    const selector = page.getByRole('combobox', { name: label, exact: true })
+    await expect(selector).toHaveValue(key(sample))
+    await expect(cards(page)).toHaveCount(Math.min(120, total))
+    await selector.selectOption('Todos')
+    await expect(cards(page)).toHaveCount(120)
+    const another = schools.find(s => s.city === 'Tijuana' && s.country === 'México')
+    await selector.selectOption(key(another))
+    await expect(cards(page)).toHaveCount(schools.filter(s => key(s) === key(another)).length)
+    for (const text of await cards(page).allTextContents()) expect(text).toContain('Tijuana')
+    await detected.click()
+    await expect(selector).toHaveValue(key(sample))
+    expect(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth)).toBe(false)
+    expect(errors).toEqual([])
+  })
+}
+test('unmatched city falls back to country and combines manual filters', async ({ page }) => {
+  await page.route('https://ipapi.co/json/', r => r.fulfill({ json: { country_code: 'MX', city: 'not-in-catalog' } }))
+  await page.goto('/directorio/')
+  await expect(page.getByRole('button', { name: /Mi país: México/ })).toHaveAttribute('aria-pressed', 'true')
+  const selector = page.getByRole('combobox', { name: 'Filtrar por ciudad', exact: true })
+  await expect(selector).toHaveValue('Todos')
+  const sample = schools.find(s => s.city === 'Miguel Hidalgo' && s.ammacCertified)
+  await selector.selectOption(key(sample))
+  await page.getByRole('checkbox').check()
+  await expect(cards(page)).toHaveCount(schools.filter(s => key(s) === key(sample) && s.ammacCertified).length)
+  await page.getByRole('searchbox').fill('no-such-school-xyz')
+  await expect(cards(page)).toHaveCount(0)
+  await page.getByRole('searchbox').fill('')
+  await expect(cards(page)).not.toHaveCount(0)
+  await page.getByRole('button', { name: '🌎 Todos', exact: true }).click()
+  await expect(selector).toHaveValue('Todos')
+  await page.getByRole('group', { name: 'Filtrar por país', exact: true }).getByRole('button', { name: /Argentina/ }).click()
+  const options = await selector.locator('option').allTextContents()
+  expect(options.slice(1).every(o => o.endsWith('Argentina'))).toBe(true)
+})
+test('late city lookup never overrides a manual city', async ({ page }) => {
+  let finish
+  const pending = new Promise(resolve => { finish = resolve })
+  await page.route('https://ipapi.co/json/', async r => { await pending; await r.fulfill({ json: { country_code: 'MX', city: 'Guadalajara', region: 'Jalisco' } }) })
+  await page.goto('/directorio/')
+  const selector = page.getByRole('combobox', { name: 'Filtrar por ciudad', exact: true })
+  const sample = schools.find(s => s.city === 'Tijuana' && s.country === 'México')
+  await expect(selector).toBeEnabled()
+  await selector.selectOption(key(sample))
+  finish()
+  await expect(page.getByRole('button', { name: 'Mi ciudad: Guadalajara', exact: true })).toBeVisible()
+  await expect(selector).toHaveValue(key(sample))
+  for (const text of await cards(page).allTextContents()) expect(text).toContain('Tijuana')
+})

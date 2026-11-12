@@ -22,7 +22,11 @@
     "miPais": "Meu país: {{pais}}",
     "otrosPaises": "Outros países",
     "descripcionPais": "Mostrando escolas de {{pais}}. País aproximado por IP, sem GPS; você pode alterá-lo nos filtros.",
-    "descripcionOtros": "Mostrando outros países do diretório. Escolha um país ou selecione Todos."
+    "descripcionOtros": "Mostrando outros países do diretório. Escolha um país ou selecione Todos.",
+    "ciudad": "Filtrar por cidade",
+    "todasCiudades": "Todas as cidades desta visualização",
+    "miCiudad": "Minha cidade: {{ciudad}}",
+    "descripcionCiudad": "Cidade aproximada por IP, sem GPS. Se indisponível, mostramos seu país; você pode escolher outra cidade. As opções seguem o país ou a visualização selecionados."
   },
   "resultados": {
     "cargando": "Carregando escolas…",

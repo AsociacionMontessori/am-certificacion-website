@@ -22,7 +22,11 @@
     "miPais": "My country: {{pais}}",
     "otrosPaises": "Other countries",
     "descripcionPais": "Showing schools in {{pais}}. Approximate country by IP, without GPS; you can change it using the filters.",
-    "descripcionOtros": "Showing other countries in the directory. Choose a country or select All."
+    "descripcionOtros": "Showing other countries in the directory. Choose a country or select All.",
+    "ciudad": "Filter by city",
+    "todasCiudades": "All cities in this view",
+    "miCiudad": "My city: {{ciudad}}",
+    "descripcionCiudad": "Approximate city by IP, without GPS. If unavailable, we show your country; you can choose another city. Options follow the selected country or view."
   },
   "resultados": {
     "cargando": "Loading schools…",

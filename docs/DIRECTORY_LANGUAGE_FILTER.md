@@ -13,8 +13,8 @@ language selector. Country detection never changes that language.
 - `detectedCountryCode` is null until a real, valid response. The existing Mexican
   pricing default is NOT evidence of visitor location. Pricing consumers keep
   their existing default and do not opt into the fallback.
-- Only the country code is used; no IP, city or coordinates are persisted by the
-  new directory functionality. Providers necessarily receive the connection IP.
+- Country, city and region from the existing primary response are used in memory
+  only; no IP, city or coordinates are persisted by the directory. Providers necessarily receive the connection IP.
 - Map ISO code to the catalog's Spanish names using native `Intl.DisplayNames`;
   unsupported browsers, missing countries and failed detection use language scope.
 - “Mi país” returns to the detected country. “Otros países” opens the rest of the
@@ -58,3 +58,23 @@ back to the language scope rather than showing an empty Brazilian directory).
   42 canonical URLs, 14 per language.
 - No Git push: the task authorized implementation/public-site release, not a push;
   local history includes earlier unpublished commits that are outside this diff.
+
+## City filtering (2026-11-12)
+
+- Reuses the existing ipapi response city/region; adds no requests, GPS, keys,
+  paid services or dependencies. GeoJS remains country-only.
+- Automatically selects a catalog city in the detected country. Accent/case
+  normalization supports spelling differences; state disambiguates repeated names.
+  Ambiguous/unmatched city falls back to country, then the existing language scope.
+- “Mi ciudad” restores the detected city. “Mi país” and scope/country changes
+  reset the city. Manual city choices cannot be overwritten by late detection.
+- Native labeled city selector lists only cities in the selected country/view,
+  displaying city, state and country. Search and certification combine with it.
+  Pagination resets on city changes, and Maps search includes the selected city.
+- ES/EN/PT-BR supported. No school data was rewritten or inferred from amounts,
+  names, addresses or IP coordinates.
+- Verification: production build, foundation, built SEO and directory Playwright
+  regression suite (40 desktop/mobile checks). Browser plugin unavailable;
+  validation uses the existing Playwright project workflow.
+- Carlos explicitly authorized commit/push of all pending project changes globally
+  on 2026-11-12, superseding the earlier no-push interpretation above.
