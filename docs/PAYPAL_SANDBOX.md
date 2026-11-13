@@ -2,7 +2,7 @@
 
 ## Qué está listo y qué no
 
-OAuth con las credenciales protegidas de OpenClaw confirmado el 2026-11-13. **Desplegados los cuatro endpoints y el sitio aislado**. Se creó una orden real Sandbox desde el navegador y se llegó al login de PayPal (cuenta ficticia Buyer requerida). El checkout comercial sigue sin conexión PayPal. La aprobación/captura buyer y firma de webhook reales siguen pendientes.
+OAuth con las credenciales protegidas de OpenClaw confirmado el 2026-11-13. **Desplegados los cuatro endpoints y el sitio aislado; compra Sandbox y recibo de webhook verificados en Firestore**. La prueba de $213 MXN quedó en `pagado`, con captura vinculada y evento `PAYMENT.CAPTURE.COMPLETED` procesado. El checkout comercial sigue sin conexión PayPal; no se activaron cobros ni entregas reales.
 
 Se mantiene Orders v2 oficial vía `fetch`, sin dependencias nuevas ni procesador propio. Se usa redirección al checkout hospedado de PayPal, no un SDK/iframe propio. El adaptador sólo contacta `api-m.sandbox.paypal.com`, con timeout y sin seguir redirecciones.
 
@@ -126,7 +126,7 @@ PAYPAL_FIRESTORE_INTEGRATION=true FIRESTORE_EMULATOR_HOST=127.0.0.1:8787 \
 
 La prueba exige una dirección de emulador en `127.0.0.1` y fija el project ID ficticio; no recurre a Firestore remoto si falta configuración. `npm test --prefix alumnos-app/functions-stripe` sigue ejecutando las 39 unitarias y omite estas cuatro salvo activación explícita. No se cambiaron configuraciones Firebase existentes ni el backend/frontend comercial.
 
-Pendiente: compra buyer/seller Sandbox real, firma de webhook real, conciliación operativa y después diseño compartido de entrega con Stripe, promociones/envíos y revisión Live. La aprobación real del comprador puede requerir que Carlos inicie sesión en la cuenta ficticia de Sandbox. No usar credenciales personales ni saltar 2FA/CAPTCHA.
+La compra buyer/seller Sandbox y el procesamiento del webhook real se verificaron después del despliegue (ver sección final). Pendiente: conciliación operativa adicional, pruebas remotas de eventos adversos/reintentos y después diseño compartido de entrega con Stripe, promociones/envíos y revisión Live. No usar credenciales personales ni saltar 2FA/CAPTCHA.
 
 ### Resultado del despliegue y smoke test (2026-11-13)
 
@@ -135,3 +135,20 @@ Firebase confirmó `Deploy complete` exclusivamente para `paypal-sandbox` y Host
 Verificaciones remotas: página HTTP 200 y cabecera robots correcta; `/checkout/` comercial en el sitio Sandbox devuelve 404; consulta sin Origin da 403 y consulta con Origin válido pero identidad ausente da 400. La página hidratada muestra el botón y el catálogo de $213 MXN. Pulsarlo creó la orden Sandbox `6YC97213PM395315J` y abrió el checkout oficial `www.sandbox.paypal.com`, que solicita login del comprador. **No hubo aprobación ni captura, no se verificó todavía entrega de webhook real.** Se conserva la pestaña `paypal-sandbox` del perfil `automation`; no cerrar ni cambiar de origen/pestaña para aprobar, porque la identidad de continuación está en sessionStorage. Para una nueva prueba en otro navegador iniciar desde la página de pruebas, nunca copiar sólo el URL PayPal.
 
 41 pruebas unitarias correctas; cuatro integraciones del emulador omitidas en esta ejecución (ya verificadas previamente). Build Sandbox correcto. Los scripts/paquete generados contienen sólo configuración pública o fixtures; los secretos no se copiaron a archivos.
+
+### Verificación de compra y webhook posteriores (2026-11-13)
+
+Tras la pantalla «Pago confirmado» reportada por Carlos, el operador comprobó los documentos remotos mediante la consola Firebase autenticada del perfil `automation`, en modo lectura. No volvió a crear ni capturar un pago, ni leyó credenciales. Evidencia:
+
+| Registro | Identificador | Resultado |
+| --- | --- | --- |
+| `paypalSandboxOrders` | `e34a9eb2-82c2-47d5-84d0-e3ee5928173f` | `environment: sandbox`, `amountCentavos: 21300`, `currency: MXN`, `estado: pagado`, `entregaSimulada: true` |
+| Orden PayPal Sandbox | `18N94638YD184945V` | Asociada a la orden anterior |
+| `paypalSandboxCaptures` | `8H114974TX863405N` | `ordenId` coincide con la orden anterior y su `captureId` |
+| `paypalSandboxEvents` | `WH-8C009609RC6186535-9DK4696035792764G` | `PAYMENT.CAPTURE.COMPLETED`, `ordenId` coincide, `processedAtMs: 1794598226298` |
+
+El evento se procesó el **13/11/2026 a las 13:30:26, America/Mexico_City**. El handler sólo escribe ese recibo después de verificar la firma con PayPal, consultar la orden remota y aplicar la transacción. El código compartido de `paypal/checkout.js` coincide byte a byte con el paquete preparado para el despliegue. Esto confirma el recorrido exitoso de esta compra y webhook Sandbox; no acredita pruebas remotas de duplicados, devoluciones, reversión o entrega comercial. La entrega observada es exclusivamente simulada.
+
+`gcloud logging read` sigue bloqueado por reautenticación de la CLI. No fue necesario cambiar su sesión ni copiar tokens: la sesión web de Firebase permitió comprobar los tres registros. No se consultó Cloud Logging por otra vía ni se afirma una comprobación independiente de su estado HTTP. No hubo cambios ni despliegues en Stripe o en el checkout comercial durante esta verificación.
+
+Las otras dos órdenes visibles de esta prueba permanecen `pendiente`, sin captura registrada: son intentos previos, no pagos adicionales confirmados en Firestore. No se borraron ni se reintentaron.
