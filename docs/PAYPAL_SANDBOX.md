@@ -2,7 +2,7 @@
 
 ## Qué está listo y qué no
 
-OAuth con las credenciales protegidas de OpenClaw confirmado el 2026-11-13. Código de endpoints y botón preparado, **no desplegado ni conectado al checkout comercial**. No se han creado órdenes ni capturado compras reales de Sandbox en esta fase.
+OAuth con las credenciales protegidas de OpenClaw confirmado el 2026-11-13. **Desplegados los cuatro endpoints y el sitio aislado**. Se creó una orden real Sandbox desde el navegador y se llegó al login de PayPal (cuenta ficticia Buyer requerida). El checkout comercial sigue sin conexión PayPal. La aprobación/captura buyer y firma de webhook reales siguen pendientes.
 
 Se mantiene Orders v2 oficial vía `fetch`, sin dependencias nuevas ni procesador propio. Se usa redirección al checkout hospedado de PayPal, no un SDK/iframe propio. El adaptador sólo contacta `api-m.sandbox.paypal.com`, con timeout y sin seguir redirecciones.
 
@@ -43,11 +43,14 @@ Sin flag, la ruta muestra «Esta prueba está deshabilitada» y no ofrece botone
 
 ## Destino aprobado y despliegue independiente (2026-11-13)
 
-Carlos autorizó usar **certificacionmontessori** con pruebas separadas, sin modificar Stripe ni el checkout público. La guarda compartida requiere coincidencia explícita del proyecto; no basta con un booleano. El retorno sigue prohibiendo el dominio comercial, sus subdominios y los dos sitios Firebase Hosting comerciales (`*.web.app` / `*.firebaseapp.com` exactos). Debe prepararse un origen de pruebas HTTPS independiente; no se ha creado ni publicado un sitio nuevo.
+Carlos autorizó usar **certificacionmontessori** con pruebas separadas, sin modificar Stripe ni el checkout público. La guarda compartida requiere coincidencia explícita del proyecto; no basta con un booleano. El retorno sigue prohibiendo el dominio comercial, sus subdominios y los dos sitios Firebase Hosting comerciales (`*.web.app` / `*.firebaseapp.com` exactos). El origen independiente es `https://certimontessori-sandbox.web.app/checkout/paypal-sandbox/`. No es un dominio de cobro real.
 
 Paquete Firebase independiente, código fuente compartido por allowlist sin copiar `.env`, handlers Stripe ni triggers de negocio:
 
 ```sh
+GATSBY_PAYPAL_SANDBOX_ENABLED=true \
+GATSBY_PAYPAL_SANDBOX_API_BASE_URL=https://us-central1-certificacionmontessori.cloudfunctions.net npm run build
+node alumnos-app/scripts/prepare-paypal-hosting.cjs
 node alumnos-app/scripts/prepare-paypal-sandbox.cjs
 cd alumnos-app/functions-paypal-sandbox
 npm ci --ignore-scripts
@@ -70,16 +73,20 @@ PAYPAL_SANDBOX_WEBHOOK_ID=<webhook real de esta app Sandbox>
 PAYPAL_SANDBOX_RETURN_URL=https://<origen-de-pruebas>/checkout/paypal-sandbox/
 ```
 
-**Bloqueo confirmado, actualizado el 2026-11-13:** se crearon los contenedores `PAYPAL_SANDBOX_CLIENT_ID` y `PAYPAL_SANDBOX_CLIENT_SECRET` en Google Secret Manager con etiqueta `purpose=paypal-sandbox`. Ambos tienen **cero versiones habilitadas**: todavía no contienen las credenciales necesarias para desplegar. Se verificaron únicamente metadatos. Los dos secretos existentes de OpenClaw están vinculados exclusivamente a `api-m.sandbox.paypal.com`. Ese consumidor sólo sustituye en tráfico HTTPS a PayPal; no entrega texto plano al CLI ni puede codificar valores para una versión de Google Secret Manager. No extraerlos ni copiar sentinels al despliegue.
+### Credenciales y webhook (2026-11-13)
 
-Para desbloquear, Carlos debe añadir una **Nueva versión** a cada contenedor con los valores de su app PayPal **Sandbox**:
+Se verificaron sólo metadatos en Google Secret Manager: Client ID versión **3 habilitada**, versión 2 incorrecta **deshabilitada**, y Client Secret versión **1 habilitada**. No se leyeron ni exportaron valores. Firebase configuró el acceso de su runtime a ambos secretos. Los secretos protegidos de OpenClaw permanecen vinculados únicamente a `api-m.sandbox.paypal.com`.
 
-- [Cargar Client ID](https://console.cloud.google.com/security/secret-manager/secret/PAYPAL_SANDBOX_CLIENT_ID/versions?project=certificacionmontessori).
-- [Cargar Client Secret](https://console.cloud.google.com/security/secret-manager/secret/PAYPAL_SANDBOX_CLIENT_SECRET/versions?project=certificacionmontessori).
+`node alumnos-app/scripts/paypal-sandbox-webhook.js`, ejecutado mediante Gateway exec y su canal HTTPS protegido, autentica exclusivamente contra PayPal Sandbox, lista los webhooks de la aplicación y crea uno sólo si no existe el URL exacto `https://us-central1-certificacionmontessori.cloudfunctions.net/paypalSandboxWebhook`. Valida los tipos con el catálogo oficial y vuelve a leer el recurso. Se confirmó la segunda ejecución con `created: false`, sin duplicados. No imprime credenciales, token OAuth ni respuestas completas. Nunca usar este script con credenciales Live.
 
-La consola abierta en el perfil `automation` pide iniciar sesión en Google; esa autenticación queda a cargo de Carlos. No enviar credenciales al chat ni guardarlas en `.env`. Esto no requiere cambiar Stripe ni la facturación. Después verificar sólo metadatos y el acceso del runtime, preparar el origen de pruebas, registrar/reconciliar un único webhook de la aplicación PayPal Sandbox y aplicar el despliegue acotado. El Merchant ID ya fue proporcionado: no volver a pedirlo. Su asociación se verificará con una orden real. Estos valores Sandbox no habilitan cobros reales; Live requiere credenciales propias y conectar/verificar la entrega comercial.
+El Merchant ID ya fue suministrado por Carlos y se configura sólo en el paquete generado. Su correspondencia con el vendedor debe comprobarse en la compra real Sandbox. No volver a pedir credenciales ya guardadas.
 
-No se intentó un despliegue incompleto, no se crearon colecciones remotas y no se hizo una compra Sandbox. Las credenciales protegidas actuales se conservaron intactas.
+El generador ahora extrae **sólo `CATALOG_META`** del catálogo compartido; el paquete declara únicamente los dos secretos PayPal, no parámetros ni resolutores Stripe. Se comprobó con el registro real de Firebase Functions. El catálogo Stripe original no cambia.
+
+Firebase exige el contenido Hosting dentro de `alumnos-app`: `prepare-paypal-hosting.cjs` prepara `hosting-paypal-sandbox/` (ignorado por Git), incluyendo sólo el HTML de la prueba, page-data de la prueba y assets Gatsby; no publica documentos de checkout comercial ni sitemap. Añade robots disallow y el Hosting fuerza `noindex, nofollow` y `no-store`. Si el staging ya existe, preservarlo/renombrarlo antes de regenerar. Para publicar ese sitio añadir `,hosting` al `--only` del comando anterior. No usar `firebase.json` productivo ni desplegar las compilaciones Sandbox en los sitios comerciales.
+
+La configuración no secreta del runtime se guarda únicamente en `functions-paypal-sandbox/.env.certificacionmontessori`, que está ignorado por Git. No contiene Client ID ni Client Secret. Respaldo previo del config Firebase: `/tmp/paypal-sandbox-config-backups/firebase.paypal-sandbox.json.bak-20261113-130920`. Para rollback del código usar el commit anterior; no borrar automáticamente secretos, webhooks ni órdenes de prueba pendientes. Para detener la prueba desactivar el flag y desplegar sólo estas cuatro funciones, o retirar exclusivamente el sitio Sandbox tras revisión.
+
 
 Eventos de webhook Sandbox: `PAYMENT.CAPTURE.COMPLETED`, `PAYMENT.CAPTURE.PENDING`, `PAYMENT.CAPTURE.DENIED`, `PAYMENT.CAPTURE.DECLINED`, `PAYMENT.CAPTURE.REFUNDED` y `PAYMENT.CAPTURE.REVERSED`. Aprobar una orden no es pagar. El webhook guarda recibo sólo al aplicar la transacción. Reembolsos (incluidos parciales) quedan en `revision`, reversión/denegación bloquean entrega simulada. Un evento completed tardío no revive esos estados; una devolución detectada por GET también bloquea aunque falte webhook.
 
@@ -120,3 +127,11 @@ PAYPAL_FIRESTORE_INTEGRATION=true FIRESTORE_EMULATOR_HOST=127.0.0.1:8787 \
 La prueba exige una dirección de emulador en `127.0.0.1` y fija el project ID ficticio; no recurre a Firestore remoto si falta configuración. `npm test --prefix alumnos-app/functions-stripe` sigue ejecutando las 39 unitarias y omite estas cuatro salvo activación explícita. No se cambiaron configuraciones Firebase existentes ni el backend/frontend comercial.
 
 Pendiente: compra buyer/seller Sandbox real, firma de webhook real, conciliación operativa y después diseño compartido de entrega con Stripe, promociones/envíos y revisión Live. La aprobación real del comprador puede requerir que Carlos inicie sesión en la cuenta ficticia de Sandbox. No usar credenciales personales ni saltar 2FA/CAPTCHA.
+
+### Resultado del despliegue y smoke test (2026-11-13)
+
+Firebase confirmó `Deploy complete` exclusivamente para `paypal-sandbox` y Hosting `certimontessori-sandbox`. El runtime usa Client ID versión 3 y Secret versión 1, máximo dos instancias por función. No se desplegaron Stripe, reglas Firestore, triggers de negocio ni sitios comerciales.
+
+Verificaciones remotas: página HTTP 200 y cabecera robots correcta; `/checkout/` comercial en el sitio Sandbox devuelve 404; consulta sin Origin da 403 y consulta con Origin válido pero identidad ausente da 400. La página hidratada muestra el botón y el catálogo de $213 MXN. Pulsarlo creó la orden Sandbox `6YC97213PM395315J` y abrió el checkout oficial `www.sandbox.paypal.com`, que solicita login del comprador. **No hubo aprobación ni captura, no se verificó todavía entrega de webhook real.** Se conserva la pestaña `paypal-sandbox` del perfil `automation`; no cerrar ni cambiar de origen/pestaña para aprobar, porque la identidad de continuación está en sessionStorage. Para una nueva prueba en otro navegador iniciar desde la página de pruebas, nunca copiar sólo el URL PayPal.
+
+41 pruebas unitarias correctas; cuatro integraciones del emulador omitidas en esta ejecución (ya verificadas previamente). Build Sandbox correcto. Los scripts/paquete generados contienen sólo configuración pública o fixtures; los secretos no se copiaron a archivos.

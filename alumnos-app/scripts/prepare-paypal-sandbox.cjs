@@ -5,12 +5,18 @@ const root = path.resolve(__dirname, "..");
 const source = path.join(root, "functions-stripe");
 const target = path.join(root, "functions-paypal-sandbox");
 const files = ["paypal/functions.js", "paypal/sandbox.js", "paypal/checkout.js",
-  "stripe/catalog.js", "stripe/programasCheckout.js", "stripe/rateLimit.js"];
+  "stripe/programasCheckout.js", "stripe/rateLimit.js"];
 fs.mkdirSync(target, {recursive: true});
 for (const file of files) {
   fs.mkdirSync(path.dirname(path.join(target, file)), {recursive: true});
   fs.copyFileSync(path.join(source, file), path.join(target, file));
 }
+// Copy only static fixture metadata, never the Stripe Firebase parameters or resolvers.
+const catalog = fs.readFileSync(path.join(source, "stripe/catalog.js"), "utf8");
+const fixture = catalog.match(/const CATALOG_META = \{[\s\S]*?\n\};/);
+if (!fixture) throw new Error("Static Sandbox catalog boundary not found");
+fs.writeFileSync(path.join(target, "stripe/catalog.js"),
+  fixture[0] + "\nmodule.exports = {CATALOG_META};\n");
 const pkg = JSON.parse(fs.readFileSync(path.join(source, "package.json")));
 const lock = JSON.parse(fs.readFileSync(path.join(source, "package-lock.json")));
 // Preserve the exact dependency lock; only the entry point/export surface changes.

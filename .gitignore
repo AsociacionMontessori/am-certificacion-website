@@ -83,3 +83,4 @@ output/
 
 # Generated isolated PayPal deployment package
 alumnos-app/functions-paypal-sandbox/
+alumnos-app/hosting-paypal-sandbox/

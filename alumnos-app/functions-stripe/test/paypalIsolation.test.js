@@ -22,7 +22,8 @@ test("isolated deployment exports only four Sandbox functions, with no business 
   execFileSync(process.execPath, [path.join(root, "scripts/prepare-paypal-sandbox.cjs")]);
   const staging = path.join(root, "functions-paypal-sandbox");
   const config = JSON.parse(fs.readFileSync(path.join(root, "firebase.paypal-sandbox.json")));
-  assert.deepEqual(Object.keys(config), ["functions"]);
+  assert.deepEqual(Object.keys(config), ["functions", "hosting"]);
+  assert.equal(config.hosting.site, "certimontessori-sandbox");
   assert.equal(config.functions.length, 1);
   assert.equal(config.functions[0].codebase, "paypal-sandbox");
   assert.equal(config.functions[0].source, "functions-paypal-sandbox");
@@ -33,4 +34,8 @@ test("isolated deployment exports only four Sandbox functions, with no business 
   assert.deepEqual(exported.sort(), ["capturePayPalSandboxOrder", "createPayPalSandboxOrder",
     "getPayPalSandboxStatus", "paypalSandboxWebhook"].sort());
   assert.equal(fs.existsSync(path.join(staging, "stripe/webhook.js")), false);
+  const fixture = require(path.join(staging, "stripe/catalog.js"));
+  assert.deepEqual(Object.keys(fixture), ["CATALOG_META"]);
+  assert.deepEqual(fixture.CATALOG_META, require("../stripe/catalog").CATALOG_META);
+  assert.equal(fs.readFileSync(path.join(staging, "stripe/catalog.js"), "utf8").includes("defineString"), false);
 });
