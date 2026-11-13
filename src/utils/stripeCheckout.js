@@ -83,3 +83,14 @@ export async function downloadDigitalBookFile(payload) {
     fileName: getFileNameFromDisposition(response.headers.get("Content-Disposition")),
   }
 }
+
+export async function getCheckoutPaymentStatus(payload) {
+  const response = await fetch(process.env.GATSBY_CHECKOUT_STATUS_API_URL ||
+    "https://us-central1-certificacionmontessori.cloudfunctions.net/getCheckoutPaymentStatus", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  })
+  if (!response.ok) throw new Error("Payment status unavailable")
+  return response.json()
+}

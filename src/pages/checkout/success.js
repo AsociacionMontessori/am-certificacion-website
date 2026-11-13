@@ -7,7 +7,7 @@ import { Trans, useTranslation } from "react-i18next"
 import { getT, useLocalization } from "../../i18n"
 import { roxanaBooks } from "../../data/roxanaBooks"
 import { roxanaBookBundles, roxanaGiftEbook } from "../../data/roxanaBookOffers"
-import { downloadDigitalBookFile } from "../../utils/stripeCheckout"
+import { downloadDigitalBookFile, getCheckoutPaymentStatus } from "../../utils/stripeCheckout"
 
 const CheckoutSuccessPage = () => {
   const { t } = useTranslation("checkout")
@@ -21,6 +21,8 @@ const CheckoutSuccessPage = () => {
     gift: "",
     accessToken: "",
   })
+  const [paymentState, setPaymentState] = React.useState("checking")
+  const [refresh, setRefresh] = React.useState(0)
   const [downloadState, setDownloadState] = React.useState({})
 
   React.useEffect(() => {
@@ -38,6 +40,27 @@ const CheckoutSuccessPage = () => {
   }, [])
 
   const { ordenId, tipo, promoNeuro, downloadToken, sku, gift, accessToken } = checkoutParams
+  React.useEffect(() => {
+    if (!ordenId || !accessToken) return
+    let active = true
+    let timer
+    let attempts = 0
+    const check = async () => {
+      try {
+        const data = await getCheckoutPaymentStatus({ ordenId, accessToken })
+        if (!active) return
+        setPaymentState(data.pagado ? "paid" : data.estado || "pending")
+        if (!data.pagado && !["fallido", "expirado"].includes(data.estado) && ++attempts < 12) {
+          timer = setTimeout(check, 5000)
+        }
+      } catch (_) {
+        if (active) setPaymentState("unavailable")
+      }
+    }
+    check()
+    return () => { active = false; clearTimeout(timer) }
+  }, [ordenId, accessToken, refresh])
+
   const esEbook = tipo === "ebook"
   const bundle = roxanaBookBundles.find((b) => b.stripeSku === sku)
   const esPaquete = Boolean(bundle)
@@ -99,6 +122,22 @@ const CheckoutSuccessPage = () => {
         },
       }))
     }
+  }
+
+  if (paymentState !== "paid") {
+    const failed = ["fallido", "expirado"].includes(paymentState)
+    return (
+      <Layout>
+        <Nav />
+        <main className="max-w-lg mx-auto px-6 py-24 text-center" aria-live="polite">
+          <h1 className="text-2xl font-bold text-blue mb-4">{t(failed ? "success.failedTitle" : "success.pendingTitle")}</h1>
+          <p className="mb-4">{t(failed ? "success.failedMessage" : "success.pendingMessage")}</p>
+          {ordenId && <p className="break-all font-mono mb-4">{ordenId}</p>}
+          <button className="btn mb-4" onClick={() => setRefresh(value => value + 1)}>{t("success.checkPayment")}</button>
+          <p><Link to={localizedPath("/")}>{t("success.home")}</Link></p>
+        </main>
+      </Layout>
+    )
   }
 
   return (

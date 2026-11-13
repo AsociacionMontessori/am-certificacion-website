@@ -145,8 +145,8 @@
     "confirmedReference": "I have a confirmed payment reference"
   },
   "success": {
-    "seoTitle": "Payment received",
-    "seoDescription": "Your payment was processed successfully.",
+    "seoTitle": "Payment status",
+    "seoDescription": "Check confirmation of your purchase.",
     "title": "Payment received",
     "ebookMessage": "Your digital purchase was registered. Download your formats from this page.",
     "promoMessage": "Your diploma course payment was registered. With the current promotion, institutional enrollment is included. Continue with account creation and the administrative file.",
@@ -169,7 +169,12 @@
     "step2Text": "Create your <strong>@certificacionmontessori.com</strong> user with your basic information.",
     "createAccount": "Create my account",
     "step2After": "After that, you will complete the <strong>administrative file</strong> (documents and signed regulations). You do not need to attach proof of payment.",
-    "home": "Back to home"
+    "home": "Back to home",
+    "pendingTitle": "Payment awaiting confirmation",
+    "pendingMessage": "We have not confirmed your payment yet. If you chose OXXO, pay the Stripe voucher before it expires and keep your receipt. Confirmation can take until the next business day. Enrollment or downloads become available once payment is confirmed.",
+    "failedTitle": "Payment not completed",
+    "failedMessage": "The reference expired or payment was not completed. Start a new purchase or contact administration.",
+    "checkPayment": "Check payment status"
   },
   "cancel": {
     "seoTitle": "Payment canceled",

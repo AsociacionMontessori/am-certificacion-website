@@ -145,8 +145,8 @@
     "confirmedReference": "Já tenho referência de pagamento confirmada"
   },
   "success": {
-    "seoTitle": "Pagamento recebido",
-    "seoDescription": "Seu pagamento foi processado corretamente.",
+    "seoTitle": "Status do pagamento",
+    "seoDescription": "Consulte a confirmação da sua compra.",
     "title": "Pagamento recebido",
     "ebookMessage": "Sua compra digital foi registrada. Baixe seus formatos nesta página.",
     "promoMessage": "Seu pagamento do diplomado foi registrado. Com a promoção vigente, sua inscrição institucional está incluída. Continue com a criação da conta e o expediente administrativo.",
@@ -169,7 +169,12 @@
     "step2Text": "Crie seu usuário <strong>@certificacionmontessori.com</strong> com seus dados básicos.",
     "createAccount": "Criar minha conta",
     "step2After": "Depois você completará o <strong>expediente administrativo</strong> (documentos e regulamento assinado). Não precisa anexar comprovante de pagamento.",
-    "home": "Voltar ao início"
+    "home": "Voltar ao início",
+    "pendingTitle": "Pagamento aguardando confirmação",
+    "pendingMessage": "Ainda não confirmamos seu pagamento. Se escolheu OXXO, pague o comprovante do Stripe antes do vencimento e guarde o recibo. A confirmação pode levar até o próximo dia útil. A inscrição ou o download será liberado após a confirmação.",
+    "failedTitle": "Pagamento não concluído",
+    "failedMessage": "A referência expirou ou o pagamento não foi concluído. Inicie uma nova compra ou entre em contato com a administração.",
+    "checkPayment": "Consultar pagamento"
   },
   "cancel": {
     "seoTitle": "Pagamento cancelado",

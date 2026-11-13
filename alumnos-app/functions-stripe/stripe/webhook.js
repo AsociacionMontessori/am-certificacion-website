@@ -5,6 +5,7 @@ const Stripe = require("stripe");
 const {notifyAdminOrdenPagada, notifyAdminPago} = require("./notifications");
 const {isOrdenFlujoInscripcion, getProgramaCheckout} = require("./programasCheckout");
 const {escapeHtml} = require("./escape");
+const {isSessionPaid, updateUnpaidSession} = require("./checkoutPaymentState");
 
 const stripeSecretKey = defineSecret("STRIPE_SECRET_KEY");
 const stripeWebhookSecret = defineSecret("STRIPE_WEBHOOK_SECRET");
@@ -12,16 +13,19 @@ const stripeWebhookSecret = defineSecret("STRIPE_WEBHOOK_SECRET");
 /**
  * @param {import('firebase-admin').firestore.Firestore} db
  * @param {string} eventId
- * @return {Promise<boolean>}
+ * @return {Promise<string>}
  */
-async function markEventProcessed(db, eventId) {
+async function claimEvent(db, eventId) {
   const ref = db.collection("stripe_events").doc(eventId);
-  const existing = await ref.get();
-  if (existing.exists) return false;
-  await ref.set({
-    processedAt: admin.firestore.FieldValue.serverTimestamp(),
+  return db.runTransaction(async (tx) => {
+    const snap = await tx.get(ref);
+    const data = snap.data() || {};
+    // Legacy receipts were written before processing. Preserve them on upgrade.
+    if (data.processedAt) return "done";
+    if (data.leaseUntil > Date.now()) return "busy";
+    tx.set(ref, {leaseUntil: Date.now() + 120000});
+    return "claimed";
   });
-  return true;
 }
 
 /**
@@ -31,60 +35,48 @@ async function markEventProcessed(db, eventId) {
  */
 async function handleOrdenPublicaPagada(db, ordenId, session) {
   const ordenRef = db.collection("ordenes").doc(ordenId);
-  const ordenSnap = await ordenRef.get();
-  if (!ordenSnap.exists) {
-    console.warn("Orden no encontrada:", ordenId);
-    return;
-  }
-
-  const amountTotal = session.amount_total ? session.amount_total / 100 : null;
-  const moneda = (session.currency || "mxn").toUpperCase();
-
-  await ordenRef.update({
-    estado: "pagado",
-    stripePaymentIntentId: session.payment_intent || null,
-    monto: amountTotal,
-    moneda,
-    paidAt: admin.firestore.FieldValue.serverTimestamp(),
-    envio: session.shipping_details || session.customer_details?.address || null,
+  const result = await db.runTransaction(async (tx) => {
+    const snap = await tx.get(ordenRef);
+    if (!snap.exists) throw new Error("Orden no encontrada");
+    const orden = snap.data();
+    if (orden.estado === "pagado") return {id: ordenId, ...orden};
+    const monto = session.amount_total / 100;
+    const moneda = session.currency.toUpperCase();
+    const paid = {
+      estado: "pagado",
+      stripePaymentIntentId: session.payment_intent || null,
+      monto, moneda,
+      paidAt: admin.firestore.FieldValue.serverTimestamp(),
+      envio: session.shipping_details || session.customer_details?.address || null,
+    };
+    if (isOrdenFlujoInscripcion(orden.tipo)) {
+      const cliente = orden.cliente || {};
+      const programa = orden.programa || session.metadata?.programa || "";
+      const nivel = orden.nivelFormulario || session.metadata?.nivelFormulario ||
+        getProgramaCheckout(programa)?.nivelFormulario || programa;
+      // Stable ID and atomic linkage prevent duplicate enrolments on retries.
+      const inscripcionRef = db.collection("inscripciones").doc(orden.inscripcionId || ordenId);
+      const inscripcion = await tx.get(inscripcionRef);
+      if (!inscripcion.exists) tx.set(inscripcionRef, {
+        nombre: cliente.nombre || session.customer_details?.name || "",
+        email: cliente.email || session.customer_email || "",
+        telefono: cliente.telefono || null,
+        nivel, nivelEspecializacion: nivel, programa,
+        estadoInscripcion: "Pagado", metodoPago: "stripe", ordenId,
+        stripeCheckoutSessionId: session.id,
+        fechaInscripcion: admin.firestore.FieldValue.serverTimestamp(),
+        origen: "sitio_publico_stripe", formularioCompleto: false,
+        inicioCompleto: orden.tipo === "inicio_programa",
+        inscripcionIncluidaEnPromo: Boolean(orden.promoInscripcionIncluida ||
+          session.metadata?.promoInscripcionIncluida === "1"),
+        lineItemsPagados: orden.lineItems || [],
+      });
+      paid.inscripcionId = inscripcionRef.id;
+    }
+    tx.update(ordenRef, paid);
+    return {id: ordenId, ...orden, ...paid};
   });
-
-  const orden = {id: ordenId, ...ordenSnap.data(), monto: amountTotal, moneda};
-  await notifyAdminOrdenPagada(db, orden);
-
-  if (isOrdenFlujoInscripcion(orden.tipo)) {
-    const cliente = orden.cliente || {};
-    const programaLabel = orden.programa || session.metadata?.programa || "";
-    const prog = getProgramaCheckout(programaLabel);
-    const nivel =
-      orden.nivelFormulario ||
-      session.metadata?.nivelFormulario ||
-      prog?.nivelFormulario ||
-      programaLabel;
-
-    const inscripcionRef = await db.collection("inscripciones").add({
-      nombre: cliente.nombre || session.customer_details?.name || "",
-      email: cliente.email || session.customer_email || "",
-      telefono: cliente.telefono || null,
-      nivel,
-      nivelEspecializacion: nivel,
-      programa: programaLabel,
-      estadoInscripcion: "Pagado",
-      metodoPago: "stripe",
-      ordenId,
-      stripeCheckoutSessionId: session.id,
-      fechaInscripcion: admin.firestore.FieldValue.serverTimestamp(),
-      origen: "sitio_publico_stripe",
-      formularioCompleto: false,
-      inicioCompleto: orden.tipo === "inicio_programa",
-      inscripcionIncluidaEnPromo: Boolean(
-          orden.promoInscripcionIncluida ||
-          session.metadata?.promoInscripcionIncluida === "1",
-      ),
-      lineItemsPagados: orden.lineItems || [],
-    });
-    await ordenRef.update({inscripcionId: inscripcionRef.id});
-  }
+  await notifyAdminOrdenPagada(db, result);
 }
 
 /**
@@ -95,9 +87,9 @@ async function handleOrdenPublicaPagada(db, ordenId, session) {
 async function handlePagoAlumnoPagado(db, pagoId, session) {
   const pagoRef = db.collection("pagos").doc(pagoId);
   const pagoSnap = await pagoRef.get();
-  if (!pagoSnap.exists) return;
+  if (!pagoSnap.exists) throw new Error("Pago no encontrado");
 
-  const montoPagado = session.amount_total ? session.amount_total / 100 : (pagoSnap.data().stripeMontoCheckout || pagoSnap.data().monto);
+  const montoPagado = session.amount_total / 100;
 
   await pagoRef.update({
     estado: "Validado",
@@ -114,6 +106,7 @@ async function handlePagoAlumnoPagado(db, pagoId, session) {
     html: `<p>El pago <strong>${escapeHtml(pagoId)}</strong> fue validado automáticamente por Stripe.</p>`,
     text: `Pago ${pagoId} validado por Stripe`,
     tipo: "stripe_pago_alumno",
+    dedupKey: `pago_${pagoId}`,
   });
 }
 
@@ -213,6 +206,7 @@ exports.stripeWebhookHandler = onRequest(
     {
       region: "us-central1",
       secrets: [stripeSecretKey, stripeWebhookSecret],
+      timeoutSeconds: 60, // Shorter than the event lease.
       cors: false,
       invoker: "public",
     },
@@ -239,44 +233,49 @@ exports.stripeWebhookHandler = onRequest(
       }
 
       const db = admin.firestore();
-      const shouldProcess = await markEventProcessed(db, event.id);
-      if (!shouldProcess) {
-        res.status(200).json({received: true, duplicate: true});
-        return;
-      }
-
+      let claimed = false;
       try {
+        const claim = await claimEvent(db, event.id);
+        if (claim === "done") {
+          res.status(200).json({received: true, duplicate: true});
+          return;
+        }
+        if (claim === "busy") {
+          res.status(503).json({error: "Evento en proceso; reintentar"});
+          return;
+        }
+        claimed = true;
         switch (event.type) {
-          case "checkout.session.completed": {
+          case "checkout.session.completed":
+          case "checkout.session.async_payment_succeeded": {
             const session = event.data.object;
             const ordenId = session.metadata?.ordenId;
             const pagoId = session.metadata?.pagoId;
 
+            if (session.mode === "subscription" && session.metadata?.alumnoId) {
+              const alumnoRef = db.collection("alumnos").doc(session.metadata.alumnoId);
+              await alumnoRef.set({
+                stripeCustomerId: session.customer,
+                stripeSubscriptionId: session.subscription,
+                ...(isSessionPaid(session) ? {suscripcionColegiaturaActiva: true} : {}),
+              }, {merge: true});
+            }
+            if (!isSessionPaid(session)) {
+              await updateUnpaidSession(db, session, "pendiente_pago");
+              break;
+            }
             if (ordenId) {
               await handleOrdenPublicaPagada(db, ordenId, session);
             }
             if (pagoId) {
               await handlePagoAlumnoPagado(db, pagoId, session);
             }
-            if (session.mode === "subscription" && session.metadata?.alumnoId) {
-              const alumnoRef = db.collection("alumnos").doc(session.metadata.alumnoId);
-              await alumnoRef.set({
-                stripeCustomerId: session.customer,
-                stripeSubscriptionId: session.subscription,
-                suscripcionColegiaturaActiva: true,
-              }, {merge: true});
-            }
             break;
           }
-          case "checkout.session.expired": {
-            const session = event.data.object;
-            const ordenId = session.metadata?.ordenId;
-            if (ordenId) {
-              await db.collection("ordenes").doc(ordenId).update({
-                estado: "expirado",
-                updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-              });
-            }
+          case "checkout.session.expired":
+          case "checkout.session.async_payment_failed": {
+            await updateUnpaidSession(db, event.data.object,
+              event.type === "checkout.session.expired" ? "expirado" : "fallido");
             break;
           }
           case "invoice.paid":
@@ -303,8 +302,13 @@ exports.stripeWebhookHandler = onRequest(
             break;
         }
 
+        await db.collection("stripe_events").doc(event.id).set({
+          processedAt: admin.firestore.FieldValue.serverTimestamp(),
+        });
         res.status(200).json({received: true});
       } catch (error) {
+        // Release only the lease owned by this request (busy returns above).
+        if (claimed) await db.collection("stripe_events").doc(event.id).delete().catch(() => {});
         console.error("Webhook handler error:", error);
         res.status(500).json({error: "Error interno"});
       }

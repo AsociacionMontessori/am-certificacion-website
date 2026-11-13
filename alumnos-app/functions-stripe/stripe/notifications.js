@@ -6,7 +6,7 @@ const {escapeHtml} = require("./escape");
  * @param {object} options
  */
 async function notifyAdminPago(db, options) {
-  const {subject, html, text, tipo} = options;
+  const {subject, html, text, tipo, dedupKey} = options;
   const adminsSnap = await db.collection("admins").where("activo", "==", true).limit(3).get();
   if (adminsSnap.empty) {
     console.warn("No hay admins activos para notificar");
@@ -17,18 +17,17 @@ async function notifyAdminPago(db, options) {
   adminsSnap.forEach((doc) => {
     const email = doc.data()?.email;
     if (!email) return;
-    batch.push(
-        db.collection("emails_pendientes").add({
-          to: email,
-          subject,
-          html,
-          text,
-          tipo: tipo || "stripe_pago",
-          fechaCreacion: admin.firestore.FieldValue.serverTimestamp(),
-          estado: "pendiente",
-          intentos: 0,
-        }),
-    );
+    const payload = {
+      to: email, subject, html, text,
+      tipo: tipo || "stripe_pago",
+      fechaCreacion: admin.firestore.FieldValue.serverTimestamp(),
+      estado: "pendiente", intentos: 0,
+    };
+    const emails = db.collection("emails_pendientes");
+    batch.push(dedupKey ?
+      emails.doc(`${dedupKey}_${doc.id}`).create(payload).catch((error) => {
+        if (error.code !== 6 && error.code !== "already-exists") throw error;
+      }) : emails.add(payload));
   });
 
   await Promise.all(batch);
@@ -59,6 +58,7 @@ async function notifyAdminOrdenPagada(db, orden) {
     html,
     text,
     tipo: "stripe_orden_publica",
+    dedupKey: `orden_${orden.id}`,
   });
 }
 

@@ -45,3 +45,4 @@ exports.getCredencialesAlumno = getCredencialesAlumnoHandler;
 exports.verificarCertificadoPublico = verificarCertificadoPublicoHandler;
 exports.syncAlumnoToSheets = syncAlumnoToSheetsTrigger;
 exports.syncInscripcionToSheets = syncInscripcionToSheetsTrigger;
+exports.getCheckoutPaymentStatus = require("./stripe/getCheckoutPaymentStatus").getCheckoutPaymentStatusHandler;

@@ -23,6 +23,8 @@ const {
 
 const stripeSecretKey = defineSecret("STRIPE_SECRET_KEY");
 
+const {oxxoCheckoutOptions} = require("./checkoutPaymentState");
+
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function hashDownloadToken(token) {
@@ -251,7 +253,8 @@ exports.createPublicCheckoutHandler = onRequest(
         const accessToken = generateAccessToken();
         const accessTokenHash = hashAccessToken(accessToken);
         const accessTokenExpiresAt = admin.firestore.Timestamp.fromDate(
-            new Date(Date.now() + ACCESS_TOKEN_TTL_MS),
+            new Date(Date.now() + (process.env.STRIPE_OXXO_PREPARED === "true" ?
+              8 * ACCESS_TOKEN_TTL_MS : ACCESS_TOKEN_TTL_MS)),
         );
         const accessTokenQuery = `&t=${encodeURIComponent(accessToken)}`;
         const successQuery =
@@ -260,6 +263,7 @@ exports.createPublicCheckoutHandler = onRequest(
 
         const session = await stripe.checkout.sessions.create({
           mode: "payment",
+          ...oxxoCheckoutOptions(),
           customer_email: email,
           locale: getStripeCheckoutLocale(language),
           line_items: lineItems,
