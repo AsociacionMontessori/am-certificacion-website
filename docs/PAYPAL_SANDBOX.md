@@ -70,9 +70,14 @@ PAYPAL_SANDBOX_WEBHOOK_ID=<webhook real de esta app Sandbox>
 PAYPAL_SANDBOX_RETURN_URL=https://<origen-de-pruebas>/checkout/paypal-sandbox/
 ```
 
-**Bloqueo confirmado:** Google Secret Manager no contiene `PAYPAL_SANDBOX_CLIENT_ID` ni `PAYPAL_SANDBOX_CLIENT_SECRET` (consulta de metadatos, no lectura de valores). Los dos secretos existentes de OpenClaw están vinculados exclusivamente a `api-m.sandbox.paypal.com`. Ese consumidor sólo sustituye en tráfico HTTPS a PayPal; no entrega texto plano al CLI ni puede codificar valores para una versión de Google Secret Manager. No extraerlos ni copiar sentinels al despliegue.
+**Bloqueo confirmado, actualizado el 2026-11-13:** se crearon los contenedores `PAYPAL_SANDBOX_CLIENT_ID` y `PAYPAL_SANDBOX_CLIENT_SECRET` en Google Secret Manager con etiqueta `purpose=paypal-sandbox`. Ambos tienen **cero versiones habilitadas**: todavía no contienen las credenciales necesarias para desplegar. Se verificaron únicamente metadatos. Los dos secretos existentes de OpenClaw están vinculados exclusivamente a `api-m.sandbox.paypal.com`. Ese consumidor sólo sustituye en tráfico HTTPS a PayPal; no entrega texto plano al CLI ni puede codificar valores para una versión de Google Secret Manager. No extraerlos ni copiar sentinels al despliegue.
 
-Para desbloquear, Carlos debe cargar esos dos valores directamente mediante la entrada protegida de [Google Secret Manager del proyecto](https://console.cloud.google.com/security/secret-manager?project=certificacionmontessori), usando sus nombres exactos. No enviarlos al chat ni guardarlos en `.env`. Esto no requiere cambiar Stripe ni la facturación. Después verificar sólo metadatos y el acceso del runtime, preparar el origen de pruebas, registrar/reconciliar un único webhook de la aplicación PayPal Sandbox y aplicar el despliegue acotado. El Merchant ID ya fue proporcionado: no volver a pedirlo. Su asociación se verificará con una orden real.
+Para desbloquear, Carlos debe añadir una **Nueva versión** a cada contenedor con los valores de su app PayPal **Sandbox**:
+
+- [Cargar Client ID](https://console.cloud.google.com/security/secret-manager/secret/PAYPAL_SANDBOX_CLIENT_ID/versions?project=certificacionmontessori).
+- [Cargar Client Secret](https://console.cloud.google.com/security/secret-manager/secret/PAYPAL_SANDBOX_CLIENT_SECRET/versions?project=certificacionmontessori).
+
+La consola abierta en el perfil `automation` pide iniciar sesión en Google; esa autenticación queda a cargo de Carlos. No enviar credenciales al chat ni guardarlas en `.env`. Esto no requiere cambiar Stripe ni la facturación. Después verificar sólo metadatos y el acceso del runtime, preparar el origen de pruebas, registrar/reconciliar un único webhook de la aplicación PayPal Sandbox y aplicar el despliegue acotado. El Merchant ID ya fue proporcionado: no volver a pedirlo. Su asociación se verificará con una orden real. Estos valores Sandbox no habilitan cobros reales; Live requiere credenciales propias y conectar/verificar la entrega comercial.
 
 No se intentó un despliegue incompleto, no se crearon colecciones remotas y no se hizo una compra Sandbox. Las credenciales protegidas actuales se conservaron intactas.
 
