@@ -41,14 +41,14 @@ function validateCapture(order, expected) {
 
 function createSandboxClient({clientId, clientSecret, merchantId, fetchImpl = fetch}) {
   if (!clientId || !clientSecret || !merchantId) throw new Error("Falta configuración PayPal sandbox");
-  async function request(path, {body, requestId} = {}) {
+  async function request(path, {body, requestId, method = "POST"} = {}) {
     // Tokens stay in this call; never returned or logged. No automatic retry of captures.
     const token = await authenticateSandbox({clientId, clientSecret, fetchImpl});
     const response = await fetchImpl(`${BASE}${path}`, {
-      method: "POST", signal: AbortSignal.timeout(20000), redirect: "error",
+      method, signal: AbortSignal.timeout(20000), redirect: "error",
       headers: {Authorization: `Bearer ${token}`, "Content-Type": "application/json",
         ...(requestId ? {"PayPal-Request-Id": requestId, Prefer: "return=representation"} : {})},
-      body: JSON.stringify(body),
+      ...(body === undefined ? {} : {body: JSON.stringify(body)}),
     });
     if (!response.ok) throw new Error(`PayPal sandbox respondió HTTP ${response.status}`);
     return response.json();
@@ -58,17 +58,35 @@ function createSandboxClient({clientId, clientSecret, merchantId, fetchImpl = fe
     return key;
   }
   return {
-    async createOrder({ordenId, amountCentavos, requestId}) {
+    async createOrder({ordenId, amountCentavos, requestId, returnUrl, cancelUrl}) {
       // Parent must resolve amount from its server-side catalog, never from req.body.
       if (typeof ordenId !== "string" || !/^[\w-]{1,100}$/.test(ordenId) || !Number.isSafeInteger(amountCentavos) || amountCentavos <= 0) {
         throw new Error("Orden o monto inválido");
       }
       return request("/v2/checkout/orders", {
         requestId: idempotencyKey(requestId),
-        body: {intent: "CAPTURE", purchase_units: [{custom_id: ordenId,
+        body: {intent: "CAPTURE", ...(returnUrl && cancelUrl ? {payment_source: {paypal: {
+          experience_context: {return_url: returnUrl, cancel_url: cancelUrl,
+            user_action: "PAY_NOW", shipping_preference: "NO_SHIPPING"},
+        }}} : {}), purchase_units: [{custom_id: ordenId,
           payee: {merchant_id: merchantId},
           amount: {currency_code: "MXN", value: (amountCentavos / 100).toFixed(2)}}]},
       });
+    },
+    async getOrder(paypalOrderId) {
+      if (!/^[A-Z0-9]{1,40}$/.test(paypalOrderId)) throw new Error("ID PayPal inválido");
+      return request(`/v2/checkout/orders/${paypalOrderId}`, {method: "GET"});
+    },
+    async verifyWebhook(event, headers, webhookId) {
+      if (!webhookId || !event?.id) return false;
+      const fields = {auth_algo: headers["paypal-auth-algo"], cert_url: headers["paypal-cert-url"],
+        transmission_id: headers["paypal-transmission-id"], transmission_sig: headers["paypal-transmission-sig"],
+        transmission_time: headers["paypal-transmission-time"]};
+      if (Object.values(fields).some(v => typeof v !== "string" || !v)) return false;
+      const result = await request("/v1/notifications/verify-webhook-signature", {
+        body: {...fields, webhook_id: webhookId, webhook_event: event},
+      });
+      return result.verification_status === "SUCCESS";
     },
     async captureOrder({paypalOrderId, ordenId, amountCentavos, requestId}) {
       if (!/^[A-Z0-9]{1,40}$/.test(paypalOrderId)) throw new Error("ID PayPal inválido");

@@ -7,7 +7,7 @@ Preparación en rama `feat/oxxo-paypal-preparation`, sin desplegar, activar mét
 | Componente | Preparado | Falta antes de ofrecerlo |
 | --- | --- | --- |
 | OXXO, checkout público | Confirmación diferida, fallos/expiración, recibos de evento reintentables, inscripción transaccional, notificaciones idempotentes, consulta autenticada de estado y pantalla ES/EN/PT | Prueba Stripe test de extremo a extremo, revisión de cuenta, despliegue coordinado y habilitación en Dashboard |
-| PayPal | Cuenta Business y Default Application Sandbox confirmadas por Carlos; credenciales protegidas; adaptador Orders v2 y comprobador OAuth sin exposición de tokens | Validación OAuth real pendiente de aplicar canal protegido; merchant ID de pruebas; endpoints públicos autenticados, catálogo/precios/promociones/envío del servidor, botón, webhooks verificados, conciliación y pruebas sandbox. No es todavía una integración pública completa |
+| PayPal | OAuth Sandbox real confirmado; endpoints aislados crear/capturar/consultar, botón de pruebas, verificación oficial de webhooks y conciliación mediante GET; pruebas automatizadas y UI simulada | Merchant ID Sandbox, webhook ID y proyecto Firebase de pruebas por definir, carga protegida de secretos en ese entorno y compra buyer/seller real de Sandbox. Cupones/envíos/mensualidades rechazados. Entrega real no conectada. No es todavía una integración pública completa |
 | Portal alumnos | Webhook ya diferencia pago diferido de validado; fallo no altera Pendiente/Vencido | UX de ficha/estado, bloqueo de sesiones duplicadas, expiración y pruebas; no habilitar allí todavía |
 | Suscripciones | Conservan Checkout; vinculan cliente/suscripción aun antes de confirmar, sin declarar activo un pago pendiente | OXXO no es compatible con cargos recurrentes |
 
@@ -35,31 +35,32 @@ Preparación en rama `feat/oxxo-paypal-preparation`, sin desplegar, activar mét
 
 Rollback: deshabilitar OXXO para **nuevas** compras en Dashboard, pero mantener el webhook/consulta funcionando para fichas emitidas pendientes. No volver al webhook antiguo mientras puedan llegar confirmaciones diferidas: validaría fichas sin pago. Quitar el flag no cancela fichas ni apaga el método. Registrar versiones desplegadas antes de cualquier publicación.
 
-## Preparación PayPal (siguiente fase)
+## PayPal: avance Sandbox y pendientes
 
 - Carlos confirmó cuenta Business y la app automática Default Application en Sandbox. Aún hay que revisar recepción en MXN, comisiones, retenciones y receptor; no asumir que PayPal se procesa dentro del Stripe mexicano.
 - Client ID/Secret se guardaron mediante entrada protegida de OpenClaw como `PAYPAL_SANDBOX_CLIENT_ID` y `PAYPAL_SANDBOX_CLIENT_SECRET`, ligados sólo a `api-m.sandbox.paypal.com`. No se leyeron valores ni se copiaron a Git, Firebase o archivos `.env`. El merchant ID Sandbox sigue pendiente.
 - Se eligió Orders v2 oficial con `fetch` nativo, sin dependencia adicional; no se construye un procesador propio. Adaptador inyectable para pruebas y host sandbox fijo.
-- `paypal/sandbox.js` no se exporta en `index.js`, no puede apuntar a live, no escribe en Firestore y **no se debe conectar directamente a req.body**. El padre debe resolver catálogo, monto, promociones, envío y beneficiario desde servidor y guardar orden antes de contactar PayPal.
-- Implementar crear/capturar con token de orden, CORS, rate limit y claves `PayPal-Request-Id` persistidas. `APPROVED`, redirección exitosa o captura `PENDING` no equivalen a pago. Validar también orden vinculada, importe, MXN y merchant ID, como hace el adaptador.
+- `paypal/sandbox.js` mantiene el host Sandbox fijo y no escribe en Firestore. El nuevo servicio `paypal/checkout.js` resuelve el catálogo en servidor, guarda la orden antes de llamar al proveedor y sólo usa colecciones `paypalSandbox*`. Las funciones sólo se exportan con `PAYPAL_SANDBOX_ENDPOINTS=true` y rechazan el proyecto productivo. Véase [guía del flujo aislado](PAYPAL_SANDBOX.md).
+- Implementado para el flujo Sandbox aislado: crear/capturar con token de orden, CORS, rate limit y claves `PayPal-Request-Id` persistidas. `APPROVED`, redirección exitosa o captura `PENDING` no equivalen a pago. Validar también orden vinculada, importe, MXN y merchant ID, como hace el adaptador.
 - Ante timeout de captura, consultar/reconciliar orden remota con la misma clave; no lanzar una segunda captura a ciegas.
-- Añadir webhook con verificación oficial de firma y recibos idempotentes; compartir la entrega transaccional entre PayPal/Stripe sin falsificar sesiones Stripe. Cubrir captura completada, pendiente/denegada, reembolso y reversión; aprobación sola nunca libera libros ni cuentas.
-- Añadir selector/botón real, URL allowlist PayPal y retorno por estado local verificado, no por parámetros del navegador. Probar sandbox buyer/seller, cancelación, doble clic, red interrumpida, montos distintos y webhook retrasado antes de preparar live.
+- Webhook Sandbox implementado con verificación oficial de firma, recibos idempotentes y cobertura simulada de captura completada, pendiente/denegada, reembolso y reversión. Sigue pendiente compartir la entrega real transaccional PayPal/Stripe sin falsificar sesiones Stripe; aprobación sola nunca libera libros ni cuentas.
+- Botón con redirección a PayPal Sandbox, allowlist de URL y retorno consultado en servidor implementados en una ruta de pruebas deshabilitada por defecto. No se añadió selector al checkout comercial. Las pruebas simuladas cubren cancelación, doble clic, respuesta perdida, montos distintos y eventos tardíos; falta la compra buyer/seller y webhook reales de Sandbox antes de preparar Live.
 
 ### Comprobación de conexión protegida
 
 - `checkSandboxConnection` usa el mismo OAuth que el adaptador y devuelve únicamente `{ok: true, environment: "sandbox"}`; no crea órdenes, captura pagos, devuelve tokens ni sigue redirecciones.
 - Ejecutar `node alumnos-app/scripts/paypal-sandbox-check.js` desde la raíz mediante **Gateway exec**, con Node 24+ y el canal HTTPS protegido de OpenClaw activo. El shell nativo no recibe esos secretos; no sustituir por credenciales en argumentos o archivos.
-- La primera ejecución se detuvo localmente antes de contactar PayPal: el proxy protegido estaba desactivado. Se habilitó y validó la opción oficial, con reinicio controlado solicitado. La ejecución posterior sigue fallando cerrada; la autenticación **no está validada** todavía. Retomar desde un turno nuevo después de aplicar el reinicio, sin pedir las credenciales otra vez.
+- La primera ejecución se detuvo antes de contactar PayPal por falta del canal protegido. Tras habilitarlo y reiniciar, el comprobador ejecutado mediante Gateway exec devolvió `{ok: true, environment: "sandbox"}` el 2026-11-13: **OAuth Sandbox confirmado**. El reintento programado anterior carecía de herramienta; el turno interactivo resolvió ese bloqueo sin nuevas credenciales.
 - Esta configuración local no registra secretos en Google Secret Manager ni despliega funciones. El comprobador no equivale a un checkout público o una prueba de compra completa.
 
 ## Verificación realizada
 
-- `npm test --prefix alumnos-app/functions-stripe`: 25/25 (incluye OAuth Sandbox simulado, bloqueo de redirecciones y carga real del CLI con fallo cerrado sin canal protegido).
+- `npm test --prefix alumnos-app/functions-stripe`: 39/39, incluidos flujo Sandbox, reintentos, respuestas perdidas, receptor/importe/moneda, verificación oficial de firma simulada, duplicados, estados pendientes y devoluciones/reversiones. Incluye regresiones OXXO existentes.
 - `node scripts/test-checkout-i18n.js`: OK.
 - `npm run build`: OK.
 - Playwright Chromium local, `http://127.0.0.1:9000/checkout/success/`, 1440×1000 y 390×844: espera → fallo → consulta manual → confirmado. API de estado **simulada**, sin proveedores reales. Sin errores `pageerror`, sin desbordamiento horizontal. Página no vacía, identidad correcta y capturas locales revisadas. Browser plugin ausente; fallback Playwright local instalado.
-- Sin pruebas contra Stripe/PayPal reales, Firebase desplegado o envíos reales. El mock de Firestore verifica transacciones/rollback lógicos; no sustituye pruebas de concurrencia con Firestore real o emulador.
+- OAuth PayPal probado realmente; **sin compra/captura contra PayPal real de Sandbox**, sin Stripe real, Firebase desplegado o envíos reales. El mock de Firestore verifica transacciones/rollback lógicos; no sustituye pruebas de concurrencia con Firestore real o emulador.
+- Nueva ruta `/checkout/paypal-sandbox/`, deshabilitada por defecto y no conectada al checkout público. UI Chromium con API/proveedor simulados: 1440×1000 y 390×844; aprobación → retorno pendiente → confirmado, más cancelación; sin errores de página/consola ni desbordamiento horizontal. Browser plugin no disponible; fallback Playwright instalado. Capturas fuera del repositorio en `entregables/paypal-sandbox-2026-11-13/` del workspace de OpenClaw.
 
 ## Fuentes oficiales
 
