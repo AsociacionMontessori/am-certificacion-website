@@ -77,6 +77,10 @@ function createSandboxClient({clientId, clientSecret, merchantId, fetchImpl = fe
       if (!/^[A-Z0-9]{1,40}$/.test(paypalOrderId)) throw new Error("ID PayPal inválido");
       return request(`/v2/checkout/orders/${paypalOrderId}`, {method: "GET"});
     },
+    async getWebhookEvent(eventId) {
+      if (typeof eventId !== "string" || !/^[\w-]{1,100}$/.test(eventId)) throw new Error("ID de evento inválido");
+      return request(`/v1/notifications/webhooks-events/${eventId}`, {method: "GET"});
+    },
     async verifyWebhook(event, headers, webhookId) {
       if (!webhookId || !event?.id) return false;
       const fields = {auth_algo: headers["paypal-auth-algo"], cert_url: headers["paypal-cert-url"],

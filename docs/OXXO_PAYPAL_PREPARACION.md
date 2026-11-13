@@ -2,12 +2,14 @@
 
 ## Estado real
 
-Preparación en rama `feat/oxxo-paypal-preparation`, sin desplegar, activar métodos en cuentas ni crear compras reales. Las credenciales Sandbox se guardaron posteriormente mediante entrada protegida de OpenClaw; no están en este repositorio ni en Firebase.
+Preparación en rama `feat/oxxo-paypal-preparation`. **Actualización 2026-11-13:** PayPal Sandbox ya está desplegado en funciones/sitio aislados dentro del proyecto aprobado; compra de $213 MXN, captura y recibo de webhook comprobados. Conciliación posterior mediante GET de orden/evento en PayPal: nueve comprobaciones correctas. Los secretos Sandbox están protegidos en OpenClaw y Google Secret Manager, nunca en Git. Stripe/OXXO y el checkout comercial no se han desplegado ni activado como parte de esta preparación. PayPal Live permanece desconectado. [Estado y evidencia actuales](PAYPAL_SANDBOX.md).
+
+Las secciones de preparación y verificaciones iniciales más abajo conservan el contexto histórico; los pendientes de credenciales, merchant, despliegue y primera compra Sandbox ya se resolvieron según la guía enlazada.
 
 | Componente | Preparado | Falta antes de ofrecerlo |
 | --- | --- | --- |
 | OXXO, checkout público | Confirmación diferida, fallos/expiración, recibos de evento reintentables, inscripción transaccional, notificaciones idempotentes, consulta autenticada de estado y pantalla ES/EN/PT | Prueba Stripe test de extremo a extremo, revisión de cuenta, despliegue coordinado y habilitación en Dashboard |
-| PayPal | OAuth Sandbox real confirmado; endpoints aislados crear/capturar/consultar, botón de pruebas, verificación oficial de webhooks y conciliación mediante GET; pruebas automatizadas y UI simulada | Merchant ID Sandbox, webhook ID y proyecto Firebase de pruebas por definir, carga protegida de secretos en ese entorno y compra buyer/seller real de Sandbox. Cupones/envíos/mensualidades rechazados. Entrega real no conectada. No es todavía una integración pública completa |
+| PayPal | Compra/captura y recibo de webhook reales de Sandbox verificados; funciones/sitio aislados; conciliación de sólo lectura con nueve comprobaciones correctas contra PayPal | Ensayos remotos de reintentos y eventos adversos; entrega compartida con Stripe, cupones/envíos y revisión Live. Cupones/envíos/mensualidades rechazados actualmente. Entrega real no conectada; no es una integración pública completa |
 | Portal alumnos | Webhook ya diferencia pago diferido de validado; fallo no altera Pendiente/Vencido | UX de ficha/estado, bloqueo de sesiones duplicadas, expiración y pruebas; no habilitar allí todavía |
 | Suscripciones | Conservan Checkout; vinculan cliente/suscripción aun antes de confirmar, sin declarar activo un pago pendiente | OXXO no es compatible con cargos recurrentes |
 

@@ -152,3 +152,28 @@ El evento se procesó el **13/11/2026 a las 13:30:26, America/Mexico_City**. El 
 `gcloud logging read` sigue bloqueado por reautenticación de la CLI. No fue necesario cambiar su sesión ni copiar tokens: la sesión web de Firebase permitió comprobar los tres registros. No se consultó Cloud Logging por otra vía ni se afirma una comprobación independiente de su estado HTTP. No hubo cambios ni despliegues en Stripe o en el checkout comercial durante esta verificación.
 
 Las otras dos órdenes visibles de esta prueba permanecen `pendiente`, sin captura registrada: son intentos previos, no pagos adicionales confirmados en Firestore. No se borraron ni se reintentaron.
+
+### Conciliación operativa de sólo lectura (2026-11-13)
+
+Se reutiliza el adaptador oficial Orders v2 existente, sin dependencias nuevas. `paypal/reconciliation.js` compara una referencia registrada con **GET de la orden y GET del evento en PayPal Sandbox**. No crea/captura pagos, reembolsa, reenvía eventos ni lee/escribe Firestore. OAuth usa POST exclusivamente para obtener el token protegido; las consultas de negocio son GET y no siguen redirecciones.
+
+Ejecutar desde la raíz mediante **Gateway exec**, Node 24+ y el canal HTTPS protegido ya configurado; no usar el shell nativo para trasladar secretos ni cargar `.env`:
+
+```sh
+node alumnos-app/scripts/paypal-sandbox-reconcile.js \
+  --order-id e34a9eb2-82c2-47d5-84d0-e3ee5928173f \
+  --paypal-order-id 18N94638YD184945V \
+  --capture-id 8H114974TX863405N \
+  --event-id WH-8C009609RC6186535-9DK4696035792764G \
+  --amount-centavos 21300 --merchant-id S9CXXNDCV93SS
+```
+
+El CLI obtiene las credenciales Sandbox del entorno protegido sin imprimirlas. Sólo devuelve booleanos de comprobación y metadatos mínimos, nunca cuerpos PayPal, pagador, tokens ni URLs de aprobación. Salida 0: coincide la referencia; 2: requiere revisión; 1: argumentos/canal/API no disponibles. No modifica estados ni concede entrega, incluso si coincide. Una captura pendiente/reembolsada o un importe, receptor, moneda, vínculo o evento discrepantes impiden el resultado correcto; un evento completed histórico no oculta una captura actualmente reembolsada.
+
+**Ejecución real completada:** `checkedAtMs: 1794598687994`, `ok: true`, las nueve comprobaciones correctas. Se confirmó orden/identidad local, receptor, importe de orden, captura vinculada y completada, identidad/tipo del evento, captura del evento, orden del evento e importe del evento. [Resultado mínimo conservado](qa/paypal-sandbox-reconciliation-2026-11-13.json).
+
+Esta consulta compara PayPal con la referencia de Firestore verificada anteriormente; **no es una nueva lectura de Firestore**, reparación de datos ni prueba de entrega/reintento del webhook. Consultar un evento autenticado en la API tampoco sustituye verificar la firma HTTP de un webhook entrante. El recibo Firestore y la verificación de firma se comprobaron en la fase anterior.
+
+Verificación local: **48 pruebas correctas; cuatro integraciones Firestore opt-in omitidas**. Siete pruebas nuevas cubren el CLI cerrado, sólo lectura/salida mínima, discrepancias, eventos históricos frente a reembolsos/pendientes, entradas inválidas, fallo sin reintento y GET Sandbox sin redirecciones. No se cambió ni desplegó Stripe, checkout comercial o configuración Firebase.
+
+Siguiente pendiente: ensayar reenvío/duplicados y eventos adversos contra el endpoint remoto Sandbox, conservando su evidencia. Después, diseñar la entrega transaccional compartida con Stripe y resolver promociones/envíos antes de cualquier revisión Live. Las pruebas automatizadas adversas siguen siendo simuladas; no se realizaron reembolsos ni reenvíos remotos en esta fase.

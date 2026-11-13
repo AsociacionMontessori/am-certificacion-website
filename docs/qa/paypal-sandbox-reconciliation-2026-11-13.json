@@ -1,0 +1,19 @@
+{
+  "environment": "sandbox",
+  "readOnly": true,
+  "checkedAtMs": 1794598687994,
+  "comparison": "recorded_reference_not_current_firestore",
+  "ok": true,
+  "result": "coincide_referencia",
+  "checks": {
+    "orderIdentity": true,
+    "merchant": true,
+    "orderAmount": true,
+    "captureIdentity": true,
+    "captureCompleted": true,
+    "eventIdentity": true,
+    "eventCapture": true,
+    "eventOrder": true,
+    "eventAmount": true
+  }
+}
