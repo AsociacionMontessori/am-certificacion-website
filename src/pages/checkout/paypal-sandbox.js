@@ -7,7 +7,6 @@ const ENABLED = process.env.GATSBY_PAYPAL_SANDBOX_ENABLED === "true"
 function apiBase() {
   const url = new URL(API)
   if (url.username || url.password || url.search || url.hash ||
-      url.hostname === "us-central1-certificacionmontessori.cloudfunctions.net" ||
       !(url.protocol === "https:" || (url.protocol === "http:" && ["127.0.0.1", "localhost"].includes(url.hostname)))) {
     throw new Error("Configura una API de pruebas aislada.")
   }

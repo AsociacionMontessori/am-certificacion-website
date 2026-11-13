@@ -9,12 +9,14 @@ const clientSecret = defineSecret("PAYPAL_SANDBOX_CLIENT_SECRET");
 
 function sandboxConfig(env = process.env) {
   const project = env.GCLOUD_PROJECT || env.GOOGLE_CLOUD_PROJECT;
-  if (env.PAYPAL_SANDBOX_ENDPOINTS !== "true" || !project || project === "certificacionmontessori" ||
+  if (env.PAYPAL_SANDBOX_ENDPOINTS !== "true" || !project ||
+      (project === "certificacionmontessori" && env.PAYPAL_SANDBOX_SHARED_PROJECT !== project) ||
       project !== env.PAYPAL_SANDBOX_PROJECT_ID || !/^[A-Z0-9]{5,40}$/.test(env.PAYPAL_SANDBOX_MERCHANT_ID || "") ||
       !env.PAYPAL_SANDBOX_WEBHOOK_ID) throw new Error("Sandbox aislado no configurado");
   const url = new URL(env.PAYPAL_SANDBOX_RETURN_URL);
   const production = /(^|\.)certificacionmontessori\.com$/;
-  if (production.test(url.hostname) || url.username || url.password || url.search || url.hash ||
+  if (production.test(url.hostname) || ["certificacionmontessori.web.app", "certificacionmontessori.firebaseapp.com",
+      "alumnos-certificacionmontessori.web.app", "alumnos-certificacionmontessori.firebaseapp.com"].includes(url.hostname) || url.username || url.password || url.search || url.hash ||
       (url.protocol !== "https:" && !(url.protocol === "http:" && ["127.0.0.1", "localhost"].includes(url.hostname)))) {
     throw new Error("Retorno Sandbox no permitido");
   }
@@ -23,7 +25,7 @@ function sandboxConfig(env = process.env) {
 }
 function handler(action) {
   return onRequest({region: "us-central1", secrets: [clientId, clientSecret],
-    cors: false, invoker: "public", timeoutSeconds: 120}, async (req, res) => {
+    cors: false, invoker: "public", timeoutSeconds: 120, maxInstances: 2}, async (req, res) => {
     res.set("Cache-Control", "no-store");
     let config;
     try {config = sandboxConfig();} catch (_) {res.status(503).json({error: "Sandbox no configurado"}); return;}
@@ -39,7 +41,7 @@ function handler(action) {
     try {
       const db = admin.firestore();
       if (action !== "webhook" && await enforceRateLimit(db, req, res,
-        {key: `paypalSandbox-${action}`, limit: action === "status" ? 60 : 20, windowSeconds: 600})) return;
+        {collection: "paypalSandboxRateLimits", key: `paypalSandbox-${action}`, limit: action === "status" ? 60 : 20, windowSeconds: 600})) return;
       const client = createSandboxClient({clientId: clientId.value(), clientSecret: clientSecret.value(),
         merchantId: config.merchantId});
       const checkout = createCheckout({db, client, ...config});

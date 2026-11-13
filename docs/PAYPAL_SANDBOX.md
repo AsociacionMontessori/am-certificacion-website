@@ -10,14 +10,14 @@ El flujo prueba un ebook del catálogo servidor ($213 MXN) y el backend también
 
 ## Superficie
 
-Sólo con `PAYPAL_SANDBOX_ENDPOINTS=true`, `alumnos-app/functions-stripe/index.js` exporta:
+El paquete independiente `functions-paypal-sandbox` exporta únicamente cuatro funciones; las operaciones fallan cerradas salvo `PAYPAL_SANDBOX_ENDPOINTS=true`:
 
 - `createPayPalSandboxOrder`: identidad aleatoria de navegador, cotización servidor, persistencia previa e idempotencia del proveedor. Devuelve enlace de aprobación con allowlist estricta Sandbox.
 - `capturePayPalSandboxOrder`: token de orden, GET previo, comprobación de receptor/importe/MXN/vínculo antes de capturar, intento persistido, GET posterior y validación de captura completada.
 - `getPayPalSandboxStatus`: token de orden, sin PII ni respuestas del proveedor. Devuelve estado local.
 - `paypalSandboxWebhook`: verificación oficial con PayPal y el webhook ID configurado; GET de la orden vinculada y recibo transaccional por evento. Nunca confía sólo en el JSON recibido.
 
-Datos de prueba: `paypalSandboxOrders`, `paypalSandboxEvents` y `paypalSandboxCaptures`, más `rate_limits`. No escribe `ordenes`, `inscripciones`, `alumnos`, colas de correos ni entregas digitales. `entregaSimulada` es sólo un indicador en la orden de prueba, no un permiso real.
+Datos de prueba: `paypalSandboxOrders`, `paypalSandboxEvents` y `paypalSandboxCaptures`, y `paypalSandboxRateLimits`. No escribe `ordenes`, `inscripciones`, `alumnos`, colas de correos ni entregas digitales. `entregaSimulada` es sólo un indicador en la orden de prueba, no un permiso real.
 
 Los tokens aleatorios de 32 bytes se generan con Web Crypto; el servidor almacena sólo SHA-256 y vencimiento de 24 horas. El navegador los guarda en `sessionStorage` antes de la primera llamada para soportar reintentos; no van en URLs de retorno ni logs. Sólo la misma pestaña/origen puede continuar tras PayPal. Cerrar la pestaña requiere conciliación por administración; no añadir un bypass anónimo.
 
@@ -26,7 +26,7 @@ Los tokens aleatorios de 32 bytes se generan con Web Crypto; el servidor almacen
 El backend falla cerrado salvo que:
 
 - `PAYPAL_SANDBOX_ENDPOINTS=true`.
-- El proyecto efectivo (`GCLOUD_PROJECT` o `GOOGLE_CLOUD_PROJECT`) coincide con `PAYPAL_SANDBOX_PROJECT_ID` y **no** es `certificacionmontessori`.
+- El proyecto efectivo (`GCLOUD_PROJECT` o `GOOGLE_CLOUD_PROJECT`) coincide con `PAYPAL_SANDBOX_PROJECT_ID`. Si es `certificacionmontessori`, se exige además `PAYPAL_SANDBOX_SHARED_PROJECT=certificacionmontessori` (autorizado por Carlos el 2026-11-13).
 - Hay `PAYPAL_SANDBOX_MERCHANT_ID`, `PAYPAL_SANDBOX_WEBHOOK_ID` y `PAYPAL_SANDBOX_RETURN_URL` de pruebas.
 - Client ID/Secret están disponibles mediante los secretos `PAYPAL_SANDBOX_CLIENT_ID` y `PAYPAL_SANDBOX_CLIENT_SECRET` en el entorno de ejecución seleccionado.
 
@@ -36,14 +36,45 @@ Frontend de pruebas, mediante variables **de compilación**:
 
 ```
 GATSBY_PAYPAL_SANDBOX_ENABLED=true
-GATSBY_PAYPAL_SANDBOX_API_BASE_URL=https://us-central1-PROYECTO-DE-PRUEBAS.cloudfunctions.net
+GATSBY_PAYPAL_SANDBOX_API_BASE_URL=https://us-central1-certificacionmontessori.cloudfunctions.net
 ```
 
 Sin flag, la ruta muestra «Esta prueba está deshabilitada» y no ofrece botones. No se modifica el formulario comercial ni Stripe. No publicar una compilación de pruebas en hosting productivo.
 
-**No se trasladaron secretos** desde OpenClaw a Google Secret Manager ni se cambió configuración Firebase. Carlos proporcionó el Merchant ID del seller Sandbox el 2026-11-13; su formato es válido, pero su asociación con la aplicación todavía no se ha verificado mediante una orden real. No volver a pedir el identificador ni las credenciales ya suministradas. La consulta Firebase se repitió ese día: no hay proyecto inequívocamente etiquetado como Sandbox. No reutilizar otro proyecto por su nombre parecido ni crear recursos con facturación sin acordar destino/costo. Para la siguiente compra falta resolver el entorno aislado; después registrar el webhook de ese entorno y cargar secretos por un mecanismo protegido, sin imprimir/copiar valores al chat, repositorio o `.env`.
+## Destino aprobado y despliegue independiente (2026-11-13)
 
-Si se prueba un despliegue, limitar explícitamente `functions:stripe:createPayPalSandboxOrder`, `functions:stripe:capturePayPalSandboxOrder`, `functions:stripe:getPayPalSandboxStatus` y `functions:stripe:paypalSandboxWebhook`, con `--project` del proyecto aislado. No desplegar todo el codebase: también contiene triggers de negocio y otros servicios ajenos a estas pruebas.
+Carlos autorizó usar **certificacionmontessori** con pruebas separadas, sin modificar Stripe ni el checkout público. La guarda compartida requiere coincidencia explícita del proyecto; no basta con un booleano. El retorno sigue prohibiendo el dominio comercial, sus subdominios y los dos sitios Firebase Hosting comerciales (`*.web.app` / `*.firebaseapp.com` exactos). Debe prepararse un origen de pruebas HTTPS independiente; no se ha creado ni publicado un sitio nuevo.
+
+Paquete Firebase independiente, código fuente compartido por allowlist sin copiar `.env`, handlers Stripe ni triggers de negocio:
+
+```sh
+node alumnos-app/scripts/prepare-paypal-sandbox.cjs
+cd alumnos-app/functions-paypal-sandbox
+npm ci --ignore-scripts
+cd ..
+firebase deploy --config firebase.paypal-sandbox.json --project certificacionmontessori \
+  --only functions:paypal-sandbox:createPayPalSandboxOrder,functions:paypal-sandbox:capturePayPalSandboxOrder,functions:paypal-sandbox:getPayPalSandboxStatus,functions:paypal-sandbox:paypalSandboxWebhook \
+  --non-interactive
+```
+
+`firebase.paypal-sandbox.json` es nuevo: no modifica `firebase.json` ni los sitios existentes. El índice Stripe ya no exporta PayPal. Máximo dos instancias por función Sandbox; no reserva instancias mínimas. Usa límites separados `paypalSandboxRateLimits`; Stripe conserva `rate_limits`. Los paquetes generados están ignorados por Git. La preparación no publica nada.
+
+Configuración **no secreta** que deberá cargarse sólo en el paquete generado, nunca en el código Stripe:
+
+```
+PAYPAL_SANDBOX_ENDPOINTS=true
+PAYPAL_SANDBOX_PROJECT_ID=certificacionmontessori
+PAYPAL_SANDBOX_SHARED_PROJECT=certificacionmontessori
+PAYPAL_SANDBOX_MERCHANT_ID=<seller Sandbox ya suministrado>
+PAYPAL_SANDBOX_WEBHOOK_ID=<webhook real de esta app Sandbox>
+PAYPAL_SANDBOX_RETURN_URL=https://<origen-de-pruebas>/checkout/paypal-sandbox/
+```
+
+**Bloqueo confirmado:** Google Secret Manager no contiene `PAYPAL_SANDBOX_CLIENT_ID` ni `PAYPAL_SANDBOX_CLIENT_SECRET` (consulta de metadatos, no lectura de valores). Los dos secretos existentes de OpenClaw están vinculados exclusivamente a `api-m.sandbox.paypal.com`. Ese consumidor sólo sustituye en tráfico HTTPS a PayPal; no entrega texto plano al CLI ni puede codificar valores para una versión de Google Secret Manager. No extraerlos ni copiar sentinels al despliegue.
+
+Para desbloquear, Carlos debe cargar esos dos valores directamente mediante la entrada protegida de [Google Secret Manager del proyecto](https://console.cloud.google.com/security/secret-manager?project=certificacionmontessori), usando sus nombres exactos. No enviarlos al chat ni guardarlos en `.env`. Esto no requiere cambiar Stripe ni la facturación. Después verificar sólo metadatos y el acceso del runtime, preparar el origen de pruebas, registrar/reconciliar un único webhook de la aplicación PayPal Sandbox y aplicar el despliegue acotado. El Merchant ID ya fue proporcionado: no volver a pedirlo. Su asociación se verificará con una orden real.
+
+No se intentó un despliegue incompleto, no se crearon colecciones remotas y no se hizo una compra Sandbox. Las credenciales protegidas actuales se conservaron intactas.
 
 Eventos de webhook Sandbox: `PAYMENT.CAPTURE.COMPLETED`, `PAYMENT.CAPTURE.PENDING`, `PAYMENT.CAPTURE.DENIED`, `PAYMENT.CAPTURE.DECLINED`, `PAYMENT.CAPTURE.REFUNDED` y `PAYMENT.CAPTURE.REVERSED`. Aprobar una orden no es pagar. El webhook guarda recibo sólo al aplicar la transacción. Reembolsos (incluidos parciales) quedan en `revision`, reversión/denegación bloquean entrega simulada. Un evento completed tardío no revive esos estados; una devolución detectada por GET también bloquea aunque falte webhook.
 
@@ -58,7 +89,7 @@ Eventos de webhook Sandbox: `PAYMENT.CAPTURE.COMPLETED`, `PAYMENT.CAPTURE.PENDIN
 
 ## Verificación
 
-- `npm test --prefix alumnos-app/functions-stripe`: 39 pruebas correctas, API/proveedor/Firestore simulados.
+- `npm test --prefix alumnos-app/functions-stripe`: 41 pruebas unitarias, incluyendo guardas de proyecto compartido, separación de rate limits y exportaciones del paquete; cuatro pruebas de integración opt-in adicionales.
 - `npm run build` con flags Sandbox para QA local; compilación normal adicional con flags ausentes para verificar que queda apagado.
 - Chromium local en `http://127.0.0.1:9000/checkout/paypal-sandbox/`, API y navegación PayPal interceptadas: 1440×1000 y 390×844. Compra → aprobación simulada → retorno pendiente → consulta confirmada; cancelación sin captura adicional. Identidad/título correctos, contenido visible, sin overlay/errores de página/consola ni overflow. Capturas revisadas fuera del repo. Browser plugin ausente; se usó Playwright instalado.
 

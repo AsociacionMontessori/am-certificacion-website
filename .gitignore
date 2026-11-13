@@ -80,3 +80,6 @@ output/
 
 # Isolated feature worktrees
 .worktrees/
+
+# Generated isolated PayPal deployment package
+alumnos-app/functions-paypal-sandbox/

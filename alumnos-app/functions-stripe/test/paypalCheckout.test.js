@@ -137,10 +137,19 @@ test("snapshot reembolsado bloquea aun sin webhook; captura inválida no acredit
   g.remote.purchase_units[0].payments.captures[0].amount.currency_code = "USD";
   await assert.rejects(g.checkout.capture(body)); assert.notEqual(g.saved().estado, "pagado");
 });
-test("guard de entorno impide proyecto productivo y retorno a producción", () => {
+test("guard exige opt-in compartido y prohíbe retorno a producción", () => {
   const env = {PAYPAL_SANDBOX_ENDPOINTS: "true", GCLOUD_PROJECT: "test-isolated", PAYPAL_SANDBOX_PROJECT_ID: "test-isolated",
     PAYPAL_SANDBOX_MERCHANT_ID: "MERCHANT", PAYPAL_SANDBOX_WEBHOOK_ID: "WH", PAYPAL_SANDBOX_RETURN_URL: "http://127.0.0.1:9000/checkout/paypal-sandbox/"};
   assert.equal(sandboxConfig(env).origin, "http://127.0.0.1:9000");
+  const shared = {...env, GCLOUD_PROJECT: "certificacionmontessori", PAYPAL_SANDBOX_PROJECT_ID: "certificacionmontessori"};
+  assert.throws(() => sandboxConfig(shared));
+  assert.throws(() => sandboxConfig({...shared, PAYPAL_SANDBOX_SHARED_PROJECT: "true"}));
+  assert.equal(sandboxConfig({...shared, PAYPAL_SANDBOX_SHARED_PROJECT: "certificacionmontessori"}).origin,
+    "http://127.0.0.1:9000");
+  for (const host of ["certificacionmontessori.web.app", "certificacionmontessori.firebaseapp.com",
+    "alumnos-certificacionmontessori.web.app", "alumnos-certificacionmontessori.firebaseapp.com"]) {
+    assert.throws(() => sandboxConfig({...env, PAYPAL_SANDBOX_RETURN_URL: `https://${host}/checkout/paypal-sandbox/`}));
+  }
   for (const change of [{PAYPAL_SANDBOX_ENDPOINTS: "false"}, {GCLOUD_PROJECT: "certificacionmontessori"},
     {PAYPAL_SANDBOX_MERCHANT_ID: ""}, {PAYPAL_SANDBOX_WEBHOOK_ID: ""},
     {PAYPAL_SANDBOX_RETURN_URL: "https://certificacionmontessori.com/checkout/paypal-sandbox/"}]) {

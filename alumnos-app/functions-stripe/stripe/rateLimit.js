@@ -28,7 +28,7 @@ function getRateLimitFingerprint(req) {
  * @param {import("firebase-admin").firestore.Firestore} db
  * @param {import("firebase-functions/v2/https").Request} req
  * @param {import("firebase-functions/v2/https").Response} res
- * @param {{key: string, limit: number, windowSeconds?: number}} options
+ * @param {{key: string, limit: number, windowSeconds?: number, collection?: string}} options
  * @return {Promise<boolean>} true when the request was rejected
  */
 async function enforceRateLimit(db, req, res, options) {
@@ -39,7 +39,7 @@ async function enforceRateLimit(db, req, res, options) {
   const windowStart = Math.floor(nowSeconds / windowSeconds) * windowSeconds;
   const retryAfter = Math.max(1, windowStart + windowSeconds - nowSeconds);
   const fingerprint = getRateLimitFingerprint(req);
-  const ref = db.collection("rate_limits").doc(`${key}_${windowStart}_${fingerprint}`);
+  const ref = db.collection(options.collection || "rate_limits").doc(`${key}_${windowStart}_${fingerprint}`);
 
   const allowed = await db.runTransaction(async (tx) => {
     const snap = await tx.get(ref);

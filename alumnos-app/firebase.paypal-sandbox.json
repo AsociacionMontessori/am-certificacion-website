@@ -1,0 +1,15 @@
+{
+  "functions": [
+    {
+      "source": "functions-paypal-sandbox",
+      "codebase": "paypal-sandbox",
+      "runtime": "nodejs22",
+      "ignore": [
+        "node_modules",
+        ".git",
+        "*.log",
+        ".env*"
+      ]
+    }
+  ]
+}

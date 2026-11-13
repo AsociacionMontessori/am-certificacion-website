@@ -46,12 +46,3 @@ exports.verificarCertificadoPublico = verificarCertificadoPublicoHandler;
 exports.syncAlumnoToSheets = syncAlumnoToSheetsTrigger;
 exports.syncInscripcionToSheets = syncInscripcionToSheetsTrigger;
 exports.getCheckoutPaymentStatus = require("./stripe/getCheckoutPaymentStatus").getCheckoutPaymentStatusHandler;
-
-// Explicit opt-in for a SEPARATE Firebase test project. Never enabled by default.
-if (process.env.PAYPAL_SANDBOX_ENDPOINTS === "true") {
-  const sandbox = require("./paypal/functions");
-  exports.createPayPalSandboxOrder = sandbox.createPayPalSandboxOrder;
-  exports.capturePayPalSandboxOrder = sandbox.capturePayPalSandboxOrder;
-  exports.getPayPalSandboxStatus = sandbox.getPayPalSandboxStatus;
-  exports.paypalSandboxWebhook = sandbox.paypalSandboxWebhook;
-}
