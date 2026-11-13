@@ -1,6 +1,28 @@
 /** PayPal Orders v2 preparation. Not exported as a Cloud Function; sandbox only. */
 const BASE = "https://api-m.sandbox.paypal.com";
 
+async function authenticateSandbox({clientId, clientSecret, fetchImpl = fetch}) {
+  if (!clientId || !clientSecret) throw new Error("Falta configuración PayPal sandbox");
+  const auth = await fetchImpl(`${BASE}/v1/oauth2/token`, {
+    method: "POST", signal: AbortSignal.timeout(15000), redirect: "error",
+    headers: {Authorization: `Basic ${Buffer.from(`${clientId}:${clientSecret}`).toString("base64")}`,
+      "Content-Type": "application/x-www-form-urlencoded"},
+    body: "grant_type=client_credentials",
+  });
+  if (!auth.ok) throw new Error(`No se pudo autenticar PayPal sandbox (HTTP ${auth.status})`);
+  const data = await auth.json();
+  if (typeof data.access_token !== "string" || !data.access_token) {
+    throw new Error("Autenticación PayPal incompleta");
+  }
+  return data.access_token;
+}
+
+/** Connectivity probe: deliberately returns no credential, token or provider body. */
+async function checkSandboxConnection(options) {
+  await authenticateSandbox(options);
+  return {ok: true, environment: "sandbox"};
+}
+
 function validateCapture(order, expected) {
   const units = order?.purchase_units;
   if (order?.id !== expected.paypalOrderId || order.status !== "COMPLETED" ||
@@ -21,17 +43,9 @@ function createSandboxClient({clientId, clientSecret, merchantId, fetchImpl = fe
   if (!clientId || !clientSecret || !merchantId) throw new Error("Falta configuración PayPal sandbox");
   async function request(path, {body, requestId} = {}) {
     // Tokens stay in this call; never returned or logged. No automatic retry of captures.
-    const auth = await fetchImpl(`${BASE}/v1/oauth2/token`, {
-      method: "POST", signal: AbortSignal.timeout(15000),
-      headers: {Authorization: `Basic ${Buffer.from(`${clientId}:${clientSecret}`).toString("base64")}`,
-        "Content-Type": "application/x-www-form-urlencoded"},
-      body: "grant_type=client_credentials",
-    });
-    if (!auth.ok) throw new Error("No se pudo autenticar PayPal sandbox");
-    const token = (await auth.json()).access_token;
-    if (!token) throw new Error("Autenticación PayPal incompleta");
+    const token = await authenticateSandbox({clientId, clientSecret, fetchImpl});
     const response = await fetchImpl(`${BASE}${path}`, {
-      method: "POST", signal: AbortSignal.timeout(20000),
+      method: "POST", signal: AbortSignal.timeout(20000), redirect: "error",
       headers: {Authorization: `Bearer ${token}`, "Content-Type": "application/json",
         ...(requestId ? {"PayPal-Request-Id": requestId, Prefer: "return=representation"} : {})},
       body: JSON.stringify(body),
@@ -65,4 +79,4 @@ function createSandboxClient({clientId, clientSecret, merchantId, fetchImpl = fe
     },
   };
 }
-module.exports = {createSandboxClient, validateCapture};
+module.exports = {createSandboxClient, validateCapture, checkSandboxConnection};

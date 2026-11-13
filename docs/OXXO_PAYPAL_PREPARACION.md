@@ -2,12 +2,12 @@
 
 ## Estado real
 
-Preparación local en rama `feat/oxxo-paypal-preparation`, sin desplegar, activar métodos en cuentas, crear compras reales ni modificar secretos.
+Preparación en rama `feat/oxxo-paypal-preparation`, sin desplegar, activar métodos en cuentas ni crear compras reales. Las credenciales Sandbox se guardaron posteriormente mediante entrada protegida de OpenClaw; no están en este repositorio ni en Firebase.
 
 | Componente | Preparado | Falta antes de ofrecerlo |
 | --- | --- | --- |
 | OXXO, checkout público | Confirmación diferida, fallos/expiración, recibos de evento reintentables, inscripción transaccional, notificaciones idempotentes, consulta autenticada de estado y pantalla ES/EN/PT | Prueba Stripe test de extremo a extremo, revisión de cuenta, despliegue coordinado y habilitación en Dashboard |
-| PayPal | Adaptador **sólo sandbox** Orders v2 para crear/capturar, claves idempotentes, comprobación de captura/importe/MXN/orden/beneficiario | Cuenta Business y app sandbox; endpoints públicos autenticados, catálogo/precios/promociones/envío del servidor, botón, webhooks verificados, conciliación y pruebas sandbox. No es todavía una integración pública completa |
+| PayPal | Cuenta Business y Default Application Sandbox confirmadas por Carlos; credenciales protegidas; adaptador Orders v2 y comprobador OAuth sin exposición de tokens | Validación OAuth real pendiente de aplicar canal protegido; merchant ID de pruebas; endpoints públicos autenticados, catálogo/precios/promociones/envío del servidor, botón, webhooks verificados, conciliación y pruebas sandbox. No es todavía una integración pública completa |
 | Portal alumnos | Webhook ya diferencia pago diferido de validado; fallo no altera Pendiente/Vencido | UX de ficha/estado, bloqueo de sesiones duplicadas, expiración y pruebas; no habilitar allí todavía |
 | Suscripciones | Conservan Checkout; vinculan cliente/suscripción aun antes de confirmar, sin declarar activo un pago pendiente | OXXO no es compatible con cargos recurrentes |
 
@@ -37,8 +37,8 @@ Rollback: deshabilitar OXXO para **nuevas** compras en Dashboard, pero mantener 
 
 ## Preparación PayPal (siguiente fase)
 
-- Confirmar con Carlos que su cuenta es Business y que recibe pagos comerciales en MXN; revisar comisiones, retenciones y receptor. Sin asumir que PayPal se procesa dentro del Stripe mexicano.
-- Crear app sandbox en PayPal Developer. Client ID/secret y merchant ID mediante entrada segura/gestor de secretos; nunca chat, Git o variables `GATSBY_*` para secretos. Esta fase no leyó ni creó credenciales.
+- Carlos confirmó cuenta Business y la app automática Default Application en Sandbox. Aún hay que revisar recepción en MXN, comisiones, retenciones y receptor; no asumir que PayPal se procesa dentro del Stripe mexicano.
+- Client ID/Secret se guardaron mediante entrada protegida de OpenClaw como `PAYPAL_SANDBOX_CLIENT_ID` y `PAYPAL_SANDBOX_CLIENT_SECRET`, ligados sólo a `api-m.sandbox.paypal.com`. No se leyeron valores ni se copiaron a Git, Firebase o archivos `.env`. El merchant ID Sandbox sigue pendiente.
 - Se eligió Orders v2 oficial con `fetch` nativo, sin dependencia adicional; no se construye un procesador propio. Adaptador inyectable para pruebas y host sandbox fijo.
 - `paypal/sandbox.js` no se exporta en `index.js`, no puede apuntar a live, no escribe en Firestore y **no se debe conectar directamente a req.body**. El padre debe resolver catálogo, monto, promociones, envío y beneficiario desde servidor y guardar orden antes de contactar PayPal.
 - Implementar crear/capturar con token de orden, CORS, rate limit y claves `PayPal-Request-Id` persistidas. `APPROVED`, redirección exitosa o captura `PENDING` no equivalen a pago. Validar también orden vinculada, importe, MXN y merchant ID, como hace el adaptador.
@@ -46,9 +46,16 @@ Rollback: deshabilitar OXXO para **nuevas** compras en Dashboard, pero mantener 
 - Añadir webhook con verificación oficial de firma y recibos idempotentes; compartir la entrega transaccional entre PayPal/Stripe sin falsificar sesiones Stripe. Cubrir captura completada, pendiente/denegada, reembolso y reversión; aprobación sola nunca libera libros ni cuentas.
 - Añadir selector/botón real, URL allowlist PayPal y retorno por estado local verificado, no por parámetros del navegador. Probar sandbox buyer/seller, cancelación, doble clic, red interrumpida, montos distintos y webhook retrasado antes de preparar live.
 
+### Comprobación de conexión protegida
+
+- `checkSandboxConnection` usa el mismo OAuth que el adaptador y devuelve únicamente `{ok: true, environment: "sandbox"}`; no crea órdenes, captura pagos, devuelve tokens ni sigue redirecciones.
+- Ejecutar `node alumnos-app/scripts/paypal-sandbox-check.js` desde la raíz mediante **Gateway exec**, con Node 24+ y el canal HTTPS protegido de OpenClaw activo. El shell nativo no recibe esos secretos; no sustituir por credenciales en argumentos o archivos.
+- La primera ejecución se detuvo localmente antes de contactar PayPal: el proxy protegido estaba desactivado. Se habilitó y validó la opción oficial, con reinicio controlado solicitado. La ejecución posterior sigue fallando cerrada; la autenticación **no está validada** todavía. Retomar desde un turno nuevo después de aplicar el reinicio, sin pedir las credenciales otra vez.
+- Esta configuración local no registra secretos en Google Secret Manager ni despliega funciones. El comprobador no equivale a un checkout público o una prueba de compra completa.
+
 ## Verificación realizada
 
-- `npm test --prefix alumnos-app/functions-stripe`: 21/21 (10 existentes, 11 nuevas).
+- `npm test --prefix alumnos-app/functions-stripe`: 25/25 (incluye OAuth Sandbox simulado, bloqueo de redirecciones y carga real del CLI con fallo cerrado sin canal protegido).
 - `node scripts/test-checkout-i18n.js`: OK.
 - `npm run build`: OK.
 - Playwright Chromium local, `http://127.0.0.1:9000/checkout/success/`, 1440×1000 y 390×844: espera → fallo → consulta manual → confirmado. API de estado **simulada**, sin proveedores reales. Sin errores `pageerror`, sin desbordamiento horizontal. Página no vacía, identidad correcta y capturas locales revisadas. Browser plugin ausente; fallback Playwright local instalado.
